@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Permet de déclencher manuellement depuis l’interface GitHub
+  workflow_dispatch: # Permet un déclenchement manuel
 
 jobs:
   deploy:
@@ -12,11 +12,9 @@ jobs:
     environment: VIMAIZ
 
     steps:
-      # Étape 1 : Récupérer le code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Étape 2 : Déployer via SSH sur le VPS
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -25,35 +23,47 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            set -e
             echo "🔹 Déploiement commencé : $(date)"
             cd /var/www/vimaiz
 
-            # Mise à jour du code
             git fetch origin main
             LOCAL=$(git rev-parse HEAD)
             REMOTE=$(git rev-parse origin/main)
+
             if [ "$LOCAL" != "$REMOTE" ]; then
               echo "🔹 Nouveau commit détecté, mise à jour du code..."
               git reset --hard origin/main
 
-              # Installation des dépendances PHP
-              echo "🔹 Installation / mise à jour des dépendances PHP"
-              composer install --no-dev --optimize-autoloader
+              # Installer dépendances PHP uniquement si composer.lock a changé
+              if git diff --name-only HEAD~1 HEAD | grep -q 'composer.lock'; then
+                echo "🔹 Composer.lock changé, installation des dépendances PHP"
+                composer install --no-dev --optimize-autoloader
+              else
+                echo "⚠️ Aucun changement dans composer.lock, installation PHP ignorée"
+              fi
 
               # Migration base de données
+              echo "🔹 Exécution des migrations"
               php artisan migrate --force
 
               # Clear / Cache config, routes, views
+              echo "🔹 Cache configuration, routes et vues"
               php artisan config:cache
               php artisan route:cache
               php artisan view:cache
 
-              # Build front React/Vite
-              echo "🔹 Build front React/Vite"
-              npm ci
-              npm run build
+              # Installer et build front uniquement si package.json ou package-lock.json ont changé
+              if git diff --name-only HEAD~1 HEAD | grep -E 'package(-lock)?\.json'; then
+                echo "🔹 Changement détecté côté front, installation npm et build"
+                npm ci
+                npm run build
+              else
+                echo "⚠️ Aucun changement dans le front, build ignoré"
+              fi
 
-              # Redémarrage services si nécessaire
+              # Redémarrage services
+              echo "🔹 Redémarrage PHP-FPM et queue"
               sudo systemctl restart php8.4-fpm
               php artisan queue:restart || true
 
