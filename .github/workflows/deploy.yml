@@ -23,19 +23,24 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            set -e
+            # 🔹 Exit immediately on errors + afficher chaque commande
+            set -ex
+
             echo "🔹 Déploiement commencé : $(date)"
             cd /var/www/vimaiz
 
-            # Vérification commit
-            echo "🔹 Checking new commits..."
+            # 🔹 Vérification des commits
+            echo "🔹 Vérification des commits"
             git fetch origin main
 
             LOCAL=$(git rev-parse HEAD)
             REMOTE=$(git rev-parse origin/main)
 
+            echo "LOCAL HEAD: $LOCAL"
+            echo "REMOTE HEAD: $REMOTE"
+
             if [ "$LOCAL" != "$REMOTE" ]; then
-              echo "🔹 Nouveau commit détecté → mise à jour"
+              echo "🔹 Nouveau commit détecté → pull et mise à jour"
               git reset --hard origin/main
 
               # ---- PHP / Composer ----
@@ -43,7 +48,7 @@ jobs:
               composer install --no-dev --optimize-autoloader
 
               # ---- Laravel ----
-              echo "🔹 Migrations & optimisation Laravel"
+              echo "🔹 Exécution des migrations et optimisation"
               php artisan migrate --force
               php artisan optimize
 
@@ -52,8 +57,8 @@ jobs:
               npm ci
               npm run build
 
-              # ---- Restart services ----
-              echo "🔹 Restart PHP-FPM"
+              # ---- Redémarrage services ----
+              echo "🔹 Redémarrage PHP-FPM et queues"
               sudo systemctl restart php8.4-fpm
               php artisan queue:restart || true
 
@@ -61,4 +66,3 @@ jobs:
             else
               echo "⚠️ Aucun nouveau commit → déploiement ignoré"
             fi
-                
