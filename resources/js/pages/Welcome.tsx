@@ -157,7 +157,7 @@ export default function Accueil({ canLogin, canRegister }: Props) {
                         </div>
 
                         <h1 className="mb-6 text-4xl leading-tight font-extrabold text-white md:text-6xl">
-                            ça marche !!!!!!!!
+                         VIMAIZ!!!!!!!!
                             <span className="bg-gradient-to-r from-neutral-200 via-neutral-400 to-neutral-200 bg-clip-text text-transparent">
                                 'Art du Nettoyage
                             </span>
