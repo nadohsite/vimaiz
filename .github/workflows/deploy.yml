@@ -66,5 +66,5 @@ jobs:
 
               echo "✅ Déploiement terminé : $(date)"
             else
-              echo "⚠️ Aucun nouveau commit → déploiement ignoré"
+              echo "⚠️ Aucun nouveau committ → déploiement ignoré"
             fi
