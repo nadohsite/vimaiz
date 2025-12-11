@@ -1,0 +1,66 @@
+name: CI/CD Laravel + React Optimized
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: VIMAIZ
+
+    steps:
+      # Étape 1 : Récupérer le code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Étape 2 : Déployer via SSH sur le VPS
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            echo "🔹 Déploiement commencé : $(date)"
+            cd /var/www/vimaiz
+
+            # Mise à jour du code
+            git fetch origin main
+            LOCAL=$(git rev-parse HEAD)
+            REMOTE=$(git rev-parse origin/main)
+            if [ $LOCAL != $REMOTE ]; then
+              echo "🔹 Nouveau commit détecté, mise à jour du code..."
+              git reset --hard origin/main
+
+              # Installation des dépendances PHP seulement si composer.lock a changé
+              if [ -f composer.lock ]; then
+                echo "🔹 Installation / mise à jour des dépendances PHP"
+                composer install --no-dev --optimize-autoloader
+              fi
+
+              # Migration base de données
+              php artisan migrate --force
+
+              # Clear / Cache config, routes, views
+              php artisan config:cache
+              php artisan route:cache
+              php artisan view:cache
+
+              # Build front React/Vite seulement si package.json a changé
+              if [ -f package-lock.json ]; then
+                echo "🔹 Build front React/Vite"
+                npm ci
+                npm run build
+              fi
+
+              # Redémarrage services si nécessaire
+              sudo systemctl restart php8.4-fpm
+              php artisan queue:restart || true
+
+              echo "✅ Déploiement terminé : $(date)"
+            else
+              echo "⚠️ Pas de nouveau commit, aucun déploiement nécessaire"
+            fi
