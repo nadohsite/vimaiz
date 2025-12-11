@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Permet un déclenchement manuel
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -27,47 +27,49 @@ jobs:
             echo "🔹 Déploiement commencé : $(date)"
             cd /var/www/vimaiz
 
+            # Récupération du dernier commit remote
+            echo "🔹 Checking new commits..."
             git fetch origin main
+
             LOCAL=$(git rev-parse HEAD)
             REMOTE=$(git rev-parse origin/main)
 
             if [ "$LOCAL" != "$REMOTE" ]; then
-              echo "🔹 Nouveau commit détecté, mise à jour du code..."
+              echo "🔹 Nouveau commit détecté, pull..."
               git reset --hard origin/main
 
-              # Installer dépendances PHP uniquement si composer.lock a changé
-              if git diff --name-only HEAD~1 HEAD | grep -q 'composer.lock'; then
-                echo "🔹 Composer.lock changé, installation des dépendances PHP"
+              echo "🔹 Détection des fichiers modifiés..."
+              CHANGED_FILES=$(git diff --name-only $LOCAL $REMOTE)
+
+              # ---- Composer ----
+              if echo "$CHANGED_FILES" | grep -q "composer.lock"; then
+                echo "🔹 Composer.lock changé → composer install"
                 composer install --no-dev --optimize-autoloader
               else
-                echo "⚠️ Aucun changement dans composer.lock, installation PHP ignorée"
+                echo "⚠️ Aucun changement PHP → composer ignoré"
               fi
 
-              # Migration base de données
-              echo "🔹 Exécution des migrations"
+              # ---- Laravel ----
+              echo "🔹 Migrations & cache Laravel"
               php artisan migrate --force
+              php artisan optimize
 
-              # Clear / Cache config, routes, views
-              echo "🔹 Cache configuration, routes et vues"
-              php artisan config:cache
-              php artisan route:cache
-              php artisan view:cache
-
-              # Installer et build front uniquement si package.json ou package-lock.json ont changé
-              if git diff --name-only HEAD~1 HEAD | grep -E 'package(-lock)?\.json'; then
-                echo "🔹 Changement détecté côté front, installation npm et build"
+              # ---- NPM/Vite ----
+              if echo "$CHANGED_FILES" | grep -Eq "package.json|package-lock.json|resources"; then
+                echo "🔹 Changement détecté dans le front → npm ci + build"
                 npm ci
                 npm run build
               else
-                echo "⚠️ Aucun changement dans le front, build ignoré"
+                echo "⚠️ Aucun changement front → build ignoré"
               fi
 
-              # Redémarrage services
-              echo "🔹 Redémarrage PHP-FPM et queue"
+              # ---- Services ----
+              echo "🔹 Restart PHP-FPM"
               sudo systemctl restart php8.4-fpm
+
               php artisan queue:restart || true
 
               echo "✅ Déploiement terminé : $(date)"
             else
-              echo "⚠️ Pas de nouveau commit, aucun déploiement nécessaire"
+              echo "⚠️ Pas de nouveau commit → rien à déployer"
             fi
