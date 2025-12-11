@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Permet de déclencher manuellement depuis l’interface GitHub
 
 jobs:
   deploy:
@@ -31,15 +32,13 @@ jobs:
             git fetch origin main
             LOCAL=$(git rev-parse HEAD)
             REMOTE=$(git rev-parse origin/main)
-            if [ $LOCAL != $REMOTE ]; then
+            if [ "$LOCAL" != "$REMOTE" ]; then
               echo "🔹 Nouveau commit détecté, mise à jour du code..."
               git reset --hard origin/main
 
-              # Installation des dépendances PHP seulement si composer.lock a changé
-              if [ -f composer.lock ]; then
-                echo "🔹 Installation / mise à jour des dépendances PHP"
-                composer install --no-dev --optimize-autoloader
-              fi
+              # Installation des dépendances PHP
+              echo "🔹 Installation / mise à jour des dépendances PHP"
+              composer install --no-dev --optimize-autoloader
 
               # Migration base de données
               php artisan migrate --force
@@ -49,12 +48,10 @@ jobs:
               php artisan route:cache
               php artisan view:cache
 
-              # Build front React/Vite seulement si package.json a changé
-              if [ -f package-lock.json ]; then
-                echo "🔹 Build front React/Vite"
-                npm ci
-                npm run build
-              fi
+              # Build front React/Vite
+              echo "🔹 Build front React/Vite"
+              npm ci
+              npm run build
 
               # Redémarrage services si nécessaire
               sudo systemctl restart php8.4-fpm
