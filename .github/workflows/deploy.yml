@@ -27,7 +27,7 @@ jobs:
             echo "🔹 Déploiement commencé : $(date)"
             cd /var/www/vimaiz
 
-            # Récupération du dernier commit remote
+            # Vérification commit
             echo "🔹 Checking new commits..."
             git fetch origin main
 
@@ -35,41 +35,30 @@ jobs:
             REMOTE=$(git rev-parse origin/main)
 
             if [ "$LOCAL" != "$REMOTE" ]; then
-              echo "🔹 Nouveau commit détecté, pull..."
+              echo "🔹 Nouveau commit détecté → mise à jour"
               git reset --hard origin/main
 
-              echo "🔹 Détection des fichiers modifiés..."
-              CHANGED_FILES=$(git diff --name-only $LOCAL $REMOTE)
-
-              # ---- Composer ----
-              if echo "$CHANGED_FILES" | grep -q "composer.lock"; then
-                echo "🔹 Composer.lock changé → composer install"
-                composer install --no-dev --optimize-autoloader
-              else
-                echo "⚠️ Aucun changement PHP → composer ignoré"
-              fi
+              # ---- PHP / Composer ----
+              echo "🔹 Installation des dépendances PHP"
+              composer install --no-dev --optimize-autoloader
 
               # ---- Laravel ----
-              echo "🔹 Migrations & cache Laravel"
+              echo "🔹 Migrations & optimisation Laravel"
               php artisan migrate --force
               php artisan optimize
 
-              # ---- NPM/Vite ----
-              if echo "$CHANGED_FILES" | grep -Eq "package.json|package-lock.json|resources"; then
-                echo "🔹 Changement détecté dans le front → npm ci + build"
-                npm ci
-                npm run build
-              else
-                echo "⚠️ Aucun changement front → build ignoré"
-              fi
+              # ---- NPM / React / Vite ----
+              echo "🔹 Installation et build du front"
+              npm ci
+              npm run build
 
-              # ---- Services ----
+              # ---- Restart services ----
               echo "🔹 Restart PHP-FPM"
               sudo systemctl restart php8.4-fpm
-
               php artisan queue:restart || true
 
               echo "✅ Déploiement terminé : $(date)"
             else
-              echo "⚠️ Pas de nouveau committ → rien à déployer"
+              echo "⚠️ Aucun nouveau commit → déploiement ignoré"
             fi
+                
