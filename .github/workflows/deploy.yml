@@ -26,13 +26,15 @@ jobs:
             # 🔹 Exit immediately on errors + afficher chaque commande
             set -ex
 
+            # 🔹 Ajouter Composer au PATH
+            export PATH="$PATH:/home/ubuntu/.config/herd-lite/bin"
+
             echo "🔹 Déploiement commencé : $(date)"
             cd /var/www/vimaiz
 
             # 🔹 Vérification des commits
             echo "🔹 Vérification des commits"
             git fetch origin main
-
             LOCAL=$(git rev-parse HEAD)
             REMOTE=$(git rev-parse origin/main)
 
