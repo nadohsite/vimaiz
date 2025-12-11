@@ -3,6 +3,7 @@ import {
     PrimaryButton,
     SecondaryButton,
 } from '@/components/ui/buttons';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Head, Link } from '@inertiajs/react';
 import {
     Calendar,
@@ -153,21 +154,18 @@ export default function Accueil({ canLogin, canRegister }: Props) {
                                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-60" />
                                 <span className="relative inline-flex h-2 w-2 rounded-full bg-neutral-200" />
                             </span>
-                            Marketplace de Nettoyage • Confiance & Qualité
+                            <Skeleton className="h-6 w-64 rounded-full bg-white/20" />
                         </div>
 
-                        <h1 className="mb-6 text-4xl leading-tight font-extrabold text-white md:text-6xl">
-                         BIENTOT DISPONIBLE
-                            <span className="bg-gradient-to-r from-neutral-200 via-neutral-400 to-neutral-200 bg-clip-text text-transparent">
-                                'Art du Nettoyage
-                            </span>
-                        </h1>
+                        <div className="mb-6 flex flex-col items-center gap-4">
+                            <Skeleton className="h-12 w-3/4 bg-white/20 md:h-16" />
+                            <Skeleton className="h-12 w-1/2 bg-white/20 md:h-16" />
+                        </div>
 
-                        <p className="mx-auto mb-8 max-w-2xl text-lg text-neutral-200">
-                            Connectez-vous avec des professionnels vérifiés,
-                            assurés et évalués — réservation simple, résultats
-                            premium.
-                        </p>
+                        <div className="mx-auto mb-8 flex max-w-2xl flex-col items-center gap-2">
+                            <Skeleton className="h-4 w-full bg-white/20" />
+                            <Skeleton className="h-4 w-5/6 bg-white/20" />
+                        </div>
 
                         <div className="flex flex-col justify-center gap-4 sm:flex-row">
                             <Link href={route('search.index')}>
@@ -210,20 +208,9 @@ export default function Accueil({ canLogin, canRegister }: Props) {
             {/* SEARCH CARD */}
             <div className="relative z-20 mx-auto -mt-12 max-w-3xl px-4">
                 <div className="flex flex-col items-center gap-4 rounded-3xl bg-white p-6 shadow-2xl md:flex-row">
-                    <input
-                        aria-label="ville"
-                        type="text"
-                        placeholder="Votre ville"
-                        className="flex-1 rounded-full border border-neutral-200 px-4 py-3 transition focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-                    />
-                    <select className="rounded-full border border-neutral-200 px-4 py-3 transition focus:ring-2 focus:ring-neutral-400 focus:outline-none">
-                        <option>Type de service</option>
-                        <option>Ménage standard</option>
-                        <option>Nettoyage profond</option>
-                    </select>
-                    <button className="rounded-full bg-neutral-900 px-6 py-3 font-medium text-white transition hover:bg-neutral-800">
-                        Rechercher
-                    </button>
+                    <Skeleton className="flex-1 h-12 rounded-full" />
+                    <Skeleton className="h-12 w-full md:w-48 rounded-full" />
+                    <Skeleton className="h-12 w-full md:w-32 rounded-full bg-neutral-900" />
                 </div>
             </div>
 
@@ -379,13 +366,9 @@ function ServicesSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="mb-4 text-3xl font-bold text-neutral-900 md:text-4xl">
-                        Nos services populaires
-                    </h2>
-                    <p className="mx-auto mb-12 max-w-2xl text-lg text-neutral-600">
-                        Des prestations adaptées à tous vos besoins, réalisées
-                        par des professionnels certifiés
-                    </p>
+                    <Skeleton className="mb-4 h-10 w-64 mx-auto bg-neutral-200" />
+                    <Skeleton className="mx-auto mb-2 h-6 w-full max-w-2xl bg-neutral-200" />
+                    <Skeleton className="mx-auto mb-12 h-6 w-3/4 max-w-2xl bg-neutral-200" />
                 </motion.div>
                 <div className="grid gap-8 md:grid-cols-3">
                     {services.map((s, idx) => (
@@ -397,36 +380,22 @@ function ServicesSection() {
                             transition={{ delay: idx * 0.12 }}
                             className="group cursor-pointer rounded-2xl border border-transparent bg-white p-8 shadow-lg transition-all hover:border-neutral-900/20 hover:shadow-2xl"
                         >
-                            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900 transition-transform group-hover:scale-110">
-                                <s.icon className="h-7 w-7" />
+                            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900">
+                                <Skeleton className="h-7 w-7 bg-neutral-200" />
                             </div>
-                            <h3 className="mb-3 text-xl font-bold text-neutral-900">
-                                {s.name}
-                            </h3>
-                            <p className="mb-4 leading-relaxed text-neutral-600">
-                                {s.desc}
-                            </p>
-                            <ul className="mb-6 space-y-2 text-sm text-neutral-500">
-                                {s.features.map((feature, i) => (
-                                    <li
-                                        key={i}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <CheckCircle className="h-4 w-4 text-neutral-900" />
-                                        {feature}
-                                    </li>
-                                ))}
-                            </ul>
+                            <Skeleton className="mb-3 h-8 w-3/4 bg-neutral-200" />
+                            <Skeleton className="mb-2 h-4 w-full bg-neutral-200" />
+                            <Skeleton className="mb-4 h-4 w-5/6 bg-neutral-200" />
+
+                            <div className="mb-6 space-y-2">
+                                <Skeleton className="h-4 w-1/2 bg-neutral-200" />
+                                <Skeleton className="h-4 w-1/2 bg-neutral-200" />
+                                <Skeleton className="h-4 w-1/2 bg-neutral-200" />
+                            </div>
+
                             <div className="flex items-center justify-between border-t border-neutral-100 pt-4">
-                                <span className="font-semibold text-neutral-900">
-                                    {s.price}
-                                </span>
-                                <Link
-                                    href={route('services.index')}
-                                    className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-                                >
-                                    En savoir plus →
-                                </Link>
+                                <Skeleton className="h-6 w-24 bg-neutral-200" />
+                                <Skeleton className="h-4 w-24 bg-neutral-200" />
                             </div>
                         </motion.div>
                     ))}
@@ -467,9 +436,7 @@ function TopAgentsSection() {
     return (
         <div className="bg-white py-24">
             <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-                <h2 className="mb-8 text-3xl font-bold text-neutral-900">
-                    Agents les mieux notés
-                </h2>
+                <Skeleton className="mb-8 mx-auto h-10 w-64 bg-neutral-200" />
                 <div className="grid gap-8 md:grid-cols-3">
                     {agents.map((agent, idx) => (
                         <motion.div
@@ -492,20 +459,15 @@ function TopAgentsSection() {
                                 </div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-lg font-bold text-neutral-900">
-                                    {agent.name}
-                                </h3>
-                                <p className="mb-4 text-sm text-neutral-500">
-                                    {agent.specialty} • {agent.exp} ans
-                                    d'expérience
-                                </p>
-                                <div className="mb-6 flex items-center gap-2 text-sm text-neutral-600">
-                                    <MapPin className="h-4 w-4 text-neutral-400" />
-                                    <span>{agent.location}</span>
+                                <Skeleton className="mb-3 h-6 w-1/2 bg-neutral-200" />
+                                <div className="mb-4">
+                                    <Skeleton className="h-4 w-3/4 bg-neutral-200" />
                                 </div>
-                                <button className="w-full rounded-xl border border-neutral-200 py-3 font-medium text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50">
-                                    Voir Profil
-                                </button>
+                                <div className="mb-6 flex items-center gap-2">
+                                    <Skeleton className="h-4 w-4 rounded-full bg-neutral-200" />
+                                    <Skeleton className="h-4 w-1/2 bg-neutral-200" />
+                                </div>
+                                <Skeleton className="w-full h-12 rounded-xl bg-neutral-200" />
                             </div>
                         </motion.div>
                     ))}
@@ -520,13 +482,8 @@ function HowItWorksSection() {
         <section id="comment-ca-marche" className="bg-neutral-50 py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="mb-16 text-center">
-                    <h2 className="mb-4 text-3xl font-bold text-neutral-900 md:text-4xl">
-                        Comment ça marche ?
-                    </h2>
-                    <p className="mx-auto max-w-2xl text-lg text-neutral-600">
-                        Que vous cherchiez un nettoyage parfait ou des clients
-                        réguliers, VIMAIZ simplifie tout.
-                    </p>
+                    <Skeleton className="mx-auto mb-4 h-10 w-64 bg-neutral-200" />
+                    <Skeleton className="mx-auto h-6 w-full max-w-2xl bg-neutral-200" />
                 </div>
 
                 <div className="grid gap-12 md:grid-cols-2">
@@ -560,12 +517,10 @@ function HowItWorksSection() {
                                         {i + 1}
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-neutral-900">
-                                            {step.title}
-                                        </h4>
-                                        <p className="text-neutral-600">
-                                            {step.desc}
-                                        </p>
+                                        <div>
+                                            <Skeleton className="mb-2 h-6 w-32 bg-neutral-200" />
+                                            <Skeleton className="h-4 w-64 bg-neutral-200" />
+                                        </div>
                                     </div>
                                 </li>
                             ))}
@@ -609,21 +564,17 @@ function HowItWorksSection() {
                                         {i + 1}
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white">
-                                            {step.title}
-                                        </h4>
-                                        <p className="text-neutral-400">
-                                            {step.desc}
-                                        </p>
+                                        <div>
+                                            <Skeleton className="mb-2 h-6 w-32 bg-white/20" />
+                                            <Skeleton className="h-4 w-64 bg-white/20" />
+                                        </div>
                                     </div>
                                 </li>
                             ))}
                         </ul>
                         <div className="mt-8 border-t border-white/10 pt-8">
                             <Link href={route('register')}>
-                                <SecondaryButton className="w-full justify-center rounded-xl py-6 text-base hover:bg-neutral-200">
-                                    Devenir Agent VIMAIZ
-                                </SecondaryButton>
+                                <Skeleton className="w-full h-14 rounded-xl bg-white/20" />
                             </Link>
                         </div>
                     </div>
@@ -673,12 +624,9 @@ function TestimonialsSection() {
                                         />
                                     ))}
                             </div>
-                            <p className="mb-2 text-neutral-700 italic">
-                                "{t.text}"
-                            </p>
-                            <p className="font-bold text-neutral-900">
-                                {t.author}
-                            </p>
+                            <Skeleton className="mb-2 h-4 w-full bg-neutral-200" />
+                            <Skeleton className="mb-4 h-4 w-5/6 bg-neutral-200" />
+                            <Skeleton className="h-4 w-32 font-bold bg-neutral-200" />
                         </motion.div>
                     ))}
                 </div>
@@ -707,14 +655,8 @@ function FeaturesSection() {
         <div className="bg-neutral-900 py-24 text-white">
             <div className="mx-auto grid max-w-7xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
                 <div>
-                    <h2 className="mb-6 text-3xl font-bold md:text-4xl">
-                        Pourquoi VIMAIZ est la référence
-                    </h2>
-                    <p className="mb-8 text-lg text-neutral-400">
-                        Nous ne faisons pas que nettoyer ; nous prenons soin.
-                        Notre processus rigoureux et notre engagement
-                        garantissent un service premium à chaque fois.
-                    </p>
+                    <Skeleton className="mb-6 h-10 w-3/4 bg-white/20" />
+                    <Skeleton className="mb-8 h-20 w-full bg-white/20" />
                     <ul className="space-y-6">
                         {features.map((f, idx) => (
                             <li key={idx} className="flex gap-4">
@@ -722,10 +664,8 @@ function FeaturesSection() {
                                     <CheckCircle className="h-4 w-4 text-white" />
                                 </div>
                                 <div>
-                                    <h4 className="text-lg font-bold">
-                                        {f.title}
-                                    </h4>
-                                    <p className="text-neutral-400">{f.desc}</p>
+                                    <Skeleton className="mb-1 h-6 w-48 bg-white/20" />
+                                    <Skeleton className="h-4 w-64 bg-white/20" />
                                 </div>
                             </li>
                         ))}
@@ -784,18 +724,8 @@ function CinematicSection() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h2 className="mb-6 text-4xl font-extrabold text-white md:text-5xl">
-                            Une expérience de nettoyage{' '}
-                            <span className="bg-gradient-to-r from-neutral-400 to-neutral-200 bg-clip-text text-transparent">
-                                cinématique
-                            </span>
-                        </h2>
-                        <p className="mb-8 text-xl leading-relaxed text-neutral-300">
-                            Chaque intervention est orchestrée avec précision.
-                            Nos agents utilisent des techniques professionnelles
-                            et des produits premium pour transformer votre
-                            espace en un environnement impeccable.
-                        </p>
+                        <Skeleton className="mb-6 h-12 w-full bg-white/20" />
+                        <Skeleton className="mb-8 h-24 w-full bg-white/20" />
                         <div className="grid grid-cols-2 gap-6">
                             {[
                                 {
@@ -817,12 +747,8 @@ function CinematicSection() {
                                     transition={{ delay: i * 0.1 }}
                                     className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
                                 >
-                                    <div className="text-3xl font-bold text-neutral-400">
-                                        {stat.value}
-                                    </div>
-                                    <div className="mt-1 text-sm text-neutral-300">
-                                        {stat.label}
-                                    </div>
+                                    <Skeleton className="h-8 w-16 mb-1 bg-white/20" />
+                                    <Skeleton className="h-4 w-24 bg-white/20" />
                                 </motion.div>
                             ))}
                         </div>
@@ -893,17 +819,8 @@ function FuturisticSection() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
                 >
-                    <h2 className="mb-6 text-4xl font-extrabold text-white md:text-5xl">
-                        Le futur du{' '}
-                        <span className="bg-gradient-to-r from-neutral-200 via-neutral-400 to-neutral-200 bg-clip-text text-transparent">
-                            nettoyage professionnel
-                        </span>
-                    </h2>
-                    <p className="mx-auto mb-12 max-w-3xl text-xl text-neutral-300">
-                        Technologie de pointe, transparence totale et service
-                        irréprochable. VIMAIZ réinvente la mise en relation
-                        entre clients et professionnels du nettoyage.
-                    </p>
+                    <Skeleton className="mx-auto mb-6 h-10 w-3/4 max-w-3xl bg-white/20" />
+                    <Skeleton className="mx-auto mb-12 h-20 w-full max-w-3xl bg-white/20" />
 
                     {/* Feature Cards */}
                     <div className="mt-16 grid gap-8 md:grid-cols-3">
@@ -937,12 +854,8 @@ function FuturisticSection() {
                                     <div className="mb-4 text-5xl">
                                         {feature.icon}
                                     </div>
-                                    <h3 className="mb-3 text-xl font-bold text-white">
-                                        {feature.title}
-                                    </h3>
-                                    <p className="leading-relaxed text-neutral-300">
-                                        {feature.desc}
-                                    </p>
+                                    <Skeleton className="mb-3 h-6 w-3/4 bg-white/20" />
+                                    <Skeleton className="h-16 w-full bg-white/20" />
                                 </div>
                             </motion.div>
                         ))}
@@ -985,99 +898,46 @@ function Footer() {
                                 VIMAIZ
                             </span>
                         </div>
-                        <p className="text-sm text-neutral-500">
-                            Transformez vos espaces, un nettoyage à la fois.
-                            Marketplace premium pour professionnels du
-                            nettoyage.
-                        </p>
+                        <Skeleton className="mt-2 h-16 w-full bg-neutral-200" />
                     </div>
 
                     <div>
-                        <h4 className="mb-4 font-bold text-neutral-900">
-                            Entreprise
-                        </h4>
-                        <ul className="space-y-2 text-sm text-neutral-500">
-                            <li>
-                                <a href="#" className="hover:text-neutral-900">
-                                    À propos
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-neutral-900">
-                                    Carrières
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-neutral-900">
-                                    Presse
-                                </a>
-                            </li>
+                        <Skeleton className="mb-4 h-6 w-24 bg-neutral-200" />
+                        <ul className="space-y-2">
+                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
+                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
+                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="mb-4 font-bold text-neutral-900">
-                            Support
-                        </h4>
-                        <ul className="space-y-2 text-sm text-neutral-500">
-                            <li>
-                                <a href="#" className="hover:text-neutral-900">
-                                    Aide
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-neutral-900">
-                                    Sécurité
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-neutral-900">
-                                    Conditions
-                                </a>
-                            </li>
+                        <Skeleton className="mb-4 h-6 w-24 bg-neutral-200" />
+                        <ul className="space-y-2">
+                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
+                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
+                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
                         </ul>
+
                     </div>
 
                     <div>
-                        <h4 className="mb-4 font-bold text-neutral-900">
-                            Social
-                        </h4>
-                        <ul className="space-y-2 text-sm text-neutral-500">
-                            <li>
-                                <a href="#" className="hover:text-neutral-900">
-                                    Instagram
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-neutral-900">
-                                    Twitter
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:text-neutral-900">
-                                    LinkedIn
-                                </a>
-                            </li>
+                        <Skeleton className="mb-4 h-6 w-24 bg-neutral-200" />
+                        <ul className="space-y-2">
+                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
+                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
+                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
                         </ul>
                     </div>
                 </div>
                 <div className="flex flex-col items-center justify-between gap-4 border-t border-neutral-100 pt-8 md:flex-row">
-                    <p className="text-sm text-neutral-400">
-                        © 2025 VIMAIZ. Tous droits réservés.
-                    </p>
-                    <div className="flex gap-6 text-sm text-neutral-400">
-                        <a href="#" className="hover:text-neutral-600">
-                            Confidentialité
-                        </a>
-                        <a href="#" className="hover:text-neutral-600">
-                            Conditions
-                        </a>
-                        <a href="#" className="hover:text-neutral-600">
-                            Plan du site
-                        </a>
+                    <Skeleton className="h-4 w-48 bg-neutral-200" />
+                    <div className="flex gap-6">
+                        <Skeleton className="h-4 w-24 bg-neutral-200" />
+                        <Skeleton className="h-4 w-24 bg-neutral-200" />
+                        <Skeleton className="h-4 w-24 bg-neutral-200" />
                     </div>
                 </div>
             </div>
-        </footer>
+        </footer >
     );
 }
