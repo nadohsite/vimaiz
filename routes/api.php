@@ -1,11 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\AgentController;
+use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\BookingController;
-use App\Http\Controllers\Api\ReviewController;
-use App\Http\Controllers\Api\ServiceController;
-use App\Http\Controllers\Api\MessageController;
-use App\Http\Controllers\Api\AddressController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\PaymentController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,52 +13,35 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Public routes
-Route::get('/services/categories', [ServiceController::class, 'categories']);
-Route::get('/services', [ServiceController::class, 'index']);
-Route::get('/services/{id}', [ServiceController::class, 'show']);
-
-Route::get('/agents', [AgentController::class, 'index']);
-Route::get('/agents/{id}', [AgentController::class, 'show']);
-Route::post('/agents/search-nearby', [AgentController::class, 'searchNearby']);
-Route::get('/agents/{id}/reviews', [ReviewController::class, 'agentReviews']);
-
-// Protected routes (require authentication)
 Route::middleware(['auth:sanctum'])->group(function () {
-    
-    // Agent routes
-    Route::middleware(['role:agent'])->prefix('agent')->group(function () {
-        Route::get('/profile', [AgentController::class, 'show']);
-        Route::put('/profile', [AgentController::class, 'update']);
-        Route::get('/statistics', [AgentController::class, 'statistics']);
-        
-        Route::put('/bookings/{id}/accept', [BookingController::class, 'accept']);
-        Route::put('/bookings/{id}/reject', [BookingController::class, 'reject']);
-        Route::put('/bookings/{id}/status', [BookingController::class, 'updateStatus']);
-        
-        Route::post('/reviews/{id}/respond', [ReviewController::class, 'respond']);
+
+    // User info
+    Route::get('/user', function (Request $request) {
+        return $request->user();
     });
-    
-    // Client routes
-    Route::middleware(['role:client'])->prefix('client')->group(function () {
-        Route::post('/bookings', [BookingController::class, 'store']);
-        Route::post('/bookings/{id}/review', [ReviewController::class, 'store']);
-        
-        Route::apiResource('addresses', AddressController::class);
-    });
-    
-    // Shared routes (client & agent)
-    Route::get('/bookings', [BookingController::class, 'index']);
-    Route::get('/bookings/upcoming', [BookingController::class, 'upcoming']);
-    Route::get('/bookings/{id}', [BookingController::class, 'show']);
-    Route::put('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
-    
-    Route::get('/reviews/{id}', [ReviewController::class, 'show']);
-    Route::put('/reviews/{id}', [ReviewController::class, 'update']);
-    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
-    
-    Route::get('/conversations', [MessageController::class, 'conversations']);
-    Route::get('/conversations/{id}/messages', [MessageController::class, 'messages']);
-    Route::post('/conversations/{id}/messages', [MessageController::class, 'sendMessage']);
-    Route::put('/messages/{id}/read', [MessageController::class, 'markAsRead']);
+
+    // Search & Agents
+    Route::post('/search/agents', [SearchController::class, 'searchAgents'])->name('api.search.agents');
+    Route::get('/agents/{agent}', [SearchController::class, 'showAgent'])->name('api.agents.show');
+    Route::get('/agents/{agent}/availability', [SearchController::class, 'getAvailability'])->name('api.agents.availability');
+
+    // Bookings
+    Route::apiResource('bookings', BookingController::class);
+    Route::post('/bookings/{booking}/recurrence', [BookingController::class, 'createRecurrence'])->name('api.bookings.recurrence');
+
+    // Chat
+    Route::get('/conversations', [ChatController::class, 'index'])->name('api.conversations.index');
+    Route::get('/conversations/{conversation}/messages', [ChatController::class, 'messages'])->name('api.conversations.messages');
+    Route::post('/conversations/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('api.conversations.send');
+    Route::post('/conversations/{conversation}/messages/image', [ChatController::class, 'sendImage'])->name('api.conversations.image');
+
+    // Payments
+    Route::post('/payments/intent', [PaymentController::class, 'createIntent'])->name('api.payments.intent');
+    Route::post('/payments/{booking}/confirm', [PaymentController::class, 'confirmPayment'])->name('api.payments.confirm');
+    Route::post('/payments/{booking}/tip', [PaymentController::class, 'addTip'])->name('api.payments.tip');
+    Route::get('/invoices', [PaymentController::class, 'invoices'])->name('api.invoices.index');
+    Route::get('/invoices/{invoice}/download', [PaymentController::class, 'downloadInvoice'])->name('api.invoices.download');
 });
+
+// Stripe webhook (public, verified by Stripe signature)
+Route::post('/webhooks/stripe', [\App\Http\Controllers\WebhookController::class, 'handleStripeWebhook'])->name('webhooks.stripe');

@@ -4,7 +4,7 @@ import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
-import AppLayout from '@/layouts/app-layout';
+import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { disable, enable } from '@/routes/two-factor';
 import { type BreadcrumbItem } from '@/types';
@@ -19,8 +19,8 @@ interface TwoFactorProps {
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Two-Factor Authentication',
-        href: route('two-factor.show'),
+        title: 'Authentification à deux facteurs',
+        href: route('settings.two-factor.show'),
     },
 ];
 
@@ -41,22 +41,21 @@ export default function TwoFactor({
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Two-Factor Authentication" />
+        <AppSidebarLayout breadcrumbs={breadcrumbs}>
+            <Head title="Authentification à deux facteurs" />
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
-                        title="Two-Factor Authentication"
-                        description="Manage your two-factor authentication settings"
+                        title="Authentification à deux facteurs"
+                        description="Gérez vos paramètres de sécurité avec la double authentification"
                     />
                     {twoFactorEnabled ? (
                         <div className="flex flex-col items-start justify-start space-y-4">
-                            <Badge variant="default">Enabled</Badge>
+                            <Badge variant="default">Activée</Badge>
                             <p className="text-muted-foreground">
-                                With two-factor authentication enabled, you will
-                                be prompted for a secure, random pin during
-                                login, which you can retrieve from the
-                                TOTP-supported application on your phone.
+                                L'authentification à deux facteurs est activée. Vous devrez
+                                saisir un code de sécurité aléatoire lors de la connexion,
+                                que vous pouvez récupérer depuis l'application TOTP sur votre téléphone.
                             </p>
 
                             <TwoFactorRecoveryCodes
@@ -73,7 +72,7 @@ export default function TwoFactor({
                                             type="submit"
                                             disabled={processing}
                                         >
-                                            <ShieldBan /> Disable 2FA
+                                            <ShieldBan className="mr-2 h-4 w-4" /> Désactiver la 2FA
                                         </Button>
                                     )}
                                 </Form>
@@ -81,12 +80,11 @@ export default function TwoFactor({
                         </div>
                     ) : (
                         <div className="flex flex-col items-start justify-start space-y-4">
-                            <Badge variant="destructive">Disabled</Badge>
+                            <Badge variant="destructive">Désactivée</Badge>
                             <p className="text-muted-foreground">
-                                When you enable two-factor authentication, you
-                                will be prompted for a secure pin during login.
-                                This pin can be retrieved from a TOTP-supported
-                                application on your phone.
+                                Lorsque vous activez l'authentification à deux facteurs, vous
+                                devrez saisir un code sécurisé lors de la connexion.
+                                Ce code peut être récupéré depuis une application TOTP sur votre téléphone.
                             </p>
 
                             <div>
@@ -94,8 +92,8 @@ export default function TwoFactor({
                                     <Button
                                         onClick={() => setShowSetupModal(true)}
                                     >
-                                        <ShieldCheck />
-                                        Continue Setup
+                                        <ShieldCheck className="mr-2 h-4 w-4" />
+                                        Continuer la configuration
                                     </Button>
                                 ) : (
                                     <Form
@@ -109,8 +107,8 @@ export default function TwoFactor({
                                                 type="submit"
                                                 disabled={processing}
                                             >
-                                                <ShieldCheck />
-                                                Enable 2FA
+                                                <ShieldCheck className="mr-2 h-4 w-4" />
+                                                Activer la 2FA
                                             </Button>
                                         )}
                                     </Form>
@@ -132,6 +130,6 @@ export default function TwoFactor({
                     />
                 </div>
             </SettingsLayout>
-        </AppLayout>
+        </AppSidebarLayout>
     );
 }

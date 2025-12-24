@@ -18,9 +18,9 @@ class RoleSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create roles
-        $client = Role::create(['name' => 'client']);
-        $agent = Role::create(['name' => 'agent']);
-        $admin = Role::create(['name' => 'admin']);
+        $client = Role::findOrCreate('client');
+        $agent = Role::findOrCreate('agent');
+        $admin = Role::findOrCreate('admin');
 
         // Create permissions
         $permissions = [
@@ -29,7 +29,7 @@ class RoleSeeder extends Seeder
             'view own bookings',
             'cancel booking',
             'rate agent',
-            
+
             // Agent permissions
             'view job requests',
             'accept job',
@@ -38,7 +38,7 @@ class RoleSeeder extends Seeder
             'manage availability',
             'manage profile',
             'withdraw earnings',
-            
+
             // Admin permissions
             'manage users',
             'verify agents',

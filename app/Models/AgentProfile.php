@@ -11,6 +11,11 @@ class AgentProfile extends Model
 
     protected $fillable = [
         'user_id',
+        'type',
+        'company_name',
+        'siret',
+        'tva_number',
+        'website',
         'description',
         'experience_years',
         'hourly_rate',
@@ -25,6 +30,8 @@ class AgentProfile extends Model
         'total_reviews',
         'total_bookings',
         'is_available',
+        'supported_property_types',
+        'max_surface_area',
     ];
 
     protected $casts = [
@@ -32,6 +39,8 @@ class AgentProfile extends Model
         'hourly_rate' => 'decimal:2',
         'average_rating' => 'decimal:2',
         'is_available' => 'boolean',
+        'supported_property_types' => 'array',
+        'max_surface_area' => 'integer',
     ];
 
     // Relationships
@@ -62,7 +71,22 @@ class AgentProfile extends Model
         return $this->hasMany(AgentPayout::class, 'agent_id', 'user_id');
     }
 
+    public function availabilities()
+    {
+        return $this->hasMany(Availability::class);
+    }
+
     // Scopes
+    public function scopeIndividuals($query)
+    {
+        return $query->where('type', 'individual');
+    }
+
+    public function scopeCompanies($query)
+    {
+        return $query->where('type', 'company');
+    }
+
     public function scopeVerified($query)
     {
         return $query->where('verification_status', 'verified');

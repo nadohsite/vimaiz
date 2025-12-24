@@ -1,3 +1,4 @@
+import GoogleLoginButton from '@/components/GoogleLoginButton';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -24,10 +25,10 @@ export default function Login({
 }: LoginProps) {
     return (
         <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
+            title="Bienvenue chez VIMAIZ"
+            description="Connectez-vous pour accéder à votre espace personnalisé"
         >
-            <Head title="Log in" />
+            <Head title="Connexion" />
 
             <Form
                 {...store.form()}
@@ -38,7 +39,7 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email" className="text-sm font-semibold text-neutral-700">Adresse email</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -47,21 +48,22 @@ export default function Login({
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="email@example.com"
+                                    placeholder="email@exemple.com"
+                                    className="h-11 rounded-xl bg-neutral-50 border-neutral-200 focus:bg-white transition-all"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password" className="text-sm font-semibold text-neutral-700">Mot de passe</Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-sm"
+                                            className="ml-auto text-xs font-bold text-neutral-400 hover:text-black transition-colors"
                                             tabIndex={5}
                                         >
-                                            Forgot password?
+                                            Oublié ?
                                         </TextLink>
                                     )}
                                 </div>
@@ -72,7 +74,8 @@ export default function Login({
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder="••••••••"
+                                    className="h-11 rounded-xl bg-neutral-50 border-neutral-200 focus:bg-white transition-all"
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -82,27 +85,41 @@ export default function Login({
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
+                                    className="border-neutral-200"
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label htmlFor="remember" className="text-sm text-neutral-500 cursor-pointer">Se souvenir de moi</Label>
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-2 w-full bg-black hover:bg-neutral-800 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-black/10 transition-all hover:translate-y-[-2px] active:translate-y-0"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
-                                {processing && <Spinner />}
-                                Log in
+                                {processing && <Spinner className="mr-2" />}
+                                Se connecter
                             </Button>
+
+                            <div className="relative py-2">
+                                <div className="absolute inset-0 flex items-center">
+                                    <span className="w-full border-t border-neutral-100" />
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase tracking-widest">
+                                    <span className="bg-white px-4 text-neutral-400 font-bold">
+                                        Ou
+                                    </span>
+                                </div>
+                            </div>
+
+                            <GoogleLoginButton text="Continuer avec Google" />
                         </div>
 
                         {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
-                                Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    Sign up
+                            <div className="text-center text-sm text-neutral-500 mt-4">
+                                Pas encore de compte ?{' '}
+                                <TextLink href={register()} tabIndex={5} className="font-bold text-black border-b-2 border-black/10 hover:border-black transition-colors">
+                                    S'inscrire
                                 </TextLink>
                             </div>
                         )}
@@ -111,7 +128,7 @@ export default function Login({
             </Form>
 
             {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                <div className="mt-6 text-center text-sm font-medium text-green-600 bg-green-50 p-3 rounded-lg border border-green-100 animate-in fade-in slide-in-from-top-4">
                     {status}
                 </div>
             )}

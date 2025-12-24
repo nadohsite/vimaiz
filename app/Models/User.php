@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_id',
         'role',
         'phone',
         'phone_verified_at',
@@ -128,6 +129,11 @@ class User extends Authenticatable
     public function messages()
     {
         return $this->hasMany(\App\Models\Message::class, 'sender_id');
+    }
+
+    public function properties()
+    {
+        return $this->hasMany(\App\Models\Property::class);
     }
 
     // Scopes

@@ -23,12 +23,13 @@ class AgentResource extends JsonResource
             'average_rating' => (float) $this->average_rating,
             'total_reviews' => $this->total_reviews,
             'profile_photo' => $this->profile_photo,
-            'location' => [
-                'latitude' => $address?->latitude ? (float) $address->latitude : null,
-                'longitude' => $address?->longitude ? (float) $address->longitude : null,
-                'city' => $address?->city,
-                'distance' => $this->distance ?? null,
-            ],
+            'latitude' => $address?->latitude ? (float) $address->latitude : null,
+            'longitude' => $address?->longitude ? (float) $address->longitude : null,
+            'city' => $address?->city,
+            'distance' => $this->distance ?? null,
+            'search_score' => $this->search_score ?? null,
+            'supported_property_types' => $this->supported_property_types,
+            'max_surface_area' => $this->max_surface_area,
             'services' => $this->services->map(function ($service) {
                 return [
                     'id' => $service->id,

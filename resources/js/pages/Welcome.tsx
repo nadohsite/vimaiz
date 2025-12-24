@@ -3,8 +3,16 @@ import {
     PrimaryButton,
     SecondaryButton,
 } from '@/components/ui/buttons';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Head, Link } from '@inertiajs/react';
+import { router as inertiaRouter } from '@inertiajs/react';
 import {
     Calendar,
     CheckCircle,
@@ -30,6 +38,7 @@ interface Props {
 }
 
 export default function Accueil({ canLogin, canRegister }: Props) {
+    const router = inertiaRouter;
     const { scrollY } = useScroll();
 
     // parallax transforms
@@ -56,6 +65,16 @@ export default function Accueil({ canLogin, canRegister }: Props) {
         return () => clearInterval(t);
     }, []);
 
+    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        router.get(route('agents.index'), {
+            search: formData.get('location'),
+            property_type: formData.get('property_type'),
+            size: formData.get('size'),
+        });
+    };
+
     return (
         <div className="min-h-screen bg-white font-sans text-neutral-900">
             <Head title="VIMAIZ — Marketplace Premium" />
@@ -77,18 +96,18 @@ export default function Accueil({ canLogin, canRegister }: Props) {
                         </div>
 
                         <div className="hidden items-center space-x-8 md:flex">
-                            <Link
-                                href={route('services.index')}
+                            <a
+                                href="#services"
                                 className="text-sm font-medium text-white transition-colors hover:text-neutral-300"
                             >
                                 Services
-                            </Link>
-                            <Link
-                                href={route('agents.index')}
+                            </a>
+                            <a
+                                href="#trouver-un-agent"
                                 className="text-sm font-medium text-white transition-colors hover:text-neutral-300"
                             >
                                 Trouver un agent
-                            </Link>
+                            </a>
                             <a
                                 href="#comment-ca-marche"
                                 className="text-sm font-medium text-white transition-colors hover:text-neutral-300"
@@ -98,20 +117,27 @@ export default function Accueil({ canLogin, canRegister }: Props) {
                         </div>
 
                         <div className="flex items-center space-x-4">
-                            {canLogin && (
+                            {canLogin ? (
                                 <Link
-                                    href={route('login')}
-                                    className="text-sm font-medium text-white transition-colors hover:text-neutral-300"
+                                    href={route('dashboard')}
+                                    className="text-sm font-medium text-white hover:text-neutral-300"
                                 >
-                                    Se connecter
+                                    Mon Espace
                                 </Link>
-                            )}
-                            {canRegister && (
-                                <Link href={route('register')}>
-                                    <PrimaryButton className="rounded-full px-6 py-2.5 text-sm shadow-lg transition-all hover:bg-neutral-200">
-                                        Commencer
-                                    </PrimaryButton>
-                                </Link>
+                            ) : (
+                                <>
+                                    <Link
+                                        href={route('login')}
+                                        className="text-sm font-medium text-white hover:text-neutral-300"
+                                    >
+                                        Connexion
+                                    </Link>
+                                    <Link href={route('register')}>
+                                        <PrimaryButton className="rounded-full bg-white text-neutral-900 border-none hover:bg-neutral-100 px-6">
+                                            Inscription
+                                        </PrimaryButton>
+                                    </Link>
+                                </>
                             )}
                         </div>
                     </div>
@@ -154,21 +180,26 @@ export default function Accueil({ canLogin, canRegister }: Props) {
                                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-60" />
                                 <span className="relative inline-flex h-2 w-2 rounded-full bg-neutral-200" />
                             </span>
-                            <Skeleton className="h-6 w-64 rounded-full bg-white/20" />
+                            Service de conciergerie de luxe
                         </div>
 
                         <div className="mb-6 flex flex-col items-center gap-4">
-                            <Skeleton className="h-12 w-3/4 bg-white/20 md:h-16" />
-                            <Skeleton className="h-12 w-1/2 bg-white/20 md:h-16" />
+                            <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-6xl lg:text-7xl">
+                                Vos agents de confiance
+                            </h1>
+                            <h2 className="text-3xl font-light italic text-neutral-200 md:text-5xl">
+                                en un clic.
+                            </h2>
                         </div>
 
                         <div className="mx-auto mb-8 flex max-w-2xl flex-col items-center gap-2">
-                            <Skeleton className="h-4 w-full bg-white/20" />
-                            <Skeleton className="h-4 w-5/6 bg-white/20" />
+                            <p className="text-lg text-neutral-200 md:text-xl">
+                                Découvrez une sélection exclusive d'agents qualifiés pour prendre soin de votre intérieur avec excellence.
+                            </p>
                         </div>
 
                         <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                            <Link href={route('search.index')}>
+                            <Link href={route('agents.index')}>
                                 <PrimaryButton
                                     size="lg"
                                     className="rounded-full px-8 py-6 text-lg shadow-xl hover:scale-105"
@@ -206,25 +237,86 @@ export default function Accueil({ canLogin, canRegister }: Props) {
             </section>
 
             {/* SEARCH CARD */}
-            <div className="relative z-20 mx-auto -mt-12 max-w-3xl px-4">
-                <div className="flex flex-col items-center gap-4 rounded-3xl bg-white p-6 shadow-2xl md:flex-row">
-                    <Skeleton className="flex-1 h-12 rounded-full" />
-                    <Skeleton className="h-12 w-full md:w-48 rounded-full" />
-                    <Skeleton className="h-12 w-full md:w-32 rounded-full bg-neutral-900" />
-                </div>
+            <div className="relative z-20 mx-auto -mt-16 max-w-5xl px-4">
+                <form
+                    onSubmit={handleSearch}
+                    className="flex flex-col items-stretch gap-4 rounded-[2rem] bg-white p-6 shadow-2xl md:flex-row md:items-center border border-neutral-100"
+                >
+                    <div className="flex flex-1 flex-col gap-1 px-2">
+                        <label className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                            Localisation
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-indigo-600" />
+                            <input
+                                name="location"
+                                type="text"
+                                placeholder="Adresse, ville ou code postal"
+                                className="w-full border-none p-0 text-sm font-medium focus:ring-0"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="h-10 w-px bg-neutral-100 hidden md:block" />
+
+                    <div className="flex w-full flex-col gap-1 px-2 md:w-48">
+                        <label className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                            Logement
+                        </label>
+                        <Select name="property_type" defaultValue="appartement">
+                            <SelectTrigger className="border-none p-0 h-auto text-sm font-medium focus:ring-0 shadow-none bg-transparent">
+                                <SelectValue placeholder="Type de bien" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="appartement">Appartement</SelectItem>
+                                <SelectItem value="maison">Maison</SelectItem>
+                                <SelectItem value="villa">Villa</SelectItem>
+                                <SelectItem value="bureau">Bureau</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="h-10 w-px bg-neutral-100 hidden md:block" />
+
+                    <div className="flex w-full flex-col gap-1 px-2 md:w-32">
+                        <label className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                            Surface (m²)
+                        </label>
+                        <input
+                            name="size"
+                            type="number"
+                            placeholder="Ex: 80"
+                            className="w-full border-none p-0 text-sm font-medium focus:ring-0"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="flex items-center justify-center gap-2 rounded-2xl bg-neutral-900 px-8 py-4 text-sm font-bold text-white transition-all hover:bg-black hover:shadow-lg active:scale-95"
+                    >
+                        <Search className="h-4 w-4" />
+                        Rechercher
+                    </button>
+                </form>
             </div>
 
             {/* Services */}
-            <ServicesSection />
+            <div id="services">
+                <ServicesSection />
+            </div>
 
             {/* Cinematic Section - Scale + Blur + Gradient */}
             <CinematicSection />
 
             {/* Top Agents */}
-            <TopAgentsSection />
+            <div id="trouver-un-agent">
+                <TopAgentsSection />
+            </div>
 
             {/* How it works */}
-            <HowItWorksSection />
+            <div id="comment-ca-marche">
+                <HowItWorksSection />
+            </div>
 
             {/* Testimonials */}
             <TestimonialsSection />
@@ -366,9 +458,10 @@ function ServicesSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <Skeleton className="mb-4 h-10 w-64 mx-auto bg-neutral-200" />
-                    <Skeleton className="mx-auto mb-2 h-6 w-full max-w-2xl bg-neutral-200" />
-                    <Skeleton className="mx-auto mb-12 h-6 w-3/4 max-w-2xl bg-neutral-200" />
+                    <h2 className="mb-4 text-3xl font-bold text-neutral-900 md:text-4xl">Nos Domaines d'Intervention</h2>
+                    <p className="mx-auto mb-12 max-w-2xl text-lg text-neutral-600">
+                        VIMAIZ vous connecte avec des experts qualifiés dans les catégories de services les plus demandées.
+                    </p>
                 </motion.div>
                 <div className="grid gap-8 md:grid-cols-3">
                     {services.map((s, idx) => (
@@ -378,24 +471,30 @@ function ServicesSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.12 }}
-                            className="group cursor-pointer rounded-2xl border border-transparent bg-white p-8 shadow-lg transition-all hover:border-neutral-900/20 hover:shadow-2xl"
+                            className="group cursor-pointer rounded-3xl border border-neutral-100 bg-white p-8 shadow-xl transition-all hover:-translate-y-2 hover:border-neutral-900/10 hover:shadow-2xl"
                         >
-                            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-neutral-100 text-neutral-900">
-                                <Skeleton className="h-7 w-7 bg-neutral-200" />
+                            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-900 text-white shadow-lg transition-transform group-hover:scale-110">
+                                <s.icon className="h-7 w-7" />
                             </div>
-                            <Skeleton className="mb-3 h-8 w-3/4 bg-neutral-200" />
-                            <Skeleton className="mb-2 h-4 w-full bg-neutral-200" />
-                            <Skeleton className="mb-4 h-4 w-5/6 bg-neutral-200" />
+                            <h3 className="mb-3 text-xl font-bold text-neutral-900">{s.name}</h3>
+                            <p className="mb-6 text-sm leading-relaxed text-neutral-500">
+                                {s.desc}
+                            </p>
 
-                            <div className="mb-6 space-y-2">
-                                <Skeleton className="h-4 w-1/2 bg-neutral-200" />
-                                <Skeleton className="h-4 w-1/2 bg-neutral-200" />
-                                <Skeleton className="h-4 w-1/2 bg-neutral-200" />
+                            <div className="mb-6 space-y-3">
+                                {s.features.map((f, i) => (
+                                    <div key={i} className="flex items-center gap-3 text-sm text-neutral-600">
+                                        <CheckCircle className="h-4 w-4 text-indigo-600" />
+                                        <span>{f}</span>
+                                    </div>
+                                ))}
                             </div>
 
-                            <div className="flex items-center justify-between border-t border-neutral-100 pt-4">
-                                <Skeleton className="h-6 w-24 bg-neutral-200" />
-                                <Skeleton className="h-4 w-24 bg-neutral-200" />
+                            <div className="flex items-center justify-between border-t border-neutral-50 pt-6">
+                                <span className="text-lg font-bold text-neutral-900">{s.price}</span>
+                                <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 group-hover:translate-x-1 transition-transform">
+                                    Découvrir →
+                                </span>
                             </div>
                         </motion.div>
                     ))}
@@ -445,7 +544,7 @@ function TopAgentsSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.12 }}
-                            className="group overflow-hidden rounded-2xl border border-neutral-100 transition-all duration-300 hover:shadow-2xl"
+                            className="group overflow-hidden rounded-3xl border border-neutral-100 transition-all duration-300 hover:shadow-2xl"
                         >
                             <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
                                 <img
@@ -458,16 +557,18 @@ function TopAgentsSection() {
                                     {agent.rating}
                                 </div>
                             </div>
-                            <div className="p-6">
-                                <Skeleton className="mb-3 h-6 w-1/2 bg-neutral-200" />
-                                <div className="mb-4">
-                                    <Skeleton className="h-4 w-3/4 bg-neutral-200" />
+                            <div className="p-6 text-left">
+                                <h3 className="mb-1 text-lg font-bold text-neutral-900">{agent.name}</h3>
+                                <p className="mb-4 text-xs font-medium text-indigo-600 uppercase tracking-wider">{agent.specialty}</p>
+                                <div className="mb-6 flex items-center gap-2 text-sm text-neutral-500">
+                                    <MapPin className="h-4 w-4" />
+                                    <span>{agent.location}</span>
                                 </div>
-                                <div className="mb-6 flex items-center gap-2">
-                                    <Skeleton className="h-4 w-4 rounded-full bg-neutral-200" />
-                                    <Skeleton className="h-4 w-1/2 bg-neutral-200" />
-                                </div>
-                                <Skeleton className="w-full h-12 rounded-xl bg-neutral-200" />
+                                <Link href={route('agents.index')}>
+                                    <PrimaryButton className="w-full justify-center rounded-xl py-4 text-sm">
+                                        Voir les disponibilités
+                                    </PrimaryButton>
+                                </Link>
                             </div>
                         </motion.div>
                     ))}
@@ -482,8 +583,10 @@ function HowItWorksSection() {
         <section id="comment-ca-marche" className="bg-neutral-50 py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="mb-16 text-center">
-                    <Skeleton className="mx-auto mb-4 h-10 w-64 bg-neutral-200" />
-                    <Skeleton className="mx-auto h-6 w-full max-w-2xl bg-neutral-200" />
+                    <h2 className="mb-4 text-3xl font-bold text-neutral-900 md:text-4xl">Une plateforme, deux expériences.</h2>
+                    <p className="mx-auto max-w-2xl text-lg text-neutral-600">
+                        Que vous cherchiez un service ou que vous proposiez votre expertise, VIMAIZ simplifie votre mise en relation.
+                    </p>
                 </div>
 
                 <div className="grid gap-12 md:grid-cols-2">
@@ -500,27 +603,25 @@ function HowItWorksSection() {
                         <ul className="space-y-8">
                             {[
                                 {
-                                    title: 'Recherchez',
-                                    desc: 'Trouvez des agents qualifiés près de chez vous en quelques clics.',
+                                    title: '1. Recherchez',
+                                    desc: 'Utilisez nos filtres avancés pour trouver l\'agent qui correspond parfaitement à vos besoins.',
                                 },
                                 {
-                                    title: 'Réservez',
-                                    desc: 'Choisissez votre créneau et payez en toute sécurité.',
+                                    title: '2. Comparez & Réservez',
+                                    desc: 'Consultez les profils, les avis et réservez instantanément votre créneau.',
                                 },
                                 {
-                                    title: 'Profitez',
-                                    desc: 'Un service impeccable, garanti et assuré.',
+                                    title: '3. Profitez du Service',
+                                    desc: 'L\'expert intervient chez vous. Le paiement est libéré une fois la mission validée.',
                                 },
                             ].map((step, i) => (
                                 <li key={i} className="flex gap-4">
-                                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100 font-bold text-neutral-900">
-                                        {i + 1}
+                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-neutral-100 font-bold text-neutral-900 shadow-sm">
+                                        <CheckCircle className="h-5 w-5 text-indigo-600" />
                                     </div>
                                     <div>
-                                        <div>
-                                            <Skeleton className="mb-2 h-6 w-32 bg-neutral-200" />
-                                            <Skeleton className="h-4 w-64 bg-neutral-200" />
-                                        </div>
+                                        <h4 className="text-lg font-bold text-neutral-900">{step.title}</h4>
+                                        <p className="text-sm text-neutral-500">{step.desc}</p>
                                     </div>
                                 </li>
                             ))}
@@ -547,34 +648,34 @@ function HowItWorksSection() {
                         <ul className="space-y-8">
                             {[
                                 {
-                                    title: 'Créez votre profil',
-                                    desc: 'Mettez en avant votre expérience et vos services.',
+                                    title: '1. Postulez & Vérifiez',
+                                    desc: 'Inscrivez-vous et soumettez vos documents. Nous validons chaque profil pour garantir l\'excellence.',
                                 },
                                 {
-                                    title: 'Recevez des missions',
-                                    desc: 'Acceptez les demandes qui correspondent à votre emploi du temps.',
+                                    title: '2. Gérez vos Missions',
+                                    desc: 'Recevez des demandes en temps réel et gérez votre emploi du temps via votre tableau de bord.',
                                 },
                                 {
-                                    title: 'Gagnez plus',
-                                    desc: 'Fixez vos tarifs et recevez vos paiements rapidement.',
+                                    title: '3. Développez votre Activité',
+                                    desc: 'Fixez vos tarifs, recevez des évaluations positives et augmentez vos revenus mensuels.',
                                 },
                             ].map((step, i) => (
                                 <li key={i} className="flex gap-4">
-                                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/10 font-bold text-white">
-                                        {i + 1}
+                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 font-bold text-white shadow-sm">
+                                        <Sparkles className="h-5 w-5 text-white/60" />
                                     </div>
                                     <div>
-                                        <div>
-                                            <Skeleton className="mb-2 h-6 w-32 bg-white/20" />
-                                            <Skeleton className="h-4 w-64 bg-white/20" />
-                                        </div>
+                                        <h4 className="text-lg font-bold text-white">{step.title}</h4>
+                                        <p className="text-sm text-neutral-400">{step.desc}</p>
                                     </div>
                                 </li>
                             ))}
                         </ul>
                         <div className="mt-8 border-t border-white/10 pt-8">
                             <Link href={route('register')}>
-                                <Skeleton className="w-full h-14 rounded-xl bg-white/20" />
+                                <PrimaryButton className="w-full justify-center rounded-xl bg-white py-6 text-base text-neutral-900 border-none hover:bg-neutral-100">
+                                    Devenir agent expert
+                                </PrimaryButton>
                             </Link>
                         </div>
                     </div>
@@ -612,21 +713,22 @@ function TestimonialsSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.12 }}
-                            className="rounded-3xl bg-neutral-50 p-8 shadow-lg"
+                            className="rounded-[2.5rem] bg-neutral-50 p-10 shadow-sm border border-neutral-100"
                         >
-                            <div className="mb-4 flex items-center gap-2 text-yellow-500">
+                            <div className="mb-6 flex items-center gap-1 text-yellow-400">
                                 {Array(t.rating)
                                     .fill(0)
                                     .map((_, i) => (
                                         <Star
                                             key={i}
-                                            className="h-4 w-4 fill-current"
+                                            className="h-5 w-5 fill-current"
                                         />
                                     ))}
                             </div>
-                            <Skeleton className="mb-2 h-4 w-full bg-neutral-200" />
-                            <Skeleton className="mb-4 h-4 w-5/6 bg-neutral-200" />
-                            <Skeleton className="h-4 w-32 font-bold bg-neutral-200" />
+                            <p className="mb-8 text-xl italic leading-relaxed text-neutral-700">
+                                "{t.text}"
+                            </p>
+                            <p className="font-bold text-neutral-900">— {t.author}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -655,17 +757,17 @@ function FeaturesSection() {
         <div className="bg-neutral-900 py-24 text-white">
             <div className="mx-auto grid max-w-7xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
                 <div>
-                    <Skeleton className="mb-6 h-10 w-3/4 bg-white/20" />
-                    <Skeleton className="mb-8 h-20 w-full bg-white/20" />
+                    <h2 className="mb-6 text-3xl font-bold md:text-4xl text-white">Pourquoi choisir VIMAIZ ?</h2>
+                    <p className="mb-10 text-lg text-neutral-400">Nous redéfinissons les standards du service à domicile avec une approche premium et technologique.</p>
                     <ul className="space-y-6">
                         {features.map((f, idx) => (
-                            <li key={idx} className="flex gap-4">
-                                <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-neutral-700">
+                            <li key={idx} className="flex gap-4 group">
+                                <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-all">
                                     <CheckCircle className="h-4 w-4 text-white" />
                                 </div>
                                 <div>
-                                    <Skeleton className="mb-1 h-6 w-48 bg-white/20" />
-                                    <Skeleton className="h-4 w-64 bg-white/20" />
+                                    <h4 className="text-xl font-bold text-white mb-1">{f.title}</h4>
+                                    <p className="text-neutral-400">{f.desc}</p>
                                 </div>
                             </li>
                         ))}
@@ -724,9 +826,13 @@ function CinematicSection() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
                     >
-                        <Skeleton className="mb-6 h-12 w-full bg-white/20" />
-                        <Skeleton className="mb-8 h-24 w-full bg-white/20" />
-                        <div className="grid grid-cols-2 gap-6">
+                        <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl leading-tight">
+                            L'excellence opérationnelle <br />au service de votre sérénité.
+                        </h2>
+                        <p className="mb-12 text-xl text-neutral-300">
+                            Notre engagement : une qualité constante, un support dédié et une technologie transparente pour simplifier votre quotidien.
+                        </p>
+                        <div className="grid grid-cols-2 gap-8">
                             {[
                                 {
                                     label: 'Satisfaction client',
@@ -745,10 +851,10 @@ function CinematicSection() {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.1 }}
-                                    className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
+                                    className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md"
                                 >
-                                    <Skeleton className="h-8 w-16 mb-1 bg-white/20" />
-                                    <Skeleton className="h-4 w-24 bg-white/20" />
+                                    <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+                                    <div className="text-sm uppercase tracking-widest text-neutral-400 font-bold">{stat.label}</div>
                                 </motion.div>
                             ))}
                         </div>
@@ -819,8 +925,12 @@ function FuturisticSection() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
                 >
-                    <Skeleton className="mx-auto mb-6 h-10 w-3/4 max-w-3xl bg-white/20" />
-                    <Skeleton className="mx-auto mb-12 h-20 w-full max-w-3xl bg-white/20" />
+                    <h2 className="mx-auto mb-6 text-4xl font-extrabold tracking-tight text-white md:text-6xl">
+                        Propulsé par une technologie de pointe.
+                    </h2>
+                    <p className="mx-auto mb-16 max-w-3xl text-xl text-neutral-400">
+                        VIMAIZ utilise les dernières innovations en intelligence artificielle et géolocalisation pour vous garantir une expérience fluide et sécurisée.
+                    </p>
 
                     {/* Feature Cards */}
                     <div className="mt-16 grid gap-8 md:grid-cols-3">
@@ -854,8 +964,8 @@ function FuturisticSection() {
                                     <div className="mb-4 text-5xl">
                                         {feature.icon}
                                     </div>
-                                    <Skeleton className="mb-3 h-6 w-3/4 bg-white/20" />
-                                    <Skeleton className="h-16 w-full bg-white/20" />
+                                    <h4 className="text-xl font-bold text-white mb-3">{feature.title}</h4>
+                                    <p className="text-sm leading-relaxed text-neutral-400">{feature.desc}</p>
                                 </div>
                             </motion.div>
                         ))}
@@ -898,43 +1008,45 @@ function Footer() {
                                 VIMAIZ
                             </span>
                         </div>
-                        <Skeleton className="mt-2 h-16 w-full bg-neutral-200" />
+                        <p className="mt-4 text-sm leading-relaxed text-neutral-500">
+                            La première plateforme de services à domicile haut de gamme au Maroc. Qualité, confiance et simplicité.
+                        </p>
                     </div>
 
                     <div>
-                        <Skeleton className="mb-4 h-6 w-24 bg-neutral-200" />
-                        <ul className="space-y-2">
-                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
-                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
-                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
+                        <h4 className="mb-6 text-sm font-bold uppercase tracking-widest text-neutral-900">Services</h4>
+                        <ul className="space-y-4">
+                            <li><a href="#" className="text-sm text-neutral-500 hover:text-neutral-900">Ménage standard</a></li>
+                            <li><a href="#" className="text-sm text-neutral-500 hover:text-neutral-900">Nettoyage profond</a></li>
+                            <li><a href="#" className="text-sm text-neutral-500 hover:text-neutral-900">Lavage de vitres</a></li>
                         </ul>
                     </div>
 
                     <div>
-                        <Skeleton className="mb-4 h-6 w-24 bg-neutral-200" />
-                        <ul className="space-y-2">
-                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
-                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
-                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
+                        <h4 className="mb-6 text-sm font-bold uppercase tracking-widest text-neutral-900">Société</h4>
+                        <ul className="space-y-4">
+                            <li><a href="#" className="text-sm text-neutral-500 hover:text-neutral-900">À propos</a></li>
+                            <li><a href="#" className="text-sm text-neutral-500 hover:text-neutral-900">Blog</a></li>
+                            <li><a href="#" className="text-sm text-neutral-500 hover:text-neutral-900">Carrières</a></li>
                         </ul>
 
                     </div>
 
                     <div>
-                        <Skeleton className="mb-4 h-6 w-24 bg-neutral-200" />
-                        <ul className="space-y-2">
-                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
-                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
-                            <li><Skeleton className="h-4 w-16 bg-neutral-200" /></li>
+                        <h4 className="mb-6 text-sm font-bold uppercase tracking-widest text-neutral-900">Support</h4>
+                        <ul className="space-y-4">
+                            <li><a href="#" className="text-sm text-neutral-500 hover:text-neutral-900">Aide & FAQ</a></li>
+                            <li><a href="#" className="text-sm text-neutral-500 hover:text-neutral-900">Contact</a></li>
+                            <li><a href="#" className="text-sm text-neutral-500 hover:text-neutral-900">Confidentialité</a></li>
                         </ul>
                     </div>
                 </div>
                 <div className="flex flex-col items-center justify-between gap-4 border-t border-neutral-100 pt-8 md:flex-row">
-                    <Skeleton className="h-4 w-48 bg-neutral-200" />
+                    <p className="text-xs text-neutral-400">© {new Date().getFullYear()} VIMAIZ. Tous droits réservés.</p>
                     <div className="flex gap-6">
-                        <Skeleton className="h-4 w-24 bg-neutral-200" />
-                        <Skeleton className="h-4 w-24 bg-neutral-200" />
-                        <Skeleton className="h-4 w-24 bg-neutral-200" />
+                        <a href="#" className="text-xs text-neutral-400 hover:text-neutral-900">Twitter</a>
+                        <a href="#" className="text-xs text-neutral-400 hover:text-neutral-900">LinkedIn</a>
+                        <a href="#" className="text-xs text-neutral-400 hover:text-neutral-900">Instagram</a>
                     </div>
                 </div>
             </div>

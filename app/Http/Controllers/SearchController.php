@@ -19,20 +19,32 @@ class SearchController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only([
-            'lat', 
-            'lng', 
-            'radius', 
-            'service_id', 
-            'date',
-            'search',
-            'min_price',
-            'max_price',
-            'min_rating',
-            'min_experience',
-            'sort_by',
-            'sort_direction'
-        ]);
+        $filters = array_merge([
+            'radius' => 20,
+            'lat' => null,
+            'lng' => null,
+            'service_id' => null,
+            'min_rating' => null,
+            'min_experience' => null,
+            'search' => '',
+            'property_type' => null,
+            'size' => null,
+        ], $request->only([
+                        'lat',
+                        'lng',
+                        'radius',
+                        'service_id',
+                        'date',
+                        'search',
+                        'min_price',
+                        'max_price',
+                        'min_rating',
+                        'min_experience',
+                        'sort_by',
+                        'sort_direction',
+                        'property_type',
+                        'size',
+                    ]));
 
         $agents = $this->agentMatchingService->search($filters);
 
