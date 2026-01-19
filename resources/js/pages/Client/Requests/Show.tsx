@@ -1,0 +1,370 @@
+import { Head, Link, router } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Home, Calendar, Clock, MapPin, FileText, CreditCard, User, XCircle, CheckCircle } from 'lucide-react';
+
+interface Property {
+    id: number;
+    name: string | null;
+    type_label: string;
+    city: string;
+    address_line1: string;
+    postal_code: string;
+    surface_area: number;
+}
+
+interface Quote {
+    id: number;
+    quote_number: string;
+    final_price: number;
+    estimated_price: number;
+    commission_amount: number;
+    status: string;
+    status_label: string;
+    expires_at: string | null;
+}
+
+interface Agent {
+    id: number;
+    name: string;
+}
+
+interface MissionPhoto {
+    id: number;
+    type: string;
+    path: string;
+}
+
+interface Mission {
+    id: number;
+    mission_number: string;
+    status: string;
+    status_label: string;
+    scheduled_at: string;
+    agent: Agent | null;
+    photos: MissionPhoto[];
+}
+
+interface ServiceRequest {
+    id: number;
+    request_number: string;
+    scheduled_date: string;
+    scheduled_time: string;
+    requested_hours: number;
+    special_instructions: string | null;
+    status: string;
+    status_label: string;
+    property: Property;
+    quote: Quote | null;
+    mission: Mission | null;
+    created_at: string;
+}
+
+interface Props {
+    serviceRequest: ServiceRequest;
+    canCancel: boolean;
+    canPay: boolean;
+}
+
+export default function Show({ serviceRequest, canCancel, canPay }: Props) {
+    const getStatusColor = (status: string) => {
+        const colors: Record<string, string> = {
+            pending: 'bg-yellow-100 text-yellow-800',
+            quote_sent: 'bg-blue-100 text-blue-800',
+            quote_accepted: 'bg-emerald-100 text-emerald-800',
+            paid: 'bg-green-100 text-green-800',
+            assigned: 'bg-purple-100 text-purple-800',
+            in_progress: 'bg-sky-100 text-sky-800',
+            completed: 'bg-green-100 text-green-800',
+            cancelled: 'bg-gray-100 text-gray-800',
+            draft: 'bg-gray-100 text-gray-800',
+            sent: 'bg-blue-100 text-blue-800',
+            accepted: 'bg-green-100 text-green-800',
+            refused: 'bg-red-100 text-red-800',
+            expired: 'bg-orange-100 text-orange-800',
+        };
+        return colors[status] || 'bg-gray-100 text-gray-800';
+    };
+
+    const handleCancel = () => {
+        if (confirm('Êtes-vous sûr de vouloir annuler cette demande ?')) {
+            router.post(route('client.requests.cancel', serviceRequest.id));
+        }
+    };
+
+    const handleAcceptQuote = () => {
+        if (serviceRequest.quote) {
+            router.post(route('client.quotes.accept', serviceRequest.quote.id));
+        }
+    };
+
+    const handleRefuseQuote = () => {
+        if (serviceRequest.quote && confirm('Êtes-vous sûr de vouloir refuser ce devis ?')) {
+            router.post(route('client.quotes.refuse', serviceRequest.quote.id));
+        }
+    };
+
+    const steps = [
+        { key: 'pending', label: 'Demande envoyée', done: true },
+        { key: 'quote_sent', label: 'Devis reçu', done: ['quote_sent', 'quote_accepted', 'paid', 'assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
+        { key: 'paid', label: 'Paiement', done: ['paid', 'assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
+        { key: 'assigned', label: 'Agent attribué', done: ['assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
+        { key: 'completed', label: 'Terminé', done: serviceRequest.status === 'completed' },
+    ];
+
+    return (
+        <AppLayout breadcrumbs={[
+            { title: 'Mes demandes', href: route('client.requests.index') },
+            { title: serviceRequest.request_number, href: '#' },
+        ]}>
+            <Head title={`Demande ${serviceRequest.request_number}`} />
+
+            <div className="py-8">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Header */}
+                    <div className="mb-8">
+                        <Link href={route('client.requests.index')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 mb-4">
+                            <ArrowLeft className="h-4 w-4 mr-1" />
+                            Retour aux demandes
+                        </Link>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div>
+                                <div className="flex items-center gap-3">
+                                    <h1 className="text-2xl font-bold text-slate-900">
+                                        {serviceRequest.request_number}
+                                    </h1>
+                                    <Badge className={getStatusColor(serviceRequest.status)}>
+                                        {serviceRequest.status_label}
+                                    </Badge>
+                                </div>
+                                <p className="text-slate-500 mt-1">
+                                    Créée le {new Date(serviceRequest.created_at).toLocaleDateString('fr-FR')}
+                                </p>
+                            </div>
+                            {canCancel && (
+                                <Button variant="outline" onClick={handleCancel} className="text-red-600 hover:text-red-700">
+                                    <XCircle className="h-4 w-4 mr-2" />
+                                    Annuler
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Progress Steps */}
+                    {serviceRequest.status !== 'cancelled' && serviceRequest.status !== 'quote_refused' && (
+                        <Card className="mb-6">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    {steps.map((step, index) => (
+                                        <div key={step.key} className="flex items-center flex-1">
+                                            <div className="flex flex-col items-center">
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                                    step.done ? 'bg-sky-500 text-white' : 'bg-slate-200 text-slate-500'
+                                                }`}>
+                                                    {step.done ? <CheckCircle className="h-5 w-5" /> : index + 1}
+                                                </div>
+                                                <span className="text-xs mt-2 text-center hidden sm:block">{step.label}</span>
+                                            </div>
+                                            {index < steps.length - 1 && (
+                                                <div className={`flex-1 h-1 mx-2 ${
+                                                    steps[index + 1].done ? 'bg-sky-500' : 'bg-slate-200'
+                                                }`} />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    <div className="grid gap-6 lg:grid-cols-3">
+                        {/* Main Content */}
+                        <div className="lg:col-span-2 space-y-6">
+                            {/* Quote Card */}
+                            {serviceRequest.quote && (
+                                <Card className={serviceRequest.quote.status === 'sent' ? 'border-sky-300 bg-sky-50/50' : ''}>
+                                    <CardHeader>
+                                        <div className="flex items-center justify-between">
+                                            <CardTitle className="flex items-center gap-2">
+                                                <FileText className="h-5 w-5 text-sky-500" />
+                                                Devis {serviceRequest.quote.quote_number}
+                                            </CardTitle>
+                                            <Badge className={getStatusColor(serviceRequest.quote.status)}>
+                                                {serviceRequest.quote.status_label}
+                                            </Badge>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <span className="text-slate-600">Montant total</span>
+                                            <span className="text-2xl font-bold text-slate-900">
+                                                {serviceRequest.quote.final_price} MAD
+                                            </span>
+                                        </div>
+                                        
+                                        {serviceRequest.quote.expires_at && serviceRequest.quote.status === 'sent' && (
+                                            <p className="text-sm text-orange-600 mb-4">
+                                                Expire le {new Date(serviceRequest.quote.expires_at).toLocaleDateString('fr-FR')}
+                                            </p>
+                                        )}
+
+                                        {serviceRequest.quote.status === 'sent' && (
+                                            <div className="flex gap-3">
+                                                <Button 
+                                                    onClick={handleAcceptQuote}
+                                                    className="flex-1 bg-sky-500 hover:bg-sky-600"
+                                                >
+                                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                                    Accepter et payer
+                                                </Button>
+                                                <Button 
+                                                    variant="outline" 
+                                                    onClick={handleRefuseQuote}
+                                                    className="text-red-600"
+                                                >
+                                                    Refuser
+                                                </Button>
+                                            </div>
+                                        )}
+
+                                        {serviceRequest.quote.status === 'accepted' && (
+                                            <Link href={route('client.payment.show', serviceRequest.quote.id)}>
+                                                <Button className="w-full bg-green-500 hover:bg-green-600">
+                                                    <CreditCard className="h-4 w-4 mr-2" />
+                                                    Procéder au paiement
+                                                </Button>
+                                            </Link>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Mission Card */}
+                            {serviceRequest.mission && (
+                                <Card>
+                                    <CardHeader>
+                                        <div className="flex items-center justify-between">
+                                            <CardTitle className="flex items-center gap-2">
+                                                <User className="h-5 w-5 text-sky-500" />
+                                                Mission {serviceRequest.mission.mission_number}
+                                            </CardTitle>
+                                            <Badge className={getStatusColor(serviceRequest.mission.status)}>
+                                                {serviceRequest.mission.status_label}
+                                            </Badge>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {serviceRequest.mission.agent && (
+                                            <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded-lg">
+                                                <div className="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center">
+                                                    <User className="h-5 w-5 text-sky-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium">{serviceRequest.mission.agent.name}</p>
+                                                    <p className="text-sm text-slate-500">Agent de ménage</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        <Link href={route('client.missions.show', serviceRequest.mission.id)}>
+                                            <Button variant="outline" className="w-full">
+                                                Voir les détails de la mission
+                                            </Button>
+                                        </Link>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Waiting for Quote */}
+                            {serviceRequest.status === 'pending' && (
+                                <Card className="bg-yellow-50 border-yellow-200">
+                                    <CardContent className="p-6 text-center">
+                                        <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Clock className="h-6 w-6 text-yellow-600" />
+                                        </div>
+                                        <h3 className="font-semibold text-yellow-800 mb-2">En attente de devis</h3>
+                                        <p className="text-sm text-yellow-700">
+                                            Notre équipe prépare votre devis personnalisé. Vous le recevrez sous 24h.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
+
+                        {/* Sidebar */}
+                        <div className="space-y-6">
+                            {/* Property Info */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-base">
+                                        <Home className="h-4 w-4 text-sky-500" />
+                                        Logement
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="font-medium">{serviceRequest.property.name || serviceRequest.property.type_label}</p>
+                                    <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
+                                        <MapPin className="h-3 w-3" />
+                                        {serviceRequest.property.address_line1}
+                                    </p>
+                                    <p className="text-sm text-slate-500">
+                                        {serviceRequest.property.postal_code} {serviceRequest.property.city}
+                                    </p>
+                                    <p className="text-sm text-slate-500 mt-2">
+                                        {serviceRequest.property.surface_area} m²
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            {/* Schedule */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-base">
+                                        <Calendar className="h-4 w-4 text-sky-500" />
+                                        Planification
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-500">Date</span>
+                                        <span className="font-medium">
+                                            {new Date(serviceRequest.scheduled_date).toLocaleDateString('fr-FR', {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long'
+                                            })}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-500">Heure</span>
+                                        <span className="font-medium">{serviceRequest.scheduled_time}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-500">Durée</span>
+                                        <span className="font-medium">{serviceRequest.requested_hours}h</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Special Instructions */}
+                            {serviceRequest.special_instructions && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="text-base">Instructions</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-slate-600 whitespace-pre-wrap">
+                                            {serviceRequest.special_instructions}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </AppLayout>
+    );
+}

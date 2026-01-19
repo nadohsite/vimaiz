@@ -1,36 +1,7 @@
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Calendar, MapPin, Star, TrendingUp, PieChart as PieChartIcon } from 'lucide-react';
-import {
-    Area,
-    AreaChart,
-    Cell,
-    Pie,
-    PieChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
-} from 'recharts';
-
-const spendingData = [
-    { month: 'Jan', total: 400 },
-    { month: 'Fév', total: 300 },
-    { month: 'Mar', total: 600 },
-    { month: 'Avr', total: 800 },
-    { month: 'Mai', total: 500 },
-    { month: 'Juin', total: 900 },
-];
-
-const serviceData = [
-    { name: 'Nettoyage Standard', value: 400 },
-    { name: 'Nettoyage Profond', value: 300 },
-    { name: 'Repassage', value: 200 },
-    { name: 'Vitre', value: 100 },
-];
-
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899'];
+import { Home, Plus, ClipboardList, FileText, ArrowRight } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -39,152 +10,164 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard({ activeBookings = [], properties = [] }: any) {
+interface DashboardProps {
+    properties?: any[];
+    activeRequests?: any[];
+    stats?: {
+        properties_count: number;
+        requests_count: number;
+        completed_count: number;
+    };
+}
+
+export default function Dashboard({ properties = [], activeRequests = [], stats }: DashboardProps) {
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tableau de bord" />
+            <Head title="Tableau de bord - VIMAIZ" />
 
-            <div className="p-4 space-y-8 sm:p-6 lg:p-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-                        Bienvenue !
+            <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-slate-900">
+                        Bienvenue sur VIMAIZ
                     </h1>
-                    <p className="mt-1 text-neutral-600 dark:text-neutral-400">
-                        Gérez vos réservations et suivez vos statistiques de nettoyage.
+                    <p className="mt-2 text-slate-600">
+                        Gérez vos logements et demandes de ménage en toute simplicité.
                     </p>
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <p className="text-sm font-medium text-neutral-500">Total Dépensé</p>
-                        <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mt-1">3,700 MAD</p>
-                    </div>
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <p className="text-sm font-medium text-neutral-500">Réservations</p>
-                        <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mt-1">12</p>
-                    </div>
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <p className="text-sm font-medium text-neutral-500">Heures de service</p>
-                        <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mt-1">48h</p>
-                    </div>
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <p className="text-sm font-medium text-neutral-500">Economisé</p>
-                        <p className="text-2xl font-bold text-indigo-600 mt-1">15%</p>
-                    </div>
-                </div>
-
-                {/* Charts Section */}
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <div className="flex items-center gap-2 mb-6">
-                            <TrendingUp className="h-5 w-5 text-indigo-600" />
-                            <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">Dépenses Mensuelles</h3>
-                        </div>
-                        <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={spendingData}>
-                                    <defs>
-                                        <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1}/>
-                                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                                        </linearGradient>
-                                    </defs>
-                                    <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value} MAD`} />
-                                    <Tooltip 
-                                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                                        labelStyle={{ fontWeight: 'bold' }}
-                                    />
-                                    <Area type="monotone" dataKey="total" stroke="#6366f1" fillOpacity={1} fill="url(#colorTotal)" />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
+                    <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+                        <div className="flex items-center gap-4">
+                            <div className="rounded-xl bg-sky-100 p-3">
+                                <Home className="h-6 w-6 text-sky-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">Logements</p>
+                                <p className="text-2xl font-bold text-slate-900">{stats?.properties_count ?? properties.length}</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <div className="flex items-center gap-2 mb-6">
-                            <PieChartIcon className="h-5 w-5 text-green-600" />
-                            <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">Répartition des Services</h3>
+                    <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+                        <div className="flex items-center gap-4">
+                            <div className="rounded-xl bg-amber-100 p-3">
+                                <ClipboardList className="h-6 w-6 text-amber-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">Demandes en cours</p>
+                                <p className="text-2xl font-bold text-slate-900">{stats?.requests_count ?? activeRequests.length}</p>
+                            </div>
                         </div>
-                        <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={serviceData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                    >
-                                        {serviceData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                </PieChart>
-                            </ResponsiveContainer>
-                            <div className="flex flex-wrap justify-center gap-4 mt-4">
-                                {serviceData.map((item, index) => (
-                                    <div key={item.name} className="flex items-center gap-2">
-                                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-                                        <span className="text-xs text-neutral-600 dark:text-neutral-400">{item.name}</span>
-                                    </div>
-                                ))}
+                    </div>
+                    <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+                        <div className="flex items-center gap-4">
+                            <div className="rounded-xl bg-green-100 p-3">
+                                <FileText className="h-6 w-6 text-green-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">Ménages effectués</p>
+                                <p className="text-2xl font-bold text-slate-900">{stats?.completed_count ?? 0}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Actions Rapides */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                {/* Quick Actions */}
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">Actions rapides</h2>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
                     <Link
-                        href={route('client.search')}
-                        className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6 transition-all hover:border-indigo-300 hover:shadow-md"
+                        href={route('client.requests.create')}
+                        className="group rounded-2xl bg-sky-500 p-6 text-white transition-all hover:bg-sky-600 hover:shadow-lg"
                     >
-                        <div className="mb-4 w-fit rounded-lg bg-indigo-100 p-3 dark:bg-indigo-900/30">
-                            <MapPin className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                        <div className="mb-4 w-fit rounded-xl bg-white/20 p-3">
+                            <Plus className="h-6 w-6" />
                         </div>
-                        <h3 className="mb-2 text-lg font-bold text-neutral-900 dark:text-neutral-100">
-                            Trouver un Agent
-                        </h3>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                            Recherchez des professionnels près de chez vous
-                        </p>
+                        <h3 className="text-lg font-semibold mb-1">Demander un ménage</h3>
+                        <p className="text-sm text-sky-100">Planifiez votre prochain ménage</p>
+                        <ArrowRight className="mt-4 h-5 w-5 transition-transform group-hover:translate-x-1" />
                     </Link>
 
                     <Link
-                        href={route('client.bookings.index')}
-                        className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6 transition-all hover:border-indigo-300 hover:shadow-md"
+                        href={route('client.properties.index')}
+                        className="group rounded-2xl bg-white p-6 border border-slate-200 transition-all hover:border-sky-300 hover:shadow-md"
                     >
-                        <div className="mb-4 w-fit rounded-lg bg-green-100 p-3 dark:bg-green-900/30">
-                            <Calendar className="h-6 w-6 text-green-600 dark:text-green-400" />
+                        <div className="mb-4 w-fit rounded-xl bg-slate-100 p-3">
+                            <Home className="h-6 w-6 text-slate-600" />
                         </div>
-                        <h3 className="mb-2 text-lg font-bold text-neutral-900 dark:text-neutral-100">
-                            Mes Réservations
-                        </h3>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                            Consultez et gérez vos rendez-vous
-                        </p>
+                        <h3 className="text-lg font-semibold text-slate-900 mb-1">Mes logements</h3>
+                        <p className="text-sm text-slate-500">Gérez vos propriétés</p>
+                        <ArrowRight className="mt-4 h-5 w-5 text-slate-400 transition-transform group-hover:translate-x-1" />
                     </Link>
 
                     <Link
-                        href={route('services.index')}
-                        className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6 transition-all hover:border-indigo-300 hover:shadow-md"
+                        href={route('client.requests.index')}
+                        className="group rounded-2xl bg-white p-6 border border-slate-200 transition-all hover:border-sky-300 hover:shadow-md"
                     >
-                        <div className="mb-4 w-fit rounded-lg bg-purple-100 p-3 dark:bg-purple-900/30">
-                            <Star className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                        <div className="mb-4 w-fit rounded-xl bg-slate-100 p-3">
+                            <ClipboardList className="h-6 w-6 text-slate-600" />
                         </div>
-                        <h3 className="mb-2 text-lg font-bold text-neutral-900 dark:text-neutral-100">
-                            Services
-                        </h3>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                            Parcourez nos services de nettoyage disponibles
-                        </p>
+                        <h3 className="text-lg font-semibold text-slate-900 mb-1">Mes demandes</h3>
+                        <p className="text-sm text-slate-500">Suivez vos demandes</p>
+                        <ArrowRight className="mt-4 h-5 w-5 text-slate-400 transition-transform group-hover:translate-x-1" />
+                    </Link>
+
+                    <Link
+                        href={route('client.missions.index')}
+                        className="group rounded-2xl bg-white p-6 border border-slate-200 transition-all hover:border-sky-300 hover:shadow-md"
+                    >
+                        <div className="mb-4 w-fit rounded-xl bg-slate-100 p-3">
+                            <FileText className="h-6 w-6 text-slate-600" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-slate-900 mb-1">Historique</h3>
+                        <p className="text-sm text-slate-500">Factures et ménages passés</p>
+                        <ArrowRight className="mt-4 h-5 w-5 text-slate-400 transition-transform group-hover:translate-x-1" />
                     </Link>
                 </div>
+
+                {/* Recent Properties */}
+                {properties.length > 0 && (
+                    <div className="mb-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-semibold text-slate-900">Mes logements</h2>
+                            <Link href={route('client.properties.index')} className="text-sm font-medium text-sky-600 hover:text-sky-700">
+                                Voir tout →
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {properties.slice(0, 3).map((property: any) => (
+                                <div key={property.id} className="rounded-2xl bg-white p-5 border border-slate-200">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <span className="inline-flex items-center rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-medium text-sky-800 capitalize">
+                                            {property.type}
+                                        </span>
+                                    </div>
+                                    <h3 className="font-semibold text-slate-900 mb-1">{property.name || `${property.type} - ${property.city}`}</h3>
+                                    <p className="text-sm text-slate-500">{property.city}, {property.postal_code}</p>
+                                    <p className="text-sm text-slate-400 mt-2">{property.surface_area} m² • {property.bedrooms} ch.</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {properties.length === 0 && (
+                    <div className="rounded-2xl bg-white p-8 border border-slate-200 text-center">
+                        <div className="mx-auto w-fit rounded-full bg-sky-100 p-4 mb-4">
+                            <Home className="h-8 w-8 text-sky-600" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-slate-900 mb-2">Aucun logement enregistré</h3>
+                        <p className="text-slate-500 mb-4">Commencez par ajouter votre premier logement pour demander un ménage.</p>
+                        <Link
+                            href={route('client.properties.create')}
+                            className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-4 py-2 text-white font-medium hover:bg-sky-600 transition-colors"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Ajouter un logement
+                        </Link>
+                    </div>
+                )}
             </div>
         </AppSidebarLayout>
     );

@@ -1,10 +1,9 @@
-import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
-import { type SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { type PropsWithChildren } from 'react';
+import { Sparkles, Shield, Clock, CheckCircle } from 'lucide-react';
 
 interface AuthLayoutProps {
     title?: string;
@@ -16,27 +15,30 @@ export default function AuthSplitLayout({
     children,
     title,
     description,
-    reverse = true, // Default to true as per user request: form left, image right
+    reverse = true,
 }: PropsWithChildren<AuthLayoutProps>) {
-    const { name, quote } = usePage<SharedData>().props;
-
     return (
-        <div className="relative grid min-h-svh flex-col items-center justify-center sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0 bg-background">
+        <div className="relative grid min-h-svh flex-col items-center justify-center sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0 bg-white">
             {/* Form Column */}
             <div className={cn(
-                "w-full lg:p-8 flex flex-col justify-center min-h-svh",
+                "w-full lg:p-8 flex flex-col justify-center min-h-svh bg-white",
                 reverse ? "order-1" : "order-2"
             )}>
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px] p-6">
                     <Link
                         href={home()}
-                        className="relative z-20 flex items-center justify-center lg:hidden mb-8"
+                        className="relative z-20 flex items-center justify-center lg:hidden mb-6"
                     >
-                        <AppLogoIcon className="h-10 fill-current text-black" />
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-sky-600 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/30">
+                                <Sparkles className="h-5 w-5 text-white" />
+                            </div>
+                            <span className="text-2xl font-bold text-slate-900">VIMAIZ</span>
+                        </div>
                     </Link>
                     <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center mb-4">
-                        <h1 className="text-3xl font-bold tracking-tight text-neutral-900">{title}</h1>
-                        <p className="text-base text-neutral-500 max-w-[350px]">
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">{title}</h1>
+                        <p className="text-base text-slate-500 max-w-[350px]">
                             {description}
                         </p>
                     </div>
@@ -46,48 +48,64 @@ export default function AuthSplitLayout({
 
             {/* Image/Decoration Column */}
             <div className={cn(
-                "relative hidden h-full flex-col bg-muted p-10 text-white lg:flex",
+                "relative hidden h-full flex-col p-10 text-white lg:flex",
                 reverse ? "order-2" : "order-1"
             )}>
-                <div className="absolute inset-0 bg-neutral-900 overflow-hidden">
-                    {/* Cinematic background with gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/20 to-transparent z-10" />
-                    <img 
-                        src="https://images.unsplash.com/photo-1600880212340-02d956381b2e?q=80&w=2070&auto=format&fit=crop" 
-                        alt="Premium Interior"
-                        className="h-full w-full object-cover opacity-60 scale-105 hover:scale-100 transition-transform duration-[10s]"
-                    />
+                <div className="absolute inset-0 bg-gradient-to-br from-sky-500 via-sky-600 to-cyan-600 overflow-hidden">
+                    {/* Decorative circles */}
+                    <div className="absolute -top-20 -right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+                    <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-400/10 rounded-full blur-3xl" />
                 </div>
                 
                 <Link
                     href={home()}
-                    className="relative z-20 flex items-center text-xl font-bold tracking-tighter"
+                    className="relative z-20 flex items-center gap-3"
                 >
-                    <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-md border border-white/20">
-                        <AppLogoIcon className="size-5 fill-current text-white" />
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30">
+                        <Sparkles className="h-6 w-6 text-white" />
                     </div>
-                    <span className="text-white drop-shadow-sm">{name}</span>
+                    <span className="text-2xl font-bold text-white">VIMAIZ</span>
                 </Link>
 
-                {quote && (
-                    <div className="relative z-20 mt-auto">
-                        <motion.blockquote 
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="space-y-4 max-w-lg"
-                        >
-                            <p className="text-2xl font-light leading-snug text-white/90 italic">
-                                &ldquo;{quote.message}&rdquo;
-                            </p>
-                            <footer className="flex items-center gap-3">
-                                <div className="h-px w-12 bg-white/30" />
-                                <span className="text-sm font-medium tracking-widest uppercase text-white/60">
-                                    {quote.author}
-                                </span>
-                            </footer>
-                        </motion.blockquote>
-                    </div>
-                )}
+                <div className="relative z-20 mt-auto space-y-8">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                    >
+                        <h2 className="text-4xl font-bold leading-tight mb-4">
+                            Le ménage professionnel<br />à portée de clic
+                        </h2>
+                        <p className="text-lg text-white/80 max-w-md">
+                            Réservez votre agent de ménage en quelques minutes et profitez d'un intérieur impeccable.
+                        </p>
+                    </motion.div>
+
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="grid grid-cols-2 gap-4"
+                    >
+                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+                            <Shield className="h-6 w-6 mb-2 text-white/90" />
+                            <p className="text-sm font-medium">Agents vérifiés</p>
+                        </div>
+                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+                            <Clock className="h-6 w-6 mb-2 text-white/90" />
+                            <p className="text-sm font-medium">Réservation rapide</p>
+                        </div>
+                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+                            <CheckCircle className="h-6 w-6 mb-2 text-white/90" />
+                            <p className="text-sm font-medium">Satisfaction garantie</p>
+                        </div>
+                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+                            <Sparkles className="h-6 w-6 mb-2 text-white/90" />
+                            <p className="text-sm font-medium">Service premium</p>
+                        </div>
+                    </motion.div>
+                </div>
             </div>
         </div>
     );

@@ -11,6 +11,13 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
+use App\Http\Controllers\Client\PropertyController as ClientPropertyController;
+use App\Http\Controllers\Client\ServiceRequestController as ClientServiceRequestController;
+use App\Http\Controllers\Client\QuoteController as ClientQuoteController;
+use App\Http\Controllers\Client\PaymentController as ClientPaymentController;
+use App\Http\Controllers\Client\MissionController as ClientMissionController;
+use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
+use App\Http\Controllers\Agent\MissionController as AgentMissionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -59,6 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Client routes
     Route::middleware(['role:client'])->prefix('client')->name('client.')->group(function () {
+        // Legacy booking routes
         Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
         Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
         Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
@@ -67,13 +75,38 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/bookings/{booking}', [BookingController::class, 'destroy'])->name('bookings.destroy');
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
 
+        // VIMAIZ - Logements (Properties)
+        Route::get('/properties', [ClientPropertyController::class, 'index'])->name('properties.index');
+        Route::get('/properties/create', [ClientPropertyController::class, 'create'])->name('properties.create');
+        Route::post('/properties', [ClientPropertyController::class, 'store'])->name('properties.store');
+        Route::get('/properties/{property}', [ClientPropertyController::class, 'show'])->name('properties.show');
+        Route::get('/properties/{property}/edit', [ClientPropertyController::class, 'edit'])->name('properties.edit');
+        Route::patch('/properties/{property}', [ClientPropertyController::class, 'update'])->name('properties.update');
+        Route::delete('/properties/{property}', [ClientPropertyController::class, 'destroy'])->name('properties.destroy');
+
+        // VIMAIZ - Demandes de ménage (Service Requests)
+        Route::get('/requests', [ClientServiceRequestController::class, 'index'])->name('requests.index');
+        Route::get('/requests/create', [ClientServiceRequestController::class, 'create'])->name('requests.create');
+        Route::post('/requests', [ClientServiceRequestController::class, 'store'])->name('requests.store');
+        Route::get('/requests/{serviceRequest}', [ClientServiceRequestController::class, 'show'])->name('requests.show');
+        Route::post('/requests/{serviceRequest}/cancel', [ClientServiceRequestController::class, 'cancel'])->name('requests.cancel');
+        Route::post('/requests/estimate', [ClientServiceRequestController::class, 'estimate'])->name('requests.estimate');
+
+        // VIMAIZ - Devis (Quotes)
+        Route::get('/quotes/{quote}', [ClientQuoteController::class, 'show'])->name('quotes.show');
+        Route::post('/quotes/{quote}/accept', [ClientQuoteController::class, 'accept'])->name('quotes.accept');
+        Route::post('/quotes/{quote}/refuse', [ClientQuoteController::class, 'refuse'])->name('quotes.refuse');
+
+        // VIMAIZ - Paiement (Payment)
+        Route::get('/payment/{quote}', [ClientPaymentController::class, 'show'])->name('payment.show');
+        Route::post('/payment/{quote}/process', [ClientPaymentController::class, 'process'])->name('payment.process');
+
+        // VIMAIZ - Missions
+        Route::get('/missions', [ClientMissionController::class, 'index'])->name('missions.index');
+        Route::get('/missions/{mission}', [ClientMissionController::class, 'show'])->name('missions.show');
+
         // Addresses
         Route::get('/addresses', function () {
-            // We can return the Inertia page directly here or use a Controller method
-            // Ideally, we should use AddressController@index but it returns JSON in my previous implementation?
-            // Let's check AddressController content again. 
-            // Wait, AddressController@index returns the collection directly (JSON API style) OR typically in Inertia apps we render a page.
-            // Let's create a Client/Addresses/Index page and pass addresses as prop.
             return Inertia::render('client/addresses/index', [
                 'addresses' => request()->user()->addresses()->orderBy('is_default', 'desc')->get()
             ]);
@@ -86,7 +119,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Agent routes
     Route::middleware(['role:agent'])->prefix('agent')->name('agent.')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'agentDashboard'])->name('dashboard');
+        // VIMAIZ - Dashboard Agent
+        Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('dashboard');
+
+        // VIMAIZ - Missions Agent
+        Route::get('/missions', [AgentMissionController::class, 'index'])->name('missions.index');
+        Route::get('/missions/{mission}', [AgentMissionController::class, 'show'])->name('missions.show');
+        Route::post('/missions/{mission}/accept', [AgentMissionController::class, 'accept'])->name('missions.accept');
+        Route::post('/missions/{mission}/refuse', [AgentMissionController::class, 'refuse'])->name('missions.refuse');
+        Route::post('/missions/{mission}/start', [AgentMissionController::class, 'start'])->name('missions.start');
+        Route::post('/missions/{mission}/photos', [AgentMissionController::class, 'uploadPhoto'])->name('missions.upload-photo');
+        Route::delete('/missions/{mission}/photos/{photo}', [AgentMissionController::class, 'deletePhoto'])->name('missions.delete-photo');
+        Route::post('/missions/{mission}/complete', [AgentMissionController::class, 'complete'])->name('missions.complete');
+
+        // Legacy booking routes (keeping for compatibility)
         Route::get('/bookings', [BookingController::class, 'agentBookings'])->name('bookings.index');
         Route::patch('/bookings/{booking}/accept', [BookingController::class, 'accept'])->name('bookings.accept');
         Route::patch('/bookings/{booking}/reject', [BookingController::class, 'reject'])->name('bookings.reject');

@@ -21,6 +21,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
         'google_id',
@@ -134,6 +136,34 @@ class User extends Authenticatable
     public function properties()
     {
         return $this->hasMany(\App\Models\Property::class);
+    }
+
+    public function serviceRequests()
+    {
+        return $this->hasMany(\App\Models\ServiceRequest::class, 'client_id');
+    }
+
+    public function clientMissions()
+    {
+        return $this->hasMany(\App\Models\Mission::class, 'client_id');
+    }
+
+    public function agentMissions()
+    {
+        return $this->hasMany(\App\Models\Mission::class, 'agent_id');
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(\App\Models\Wallet::class);
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        if ($this->first_name && $this->last_name) {
+            return $this->first_name . ' ' . $this->last_name;
+        }
+        return $this->name ?? '';
     }
 
     // Scopes

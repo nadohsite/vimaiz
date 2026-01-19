@@ -1,69 +1,39 @@
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import {
-    AlertCircle,
-    Calendar,
-    CheckCircle,
-    Clock,
-    DollarSign,
-    XCircle,
-    BarChart3,
-    Star as StarIcon,
-} from 'lucide-react';
-import {
-    Bar,
-    BarChart,
-    Cell,
-    Pie,
-    PieChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
-} from 'recharts';
+import { Briefcase, Clock, CheckCircle, Euro, ArrowRight, MapPin, Calendar } from 'lucide-react';
 
-const earningsData = [
-    { month: 'Jan', total: 1200 },
-    { month: 'Fév', total: 1900 },
-    { month: 'Mar', total: 1500 },
-    { month: 'Avr', total: 2200 },
-    { month: 'Mai', total: 1800 },
-    { month: 'Juin', total: 2500 },
-];
-
-const ratingData = [
-    { name: '5 étoiles', value: 45 },
-    { name: '4 étoiles', value: 10 },
-    { name: '3 étoiles', value: 2 },
-];
-
-const COLORS = ['#10b981', '#6366f1', '#f59e0b'];
-
-interface Booking {
+interface Mission {
     id: number;
-    booking_number: string;
-    client: { name: string };
-    service: { name: string };
+    mission_number: string;
     scheduled_at: string;
-    duration_minutes: number;
     total_price: number;
+    agent_payout: number;
     status: string;
+    service_request: {
+        property: {
+            type: string;
+            city: string;
+            address: string;
+        };
+        client: {
+            name: string;
+        };
+        requested_hours: number;
+    };
 }
 
 interface Stats {
-    total_earnings: number;
-    pending_earnings: number;
-    completed_jobs: number;
-    pending_jobs: number;
-    average_rating: number;
-    total_reviews: number;
+    pending_count: number;
+    active_count: number;
+    completed_count: number;
+    total_earned: number;
 }
 
 interface Props {
-    stats: Stats;
-    upcoming_bookings: Booking[];
-    recent_bookings: Booking[];
+    pendingMissions?: Mission[];
+    activeMissions?: Mission[];
+    stats?: Stats;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -73,300 +43,199 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function AgentDashboard({
-    stats,
-    upcoming_bookings,
-    recent_bookings,
-}: Props) {
+export default function AgentDashboard({ pendingMissions = [], activeMissions = [], stats }: Props) {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'completed':
-                return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+                return 'bg-green-100 text-green-700';
             case 'in_progress':
-                return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-            case 'pending':
-                return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
-            case 'cancelled':
-                return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                return 'bg-sky-100 text-sky-700';
+            case 'agent_accepted':
+                return 'bg-blue-100 text-blue-700';
+            case 'pending_agent':
+                return 'bg-amber-100 text-amber-700';
             default:
-                return 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400';
+                return 'bg-slate-100 text-slate-700';
         }
     };
 
     const getStatusLabel = (status: string) => {
         switch (status) {
-            case 'completed': return 'Terminé';
+            case 'completed': return 'Terminée';
             case 'in_progress': return 'En cours';
-            case 'pending': return 'En attente';
-            case 'cancelled': return 'Annulé';
-            case 'accepted': return 'Accepté';
+            case 'agent_accepted': return 'Acceptée';
+            case 'pending_agent': return 'En attente';
             default: return status;
         }
     };
 
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'completed':
-                return <CheckCircle className="h-4 w-4" />;
-            case 'cancelled':
-                return <XCircle className="h-4 w-4" />;
-            default:
-                return <AlertCircle className="h-4 w-4" />;
-        }
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('fr-FR', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
     };
 
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tableau de bord Agent" />
+            <Head title="Tableau de bord Agent - VIMAIZ" />
 
-            <div className="p-4 space-y-8 sm:p-6 lg:p-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-                        Tableau de bord Agent
+            <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-slate-900">
+                        Espace Agent VIMAIZ
                     </h1>
-                    <p className="mt-1 text-neutral-600 dark:text-neutral-400">
-                        Bon retour ! Voici un aperçu de vos performances et gains.
+                    <p className="mt-2 text-slate-600">
+                        Gérez vos missions de ménage et suivez vos revenus.
                     </p>
                 </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900/30 text-green-600">
-                                <DollarSign className="h-5 w-5" />
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                    <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+                        <div className="flex items-center gap-4">
+                            <div className="rounded-xl bg-amber-100 p-3">
+                                <Clock className="h-6 w-6 text-amber-600" />
                             </div>
-                            <span className="text-sm font-medium text-neutral-500">Gains Totaux</span>
-                        </div>
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                            {stats.total_earnings.toFixed(2)} MAD
-                        </div>
-                    </div>
-
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="rounded-lg bg-yellow-100 p-2 dark:bg-yellow-900/30 text-yellow-600">
-                                <Clock className="h-5 w-5" />
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">En attente</p>
+                                <p className="text-2xl font-bold text-slate-900">{stats?.pending_count ?? pendingMissions.length}</p>
                             </div>
-                            <span className="text-sm font-medium text-neutral-500">Gains en Attente</span>
-                        </div>
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                            {stats.pending_earnings.toFixed(2)} MAD
                         </div>
                     </div>
-
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30 text-blue-600">
-                                <CheckCircle className="h-5 w-5" />
+                    <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+                        <div className="flex items-center gap-4">
+                            <div className="rounded-xl bg-sky-100 p-3">
+                                <Briefcase className="h-6 w-6 text-sky-600" />
                             </div>
-                            <span className="text-sm font-medium text-neutral-500">Missions</span>
-                        </div>
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                            {stats.completed_jobs}
-                        </div>
-                    </div>
-
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="rounded-lg bg-indigo-100 p-2 dark:bg-indigo-900/30 text-indigo-600">
-                                <StarIcon className="h-5 w-5" />
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">En cours</p>
+                                <p className="text-2xl font-bold text-slate-900">{stats?.active_count ?? activeMissions.length}</p>
                             </div>
-                            <span className="text-sm font-medium text-neutral-500">Note Moyenne</span>
-                        </div>
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                            4.8/5
                         </div>
                     </div>
-                </div>
-
-                {/* Charts Section */}
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <div className="flex items-center gap-2 mb-6">
-                            <BarChart3 className="h-5 w-5 text-indigo-600" />
-                            <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">Revenus Mensuels</h3>
-                        </div>
-                        <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={earningsData}>
-                                    <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
-                                    <Tooltip 
-                                        cursor={{ fill: '#f1f5f9' }}
-                                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                                    />
-                                    <Bar dataKey="total" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
+                    <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+                        <div className="flex items-center gap-4">
+                            <div className="rounded-xl bg-green-100 p-3">
+                                <CheckCircle className="h-6 w-6 text-green-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">Terminées</p>
+                                <p className="text-2xl font-bold text-slate-900">{stats?.completed_count ?? 0}</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <div className="flex items-center gap-2 mb-6">
-                            <PieChartIcon className="h-5 w-5 text-green-600" />
-                            <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">Analyse des Avis</h3>
-                        </div>
-                        <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={ratingData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                    >
-                                        {ratingData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                </PieChart>
-                            </ResponsiveContainer>
-                            <div className="flex flex-wrap justify-center gap-4 mt-4">
-                                {ratingData.map((item, index) => (
-                                    <div key={item.name} className="flex items-center gap-2">
-                                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-                                        <span className="text-xs text-neutral-600 dark:text-neutral-400">{item.name}</span>
-                                    </div>
-                                ))}
+                    <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+                        <div className="flex items-center gap-4">
+                            <div className="rounded-xl bg-emerald-100 p-3">
+                                <Euro className="h-6 w-6 text-emerald-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">Total gagné</p>
+                                <p className="text-2xl font-bold text-slate-900">€{(stats?.total_earned ?? 0).toFixed(2)}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                    {/* Upcoming Jobs */}
-                    <div className="rounded-xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-6">
-                        <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
-                                Missions à Venir
+                {/* Pending Missions */}
+                {pendingMissions.length > 0 && (
+                    <div className="mb-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-semibold text-slate-900">
+                                Missions en attente de votre réponse
                             </h2>
-                            <Link
-                                href={route('agent.bookings.index')}
-                                className="text-sm text-indigo-600 hover:text-indigo-700"
-                            >
-                                Voir Tout
-                            </Link>
                         </div>
-
-                        <div className="space-y-4">
-                            {upcoming_bookings.map((booking) => (
-                                <div
-                                    key={booking.id}
-                                    className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 transition-colors hover:border-indigo-300"
-                                >
-                                    <div className="mb-2 flex items-start justify-between">
-                                        <div>
-                                            <div className="font-medium text-neutral-900 dark:text-neutral-100">
-                                                {booking.client.name}
-                                            </div>
-                                            <div className="text-sm text-neutral-600 dark:text-neutral-400">
-                                                {booking.service.name}
-                                            </div>
-                                        </div>
-                                        <span
-                                            className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(booking.status)}`}
-                                        >
-                                            {getStatusLabel(booking.status)}
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            {pendingMissions.map((mission) => (
+                                <div key={mission.id} className="rounded-2xl bg-amber-50 border-2 border-amber-200 p-5">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(mission.status)}`}>
+                                            {getStatusLabel(mission.status)}
+                                        </span>
+                                        <span className="text-lg font-bold text-slate-900">€{mission.agent_payout}</span>
+                                    </div>
+                                    <h3 className="font-semibold text-slate-900 mb-1 capitalize">
+                                        {mission.service_request?.property?.type} - {mission.service_request?.property?.city}
+                                    </h3>
+                                    <p className="text-sm text-slate-600 mb-2">
+                                        Client : {mission.service_request?.client?.name}
+                                    </p>
+                                    <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
+                                        <span className="flex items-center gap-1">
+                                            <Calendar className="h-4 w-4" />
+                                            {formatDate(mission.scheduled_at)}
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <Clock className="h-4 w-4" />
+                                            {mission.service_request?.requested_hours}h
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
-                                        <div className="flex items-center gap-1">
-                                            <Calendar className="h-4 w-4" />
-                                            {new Date(
-                                                booking.scheduled_at,
-                                            ).toLocaleDateString('fr-FR')}
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <Clock className="h-4 w-4" />
-                                            {booking.duration_minutes / 60}h
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <DollarSign className="h-4 w-4" />
-                                            {booking.total_price} MAD
-                                        </div>
-                                    </div>
-                                    <div className="mt-3">
-                                        <Link
-                                            href={route(
-                                                'client.bookings.show',
-                                                booking.id,
-                                            )}
-                                            className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
-                                        >
-                                            Voir Détails →
-                                        </Link>
-                                    </div>
-                                </div>
-                            ))}
-
-                            {upcoming_bookings.length === 0 && (
-                                <div className="py-8 text-center text-neutral-500">
-                                    <Calendar className="mx-auto mb-3 h-12 w-12 text-neutral-300 dark:text-neutral-700" />
-                                    <p>Aucune mission à venir</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Recent Activity */}
-                    <div className="rounded-xl border border-neutral-200 bg-white p-6">
-                        <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-neutral-900">
-                                Activité Récente
-                            </h2>
-                            <Link
-                                href={route('agent.bookings.index')}
-                                className="text-sm text-indigo-600 hover:text-indigo-700"
-                            >
-                                Voir Tout
-                            </Link>
-                        </div>
-
-                        <div className="space-y-4">
-                            {recent_bookings.map((booking) => (
-                                <div
-                                    key={booking.id}
-                                    className="flex items-center gap-4 border-b border-neutral-100 pb-4 last:border-0 last:pb-0"
-                                >
-                                    <div
-                                        className={`rounded-lg p-2 ${getStatusColor(booking.status)}`}
+                                    <Link
+                                        href={route('agent.missions.show', mission.id)}
+                                        className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 transition-colors"
                                     >
-                                        {getStatusIcon(booking.status)}
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <div className="truncate font-medium text-neutral-900">
-                                            {booking.service.name}
-                                        </div>
-                                        <div className="text-sm text-neutral-600">
-                                            {booking.client.name}
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="font-medium text-neutral-900">
-                                            {booking.total_price} MAD
-                                        </div>
-                                        <div className="text-xs text-neutral-500">
-                                            {new Date(
-                                                booking.scheduled_at,
-                                            ).toLocaleDateString('fr-FR')}
-                                        </div>
-                                    </div>
+                                        Voir et répondre
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Link>
                                 </div>
                             ))}
-
-                            {recent_bookings.length === 0 && (
-                                <div className="py-8 text-center text-neutral-500">
-                                    <AlertCircle className="mx-auto mb-3 h-12 w-12 text-neutral-300" />
-                                    <p>Aucune activité récente</p>
-                                </div>
-                            )}
                         </div>
                     </div>
+                )}
+
+                {/* Active Missions */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-slate-900">Missions en cours</h2>
+                        <Link href={route('agent.missions.index')} className="text-sm font-medium text-sky-600 hover:text-sky-700">
+                            Toutes les missions →
+                        </Link>
+                    </div>
+                    {activeMissions.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {activeMissions.map((mission) => (
+                                <Link
+                                    key={mission.id}
+                                    href={route('agent.missions.show', mission.id)}
+                                    className="group rounded-2xl bg-white p-5 border border-slate-200 transition-all hover:border-sky-300 hover:shadow-md"
+                                >
+                                    <div className="flex items-start justify-between mb-3">
+                                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(mission.status)}`}>
+                                            {getStatusLabel(mission.status)}
+                                        </span>
+                                        <span className="text-lg font-bold text-slate-900">€{mission.agent_payout}</span>
+                                    </div>
+                                    <h3 className="font-semibold text-slate-900 mb-1 capitalize">
+                                        {mission.service_request?.property?.type} - {mission.service_request?.property?.city}
+                                    </h3>
+                                    <div className="flex items-center gap-1 text-sm text-slate-500 mb-2">
+                                        <MapPin className="h-4 w-4" />
+                                        {mission.service_request?.property?.address}
+                                    </div>
+                                    <div className="flex items-center gap-4 text-sm text-slate-500">
+                                        <span className="flex items-center gap-1">
+                                            <Calendar className="h-4 w-4" />
+                                            {formatDate(mission.scheduled_at)}
+                                        </span>
+                                    </div>
+                                    <ArrowRight className="mt-4 h-5 w-5 text-slate-400 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="rounded-2xl bg-white p-8 border border-slate-200 text-center">
+                            <div className="mx-auto w-fit rounded-full bg-slate-100 p-4 mb-4">
+                                <Briefcase className="h-8 w-8 text-slate-400" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-slate-900 mb-2">Aucune mission en cours</h3>
+                            <p className="text-slate-500">Les nouvelles missions vous seront proposées ici.</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </AppSidebarLayout>

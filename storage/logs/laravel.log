@@ -1973,3 +1973,163 @@ LINE 1: select * from \"sessions\" where \"id\" = $1 limit 1
 #48 /Volumes/Robert/projets clients/Stephane/vimaiz/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #49 {main}
 "} 
+[2026-01-19 00:13:04] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:13:04] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:13:15] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:13:18] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:22:02] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:22:26] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:26:15] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:28:20] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:28:33] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:29:11] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:30:10] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:30:56] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:31:48] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:32:04] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\MissionResource\Pages\ViewMissionPhotos::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\MissionResource\\Pages\\ViewMissionPhotos::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/MissionResource/Pages/ViewMissionPhotos.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 00:39:27] local.ERROR: SQLSTATE[42701]: Duplicate column: 7 ERROR:  column "siret" of relation "agent_profiles" already exists (Connection: pgsql, SQL: alter table "agent_profiles" add column "siret" varchar(14) null) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 42701): SQLSTATE[42701]: Duplicate column: 7 ERROR:  column \"siret\" of relation \"agent_profiles\" already exists (Connection: pgsql, SQL: alter table \"agent_profiles\" add column \"siret\" varchar(14) null) at /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824)
+[stacktrace]
+#0 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Connection.php(778): Illuminate\\Database\\Connection->runQueryCallback('alter table \"ag...', Array, Object(Closure))
+#1 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Connection.php(559): Illuminate\\Database\\Connection->run('alter table \"ag...', Array, Object(Closure))
+#2 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php(121): Illuminate\\Database\\Connection->statement('alter table \"ag...')
+#3 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php(618): Illuminate\\Database\\Schema\\Blueprint->build()
+#4 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php(460): Illuminate\\Database\\Schema\\Builder->build(Object(Illuminate\\Database\\Schema\\Blueprint))
+#5 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(363): Illuminate\\Database\\Schema\\Builder->table('agent_profiles', Object(Closure))
+#6 /Volumes/Robert/projets clients/Stephane/vimaiz/database/migrations/2026_01_19_000005_update_agent_profiles_for_vimaiz.php(14): Illuminate\\Support\\Facades\\Facade::__callStatic('table', Array)
+#7 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(514): Illuminate\\Database\\Migrations\\Migration@anonymous->up()
+#8 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(439): Illuminate\\Database\\Migrations\\Migrator->runMethod(Object(Illuminate\\Database\\PostgresConnection), Object(Illuminate\\Database\\Migrations\\Migration@anonymous), 'up')
+#9 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): Illuminate\\Database\\Migrations\\Migrator->{closure:Illuminate\\Database\\Migrations\\Migrator::runMigration():435}(Object(Illuminate\\Database\\PostgresConnection))
+#10 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(447): Illuminate\\Database\\Connection->transaction(Object(Closure))
+#11 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(250): Illuminate\\Database\\Migrations\\Migrator->runMigration(Object(Illuminate\\Database\\Migrations\\Migration@anonymous), 'up')
+#12 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php(41): Illuminate\\Database\\Migrations\\Migrator->{closure:Illuminate\\Database\\Migrations\\Migrator::runUp():250}()
+#13 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(809): Illuminate\\Console\\View\\Components\\Task->render('2026_01_19_0000...', Object(Closure))
+#14 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(250): Illuminate\\Database\\Migrations\\Migrator->write('Illuminate\\\\Cons...', '2026_01_19_0000...', Object(Closure))
+#15 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(210): Illuminate\\Database\\Migrations\\Migrator->runUp('/Volumes/Robert...', 2, false)
+#16 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(137): Illuminate\\Database\\Migrations\\Migrator->runPending(Array, Array)
+#17 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(116): Illuminate\\Database\\Migrations\\Migrator->run(Array, Array)
+#18 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(666): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->{closure:Illuminate\\Database\\Console\\Migrations\\MigrateCommand::runMigrations():109}()
+#19 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(109): Illuminate\\Database\\Migrations\\Migrator->usingConnection(NULL, Object(Closure))
+#20 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(88): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->runMigrations()
+#21 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->handle()
+#22 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate\\Container\\BoundMethod::{closure:Illuminate\\Container\\BoundMethod::call():35}()
+#23 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(96): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#24 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#25 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/Container.php(836): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#26 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate\\Container\\Container->call(Array)
+#27 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/symfony/console/Command/Command.php(318): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#28 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#29 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/symfony/console/Application.php(1073): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#30 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/symfony/console/Application.php(356): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\Migrations\\MigrateCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#31 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/symfony/console/Application.php(195): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#32 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(197): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#33 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#34 /Volumes/Robert/projets clients/Stephane/vimaiz/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#35 {main}
+
+[previous exception] [object] (PDOException(code: 42701): SQLSTATE[42701]: Duplicate column: 7 ERROR:  column \"siret\" of relation \"agent_profiles\" already exists at /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Connection.php:570)
+[stacktrace]
+#0 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Connection.php(570): PDOStatement->execute()
+#1 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Connection.php(811): Illuminate\\Database\\Connection->{closure:Illuminate\\Database\\Connection::statement():559}('alter table \"ag...', Array)
+#2 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Connection.php(778): Illuminate\\Database\\Connection->runQueryCallback('alter table \"ag...', Array, Object(Closure))
+#3 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Connection.php(559): Illuminate\\Database\\Connection->run('alter table \"ag...', Array, Object(Closure))
+#4 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php(121): Illuminate\\Database\\Connection->statement('alter table \"ag...')
+#5 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php(618): Illuminate\\Database\\Schema\\Blueprint->build()
+#6 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php(460): Illuminate\\Database\\Schema\\Builder->build(Object(Illuminate\\Database\\Schema\\Blueprint))
+#7 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(363): Illuminate\\Database\\Schema\\Builder->table('agent_profiles', Object(Closure))
+#8 /Volumes/Robert/projets clients/Stephane/vimaiz/database/migrations/2026_01_19_000005_update_agent_profiles_for_vimaiz.php(14): Illuminate\\Support\\Facades\\Facade::__callStatic('table', Array)
+#9 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(514): Illuminate\\Database\\Migrations\\Migration@anonymous->up()
+#10 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(439): Illuminate\\Database\\Migrations\\Migrator->runMethod(Object(Illuminate\\Database\\PostgresConnection), Object(Illuminate\\Database\\Migrations\\Migration@anonymous), 'up')
+#11 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): Illuminate\\Database\\Migrations\\Migrator->{closure:Illuminate\\Database\\Migrations\\Migrator::runMigration():435}(Object(Illuminate\\Database\\PostgresConnection))
+#12 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(447): Illuminate\\Database\\Connection->transaction(Object(Closure))
+#13 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(250): Illuminate\\Database\\Migrations\\Migrator->runMigration(Object(Illuminate\\Database\\Migrations\\Migration@anonymous), 'up')
+#14 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php(41): Illuminate\\Database\\Migrations\\Migrator->{closure:Illuminate\\Database\\Migrations\\Migrator::runUp():250}()
+#15 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(809): Illuminate\\Console\\View\\Components\\Task->render('2026_01_19_0000...', Object(Closure))
+#16 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(250): Illuminate\\Database\\Migrations\\Migrator->write('Illuminate\\\\Cons...', '2026_01_19_0000...', Object(Closure))
+#17 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(210): Illuminate\\Database\\Migrations\\Migrator->runUp('/Volumes/Robert...', 2, false)
+#18 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(137): Illuminate\\Database\\Migrations\\Migrator->runPending(Array, Array)
+#19 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(116): Illuminate\\Database\\Migrations\\Migrator->run(Array, Array)
+#20 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(666): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->{closure:Illuminate\\Database\\Console\\Migrations\\MigrateCommand::runMigrations():109}()
+#21 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(109): Illuminate\\Database\\Migrations\\Migrator->usingConnection(NULL, Object(Closure))
+#22 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(88): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->runMigrations()
+#23 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->handle()
+#24 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate\\Container\\BoundMethod::{closure:Illuminate\\Container\\BoundMethod::call():35}()
+#25 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(96): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#26 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#27 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Container/Container.php(836): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#28 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate\\Container\\Container->call(Array)
+#29 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/symfony/console/Command/Command.php(318): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#30 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#31 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/symfony/console/Application.php(1073): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#32 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/symfony/console/Application.php(356): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\Migrations\\MigrateCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#33 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/symfony/console/Application.php(195): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#34 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(197): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#35 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#36 /Volumes/Robert/projets clients/Stephane/vimaiz/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#37 {main}
+"} 
+[2026-01-19 01:32:55] local.ERROR: Could not check compatibility between App\Filament\Resources\UserResource\Pages\ViewUser::infolist(Filament\Infolists\Infolist $infolist): Filament\Infolists\Infolist and Filament\Resources\Pages\ViewRecord::infolist(Filament\Schemas\Schema $schema): Filament\Schemas\Schema, because class Filament\Infolists\Infolist is not available {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Could not check compatibility between App\\Filament\\Resources\\UserResource\\Pages\\ViewUser::infolist(Filament\\Infolists\\Infolist $infolist): Filament\\Infolists\\Infolist and Filament\\Resources\\Pages\\ViewRecord::infolist(Filament\\Schemas\\Schema $schema): Filament\\Schemas\\Schema, because class Filament\\Infolists\\Infolist is not available at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/UserResource/Pages/ViewUser.php:38)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 01:33:18] local.ERROR: Could not check compatibility between App\Filament\Resources\UserResource\Pages\ViewUser::infolist(Filament\Infolists\Infolist $infolist): Filament\Infolists\Infolist and Filament\Resources\Pages\ViewRecord::infolist(Filament\Schemas\Schema $schema): Filament\Schemas\Schema, because class Filament\Infolists\Infolist is not available {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Could not check compatibility between App\\Filament\\Resources\\UserResource\\Pages\\ViewUser::infolist(Filament\\Infolists\\Infolist $infolist): Filament\\Infolists\\Infolist and Filament\\Resources\\Pages\\ViewRecord::infolist(Filament\\Schemas\\Schema $schema): Filament\\Schemas\\Schema, because class Filament\\Infolists\\Infolist is not available at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/UserResource/Pages/ViewUser.php:38)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 01:34:41] local.ERROR: Could not check compatibility between App\Filament\Resources\UserResource\Pages\ViewUser::infolist(Filament\Infolists\Infolist $infolist): Filament\Infolists\Infolist and Filament\Resources\Pages\ViewRecord::infolist(Filament\Schemas\Schema $schema): Filament\Schemas\Schema, because class Filament\Infolists\Infolist is not available {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Could not check compatibility between App\\Filament\\Resources\\UserResource\\Pages\\ViewUser::infolist(Filament\\Infolists\\Infolist $infolist): Filament\\Infolists\\Infolist and Filament\\Resources\\Pages\\ViewRecord::infolist(Filament\\Schemas\\Schema $schema): Filament\\Schemas\\Schema, because class Filament\\Infolists\\Infolist is not available at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/UserResource/Pages/ViewUser.php:38)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 01:38:46] local.ERROR: Cannot redeclare non static Filament\Widgets\ChartWidget::$heading as static App\Filament\Widgets\MissionsChartWidget::$heading {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Widgets\\ChartWidget::$heading as static App\\Filament\\Widgets\\MissionsChartWidget::$heading at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Widgets/MissionsChartWidget.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 01:50:40] local.ERROR: Cannot redeclare non static Filament\Widgets\ChartWidget::$heading as static App\Filament\Widgets\MissionsChartWidget::$heading {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Widgets\\ChartWidget::$heading as static App\\Filament\\Widgets\\MissionsChartWidget::$heading at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Widgets/MissionsChartWidget.php:9)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-19 01:50:57] local.ERROR: Cannot redeclare non static Filament\Widgets\ChartWidget::$heading as static App\Filament\Widgets\MissionsChartWidget::$heading {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Widgets\\ChartWidget::$heading as static App\\Filament\\Widgets\\MissionsChartWidget::$heading at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Widgets/MissionsChartWidget.php:9)
+[stacktrace]
+#0 {main}
+"} 

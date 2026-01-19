@@ -1,4 +1,3 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -15,22 +14,21 @@ import { type NavItem, type User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { 
     LayoutGrid, 
-    Search, 
-    Calendar, 
-    MapPin, 
-    Wallet, 
-    Star, 
+    Home,
+    Plus,
+    ClipboardList,
+    FileText,
     Settings,
-    MessageSquare,
-    ClipboardList
+    Briefcase
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-    const { auth } = usePage<{ auth: { user: User & { roles: { name: string }[] } } }>().props;
+    const { auth } = usePage<{ auth: { user: User & { role: string } } }>().props;
     const user = auth.user;
-    const isAgent = user.roles?.some(r => r.name === 'agent');
+    const isAgent = user.role === 'agent';
 
+    // Navigation Client selon CAHIER_DES_CHARGES VIMAIZ
     const clientNavItems: NavItem[] = [
         {
             title: 'Tableau de bord',
@@ -38,24 +36,24 @@ export function AppSidebar() {
             icon: LayoutGrid,
         },
         {
-            title: 'Trouver un agent',
-            href: route('client.search'),
-            icon: Search,
+            title: 'Mes logements',
+            href: route('client.properties.index'),
+            icon: Home,
         },
         {
-            title: 'Mes Réservations',
-            href: route('client.bookings.index'),
-            icon: Calendar,
+            title: 'Demander un ménage',
+            href: route('client.requests.create'),
+            icon: Plus,
         },
         {
-            title: 'Mes Adresses',
-            href: route('client.addresses.index'),
-            icon: MapPin,
+            title: 'Mes demandes',
+            href: route('client.requests.index'),
+            icon: ClipboardList,
         },
         {
-            title: 'Messages',
-            href: '#', // À définir
-            icon: MessageSquare,
+            title: 'Historique & Factures',
+            href: route('client.missions.index'),
+            icon: FileText,
         },
         {
             title: 'Mon Profil',
@@ -64,6 +62,7 @@ export function AppSidebar() {
         },
     ];
 
+    // Navigation Agent selon CAHIER_DES_CHARGES VIMAIZ
     const agentNavItems: NavItem[] = [
         {
             title: 'Tableau de bord',
@@ -72,18 +71,8 @@ export function AppSidebar() {
         },
         {
             title: 'Mes Missions',
-            href: route('agent.bookings.index'),
-            icon: ClipboardList,
-        },
-        {
-            title: 'Mon Portefeuille',
-            href: route('agent.dashboard'), // Placeholder wallet
-            icon: Wallet,
-        },
-        {
-            title: 'Avis & Notes',
-            href: '#',
-            icon: Star,
+            href: route('agent.missions.index'),
+            icon: Briefcase,
         },
         {
             title: 'Mon Profil',

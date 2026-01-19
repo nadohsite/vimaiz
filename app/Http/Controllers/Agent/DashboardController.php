@@ -3,60 +3,72 @@
 namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
+use App\Models\Mission;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Booking;
-use App\Models\Wallet;
+use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $user = $request->user();
-        
-        // Get or create wallet
+        $agentProfile = $user->agentProfile;
+
+        // Wallet
         $wallet = Wallet::firstOrCreate(
             ['user_id' => $user->id],
             ['balance' => 0, 'pending_balance' => 0, 'total_earned' => 0, 'total_withdrawn' => 0]
         );
-        
-        // Get agent profile
-        $agentProfile = $user->agentProfile;
-        
-        // Calculate stats
+
+        // Stats VIMAIZ
         $stats = [
             'total_earnings' => $wallet->total_earned,
             'pending_earnings' => $wallet->pending_balance,
-            'completed_jobs' => Booking::where('agent_id', $user->id)
-                ->where('status', 'completed')
+            'available_balance' => $wallet->balance,
+            'missions_completed' => $agentProfile->missions_completed ?? 0,
+            'missions_pending' => Mission::where('agent_id', $user->id)
+                ->whereIn('status', [Mission::STATUS_PENDING_AGENT, Mission::STATUS_AGENT_ACCEPTED])
                 ->count(),
-            'pending_jobs' => Booking::where('agent_id', $user->id)
-                ->whereIn('status', ['pending', 'confirmed'])
+            'missions_in_progress' => Mission::where('agent_id', $user->id)
+                ->where('status', Mission::STATUS_IN_PROGRESS)
                 ->count(),
-            'average_rating' => $agentProfile->average_rating ?? 0,
-            'total_reviews' => $agentProfile->total_reviews ?? 0,
+            'internal_rating' => $agentProfile->internal_rating ?? 5.0,
+            'is_eligible' => $agentProfile?->isEligibleForMissions() ?? false,
         ];
-        
-        // Get upcoming bookings
-        $upcoming_bookings = Booking::where('agent_id', $user->id)
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->where('scheduled_at', '>=', now())
-            ->with(['client', 'service'])
+
+        // Missions en attente de réponse
+        $pendingMissions = Mission::where('agent_id', $user->id)
+            ->where('status', Mission::STATUS_PENDING_AGENT)
+            ->with(['property', 'client'])
             ->orderBy('scheduled_at')
             ->limit(5)
             ->get();
-        
-        // Get recent bookings
-        $recent_bookings = Booking::where('agent_id', $user->id)
-            ->with(['client', 'service'])
-            ->orderBy('created_at', 'desc')
+
+        // Missions à venir (acceptées)
+        $upcomingMissions = Mission::where('agent_id', $user->id)
+            ->where('status', Mission::STATUS_AGENT_ACCEPTED)
+            ->where('scheduled_at', '>=', now())
+            ->with(['property', 'client'])
+            ->orderBy('scheduled_at')
             ->limit(5)
             ->get();
-        
+
+        // Missions récentes (terminées)
+        $recentMissions = Mission::where('agent_id', $user->id)
+            ->where('status', Mission::STATUS_COMPLETED)
+            ->with(['property', 'client'])
+            ->orderByDesc('completed_at')
+            ->limit(5)
+            ->get();
+
         return Inertia::render('Agent/Dashboard', [
             'stats' => $stats,
-            'upcoming_bookings' => $upcoming_bookings,
-            'recent_bookings' => $recent_bookings,
+            'pendingMissions' => $pendingMissions,
+            'upcomingMissions' => $upcomingMissions,
+            'recentMissions' => $recentMissions,
+            'agentProfile' => $agentProfile,
         ]);
     }
 }
