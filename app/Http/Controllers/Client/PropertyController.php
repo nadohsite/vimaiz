@@ -49,7 +49,7 @@ class PropertyController extends Controller
 
     public function show(Property $property): Response
     {
-        $this->authorize('view', $property);
+        abort_unless($property->user_id === auth()->id(), 403);
 
         $property->load([
             'serviceRequests' => fn ($q) => $q->latest()->limit(5),
@@ -65,7 +65,7 @@ class PropertyController extends Controller
 
     public function edit(Property $property): Response
     {
-        $this->authorize('update', $property);
+        abort_unless($property->user_id === auth()->id(), 403);
 
         return Inertia::render('Client/Properties/Edit', [
             'property' => $property,
@@ -84,7 +84,7 @@ class PropertyController extends Controller
 
     public function destroy(Property $property): RedirectResponse
     {
-        $this->authorize('delete', $property);
+        abort_unless($property->user_id === auth()->id(), 403);
 
         if (!$property->canBeDeleted()) {
             return back()->with('error', 'Ce logement a des demandes en cours et ne peut pas être supprimé.');
