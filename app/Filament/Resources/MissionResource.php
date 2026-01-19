@@ -9,9 +9,15 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use UnitEnum;
 use BackedEnum;
 
@@ -35,7 +41,7 @@ class MissionResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Informations générales')
+                Section::make('Informations générales')
                     ->schema([
                         Forms\Components\TextInput::make('mission_number')
                             ->label('N° Mission')
@@ -51,7 +57,7 @@ class MissionResource extends Resource
                             ->preload(),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Logement')
+                Section::make('Logement')
                     ->schema([
                         Forms\Components\Select::make('property_id')
                             ->label('Logement')
@@ -59,7 +65,7 @@ class MissionResource extends Resource
                             ->disabled(),
                     ]),
 
-                Forms\Components\Section::make('Planification')
+                Section::make('Planification')
                     ->schema([
                         Forms\Components\DateTimePicker::make('scheduled_at')
                             ->label('Date et heure prévues'),
@@ -73,7 +79,7 @@ class MissionResource extends Resource
                             ->label('Terminée le'),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Tarification')
+                Section::make('Tarification')
                     ->schema([
                         Forms\Components\TextInput::make('total_price')
                             ->label('Prix total')
@@ -89,7 +95,7 @@ class MissionResource extends Resource
                             ->disabled(),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Statut')
+                Section::make('Statut')
                     ->schema([
                         Forms\Components\Select::make('status')
                             ->label('Statut mission')
@@ -112,7 +118,7 @@ class MissionResource extends Resource
                             ]),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Contrôle qualité (Admin)')
+                Section::make('Contrôle qualité (Admin)')
                     ->schema([
                         Forms\Components\Select::make('internal_quality_score')
                             ->label('Note qualité interne')
@@ -128,7 +134,7 @@ class MissionResource extends Resource
                             ->rows(3),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Annulation')
+                Section::make('Annulation')
                     ->schema([
                         Forms\Components\Textarea::make('cancellation_reason')
                             ->label('Raison annulation'),
@@ -237,7 +243,7 @@ class MissionResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\Action::make('assign_agent')
+                Action::make('assign_agent')
                     ->label('Attribuer agent')
                     ->icon('heroicon-o-user-plus')
                     ->color('success')
@@ -264,12 +270,12 @@ class MissionResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\Action::make('view_photos')
+                Action::make('view_photos')
                     ->label('Photos')
                     ->icon('heroicon-o-camera')
                     ->color('info')
                     ->url(fn ($record) => MissionResource::getUrl('photos', ['record' => $record])),
-                Tables\Actions\Action::make('quality_check')
+                Action::make('quality_check')
                     ->label('Contrôle qualité')
                     ->icon('heroicon-o-star')
                     ->color('warning')
@@ -296,12 +302,12 @@ class MissionResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

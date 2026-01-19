@@ -9,6 +9,13 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use UnitEnum;
 use BackedEnum;
 
@@ -32,7 +39,7 @@ class PropertyResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Propriétaire')
+                Section::make('Propriétaire')
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->label('Client')
@@ -42,7 +49,7 @@ class PropertyResource extends Resource
                             ->required(),
                     ]),
 
-                Forms\Components\Section::make('Type & Localisation')
+                Section::make('Type & Localisation')
                     ->schema([
                         Forms\Components\Select::make('type')
                             ->label('Type de logement')
@@ -68,7 +75,7 @@ class PropertyResource extends Resource
                             ->required(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Caractéristiques')
+                Section::make('Caractéristiques')
                     ->schema([
                         Forms\Components\TextInput::make('surface_area')
                             ->label('Surface')
@@ -102,7 +109,7 @@ class PropertyResource extends Resource
                             ->suffix('m²'),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Accès & Instructions')
+                Section::make('Accès & Instructions')
                     ->schema([
                         Forms\Components\TextInput::make('access_code')
                             ->label('Code d\'accès'),
@@ -180,7 +187,7 @@ class PropertyResource extends Resource
                     ->preload(),
             ])
             ->actions([
-                Tables\Actions\Action::make('suspend')
+                Action::make('suspend')
                     ->label('Suspendre')
                     ->icon('heroicon-o-pause-circle')
                     ->color('warning')
@@ -189,19 +196,19 @@ class PropertyResource extends Resource
                     ->modalHeading('Suspendre ce logement')
                     ->modalDescription('Ce logement ne sera plus disponible pour de nouvelles demandes.')
                     ->action(fn ($record) => $record->update(['is_active' => false])),
-                Tables\Actions\Action::make('activate')
+                Action::make('activate')
                     ->label('Réactiver')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn ($record) => !($record->is_active ?? true))
                     ->requiresConfirmation()
                     ->action(fn ($record) => $record->update(['is_active' => true])),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

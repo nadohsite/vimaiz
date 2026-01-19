@@ -11,7 +11,16 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Notifications\Notification;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use UnitEnum;
 use BackedEnum;
 
@@ -35,7 +44,7 @@ class QuoteResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Demande associée')
+                Section::make('Demande associée')
                     ->schema([
                         Forms\Components\Select::make('service_request_id')
                             ->label('Demande')
@@ -44,7 +53,7 @@ class QuoteResource extends Resource
                             ->preload()
                             ->required()
                             ->live()
-                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                            ->afterStateUpdated(function ($state, Set $set) {
                                 if ($state) {
                                     $request = ServiceRequest::with('property')->find($state);
                                     if ($request && $request->property) {
@@ -74,18 +83,18 @@ class QuoteResource extends Resource
                             ->dehydrated(false),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Tarification')
+                Section::make('Tarification')
                     ->schema([
                         Forms\Components\TextInput::make('estimated_price')
                             ->label('Prix estimé (auto)')
                             ->numeric()
-                            ->prefix('€')
+                            ->suffix('MAD')
                             ->disabled()
                             ->dehydrated(true),
                         Forms\Components\TextInput::make('final_price')
                             ->label('Prix final (ajusté)')
                             ->numeric()
-                            ->prefix('€')
+                            ->suffix('MAD')
                             ->helperText('Laissez vide pour utiliser le prix estimé'),
                         Forms\Components\TextInput::make('commission_rate')
                             ->label('Taux commission')
@@ -95,18 +104,18 @@ class QuoteResource extends Resource
                         Forms\Components\TextInput::make('commission_amount')
                             ->label('Montant commission')
                             ->numeric()
-                            ->prefix('€')
+                            ->suffix('MAD')
                             ->disabled()
                             ->dehydrated(true),
                         Forms\Components\TextInput::make('agent_amount')
                             ->label('Montant agent')
                             ->numeric()
-                            ->prefix('€')
+                            ->suffix('MAD')
                             ->disabled()
                             ->dehydrated(true),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Notes internes (Admin)')
+                Section::make('Notes internes (Admin)')
                     ->schema([
                         Forms\Components\Textarea::make('admin_notes')
                             ->label('Notes internes')
@@ -115,10 +124,10 @@ class QuoteResource extends Resource
                         Forms\Components\Textarea::make('price_adjustment_reason')
                             ->label('Raison de l\'ajustement')
                             ->rows(2)
-                            ->visible(fn (Forms\Get $get) => filled($get('final_price'))),
+                            ->visible(fn (Get $get) => filled($get('final_price'))),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Statut & Validation')
+                Section::make('Statut & Validation')
                     ->schema([
                         Forms\Components\Select::make('status')
                             ->label('Statut')
@@ -164,11 +173,11 @@ class QuoteResource extends Resource
                     ->badge(),
                 Tables\Columns\TextColumn::make('estimated_price')
                     ->label('Estimé')
-                    ->money('EUR')
+                    ->money('MAD')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('final_price')
                     ->label('Final')
-                    ->money('EUR')
+                    ->money('MAD')
                     ->sortable()
                     ->placeholder('—'),
                 Tables\Columns\TextColumn::make('status')
@@ -209,7 +218,7 @@ class QuoteResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\Action::make('send')
+                Action::make('send')
                     ->label('Envoyer')
                     ->icon('heroicon-o-paper-airplane')
                     ->color('success')
@@ -230,12 +239,12 @@ class QuoteResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

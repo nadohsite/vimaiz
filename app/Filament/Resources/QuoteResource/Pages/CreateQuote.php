@@ -24,8 +24,15 @@ class CreateQuote extends CreateRecord
                 $pricingRule = PricingRule::getActive();
                 
                 if ($pricingRule) {
+                    // Handle scheduled_time which may be a full datetime or just time
+                    $timeOnly = $request->scheduled_time instanceof \Carbon\Carbon 
+                        ? $request->scheduled_time->format('H:i:s')
+                        : (strlen($request->scheduled_time) > 8 
+                            ? \Carbon\Carbon::parse($request->scheduled_time)->format('H:i:s') 
+                            : $request->scheduled_time);
+                    
                     $scheduledAt = \Carbon\Carbon::parse(
-                        $request->scheduled_date->format('Y-m-d') . ' ' . $request->scheduled_time
+                        $request->scheduled_date->format('Y-m-d') . ' ' . $timeOnly
                     );
                     
                     $calculation = $pricingRule->calculatePrice(

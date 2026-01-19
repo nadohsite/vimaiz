@@ -29,10 +29,9 @@ class StatsOverviewWidget extends BaseWidget
         $pendingMissions = Mission::where('status', 'pending_agent')->count();
 
         return [
-            Stat::make('Chiffre d\'affaires', '€' . number_format($totalRevenue, 2))
-                ->description('+ €' . number_format($monthlyRevenue, 2) . ' ce mois')
+            Stat::make('Chiffre d\'affaires', number_format($totalRevenue, 0, ',', ' ') . ' MAD')
+                ->description('+ ' . number_format($monthlyRevenue, 0, ',', ' ') . ' MAD ce mois')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
-                ->chart([7, 3, 4, 5, 6, 3, 5, 8])
                 ->color('success'),
             
             Stat::make('Demandes en attente', ServiceRequest::where('status', 'pending')->count())

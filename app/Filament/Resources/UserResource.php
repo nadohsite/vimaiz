@@ -8,7 +8,16 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Notifications\Notification;
 use UnitEnum;
 use BackedEnum;
@@ -57,7 +66,7 @@ class UserResource extends Resource
                     ->required(),
                 Forms\Components\DateTimePicker::make('email_verified_at'),
 
-                Forms\Components\Section::make('Agent Profile')
+                Section::make('Agent Profile')
                     ->relationship('agentProfile')
                     ->schema([
                         Forms\Components\Textarea::make('description')
@@ -73,7 +82,7 @@ class UserResource extends Resource
                         Forms\Components\Toggle::make('is_available'),
                         Forms\Components\TextInput::make('verification_status'),
                     ])
-                    ->visible(fn (Forms\Get $get) => $get('role') === 'agent'),
+                    ->visible(fn (Get $get) => $get('role') === 'agent'),
             ]);
     }
 
@@ -90,8 +99,14 @@ class UserResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'admin' => 'danger',
-                        'agent' => 'warning',
+                        'agent' => 'info',
                         'client' => 'success',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'admin' => 'Admin',
+                        'agent' => 'Agent',
+                        'client' => 'Client',
+                        default => $state,
                     }),
                 Tables\Columns\TextColumn::make('phone')->searchable(),
                 Tables\Columns\IconColumn::make('is_active')->boolean(),
@@ -115,7 +130,7 @@ class UserResource extends Resource
                     ->placeholder('Tous'),
             ])
             ->actions([
-                Tables\Actions\Action::make('activate')
+                Action::make('activate')
                     ->label('Activer')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -130,7 +145,7 @@ class UserResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\Action::make('suspend')
+                Action::make('suspend')
                     ->label('Suspendre')
                     ->icon('heroicon-o-pause-circle')
                     ->color('warning')
@@ -145,26 +160,26 @@ class UserResource extends Resource
                             ->warning()
                             ->send();
                     }),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make()
                     ->visible(fn ($record) => $record->role !== 'admin'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('activate_selected')
+                BulkActionGroup::make([
+                    BulkAction::make('activate_selected')
                         ->label('Activer')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()
                         ->action(fn ($records) => $records->each->update(['is_active' => true])),
-                    Tables\Actions\BulkAction::make('suspend_selected')
+                    BulkAction::make('suspend_selected')
                         ->label('Suspendre')
                         ->icon('heroicon-o-pause-circle')
                         ->color('warning')
                         ->requiresConfirmation()
                         ->action(fn ($records) => $records->each->update(['is_active' => false])),
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

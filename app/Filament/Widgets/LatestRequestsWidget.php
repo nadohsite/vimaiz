@@ -6,6 +6,7 @@ use App\Models\ServiceRequest;
 use App\Filament\Resources\ServiceRequestResource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Actions\Action;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class LatestRequestsWidget extends BaseWidget
@@ -77,7 +78,7 @@ class LatestRequestsWidget extends BaseWidget
                     ->since(),
             ])
             ->actions([
-                Tables\Actions\Action::make('view')
+                Action::make('view')
                     ->label('Voir')
                     ->icon('heroicon-o-eye')
                     ->url(fn ($record) => ServiceRequestResource::getUrl('view', ['record' => $record])),

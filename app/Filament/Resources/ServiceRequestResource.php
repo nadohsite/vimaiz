@@ -9,6 +9,13 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use UnitEnum;
 use BackedEnum;
 
@@ -32,7 +39,7 @@ class ServiceRequestResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Informations de la demande')
+                Section::make('Informations de la demande')
                     ->schema([
                         Forms\Components\TextInput::make('request_number')
                             ->label('N° Demande')
@@ -52,7 +59,7 @@ class ServiceRequestResource extends Resource
                             ->required(),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Planification')
+                Section::make('Planification')
                     ->schema([
                         Forms\Components\DatePicker::make('scheduled_date')
                             ->label('Date prévue')
@@ -68,7 +75,7 @@ class ServiceRequestResource extends Resource
                             ->suffix('heures'),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Détails')
+                Section::make('Détails')
                     ->schema([
                         Forms\Components\Textarea::make('special_instructions')
                             ->label('Instructions particulières')
@@ -90,7 +97,7 @@ class ServiceRequestResource extends Resource
                             ->required(),
                     ]),
 
-                Forms\Components\Section::make('Annulation')
+                Section::make('Annulation')
                     ->schema([
                         Forms\Components\Textarea::make('cancellation_reason')
                             ->label('Raison d\'annulation')
@@ -194,18 +201,18 @@ class ServiceRequestResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\Action::make('create_quote')
+                Action::make('create_quote')
                     ->label('Créer devis')
                     ->icon('heroicon-o-document-text')
                     ->color('success')
                     ->visible(fn ($record) => $record->status === 'pending' && !$record->quote)
                     ->url(fn ($record) => QuoteResource::getUrl('create', ['service_request_id' => $record->id])),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

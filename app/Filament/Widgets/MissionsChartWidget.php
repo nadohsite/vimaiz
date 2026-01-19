@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 
 class MissionsChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Missions des 30 derniers jours';
+    protected ?string $heading = 'Missions des 30 derniers jours';
 
     protected static ?int $sort = 3;
 
