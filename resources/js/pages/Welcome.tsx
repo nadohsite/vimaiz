@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Head, Link } from '@inertiajs/react';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import {
     ArrowRight,
     Calendar,
@@ -24,11 +25,11 @@ interface Props {
 
 export default function Welcome({ canLogin, canRegister }: Props) {
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-900 scroll-smooth">
+        <div className="min-h-screen bg-white dark:bg-slate-900 font-sans text-slate-900 dark:text-white scroll-smooth">
             <Head title="VIMAIZ — Planifiez votre ménage" />
 
             {/* NAV */}
-            <nav className="fixed z-50 w-full bg-white/95 backdrop-blur-sm border-b border-slate-100">
+            <nav className="fixed z-50 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
                         <div className="flex items-center gap-8">
@@ -44,13 +45,13 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             <div className="hidden items-center space-x-6 md:flex">
                                 <a
                                     href="#comment-ca-marche"
-                                    className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
+                                    className="text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:text-primary"
                                 >
                                     Faire le ménage
                                 </a>
                                 <a
                                     href="#professionnels"
-                                    className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
+                                    className="text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:text-primary"
                                 >
                                     Professionnels
                                 </a>
@@ -59,18 +60,19 @@ export default function Welcome({ canLogin, canRegister }: Props) {
 
                         <div className="hidden items-center space-x-6 md:flex">
                             <div className="relative group">
-                                <button className="text-sm font-medium text-slate-600 hover:text-primary">
+                                <button className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary">
                                     À propos
                                 </button>
-                                <div className="absolute right-0 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all bg-white rounded-lg shadow-lg border border-slate-100 py-2">
-                                    <a href="#about" className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">À propos de VIMAIZ</a>
-                                    <a href="#services" className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Service</a>
-                                    <a href="#comment-ca-marche" className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Fonctionnement</a>
+                                <div className="absolute right-0 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-100 dark:border-slate-700 py-2">
+                                    <a href="#about" className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">À propos de VIMAIZ</a>
+                                    <a href="#services" className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">Service</a>
+                                    <a href="#comment-ca-marche" className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">Fonctionnement</a>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex items-center space-x-3">
+                            <AppearanceToggleDropdown />
                             {canLogin ? (
                                 <Link href={route('dashboard')}>
                                     <Button variant="default" size="sm">
@@ -81,7 +83,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                 <>
                                     <Link
                                         href={route('login')}
-                                        className="text-sm font-medium text-slate-600 hover:text-primary"
+                                        className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary"
                                     >
                                         Connexion
                                     </Link>
@@ -98,7 +100,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             </nav>
 
             {/* HERO */}
-            <section className="relative bg-gradient-to-br from-sky-50 via-white to-cyan-50 pt-16 overflow-hidden">
+            <section className="relative bg-gradient-to-br from-sky-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-16 overflow-hidden">
                 <div className="absolute inset-0 overflow-hidden">
                     <motion.div 
                         className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl"
@@ -138,12 +140,12 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                 Service de ménage professionnel
                             </div>
 
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight mb-6">
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight mb-6">
                                 Planifiez votre ménage.
                                 <span className="block text-primary">VIMAIZ s'occupe du reste.</span>
                             </h1>
 
-                            <p className="text-lg text-slate-600 mb-8 max-w-xl">
+                            <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-xl">
                                 Confiez votre maison, villa ou chalet à des professionnels qualifiés.
                                 Nous orchestrons tout : devis, paiement sécurisé et intervention.
                             </p>
@@ -162,7 +164,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                 </a>
                             </div>
 
-                            <div className="mt-10 flex items-center gap-8 text-sm text-slate-500">
+                            <div className="mt-10 flex items-center gap-8 text-sm text-slate-500 dark:text-slate-400">
                                 <div className="flex items-center gap-2">
                                     <CheckCircle className="h-5 w-5 text-green-500" />
                                     Paiement sécurisé
@@ -180,7 +182,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 100 }}
                             className="relative hidden lg:block"
                         >
-                            <div className="relative rounded-3xl bg-white p-8 shadow-2xl shadow-primary/20 border border-slate-100 hover:shadow-3xl hover:shadow-primary/30 transition-all duration-500">
+                            <div className="relative rounded-3xl bg-white dark:bg-slate-800 p-8 shadow-2xl shadow-primary/20 border border-slate-100 dark:border-slate-700 hover:shadow-3xl hover:shadow-primary/30 transition-all duration-500">
                                 <motion.div 
                                     className="absolute -top-4 -right-4 rounded-full bg-primary p-3 shadow-lg"
                                     animate={{ rotate: [0, 10, -10, 0] }}
@@ -189,43 +191,43 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                     <Zap className="h-6 w-6 text-white" />
                                 </motion.div>
                                 
-                                <h3 className="text-lg font-semibold mb-6">Demande rapide</h3>
+                                <h3 className="text-lg font-semibold mb-6 dark:text-white">Demande rapide</h3>
                                 
                                 <div className="space-y-4">
                                     <motion.div 
-                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-primary/5 dark:hover:bg-primary/10 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                                         whileHover={{ x: 5 }}
                                     >
                                         <div className="p-2 rounded-lg bg-primary/10">
                                             <Home className="h-5 w-5 text-primary" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium">Type de logement</p>
-                                            <p className="text-xs text-slate-500">Maison, Villa, Chalet</p>
+                                            <p className="text-sm font-medium dark:text-white">Type de logement</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Maison, Villa, Chalet</p>
                                         </div>
                                     </motion.div>
                                     <motion.div 
-                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-primary/5 dark:hover:bg-primary/10 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                                         whileHover={{ x: 5 }}
                                     >
                                         <div className="p-2 rounded-lg bg-primary/10">
                                             <Calendar className="h-5 w-5 text-primary" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium">Date & Heure</p>
-                                            <p className="text-xs text-slate-500">Choisissez votre créneau</p>
+                                            <p className="text-sm font-medium dark:text-white">Date & Heure</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Choisissez votre créneau</p>
                                         </div>
                                     </motion.div>
                                     <motion.div 
-                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-primary/5 dark:hover:bg-primary/10 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                                         whileHover={{ x: 5 }}
                                     >
                                         <div className="p-2 rounded-lg bg-primary/10">
                                             <CreditCard className="h-5 w-5 text-primary" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium">Paiement sécurisé</p>
-                                            <p className="text-xs text-slate-500">Avant l'intervention</p>
+                                            <p className="text-sm font-medium dark:text-white">Paiement sécurisé</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Avant l'intervention</p>
                                         </div>
                                     </motion.div>
                                 </div>
@@ -242,13 +244,13 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             </section>
 
             {/* COMMENT ÇA MARCHE */}
-            <section id="comment-ca-marche" className="py-24 bg-white">
+            <section id="comment-ca-marche" className="py-24 bg-white dark:bg-slate-900">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
                             Comment ça marche ?
                         </h2>
-                        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                        <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
                             Un processus simple et transparent en 4 étapes
                         </p>
                     </div>
@@ -320,7 +322,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                     whileHover={{ y: -8, transition: { duration: 0.3 } }}
                                     className="relative group"
                                 >
-                                    <div className="text-center p-6 rounded-2xl bg-white/50 backdrop-blur-sm border border-transparent group-hover:border-primary/20 group-hover:bg-white group-hover:shadow-xl group-hover:shadow-primary/10 transition-all duration-500">
+                                    <div className="text-center p-6 rounded-2xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-transparent group-hover:border-primary/20 group-hover:bg-white dark:group-hover:bg-slate-800 group-hover:shadow-xl group-hover:shadow-primary/10 transition-all duration-500">
                                         <div className="relative inline-flex mb-6">
                                             <motion.div 
                                                 className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300"
@@ -335,8 +337,8 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                                 {item.step}
                                             </motion.span>
                                         </div>
-                                        <h3 className="text-lg font-semibold text-slate-900 mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
-                                        <p className="text-sm text-slate-600">{item.description}</p>
+                                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400">{item.description}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -346,13 +348,13 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             </section>
 
             {/* SERVICES */}
-            <section id="services" className="py-24 bg-slate-50">
+            <section id="services" className="py-24 bg-slate-50 dark:bg-slate-800">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
                             Types de logements
                         </h2>
-                        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                        <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
                             VIMAIZ intervient exclusivement dans ces types de propriétés
                         </p>
                     </div>
@@ -382,7 +384,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                 transition={{ duration: 0.6, delay: index * 0.15, type: "spring", stiffness: 100 }}
                                 viewport={{ once: true, margin: "-50px" }}
                                 whileHover={{ y: -10, scale: 1.02 }}
-                                className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-2xl hover:shadow-primary/15 hover:border-primary/30 transition-all duration-500 group"
+                                className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:shadow-primary/15 hover:border-primary/30 transition-all duration-500 group"
                             >
                                 <motion.div 
                                     className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 mb-6 group-hover:bg-primary group-hover:shadow-lg group-hover:shadow-primary/30 transition-all duration-300"
@@ -390,13 +392,13 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                 >
                                     <Home className="h-7 w-7 text-primary group-hover:text-white transition-colors" />
                                 </motion.div>
-                                <h3 className="text-xl font-semibold text-slate-900 mb-3 group-hover:text-primary transition-colors">{service.title}</h3>
-                                <p className="text-slate-600 mb-6">{service.description}</p>
+                                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors">{service.title}</h3>
+                                <p className="text-slate-600 dark:text-slate-400 mb-6">{service.description}</p>
                                 <ul className="space-y-3">
                                     {service.features.map((feature, featureIndex) => (
                                         <motion.li 
                                             key={feature} 
-                                            className="flex items-center gap-2 text-sm text-slate-600"
+                                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"
                                             initial={{ opacity: 0, x: -10 }}
                                             whileInView={{ opacity: 1, x: 0 }}
                                             transition={{ delay: 0.3 + featureIndex * 0.1 }}
@@ -516,7 +518,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             </section>
 
             {/* ABOUT */}
-            <section id="about" className="py-24 bg-white">
+            <section id="about" className="py-24 bg-white dark:bg-slate-900">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
                         <motion.div
@@ -525,17 +527,17 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             transition={{ duration: 0.8, type: "spring" }}
                             viewport={{ once: true }}
                         >
-                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">
                                 À propos de VIMAIZ
                             </h2>
-                            <p className="text-lg text-slate-600 mb-6">
+                            <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">
                                 VIMAIZ est une plateforme innovante qui révolutionne le service de ménage à domicile.
                                 Inspirée du modèle Uber, notre approche centralise tout le processus pour garantir
                                 une expérience simple et sécurisée.
                             </p>
-                            <p className="text-slate-600 mb-8">
+                            <p className="text-slate-600 dark:text-slate-400 mb-8">
                                 Vous ne cherchez pas un agent, l'agent ne vous cherche pas.
-                                <strong className="text-slate-900"> VIMAIZ orchestre la relation</strong> pour
+                                <strong className="text-slate-900 dark:text-white"> VIMAIZ orchestre la relation</strong> pour
                                 vous offrir un service de qualité, sans surprise.
                             </p>
                             <div className="grid grid-cols-3 gap-6">
@@ -553,7 +555,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                         viewport={{ once: true }}
                                     >
                                         <p className="text-2xl font-bold text-primary">{stat.value}</p>
-                                        <p className="text-sm text-slate-500">{stat.label}</p>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
                                     </motion.div>
                                 ))}
                             </div>
@@ -567,7 +569,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             ].map((item, index) => (
                                 <motion.div 
                                     key={item.title} 
-                                    className="bg-slate-50 rounded-2xl p-6 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group"
+                                    className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-6 hover:bg-primary/5 dark:hover:bg-primary/10 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group"
                                     initial={{ opacity: 0, y: 20, scale: 0.95 }}
                                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -577,8 +579,8 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                     <motion.div whileHover={{ scale: 1.1, rotate: 5 }}>
                                         <item.icon className="h-8 w-8 text-primary mb-4 group-hover:text-primary transition-colors" />
                                     </motion.div>
-                                    <h4 className="font-semibold text-slate-900 mb-1 group-hover:text-primary transition-colors">{item.title}</h4>
-                                    <p className="text-sm text-slate-600">{item.desc}</p>
+                                    <h4 className="font-semibold text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors">{item.title}</h4>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">{item.desc}</p>
                                 </motion.div>
                             ))}
                         </div>

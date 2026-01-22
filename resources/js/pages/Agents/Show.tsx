@@ -110,7 +110,7 @@ export default function Show({ agent, availabilities }: Props) {
                                 <div className="relative inline-block">
                                     <img
                                         src={
-                                            agent.user.avatar ||
+                                            agent.user.avatar ? `/storage/${agent.user.avatar}` :
                                             `https://ui-avatars.com/api/?name=${agent.user.name}&size=128`
                                         }
                                         alt={agent.user.name}

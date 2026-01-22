@@ -43,7 +43,7 @@ export function AppSidebarHeader({
                         >
                             <Avatar className="size-full rounded-full">
                                 <AvatarImage
-                                    src={auth.user.avatar}
+                                    src={auth.user.avatar ? `/storage/${auth.user.avatar}` : undefined}
                                     alt={auth.user.name}
                                 />
                                 <AvatarFallback className="rounded-full bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100 text-xs">

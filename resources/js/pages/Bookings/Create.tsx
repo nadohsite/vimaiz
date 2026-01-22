@@ -222,7 +222,7 @@ export default function Create({
                             <div className="flex items-center gap-4">
                                 <img
                                     src={
-                                        agent.user.avatar ||
+                                        agent.user.avatar ? `/storage/${agent.user.avatar}` :
                                         `https://ui-avatars.com/api/?name=${agent.user.name}&size=64`
                                     }
                                     alt={agent.user.name}

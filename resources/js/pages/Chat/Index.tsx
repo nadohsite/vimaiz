@@ -69,7 +69,7 @@ export default function Chat({ booking_id, other_user, messages: initialMessages
                             <X className="w-5 h-5" />
                         </Link>
                         <img
-                            src={other_user.avatar || `https://ui-avatars.com/api/?name=${other_user.name}&size=40`}
+                            src={other_user.avatar ? `/storage/${other_user.avatar}` : `https://ui-avatars.com/api/?name=${other_user.name}&size=40`}
                             alt={other_user.name}
                             className="w-10 h-10 rounded-full"
                         />
