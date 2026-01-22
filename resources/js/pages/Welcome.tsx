@@ -21,7 +21,7 @@ interface Props {
 
 export default function Welcome({ canLogin, canRegister }: Props) {
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-900">
+        <div className="min-h-screen bg-white font-sans text-slate-900 scroll-smooth">
             <Head title="VIMAIZ — Planifiez votre ménage" />
 
             {/* NAV */}
@@ -37,18 +37,18 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             </Link>
 
                             <div className="hidden items-center space-x-6 md:flex">
-                                <Link
-                                    href="#demander"
+                                <a
+                                    href="#comment-ca-marche"
                                     className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
                                 >
                                     Faire le ménage
-                                </Link>
-                                <Link
-                                    href={route('register') + '?role=agent'}
+                                </a>
+                                <a
+                                    href="#professionnels"
                                     className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
                                 >
                                     Professionnels
-                                </Link>
+                                </a>
                             </div>
                         </div>
 
@@ -93,13 +93,13 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             </nav>
 
             {/* HERO */}
-            <section className="relative min-h-screen flex items-center bg-gradient-to-br from-sky-50 via-white to-cyan-50 pt-16">
+            <section className="relative bg-gradient-to-br from-sky-50 via-white to-cyan-50 pt-16">
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
                     <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-cyan-200/30 blur-3xl" />
                 </div>
 
-                <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+                <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -129,7 +129,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                     </Button>
                                 </Link>
                                 <a href="#comment-ca-marche">
-                                    <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                                    <Button variant="secondary" size="lg" className="w-full sm:w-auto">
                                         Comment ça marche
                                     </Button>
                                 </a>
@@ -321,7 +321,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             </section>
 
             {/* PROFESSIONNELS CTA */}
-            <section className="py-24 bg-primary">
+            <section id="professionnels" className="py-24 bg-primary">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div>
@@ -356,8 +356,27 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             <div className="relative">
                                 <div className="absolute inset-0 bg-white/10 rounded-3xl blur-2xl" />
                                 <div className="relative bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20">
-                                    <Users className="h-24 w-24 text-white/80 mx-auto mb-4" />
-                                    <p className="text-center text-white/60 text-sm">
+                                    {/* Illustration style unDraw - Professional cleaner */}
+                                    <svg className="w-64 h-48 mx-auto" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        {/* Person */}
+                                        <circle cx="200" cy="80" r="35" fill="white" fillOpacity="0.9"/>
+                                        <path d="M200 115C170 115 150 145 150 180V240H250V180C250 145 230 115 200 115Z" fill="white" fillOpacity="0.9"/>
+                                        {/* Cleaning tools */}
+                                        <rect x="260" y="120" width="8" height="120" rx="4" fill="white" fillOpacity="0.7"/>
+                                        <ellipse cx="264" cy="110" rx="20" ry="15" fill="white" fillOpacity="0.6"/>
+                                        {/* Bucket */}
+                                        <path d="M120 200L130 260H170L180 200H120Z" fill="white" fillOpacity="0.7"/>
+                                        <path d="M115 200H185" stroke="white" strokeOpacity="0.8" strokeWidth="4" strokeLinecap="round"/>
+                                        {/* Sparkles */}
+                                        <circle cx="300" cy="160" r="8" fill="white" fillOpacity="0.5"/>
+                                        <circle cx="320" cy="140" r="5" fill="white" fillOpacity="0.4"/>
+                                        <circle cx="100" cy="150" r="6" fill="white" fillOpacity="0.5"/>
+                                        <circle cx="80" cy="180" r="4" fill="white" fillOpacity="0.4"/>
+                                        {/* Checkmark badge */}
+                                        <circle cx="280" cy="80" r="25" fill="white" fillOpacity="0.8"/>
+                                        <path d="M268 80L276 88L292 72" stroke="#0ea5e9" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                    <p className="text-center text-white/80 text-sm mt-4">
                                         Rejoignez notre réseau d'agents professionnels
                                     </p>
                                 </div>
