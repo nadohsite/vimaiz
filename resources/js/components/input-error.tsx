@@ -6,12 +6,16 @@ export default function InputError({
     className = '',
     ...props
 }: HTMLAttributes<HTMLParagraphElement> & { message?: string }) {
-    return message ? (
+    if (!message) return null;
+
+    // Check if message contains HTML (like links)
+    const containsHtml = /<[a-z][\s\S]*>/i.test(message);
+
+    return (
         <p
             {...props}
             className={cn('text-sm text-red-600 dark:text-red-400', className)}
-        >
-            {message}
-        </p>
-    ) : null;
+            {...(containsHtml ? { dangerouslySetInnerHTML: { __html: message } } : { children: message })}
+        />
+    );
 }
