@@ -3,7 +3,8 @@ import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { type PropsWithChildren } from 'react';
-import { Sparkles, Shield, Clock, CheckCircle } from 'lucide-react';
+import { Crown, Shield, Clock, CheckCircle } from 'lucide-react';
+import logoImage from '@/../assets/images/logo.png';
 
 interface AuthLayoutProps {
     title?: string;
@@ -29,12 +30,12 @@ export default function AuthSplitLayout({
                         href={home()}
                         className="relative z-20 flex items-center justify-center lg:hidden mb-6"
                     >
-                        <div className="flex items-center gap-2">
-                            <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-sky-600 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/30">
-                                <Sparkles className="h-5 w-5 text-white" />
-                            </div>
-                            <span className="text-2xl font-bold text-slate-900">VIMAIZ</span>
-                        </div>
+                        <img 
+                            src={logoImage} 
+                            alt="VIMAIZ" 
+                            className="h-22 object-contain" 
+                            style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%)' }}
+                        />
                     </Link>
                     <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center mb-4">
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900">{title}</h1>
@@ -60,15 +61,12 @@ export default function AuthSplitLayout({
                 
                 <Link
                     href={home()}
-                    className="relative z-20 flex items-center gap-3"
+                    className="relative z-20 flex items-center"
                 >
-                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30">
-                        <Sparkles className="h-6 w-6 text-white" />
-                    </div>
-                    <span className="text-2xl font-bold text-white">VIMAIZ</span>
+                    <img src={logoImage} alt="VIMAIZ" className="h-24 object-contain" />
                 </Link>
 
-                <div className="relative z-20 mt-auto space-y-8">
+                <div className="relative z-20 mt-auto mb-10 space-y-8">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -101,7 +99,7 @@ export default function AuthSplitLayout({
                             <p className="text-sm font-medium">Satisfaction garantie</p>
                         </div>
                         <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-                            <Sparkles className="h-6 w-6 mb-2 text-white/90" />
+                            <Crown className="h-6 w-6 mb-2 text-white/90" />
                             <p className="text-sm font-medium">Service premium</p>
                         </div>
                     </motion.div>

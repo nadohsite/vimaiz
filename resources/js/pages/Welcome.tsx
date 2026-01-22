@@ -8,11 +8,14 @@ import {
     Home,
     MapPin,
     Shield,
-    Sparkles,
     Star,
     Users,
+    Brush,
+    Zap,
+    PartyPopper,
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import logoImage from '@/../assets/images/logo.png';
 
 interface Props {
     canLogin: boolean;
@@ -29,11 +32,13 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
                         <div className="flex items-center gap-8">
-                            <Link href="/" className="flex items-center gap-2">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
-                                    <Sparkles className="h-6 w-6 text-white" />
-                                </div>
-                                <span className="text-xl font-bold text-slate-900">VIMAIZ</span>
+                            <Link href="/" className="flex items-center">
+                                <img 
+                                    src={logoImage} 
+                                    alt="VIMAIZ" 
+                                    className="h-22 object-contain brightness-0 saturate-100 invert-0 sepia-100 hue-rotate-[190deg] saturate-[500%]" 
+                                    style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%)' }}
+                                />
                             </Link>
 
                             <div className="hidden items-center space-x-6 md:flex">
@@ -107,7 +112,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             transition={{ duration: 0.6 }}
                         >
                             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-                                <Sparkles className="h-4 w-4" />
+                                <Brush className="h-4 w-4" />
                                 Service de ménage professionnel
                             </div>
 
@@ -155,7 +160,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                         >
                             <div className="relative rounded-3xl bg-white p-8 shadow-2xl shadow-primary/10 border border-slate-100">
                                 <div className="absolute -top-4 -right-4 rounded-full bg-primary p-3 shadow-lg">
-                                    <Sparkles className="h-6 w-6 text-white" />
+                                    <Zap className="h-6 w-6 text-white" />
                                 </div>
                                 
                                 <h3 className="text-lg font-semibold mb-6">Demande rapide</h3>
@@ -229,7 +234,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             },
                             {
                                 step: '4',
-                                icon: Sparkles,
+                                icon: PartyPopper,
                                 title: 'C\'est fait !',
                                 description: 'Un agent qualifié intervient chez vous',
                             },
@@ -440,11 +445,8 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="grid md:grid-cols-4 gap-8 mb-12">
                         <div>
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
-                                    <Sparkles className="h-6 w-6 text-white" />
-                                </div>
-                                <span className="text-xl font-bold">VIMAIZ</span>
+                            <div className="mb-4">
+                                <img src={logoImage} alt="VIMAIZ" className="h-18 object-contain" />
                             </div>
                             <p className="text-slate-400 text-sm">
                                 Planifiez votre ménage.<br />

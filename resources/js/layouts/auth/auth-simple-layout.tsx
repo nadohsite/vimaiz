@@ -23,9 +23,10 @@ export default function AuthSimpleLayout({
                             href={route('home')}
                             className="flex flex-col items-center gap-2 font-medium"
                         >
-                            <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" />
-                            </div>
+                            <AppLogoIcon 
+                                className="h-22 object-contain" 
+                                style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%)' }}
+                            />
                             <span className="sr-only">{title}</span>
                         </Link>
 

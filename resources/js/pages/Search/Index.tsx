@@ -8,7 +8,7 @@ import {
 import { Head, Link } from '@inertiajs/react';
 import { router as inertiaRouter } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { MapPin, Search, Sparkles, Star } from 'lucide-react';
+import { MapPin, Search, Heart, Star } from 'lucide-react';
 import L from 'leaflet';
 
 import { useEffect, useState } from 'react';
@@ -370,9 +370,9 @@ export default function SearchIndex({ agents, filters, services }: Props) {
                                                     Réserver
                                                 </Link>
                                                 <button 
-                                                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-200 text-neutral-400 hover:text-indigo-600 hover:border-indigo-600 transition-colors"
+                                                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-200 text-neutral-400 hover:text-red-500 hover:border-red-500 transition-colors"
                                                 >
-                                                    <Sparkles className="h-4 w-4" />
+                                                    <Heart className="h-4 w-4" />
                                                 </button>
                                             </div>
                                         </div>
