@@ -147,4 +147,89 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* Cursor pointer pour tous les éléments interactifs */
+    button,
+    [role="button"],
+    a,
+    input[type="submit"],
+    input[type="button"],
+    input[type="reset"],
+    select,
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    /* Transitions fluides globales */
+    a, button, [role="button"] {
+        @apply transition-all duration-200 ease-out;
+    }
+}
+
+/* Animations avancées */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(14, 165, 233, 0.6); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+.animate-fade-up {
+    animation: fade-up 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+    animation: scale-in 0.4s ease-out forwards;
+}
+
+/* Hover effects avancés */
+.hover-lift {
+    @apply transition-all duration-300;
+}
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.hover-scale {
+    @apply transition-transform duration-200;
+}
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 30px rgba(14, 165, 233, 0.4);
 }

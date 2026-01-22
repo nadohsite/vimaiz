@@ -98,10 +98,32 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             </nav>
 
             {/* HERO */}
-            <section className="relative bg-gradient-to-br from-sky-50 via-white to-cyan-50 pt-16">
+            <section className="relative bg-gradient-to-br from-sky-50 via-white to-cyan-50 pt-16 overflow-hidden">
                 <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
-                    <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-cyan-200/30 blur-3xl" />
+                    <motion.div 
+                        className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl"
+                        animate={{ 
+                            scale: [1, 1.2, 1],
+                            opacity: [0.5, 0.8, 0.5]
+                        }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <motion.div 
+                        className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-cyan-200/30 blur-3xl"
+                        animate={{ 
+                            scale: [1.2, 1, 1.2],
+                            opacity: [0.6, 0.9, 0.6]
+                        }}
+                        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <motion.div 
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-primary/5 blur-3xl"
+                        animate={{ 
+                            scale: [1, 1.3, 1],
+                            rotate: [0, 180, 360]
+                        }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    />
                 </div>
 
                 <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
@@ -153,40 +175,59 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                         </motion.div>
 
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 100 }}
                             className="relative hidden lg:block"
                         >
-                            <div className="relative rounded-3xl bg-white p-8 shadow-2xl shadow-primary/10 border border-slate-100">
-                                <div className="absolute -top-4 -right-4 rounded-full bg-primary p-3 shadow-lg">
+                            <div className="relative rounded-3xl bg-white p-8 shadow-2xl shadow-primary/20 border border-slate-100 hover:shadow-3xl hover:shadow-primary/30 transition-all duration-500">
+                                <motion.div 
+                                    className="absolute -top-4 -right-4 rounded-full bg-primary p-3 shadow-lg"
+                                    animate={{ rotate: [0, 10, -10, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                >
                                     <Zap className="h-6 w-6 text-white" />
-                                </div>
+                                </motion.div>
                                 
                                 <h3 className="text-lg font-semibold mb-6">Demande rapide</h3>
                                 
                                 <div className="space-y-4">
-                                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                                        <Home className="h-5 w-5 text-primary" />
+                                    <motion.div 
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                                        whileHover={{ x: 5 }}
+                                    >
+                                        <div className="p-2 rounded-lg bg-primary/10">
+                                            <Home className="h-5 w-5 text-primary" />
+                                        </div>
                                         <div>
                                             <p className="text-sm font-medium">Type de logement</p>
                                             <p className="text-xs text-slate-500">Maison, Villa, Chalet</p>
                                         </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                                        <Calendar className="h-5 w-5 text-primary" />
+                                    </motion.div>
+                                    <motion.div 
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                                        whileHover={{ x: 5 }}
+                                    >
+                                        <div className="p-2 rounded-lg bg-primary/10">
+                                            <Calendar className="h-5 w-5 text-primary" />
+                                        </div>
                                         <div>
                                             <p className="text-sm font-medium">Date & Heure</p>
                                             <p className="text-xs text-slate-500">Choisissez votre créneau</p>
                                         </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                                        <CreditCard className="h-5 w-5 text-primary" />
+                                    </motion.div>
+                                    <motion.div 
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                                        whileHover={{ x: 5 }}
+                                    >
+                                        <div className="p-2 rounded-lg bg-primary/10">
+                                            <CreditCard className="h-5 w-5 text-primary" />
+                                        </div>
                                         <div>
                                             <p className="text-sm font-medium">Paiement sécurisé</p>
                                             <p className="text-xs text-slate-500">Avant l'intervention</p>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 </div>
 
                                 <Link href={canLogin ? route('dashboard') : route('register')}>
@@ -212,58 +253,94 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-4 gap-8">
-                        {[
-                            {
-                                step: '1',
-                                icon: Home,
-                                title: 'Ajoutez votre logement',
-                                description: 'Renseignez les détails de votre maison, villa ou chalet',
-                            },
-                            {
-                                step: '2',
-                                icon: Calendar,
-                                title: 'Planifiez',
-                                description: 'Choisissez la date, l\'heure et la durée souhaitée',
-                            },
-                            {
-                                step: '3',
-                                icon: CreditCard,
-                                title: 'Validez & Payez',
-                                description: 'Recevez un devis, acceptez et payez en ligne',
-                            },
-                            {
-                                step: '4',
-                                icon: PartyPopper,
-                                title: 'C\'est fait !',
-                                description: 'Un agent qualifié intervient chez vous',
-                            },
-                        ].map((item, index) => (
-                            <motion.div
-                                key={item.step}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                viewport={{ once: true }}
-                                className="relative"
-                            >
-                                <div className="text-center">
-                                    <div className="relative inline-flex mb-6">
-                                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-                                            <item.icon className="h-8 w-8 text-primary" />
+                    <div className="relative">
+                        {/* Connecting lines - positioned to touch icons directly */}
+                        <div className="hidden md:block absolute top-[4.5rem] left-0 right-0 z-0">
+                            <svg className="w-full h-4" preserveAspectRatio="none">
+                                {/* Line 1→2: touches icon 1 right edge to icon 2 left edge */}
+                                <line 
+                                    x1="16%" y1="50%" x2="34%" y2="50%" 
+                                    stroke="#0ea5e9" 
+                                    strokeWidth="2" 
+                                    strokeDasharray="8 6"
+                                    strokeOpacity="0.5"
+                                />
+                                {/* Line 2→3: touches icon 2 right edge to icon 3 left edge */}
+                                <line 
+                                    x1="41%" y1="50%" x2="59%" y2="50%" 
+                                    stroke="#0ea5e9" 
+                                    strokeWidth="2" 
+                                    strokeDasharray="8 6"
+                                    strokeOpacity="0.5"
+                                />
+                                {/* Line 3→4: touches icon 3 right edge to icon 4 left edge */}
+                                <line 
+                                    x1="66%" y1="50%" x2="84%" y2="50%" 
+                                    stroke="#0ea5e9" 
+                                    strokeWidth="2" 
+                                    strokeDasharray="8 6"
+                                    strokeOpacity="0.5"
+                                />
+                            </svg>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-4 gap-8 relative z-10">
+                            {[
+                                {
+                                    step: '1',
+                                    icon: Home,
+                                    title: 'Ajoutez votre logement',
+                                    description: 'Renseignez les détails de votre maison, villa ou chalet',
+                                },
+                                {
+                                    step: '2',
+                                    icon: Calendar,
+                                    title: 'Planifiez',
+                                    description: 'Choisissez la date, l\'heure et la durée souhaitée',
+                                },
+                                {
+                                    step: '3',
+                                    icon: CreditCard,
+                                    title: 'Validez & Payez',
+                                    description: 'Recevez un devis, acceptez et payez en ligne',
+                                },
+                                {
+                                    step: '4',
+                                    icon: PartyPopper,
+                                    title: 'C\'est fait !',
+                                    description: 'Un agent qualifié intervient chez vous',
+                                },
+                            ].map((item, index) => (
+                                <motion.div
+                                    key={item.step}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.6, delay: index * 0.15, type: "spring", stiffness: 100 }}
+                                    viewport={{ once: true, margin: "-50px" }}
+                                    whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                                    className="relative group"
+                                >
+                                    <div className="text-center p-6 rounded-2xl bg-white/50 backdrop-blur-sm border border-transparent group-hover:border-primary/20 group-hover:bg-white group-hover:shadow-xl group-hover:shadow-primary/10 transition-all duration-500">
+                                        <div className="relative inline-flex mb-6">
+                                            <motion.div 
+                                                className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300"
+                                                whileHover={{ scale: 1.1, rotate: 5 }}
+                                            >
+                                                <item.icon className="h-8 w-8 text-primary" />
+                                            </motion.div>
+                                            <motion.span 
+                                                className="absolute -top-2 -right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-lg"
+                                                whileHover={{ scale: 1.2 }}
+                                            >
+                                                {item.step}
+                                            </motion.span>
                                         </div>
-                                        <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
-                                            {item.step}
-                                        </span>
+                                        <h3 className="text-lg font-semibold text-slate-900 mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
+                                        <p className="text-sm text-slate-600">{item.description}</p>
                                     </div>
-                                    <h3 className="text-lg font-semibold text-slate-900 mb-2">{item.title}</h3>
-                                    <p className="text-sm text-slate-600">{item.description}</p>
-                                </div>
-                                {index < 3 && (
-                                    <div className="hidden md:block absolute top-8 left-[60%] w-[80%] border-t-2 border-dashed border-slate-200" />
-                                )}
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
@@ -300,23 +377,34 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                         ].map((service, index) => (
                             <motion.div
                                 key={service.title}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                viewport={{ once: true }}
-                                className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-lg hover:border-primary/20 transition-all"
+                                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                                transition={{ duration: 0.6, delay: index * 0.15, type: "spring", stiffness: 100 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                whileHover={{ y: -10, scale: 1.02 }}
+                                className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-2xl hover:shadow-primary/15 hover:border-primary/30 transition-all duration-500 group"
                             >
-                                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 mb-6">
-                                    <Home className="h-7 w-7 text-primary" />
-                                </div>
-                                <h3 className="text-xl font-semibold text-slate-900 mb-3">{service.title}</h3>
+                                <motion.div 
+                                    className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 mb-6 group-hover:bg-primary group-hover:shadow-lg group-hover:shadow-primary/30 transition-all duration-300"
+                                    whileHover={{ rotate: 10 }}
+                                >
+                                    <Home className="h-7 w-7 text-primary group-hover:text-white transition-colors" />
+                                </motion.div>
+                                <h3 className="text-xl font-semibold text-slate-900 mb-3 group-hover:text-primary transition-colors">{service.title}</h3>
                                 <p className="text-slate-600 mb-6">{service.description}</p>
-                                <ul className="space-y-2">
-                                    {service.features.map((feature) => (
-                                        <li key={feature} className="flex items-center gap-2 text-sm text-slate-600">
-                                            <CheckCircle className="h-4 w-4 text-green-500" />
+                                <ul className="space-y-3">
+                                    {service.features.map((feature, featureIndex) => (
+                                        <motion.li 
+                                            key={feature} 
+                                            className="flex items-center gap-2 text-sm text-slate-600"
+                                            initial={{ opacity: 0, x: -10 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.3 + featureIndex * 0.1 }}
+                                            viewport={{ once: true }}
+                                        >
+                                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
                                             {feature}
-                                        </li>
+                                        </motion.li>
                                     ))}
                                 </ul>
                             </motion.div>
@@ -326,10 +414,24 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             </section>
 
             {/* PROFESSIONNELS CTA */}
-            <section id="professionnels" className="py-24 bg-primary">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <section id="professionnels" className="py-24 bg-primary relative overflow-hidden">
+                <motion.div 
+                    className="absolute inset-0"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                >
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-400/10 rounded-full blur-3xl" />
+                </motion.div>
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div>
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, type: "spring" }}
+                            viewport={{ once: true }}
+                        >
                             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
                                 Vous êtes professionnel du ménage ?
                             </h2>
@@ -343,24 +445,46 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                     'Missions attribuées automatiquement',
                                     'Paiement garanti après chaque intervention',
                                     'Aucune commission sur vos revenus visibles',
-                                ].map((item) => (
-                                    <li key={item} className="flex items-center gap-3 text-white">
+                                ].map((item, index) => (
+                                    <motion.li 
+                                        key={item} 
+                                        className="flex items-center gap-3 text-white"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.2 + index * 0.1 }}
+                                        viewport={{ once: true }}
+                                    >
                                         <CheckCircle className="h-5 w-5 text-white/80" />
                                         {item}
-                                    </li>
+                                    </motion.li>
                                 ))}
                             </ul>
-                            <Link href={route('register') + '?role=agent'}>
-                                <Button size="lg" variant="secondary" className="gap-2">
-                                    Devenir partenaire
-                                    <ArrowRight className="h-5 w-5" />
-                                </Button>
-                            </Link>
-                        </div>
-                        <div className="hidden lg:flex justify-center">
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <Link href={route('register') + '?role=agent'}>
+                                    <Button size="lg" variant="secondary" className="gap-2 shadow-xl shadow-black/20 hover:shadow-2xl hover:shadow-black/30 transition-shadow">
+                                        Devenir partenaire
+                                        <ArrowRight className="h-5 w-5" />
+                                    </Button>
+                                </Link>
+                            </motion.div>
+                        </motion.div>
+                        <motion.div 
+                            className="hidden lg:flex justify-center"
+                            initial={{ opacity: 0, x: 30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
+                            viewport={{ once: true }}
+                        >
                             <div className="relative">
-                                <div className="absolute inset-0 bg-white/10 rounded-3xl blur-2xl" />
-                                <div className="relative bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20">
+                                <motion.div 
+                                    className="absolute inset-0 bg-white/10 rounded-3xl blur-2xl"
+                                    animate={{ scale: [1, 1.1, 1] }}
+                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                />
+                                <div className="relative bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20 hover:bg-white/15 transition-colors duration-500">
                                     {/* Illustration style unDraw - Professional cleaner */}
                                     <svg className="w-64 h-48 mx-auto" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         {/* Person */}
@@ -386,7 +510,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                     </p>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
@@ -395,7 +519,12 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             <section id="about" className="py-24 bg-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
-                        <div>
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, type: "spring" }}
+                            viewport={{ once: true }}
+                        >
                             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
                                 À propos de VIMAIZ
                             </h2>
@@ -414,26 +543,43 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                     { value: '100%', label: 'Sécurisé' },
                                     { value: '24h', label: 'Réponse max' },
                                     { value: '5★', label: 'Qualité' },
-                                ].map((stat) => (
-                                    <div key={stat.label} className="text-center">
+                                ].map((stat, index) => (
+                                    <motion.div 
+                                        key={stat.label} 
+                                        className="text-center"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.3 + index * 0.1 }}
+                                        viewport={{ once: true }}
+                                    >
                                         <p className="text-2xl font-bold text-primary">{stat.value}</p>
                                         <p className="text-sm text-slate-500">{stat.label}</p>
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
-                        </div>
+                        </motion.div>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { icon: Shield, title: 'Agents vérifiés', desc: 'SIRET et documents contrôlés' },
                                 { icon: CreditCard, title: 'Paiement sécurisé', desc: 'Avant chaque intervention' },
                                 { icon: Star, title: 'Qualité garantie', desc: 'Photos avant/après obligatoires' },
                                 { icon: MapPin, title: 'Partout en France', desc: 'Réseau national d\'agents' },
-                            ].map((item) => (
-                                <div key={item.title} className="bg-slate-50 rounded-2xl p-6">
-                                    <item.icon className="h-8 w-8 text-primary mb-4" />
-                                    <h4 className="font-semibold text-slate-900 mb-1">{item.title}</h4>
+                            ].map((item, index) => (
+                                <motion.div 
+                                    key={item.title} 
+                                    className="bg-slate-50 rounded-2xl p-6 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group"
+                                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                                    viewport={{ once: true }}
+                                    whileHover={{ y: -5 }}
+                                >
+                                    <motion.div whileHover={{ scale: 1.1, rotate: 5 }}>
+                                        <item.icon className="h-8 w-8 text-primary mb-4 group-hover:text-primary transition-colors" />
+                                    </motion.div>
+                                    <h4 className="font-semibold text-slate-900 mb-1 group-hover:text-primary transition-colors">{item.title}</h4>
                                     <p className="text-sm text-slate-600">{item.desc}</p>
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
                     </div>
