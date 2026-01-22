@@ -50,20 +50,20 @@ export default function Create({ propertyTypes }: Props) {
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-8">
-                        <Link href={route('client.properties.index')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 mb-4">
+                        <Link href={route('client.properties.index')} className="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 mb-4">
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             Retour aux logements
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-900">Ajouter un logement</h1>
-                        <p className="text-slate-500 mt-1">Renseignez les informations de votre propriété</p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Ajouter un logement</h1>
+                        <p className="text-slate-500 dark:text-slate-400 mt-1">Renseignez les informations de votre propriété</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Type & Name */}
-                        <Card>
+                        <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Home className="h-5 w-5 text-sky-500" />
+                                <CardTitle className="flex items-center gap-2 dark:text-white">
+                                    <Home className="h-5 w-5 text-sky-500 dark:text-sky-400" />
                                     Informations générales
                                 </CardTitle>
                             </CardHeader>
@@ -98,9 +98,9 @@ export default function Create({ propertyTypes }: Props) {
                         </Card>
 
                         {/* Address */}
-                        <Card>
+                        <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle>Adresse</CardTitle>
+                                <CardTitle className="dark:text-white">Adresse</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
@@ -149,10 +149,10 @@ export default function Create({ propertyTypes }: Props) {
                         </Card>
 
                         {/* Property Details */}
-                        <Card>
+                        <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle>Caractéristiques</CardTitle>
-                                <CardDescription>Ces informations nous aident à calculer un devis précis</CardDescription>
+                                <CardTitle className="dark:text-white">Caractéristiques</CardTitle>
+                                <CardDescription className="dark:text-slate-400">Ces informations nous aident à calculer un devis précis</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -234,10 +234,10 @@ export default function Create({ propertyTypes }: Props) {
                         </Card>
 
                         {/* Access & Instructions */}
-                        <Card>
+                        <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle>Accès et instructions</CardTitle>
-                                <CardDescription>Informations utiles pour l'agent de ménage</CardDescription>
+                                <CardTitle className="dark:text-white">Accès et instructions</CardTitle>
+                                <CardDescription className="dark:text-slate-400">Informations utiles pour l'agent de ménage</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid gap-4 sm:grid-cols-2">
@@ -295,7 +295,7 @@ export default function Create({ propertyTypes }: Props) {
                         {/* Submit */}
                         <div className="flex justify-end gap-4">
                             <Link href={route('client.properties.index')}>
-                                <Button type="button" variant="outline">Annuler</Button>
+                                <Button type="button" variant="outline" className="dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700">Annuler</Button>
                             </Link>
                             <Button type="submit" disabled={processing} className="bg-sky-500 hover:bg-sky-600">
                                 <Save className="h-4 w-4 mr-2" />

@@ -48,13 +48,13 @@ interface Props {
 export default function Show({ mission }: Props) {
     const getStatusColor = (status: string) => {
         const colors: Record<string, string> = {
-            pending_agent: 'bg-yellow-100 text-yellow-800',
-            agent_accepted: 'bg-blue-100 text-blue-800',
-            in_progress: 'bg-sky-100 text-sky-800',
-            completed: 'bg-green-100 text-green-800',
-            cancelled: 'bg-gray-100 text-gray-800',
+            pending_agent: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+            agent_accepted: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+            in_progress: 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
+            completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+            cancelled: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+        return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
     };
 
     const beforePhotos = mission.photos.filter(p => p.type === 'before');
@@ -71,14 +71,14 @@ export default function Show({ mission }: Props) {
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-8">
-                        <Link href={route('client.missions.index')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 mb-4">
+                        <Link href={route('client.missions.index')} className="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 mb-4">
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             Retour aux missions
                         </Link>
                         <div className="flex items-center justify-between">
                             <div>
                                 <div className="flex items-center gap-3">
-                                    <h1 className="text-2xl font-bold text-slate-900">
+                                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
                                         {mission.mission_number}
                                     </h1>
                                     <Badge className={getStatusColor(mission.status)}>
@@ -117,7 +117,7 @@ export default function Show({ mission }: Props) {
 
                             {/* Photos Before */}
                             {beforePhotos.length > 0 && (
-                                <Card>
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <Camera className="h-5 w-5 text-sky-500" />
@@ -147,7 +147,7 @@ export default function Show({ mission }: Props) {
 
                             {/* Photos After */}
                             {afterPhotos.length > 0 && (
-                                <Card>
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <Camera className="h-5 w-5 text-green-500" />
@@ -177,10 +177,10 @@ export default function Show({ mission }: Props) {
 
                             {/* No Photos Yet */}
                             {mission.photos.length === 0 && (
-                                <Card>
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardContent className="p-6 text-center">
-                                        <Camera className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                                        <p className="text-slate-500">
+                                        <Camera className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                                        <p className="text-slate-500 dark:text-slate-400">
                                             Les photos seront disponibles une fois la mission commencée.
                                         </p>
                                     </CardContent>
@@ -192,21 +192,21 @@ export default function Show({ mission }: Props) {
                         <div className="space-y-6">
                             {/* Agent */}
                             {mission.agent && (
-                                <Card>
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardHeader>
-                                        <CardTitle className="flex items-center gap-2 text-base">
-                                            <User className="h-4 w-4 text-sky-500" />
+                                        <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                            <User className="h-4 w-4 text-sky-500 dark:text-sky-400" />
                                             Agent
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center">
-                                                <User className="h-6 w-6 text-sky-600" />
+                                            <div className="w-12 h-12 bg-sky-100 dark:bg-sky-900/50 rounded-full flex items-center justify-center">
+                                                <User className="h-6 w-6 text-sky-600 dark:text-sky-400" />
                                             </div>
                                             <div>
-                                                <p className="font-medium">{mission.agent.name}</p>
-                                                <p className="text-sm text-slate-500">Agent VIMAIZ</p>
+                                                <p className="font-medium dark:text-white">{mission.agent.name}</p>
+                                                <p className="text-sm text-slate-500 dark:text-slate-400">Agent VIMAIZ</p>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -214,37 +214,37 @@ export default function Show({ mission }: Props) {
                             )}
 
                             {/* Property */}
-                            <Card>
+                            <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-base">
-                                        <Home className="h-4 w-4 text-sky-500" />
+                                    <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                        <Home className="h-4 w-4 text-sky-500 dark:text-sky-400" />
                                         Logement
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="font-medium">{mission.property.name || mission.property.type_label}</p>
-                                    <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
+                                    <p className="font-medium dark:text-white">{mission.property.name || mission.property.type_label}</p>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-1">
                                         <MapPin className="h-3 w-3" />
                                         {mission.property.address_line1}
                                     </p>
-                                    <p className="text-sm text-slate-500">
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
                                         {mission.property.postal_code} {mission.property.city}
                                     </p>
                                 </CardContent>
                             </Card>
 
                             {/* Schedule */}
-                            <Card>
+                            <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-base">
-                                        <Calendar className="h-4 w-4 text-sky-500" />
+                                    <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                        <Calendar className="h-4 w-4 text-sky-500 dark:text-sky-400" />
                                         Planification
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500">Date</span>
-                                        <span className="font-medium">
+                                        <span className="text-slate-500 dark:text-slate-400">Date</span>
+                                        <span className="font-medium dark:text-white">
                                             {new Date(mission.scheduled_at).toLocaleDateString('fr-FR', {
                                                 weekday: 'long',
                                                 day: 'numeric',
@@ -253,8 +253,8 @@ export default function Show({ mission }: Props) {
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500">Heure</span>
-                                        <span className="font-medium">
+                                        <span className="text-slate-500 dark:text-slate-400">Heure</span>
+                                        <span className="font-medium dark:text-white">
                                             {new Date(mission.scheduled_at).toLocaleTimeString('fr-FR', {
                                                 hour: '2-digit',
                                                 minute: '2-digit'
@@ -262,20 +262,20 @@ export default function Show({ mission }: Props) {
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500">Durée</span>
-                                        <span className="font-medium">{mission.duration_hours}h</span>
+                                        <span className="text-slate-500 dark:text-slate-400">Durée</span>
+                                        <span className="font-medium dark:text-white">{mission.duration_hours}h</span>
                                     </div>
                                 </CardContent>
                             </Card>
 
                             {/* Price */}
-                            <Card>
+                            <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
-                                    <CardTitle className="text-base">Montant</CardTitle>
+                                    <CardTitle className="text-base dark:text-white">Montant</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-2xl font-bold text-slate-900">{mission.total_price} MAD</p>
-                                    <p className="text-xs text-slate-500 mt-1">Payé</p>
+                                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{mission.total_price} MAD</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Payé</p>
                                 </CardContent>
                             </Card>
                         </div>

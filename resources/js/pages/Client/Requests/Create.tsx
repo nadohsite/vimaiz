@@ -81,23 +81,23 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                 <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-8">
-                        <Link href={route('client.requests.index')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 mb-4">
+                        <Link href={route('client.requests.index')} className="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 mb-4">
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             Retour aux demandes
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-900">Nouvelle demande de ménage</h1>
-                        <p className="text-slate-500 mt-1">Planifiez votre prochain ménage</p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Nouvelle demande de ménage</h1>
+                        <p className="text-slate-500 dark:text-slate-400 mt-1">Planifiez votre prochain ménage</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Property Selection */}
-                        <Card>
+                        <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Home className="h-5 w-5 text-sky-500" />
+                                <CardTitle className="flex items-center gap-2 dark:text-white">
+                                    <Home className="h-5 w-5 text-sky-500 dark:text-sky-400" />
                                     Logement
                                 </CardTitle>
-                                <CardDescription>
+                                <CardDescription className="dark:text-slate-400">
                                     Sélectionnez le logement à nettoyer
                                 </CardDescription>
                             </CardHeader>
@@ -126,8 +126,8 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                                 </div>
 
                                 {properties.length === 0 && (
-                                    <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-                                        <p className="text-sm text-yellow-800">
+                                    <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                                        <p className="text-sm text-yellow-800 dark:text-yellow-300">
                                             Vous n'avez pas encore de logement.{' '}
                                             <Link href={route('client.properties.create')} className="font-medium underline">
                                                 Ajouter un logement
@@ -139,10 +139,10 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                         </Card>
 
                         {/* Date & Time */}
-                        <Card>
+                        <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Calendar className="h-5 w-5 text-sky-500" />
+                                <CardTitle className="flex items-center gap-2 dark:text-white">
+                                    <Calendar className="h-5 w-5 text-sky-500 dark:text-sky-400" />
                                     Date et durée
                                 </CardTitle>
                             </CardHeader>
@@ -204,7 +204,7 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                                     </Select>
                                     {errors.requested_hours && <p className="text-sm text-red-500">{errors.requested_hours}</p>}
                                     {selectedProperty && (
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">
                                             Recommandé pour {selectedProperty.surface_area} m² : environ {Math.ceil(selectedProperty.surface_area / 25)} heures
                                         </p>
                                     )}
@@ -213,10 +213,10 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                         </Card>
 
                         {/* Instructions */}
-                        <Card>
+                        <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle>Instructions particulières</CardTitle>
-                                <CardDescription>
+                                <CardTitle className="dark:text-white">Instructions particulières</CardTitle>
+                                <CardDescription className="dark:text-slate-400">
                                     Précisez vos attentes pour cette intervention
                                 </CardDescription>
                             </CardHeader>
@@ -234,11 +234,11 @@ export default function Create({ properties, minDate, maxDate }: Props) {
 
                         {/* Estimate */}
                         {data.property_id && data.scheduled_date && (
-                            <Card className="bg-gradient-to-r from-sky-50 to-cyan-50 border-sky-200">
+                            <Card className="bg-gradient-to-r from-sky-50 to-cyan-50 dark:from-sky-900/30 dark:to-cyan-900/30 border-sky-200 dark:border-sky-800">
                                 <CardContent className="p-6">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                                            <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                                                 <Calculator className="h-5 w-5 text-sky-500" />
                                                 Estimation du prix
                                             </h3>
@@ -247,7 +247,7 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                                                     {estimate.min} - {estimate.max} MAD
                                                 </p>
                                             ) : (
-                                                <p className="text-sm text-slate-500 mt-1">
+                                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                                                     Cliquez pour obtenir une estimation
                                                 </p>
                                             )}
@@ -261,7 +261,7 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                                             {loadingEstimate ? 'Calcul...' : 'Estimer'}
                                         </Button>
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-3">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
                                         * Le prix final sera confirmé dans le devis envoyé sous 24h
                                     </p>
                                 </CardContent>
@@ -271,7 +271,7 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                         {/* Submit */}
                         <div className="flex justify-end gap-4">
                             <Link href={route('client.requests.index')}>
-                                <Button type="button" variant="outline">Annuler</Button>
+                                <Button type="button" variant="outline" className="dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700">Annuler</Button>
                             </Link>
                             <Button 
                                 type="submit" 

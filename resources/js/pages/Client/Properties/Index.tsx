@@ -42,8 +42,8 @@ export default function Index({ properties, propertyTypes }: Props) {
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">Mes logements</h1>
-                            <p className="text-slate-500 mt-1">Gérez vos propriétés pour vos demandes de ménage</p>
+                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Mes logements</h1>
+                            <p className="text-slate-500 dark:text-slate-400 mt-1">Gérez vos propriétés pour vos demandes de ménage</p>
                         </div>
                         <Link href={route('client.properties.create')}>
                             <Button className="bg-sky-500 hover:bg-sky-600">
@@ -57,18 +57,18 @@ export default function Index({ properties, propertyTypes }: Props) {
                     {properties.length > 0 ? (
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {properties.map((property) => (
-                                <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                                    <CardHeader className="bg-gradient-to-r from-sky-50 to-cyan-50 pb-4">
+                                <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700">
+                                    <CardHeader className="bg-gradient-to-r from-sky-50 to-cyan-50 dark:from-slate-700 dark:to-slate-700 pb-4">
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-sky-100 rounded-lg">
-                                                    <Home className="h-5 w-5 text-sky-600" />
+                                                <div className="p-2 bg-sky-100 dark:bg-sky-900/50 rounded-lg">
+                                                    <Home className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                                                 </div>
                                                 <div>
-                                                    <CardTitle className="text-lg">
+                                                    <CardTitle className="text-lg dark:text-white">
                                                         {property.name || `${property.type_label}`}
                                                     </CardTitle>
-                                                    <CardDescription className="flex items-center gap-1 mt-1">
+                                                    <CardDescription className="flex items-center gap-1 mt-1 dark:text-slate-400">
                                                         <MapPin className="h-3 w-3" />
                                                         {property.city}
                                                     </CardDescription>
@@ -80,9 +80,9 @@ export default function Index({ properties, propertyTypes }: Props) {
                                         </div>
                                     </CardHeader>
                                     <CardContent className="pt-4">
-                                        <p className="text-sm text-slate-600 mb-4">{property.address_line1}</p>
+                                        <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{property.address_line1}</p>
                                         
-                                        <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-4">
+                                        <div className="flex flex-wrap gap-4 text-sm text-slate-500 dark:text-slate-400 mb-4">
                                             <span className="flex items-center gap-1">
                                                 <Maximize className="h-4 w-4" />
                                                 {property.surface_area} m²
@@ -98,20 +98,20 @@ export default function Index({ properties, propertyTypes }: Props) {
                                         </div>
 
                                         {property.active_requests_count > 0 && (
-                                            <p className="text-xs text-sky-600 mb-4">
+                                            <p className="text-xs text-sky-600 dark:text-sky-400 mb-4">
                                                 {property.active_requests_count} demande(s) en cours
                                             </p>
                                         )}
 
-                                        <div className="flex gap-2 pt-2 border-t">
+                                        <div className="flex gap-2 pt-2 border-t dark:border-slate-600">
                                             <Link href={route('client.properties.show', property.id)} className="flex-1">
-                                                <Button variant="outline" size="sm" className="w-full">
+                                                <Button variant="outline" size="sm" className="w-full dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700">
                                                     <Eye className="h-4 w-4 mr-1" />
                                                     Voir
                                                 </Button>
                                             </Link>
                                             <Link href={route('client.properties.edit', property.id)}>
-                                                <Button variant="outline" size="sm">
+                                                <Button variant="outline" size="sm" className="dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700">
                                                     <Edit className="h-4 w-4" />
                                                 </Button>
                                             </Link>
@@ -120,7 +120,7 @@ export default function Index({ properties, propertyTypes }: Props) {
                                                 size="sm"
                                                 onClick={() => handleDelete(property.id)}
                                                 disabled={property.active_requests_count > 0}
-                                                className="text-red-500 hover:text-red-700"
+                                                className="text-red-500 hover:text-red-700 dark:border-slate-600 dark:hover:bg-slate-700"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
@@ -130,15 +130,15 @@ export default function Index({ properties, propertyTypes }: Props) {
                             ))}
                         </div>
                     ) : (
-                        <Card className="text-center py-12">
+                        <Card className="text-center py-12 dark:bg-slate-800 dark:border-slate-700">
                             <CardContent>
-                                <div className="mx-auto w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mb-4">
-                                    <Home className="h-8 w-8 text-sky-500" />
+                                <div className="mx-auto w-16 h-16 bg-sky-100 dark:bg-sky-900/50 rounded-full flex items-center justify-center mb-4">
+                                    <Home className="h-8 w-8 text-sky-500 dark:text-sky-400" />
                                 </div>
-                                <h3 className="text-lg font-medium text-slate-900 mb-2">
+                                <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
                                     Aucun logement enregistré
                                 </h3>
-                                <p className="text-slate-500 mb-6">
+                                <p className="text-slate-500 dark:text-slate-400 mb-6">
                                     Ajoutez votre premier logement pour pouvoir demander un ménage.
                                 </p>
                                 <Link href={route('client.properties.create')}>

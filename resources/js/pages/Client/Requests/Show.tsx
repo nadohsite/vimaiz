@@ -71,21 +71,21 @@ interface Props {
 export default function Show({ serviceRequest, canCancel, canPay }: Props) {
     const getStatusColor = (status: string) => {
         const colors: Record<string, string> = {
-            pending: 'bg-yellow-100 text-yellow-800',
-            quote_sent: 'bg-blue-100 text-blue-800',
-            quote_accepted: 'bg-emerald-100 text-emerald-800',
-            paid: 'bg-green-100 text-green-800',
-            assigned: 'bg-purple-100 text-purple-800',
-            in_progress: 'bg-sky-100 text-sky-800',
-            completed: 'bg-green-100 text-green-800',
-            cancelled: 'bg-gray-100 text-gray-800',
-            draft: 'bg-gray-100 text-gray-800',
-            sent: 'bg-blue-100 text-blue-800',
-            accepted: 'bg-green-100 text-green-800',
-            refused: 'bg-red-100 text-red-800',
-            expired: 'bg-orange-100 text-orange-800',
+            pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+            quote_sent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+            quote_accepted: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+            paid: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+            assigned: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+            in_progress: 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
+            completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+            cancelled: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+            draft: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+            sent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+            accepted: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+            refused: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+            expired: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+        return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
     };
 
     const handleCancel = () => {
@@ -125,21 +125,21 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-8">
-                        <Link href={route('client.requests.index')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 mb-4">
+                        <Link href={route('client.requests.index')} className="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 mb-4">
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             Retour aux demandes
                         </Link>
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>
                                 <div className="flex items-center gap-3">
-                                    <h1 className="text-2xl font-bold text-slate-900">
+                                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
                                         {serviceRequest.request_number}
                                     </h1>
                                     <Badge className={getStatusColor(serviceRequest.status)}>
                                         {serviceRequest.status_label}
                                     </Badge>
                                 </div>
-                                <p className="text-slate-500 mt-1">
+                                <p className="text-slate-500 dark:text-slate-400 mt-1">
                                     Créée le {new Date(serviceRequest.created_at).toLocaleDateString('fr-FR')}
                                 </p>
                             </div>
@@ -154,14 +154,14 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
 
                     {/* Progress Steps */}
                     {serviceRequest.status !== 'cancelled' && serviceRequest.status !== 'quote_refused' && (
-                        <Card className="mb-6">
+                        <Card className="mb-6 dark:bg-slate-800 dark:border-slate-700">
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     {steps.map((step, index) => (
                                         <div key={step.key} className="flex items-center flex-1">
                                             <div className="flex flex-col items-center">
                                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                                    step.done ? 'bg-sky-500 text-white' : 'bg-slate-200 text-slate-500'
+                                                    step.done ? 'bg-sky-500 text-white' : 'bg-slate-200 dark:bg-slate-600 text-slate-500 dark:text-slate-300'
                                                 }`}>
                                                     {step.done ? <CheckCircle className="h-5 w-5" /> : index + 1}
                                                 </div>
@@ -169,7 +169,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                             </div>
                                             {index < steps.length - 1 && (
                                                 <div className={`flex-1 h-1 mx-2 ${
-                                                    steps[index + 1].done ? 'bg-sky-500' : 'bg-slate-200'
+                                                    steps[index + 1].done ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-600'
                                                 }`} />
                                             )}
                                         </div>
@@ -184,7 +184,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                         <div className="lg:col-span-2 space-y-6">
                             {/* Quote Card */}
                             {serviceRequest.quote && (
-                                <Card className={serviceRequest.quote.status === 'sent' ? 'border-sky-300 bg-sky-50/50' : ''}>
+                                <Card className={serviceRequest.quote.status === 'sent' ? 'border-sky-300 bg-sky-50/50 dark:bg-sky-900/20 dark:border-sky-700' : 'dark:bg-slate-800 dark:border-slate-700'}>
                                     <CardHeader>
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="flex items-center gap-2">
@@ -198,8 +198,8 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                     </CardHeader>
                                     <CardContent>
                                         <div className="flex items-center justify-between mb-4">
-                                            <span className="text-slate-600">Montant total</span>
-                                            <span className="text-2xl font-bold text-slate-900">
+                                            <span className="text-slate-600 dark:text-slate-400">Montant total</span>
+                                            <span className="text-2xl font-bold text-slate-900 dark:text-white">
                                                 {serviceRequest.quote.final_price} MAD
                                             </span>
                                         </div>
@@ -243,7 +243,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
 
                             {/* Mission Card */}
                             {serviceRequest.mission && (
-                                <Card>
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardHeader>
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="flex items-center gap-2">
@@ -257,13 +257,13 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                     </CardHeader>
                                     <CardContent>
                                         {serviceRequest.mission.agent && (
-                                            <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded-lg">
+                                            <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
                                                 <div className="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center">
                                                     <User className="h-5 w-5 text-sky-600" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-medium">{serviceRequest.mission.agent.name}</p>
-                                                    <p className="text-sm text-slate-500">Agent de ménage</p>
+                                                    <p className="font-medium dark:text-white">{serviceRequest.mission.agent.name}</p>
+                                                    <p className="text-sm text-slate-500 dark:text-slate-400">Agent de ménage</p>
                                                 </div>
                                             </div>
                                         )}
@@ -296,40 +296,40 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                         {/* Sidebar */}
                         <div className="space-y-6">
                             {/* Property Info */}
-                            <Card>
+                            <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-base">
-                                        <Home className="h-4 w-4 text-sky-500" />
+                                    <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                        <Home className="h-4 w-4 text-sky-500 dark:text-sky-400" />
                                         Logement
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="font-medium">{serviceRequest.property.name || serviceRequest.property.type_label}</p>
-                                    <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
+                                    <p className="font-medium dark:text-white">{serviceRequest.property.name || serviceRequest.property.type_label}</p>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-1">
                                         <MapPin className="h-3 w-3" />
                                         {serviceRequest.property.address_line1}
                                     </p>
-                                    <p className="text-sm text-slate-500">
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
                                         {serviceRequest.property.postal_code} {serviceRequest.property.city}
                                     </p>
-                                    <p className="text-sm text-slate-500 mt-2">
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
                                         {serviceRequest.property.surface_area} m²
                                     </p>
                                 </CardContent>
                             </Card>
 
                             {/* Schedule */}
-                            <Card>
+                            <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-base">
-                                        <Calendar className="h-4 w-4 text-sky-500" />
+                                    <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                        <Calendar className="h-4 w-4 text-sky-500 dark:text-sky-400" />
                                         Planification
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500">Date</span>
-                                        <span className="font-medium">
+                                        <span className="text-slate-500 dark:text-slate-400">Date</span>
+                                        <span className="font-medium dark:text-white">
                                             {new Date(serviceRequest.scheduled_date).toLocaleDateString('fr-FR', {
                                                 weekday: 'long',
                                                 day: 'numeric',
@@ -338,24 +338,24 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500">Heure</span>
-                                        <span className="font-medium">{serviceRequest.scheduled_time}</span>
+                                        <span className="text-slate-500 dark:text-slate-400">Heure</span>
+                                        <span className="font-medium dark:text-white">{serviceRequest.scheduled_time}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500">Durée</span>
-                                        <span className="font-medium">{serviceRequest.requested_hours}h</span>
+                                        <span className="text-slate-500 dark:text-slate-400">Durée</span>
+                                        <span className="font-medium dark:text-white">{serviceRequest.requested_hours}h</span>
                                     </div>
                                 </CardContent>
                             </Card>
 
                             {/* Special Instructions */}
                             {serviceRequest.special_instructions && (
-                                <Card>
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardHeader>
-                                        <CardTitle className="text-base">Instructions</CardTitle>
+                                        <CardTitle className="text-base dark:text-white">Instructions</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm text-slate-600 whitespace-pre-wrap">
+                                        <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">
                                             {serviceRequest.special_instructions}
                                         </p>
                                     </CardContent>
