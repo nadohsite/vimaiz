@@ -49,6 +49,9 @@ class AgentProfile extends Model
         'is_available',
         'supported_property_types',
         'max_surface_area',
+        'is_banned',
+        'banned_at',
+        'ban_reason',
     ];
 
     protected $casts = [
@@ -64,6 +67,8 @@ class AgentProfile extends Model
         'supported_property_types' => 'array',
         'covered_zones' => 'array',
         'max_surface_area' => 'integer',
+        'is_banned' => 'boolean',
+        'banned_at' => 'datetime',
     ];
 
     const COMPANY_TYPE_AUTO_ENTREPRENEUR = 'auto_entrepreneur';
@@ -100,6 +105,11 @@ class AgentProfile extends Model
     public function availabilities()
     {
         return $this->hasMany(Availability::class);
+    }
+
+    public function sanctions()
+    {
+        return $this->hasMany(AgentSanction::class)->orderBy('created_at', 'desc');
     }
 
     // Scopes

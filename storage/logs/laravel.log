@@ -3638,3 +3638,11 @@ LINE 1: select * from \"sessions\" where \"id\" = $1 limit 1
 #106 /Volumes/Robert/projets clients/Stephane/vimaiz/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/Volumes/Robert...')
 #107 {main}
 "} 
+[2026-01-23 22:32:27] local.ERROR: Could not check compatibility between App\Filament\Resources\AgentProfileResource::infolist(Filament\Infolists\Infolist $infolist): Filament\Infolists\Infolist and Filament\Resources\Resource::infolist(Filament\Schemas\Schema $schema): Filament\Schemas\Schema, because class Filament\Infolists\Infolist is not available {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Could not check compatibility between App\\Filament\\Resources\\AgentProfileResource::infolist(Filament\\Infolists\\Infolist $infolist): Filament\\Infolists\\Infolist and Filament\\Resources\\Resource::infolist(Filament\\Schemas\\Schema $schema): Filament\\Schemas\\Schema, because class Filament\\Infolists\\Infolist is not available at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/AgentProfileResource.php:406)
+[stacktrace]
+#0 {main}
+"} 
+[2026-01-23 22:35:22] local.ERROR: Cannot redeclare non static Filament\Pages\Page::$view as static App\Filament\Resources\AgentProfileResource\Pages\ViewAgentDocuments::$view {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare non static Filament\\Pages\\Page::$view as static App\\Filament\\Resources\\AgentProfileResource\\Pages\\ViewAgentDocuments::$view at /Volumes/Robert/projets clients/Stephane/vimaiz/app/Filament/Resources/AgentProfileResource/Pages/ViewAgentDocuments.php:15)
+[stacktrace]
+#0 {main}
+"} 
