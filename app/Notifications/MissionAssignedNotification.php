@@ -23,27 +23,12 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $property = $this->mission->property;
-        $scheduledAt = $this->mission->scheduled_at;
-
         return (new MailMessage)
             ->subject('Nouvelle mission VIMAIZ assignée')
-            ->greeting('Bonjour ' . $notifiable->name . ' !')
-            ->line('Une nouvelle mission vous a été attribuée.')
-            ->line('')
-            ->line('**Détails de la mission :**')
-            ->line('- Référence : ' . $this->mission->mission_number)
-            ->line('- Logement : ' . ($property->name ?? $property->type_label))
-            ->line('- Adresse : ' . $property->address_line1 . ', ' . $property->postal_code . ' ' . $property->city)
-            ->line('- Surface : ' . $property->surface_area . ' m²')
-            ->line('- Date : ' . $scheduledAt->format('d/m/Y') . ' à ' . $scheduledAt->format('H:i'))
-            ->line('- Durée : ' . $this->mission->duration_hours . ' heure(s)')
-            ->line('')
-            ->line('**Rémunération : ' . number_format($this->mission->agent_payout, 2, ',', ' ') . ' €**')
-            ->line('')
-            ->line('⚠️ Vous avez **30 minutes** pour accepter ou refuser cette mission.')
-            ->action('Voir la mission', url('/agent/missions/' . $this->mission->id))
-            ->salutation('L\'équipe VIMAIZ');
+            ->view('emails.mission-assigned', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+            ]);
     }
 
     public function toArray(object $notifiable): array

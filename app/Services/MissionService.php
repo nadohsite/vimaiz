@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Invoice;
 use App\Models\Mission;
 use App\Models\MissionPhoto;
 use App\Models\Quote;
@@ -71,6 +72,9 @@ class MissionService
         $mission->serviceRequest->update([
             'status' => ServiceRequest::STATUS_ASSIGNED,
         ]);
+        
+        // Create invoice for the mission
+        Invoice::createFromMission($mission);
         
         // Notify client that payment was received
         $mission->client->notify(new PaymentReceivedNotification($mission));

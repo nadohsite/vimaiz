@@ -26,14 +26,11 @@ class AgentPayoutNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Paiement crédité - ' . number_format($this->amount, 2, ',', ' ') . ' €')
-            ->greeting('Bonjour ' . $notifiable->name . ' !')
-            ->line('Votre paiement pour la mission ' . $this->mission->mission_number . ' a été crédité sur votre portefeuille.')
-            ->line('')
-            ->line('**Montant crédité : ' . number_format($this->amount, 2, ',', ' ') . ' €**')
-            ->line('')
-            ->line('Vous pouvez demander un virement vers votre compte bancaire à tout moment depuis votre espace agent.')
-            ->action('Voir mon portefeuille', url('/agent/wallet'))
-            ->salutation('L\'équipe VIMAIZ');
+            ->view('emails.agent-payout', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+                'amount' => $this->amount,
+            ]);
     }
 
     public function toArray(object $notifiable): array

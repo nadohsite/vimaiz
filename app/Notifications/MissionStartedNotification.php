@@ -23,21 +23,12 @@ class MissionStartedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $property = $this->mission->property;
-
         return (new MailMessage)
             ->subject('Votre ménage a commencé !')
-            ->greeting('Bonjour ' . $notifiable->name . ' !')
-            ->line('Bonne nouvelle ! L\'agent de ménage est arrivé et a commencé le nettoyage de votre logement.')
-            ->line('')
-            ->line('**Détails :**')
-            ->line('- Mission : ' . $this->mission->mission_number)
-            ->line('- Logement : ' . ($property->name ?? $property->type_label))
-            ->line('- Début : ' . $this->mission->started_at->format('d/m/Y à H:i'))
-            ->line('')
-            ->line('L\'agent a pris des photos AVANT intervention qui seront disponibles dans votre espace.')
-            ->action('Suivre la mission', url('/client/missions/' . $this->mission->id))
-            ->salutation('L\'équipe VIMAIZ');
+            ->view('emails.mission-started', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+            ]);
     }
 
     public function toArray(object $notifiable): array

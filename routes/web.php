@@ -111,6 +111,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/missions', [ClientMissionController::class, 'index'])->name('missions.index');
         Route::get('/missions/{mission}', [ClientMissionController::class, 'show'])->name('missions.show');
 
+        // VIMAIZ - Factures (Invoices)
+        Route::get('/invoices', [\App\Http\Controllers\Client\InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('/invoices/{invoice}', [\App\Http\Controllers\Client\InvoiceController::class, 'show'])->name('invoices.show');
+        Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Client\InvoiceController::class, 'download'])->name('invoices.download');
+
         // Addresses
         Route::get('/addresses', function () {
             return Inertia::render('client/addresses/index', [
@@ -141,6 +146,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // VIMAIZ - Wallet Agent
         Route::get('/wallet', [\App\Http\Controllers\Agent\WalletController::class, 'index'])->name('wallet.index');
         Route::post('/wallet/withdraw', [\App\Http\Controllers\Agent\WalletController::class, 'withdraw'])->name('wallet.withdraw');
+
+        // VIMAIZ - Documents Agent
+        Route::get('/documents', [\App\Http\Controllers\Agent\DocumentController::class, 'index'])->name('documents.index');
+        Route::post('/documents/{type}/upload', [\App\Http\Controllers\Agent\DocumentController::class, 'upload'])->name('documents.upload');
+        Route::delete('/documents/{type}', [\App\Http\Controllers\Agent\DocumentController::class, 'destroy'])->name('documents.destroy');
+        Route::post('/documents/submit', [\App\Http\Controllers\Agent\DocumentController::class, 'submitForVerification'])->name('documents.submit');
 
         // Legacy booking routes (keeping for compatibility)
         Route::get('/bookings', [BookingController::class, 'agentBookings'])->name('bookings.index');
