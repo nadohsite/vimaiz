@@ -6,6 +6,12 @@ use App\Models\Mission;
 use App\Models\MissionPhoto;
 use App\Models\Quote;
 use App\Models\ServiceRequest;
+use App\Notifications\AgentAcceptedMissionNotification;
+use App\Notifications\AgentPayoutNotification;
+use App\Notifications\MissionAssignedNotification;
+use App\Notifications\MissionCompletedNotification;
+use App\Notifications\MissionStartedNotification;
+use App\Notifications\PaymentReceivedNotification;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -60,11 +66,19 @@ class MissionService
             'status' => ServiceRequest::STATUS_PAID,
         ]);
         
-        $this->assignmentService->assignAgentToMission($mission);
+        $agent = $this->assignmentService->assignAgentToMission($mission);
         
         $mission->serviceRequest->update([
             'status' => ServiceRequest::STATUS_ASSIGNED,
         ]);
+        
+        // Notify client that payment was received
+        $mission->client->notify(new PaymentReceivedNotification($mission));
+        
+        // Notify agent of new mission
+        if ($agent) {
+            $agent->notify(new MissionAssignedNotification($mission->fresh()));
+        }
         
         return $mission->fresh();
     }
@@ -75,6 +89,9 @@ class MissionService
             'status' => Mission::STATUS_AGENT_ACCEPTED,
             'agent_responded_at' => now(),
         ]);
+        
+        // Notify client that agent accepted
+        $mission->client->notify(new AgentAcceptedMissionNotification($mission));
         
         return $mission->fresh();
     }
@@ -110,6 +127,9 @@ class MissionService
         $mission->serviceRequest->update([
             'status' => ServiceRequest::STATUS_IN_PROGRESS,
         ]);
+        
+        // Notify client that mission started
+        $mission->client->notify(new MissionStartedNotification($mission));
         
         return $mission->fresh();
     }
@@ -177,9 +197,39 @@ class MissionService
             $mission->agent->agentProfile->incrementMissionsCompleted();
         }
         
-        // TODO: Credit agent wallet
+        // Credit agent wallet
+        $this->creditAgentWallet($mission);
+        
+        // Notify client that mission is completed
+        $mission->client->notify(new MissionCompletedNotification($mission));
         
         return $mission->fresh();
+    }
+
+    protected function creditAgentWallet(Mission $mission): void
+    {
+        if (!$mission->agent) {
+            return;
+        }
+        
+        $wallet = $mission->agent->wallet;
+        if (!$wallet) {
+            $wallet = $mission->agent->wallet()->create([
+                'balance' => 0,
+                'pending_balance' => 0,
+                'total_earned' => 0,
+                'total_withdrawn' => 0,
+            ]);
+        }
+        
+        $wallet->credit(
+            $mission->agent_payout,
+            'Mission ' . $mission->mission_number,
+            $mission
+        );
+        
+        // Notify agent of payout
+        $mission->agent->notify(new AgentPayoutNotification($mission, $mission->agent_payout));
     }
 
     public function cancelMission(Mission $mission, string $reason): Mission

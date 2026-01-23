@@ -64,6 +64,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])->name('settings.two-factor.show');
 
+    // Notifications (shared by all authenticated users)
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+
     // Client routes
     Route::middleware(['role:client'])->prefix('client')->name('client.')->group(function () {
         // Legacy booking routes
@@ -131,6 +137,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/missions/{mission}/photos', [AgentMissionController::class, 'uploadPhoto'])->name('missions.upload-photo');
         Route::delete('/missions/{mission}/photos/{photo}', [AgentMissionController::class, 'deletePhoto'])->name('missions.delete-photo');
         Route::post('/missions/{mission}/complete', [AgentMissionController::class, 'complete'])->name('missions.complete');
+
+        // VIMAIZ - Wallet Agent
+        Route::get('/wallet', [\App\Http\Controllers\Agent\WalletController::class, 'index'])->name('wallet.index');
+        Route::post('/wallet/withdraw', [\App\Http\Controllers\Agent\WalletController::class, 'withdraw'])->name('wallet.withdraw');
 
         // Legacy booking routes (keeping for compatibility)
         Route::get('/bookings', [BookingController::class, 'agentBookings'])->name('bookings.index');
