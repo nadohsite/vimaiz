@@ -44,7 +44,7 @@ class PaymentController extends Controller
             ],
         ]);
 
-        return Inertia::render('client/payment/show', [
+        return Inertia::render('Client/payment/show', [
             'quote' => $quote,
             'clientSecret' => $paymentIntent->client_secret,
             'stripeKey' => config('services.stripe.key'),

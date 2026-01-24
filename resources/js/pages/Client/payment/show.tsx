@@ -87,7 +87,7 @@ function CheckoutForm({ quote }: { quote: Quote }) {
         }
     };
 
-    const price = quote.final_price ?? quote.estimated_price;
+    const price = Number(quote.final_price ?? quote.estimated_price);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -133,7 +133,7 @@ function CheckoutForm({ quote }: { quote: Quote }) {
 
 export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
     const stripePromise = loadStripe(stripeKey);
-    const price = quote.final_price ?? quote.estimated_price;
+    const price = Number(quote.final_price ?? quote.estimated_price);
     const serviceRequest = quote.service_request;
     const property = serviceRequest.property;
 

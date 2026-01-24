@@ -142,7 +142,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                     <div>
                                         <p className="text-emerald-100 text-sm font-medium">Solde disponible</p>
                                         <p className="text-3xl font-bold mt-1">
-                                            {wallet.balance.toFixed(2)} €
+                                            {Number(wallet.balance).toFixed(2)} €
                                         </p>
                                     </div>
                                     <div className="bg-white/20 rounded-full p-3">
@@ -159,7 +159,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                     <div>
                                         <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">En attente</p>
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-                                            {wallet.pending_balance.toFixed(2)} €
+                                            {Number(wallet.pending_balance).toFixed(2)} €
                                         </p>
                                     </div>
                                     <div className="bg-amber-100 dark:bg-amber-900/30 rounded-full p-3">
@@ -176,7 +176,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                     <div>
                                         <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Total gagné</p>
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-                                            {wallet.total_earned.toFixed(2)} €
+                                            {Number(wallet.total_earned).toFixed(2)} €
                                         </p>
                                     </div>
                                     <div className="bg-green-100 dark:bg-green-900/30 rounded-full p-3">
@@ -193,7 +193,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                     <div>
                                         <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Total retiré</p>
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-                                            {wallet.total_withdrawn.toFixed(2)} €
+                                            {Number(wallet.total_withdrawn).toFixed(2)} €
                                         </p>
                                     </div>
                                     <div className="bg-blue-100 dark:bg-blue-900/30 rounded-full p-3">
@@ -220,7 +220,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                 <DialogHeader>
                                     <DialogTitle>Demander un retrait</DialogTitle>
                                     <DialogDescription>
-                                        Solde disponible : {wallet.balance.toFixed(2)} € (minimum 100 €)
+                                        Solde disponible : {Number(wallet.balance).toFixed(2)} € (minimum 100 €)
                                     </DialogDescription>
                                 </DialogHeader>
                                 <form onSubmit={handleWithdraw}>
@@ -318,7 +318,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                                 </div>
                                                 <div className="text-right">
                                                     <p className={`font-bold ${isCredit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                                                        {isCredit ? '+' : '-'}{transaction.amount.toFixed(2)} €
+                                                        {isCredit ? '+' : '-'}{Number(transaction.amount).toFixed(2)} €
                                                     </p>
                                                     {getStatusBadge(transaction.status)}
                                                 </div>
