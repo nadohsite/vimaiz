@@ -19,7 +19,9 @@ import {
     ClipboardList,
     FileText,
     Settings,
-    Briefcase
+    Briefcase,
+    MessageSquare,
+    Wallet
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -56,6 +58,11 @@ export function AppSidebar() {
             icon: FileText,
         },
         {
+            title: 'Messages',
+            href: route('messages.index'),
+            icon: MessageSquare,
+        },
+        {
             title: 'Mon Profil',
             href: route('settings.profile.edit'),
             icon: Settings,
@@ -73,6 +80,16 @@ export function AppSidebar() {
             title: 'Mes Missions',
             href: route('agent.missions.index'),
             icon: Briefcase,
+        },
+        {
+            title: 'Mon Portefeuille',
+            href: route('agent.wallet.index'),
+            icon: Wallet,
+        },
+        {
+            title: 'Messages',
+            href: route('messages.index'),
+            icon: MessageSquare,
         },
         {
             title: 'Mon Profil',

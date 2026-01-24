@@ -3646,3 +3646,4 @@ LINE 1: select * from \"sessions\" where \"id\" = $1 limit 1
 [stacktrace]
 #0 {main}
 "} 
+[2026-01-24 07:57:09] local.ERROR: Geocoding failed {"address":"France,saint louis, 75001, Paris, France","error":"cURL error 28: Operation timed out after 10000 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://nominatim.openstreetmap.org/search?q=France%2Csaint%20louis%2C%2075001%2C%20Paris%2C%20France&format=json&limit=1&addressdetails=1"} 

@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { ArrowLeft, Home, Save } from 'lucide-react';
+import AddressAutocomplete from '@/components/address/AddressAutocomplete';
 
 interface Property {
     id: number;
@@ -17,6 +18,8 @@ interface Property {
     address_line2: string | null;
     city: string;
     postal_code: string;
+    latitude: number | null;
+    longitude: number | null;
     surface_area: number;
     bedrooms: number;
     bathrooms: number;
@@ -45,6 +48,8 @@ export default function Edit({ property, propertyTypes }: Props) {
         address_line2: property.address_line2 || '',
         city: property.city,
         postal_code: property.postal_code,
+        latitude: property.latitude,
+        longitude: property.longitude,
         surface_area: String(property.surface_area),
         bedrooms: String(property.bedrooms),
         bathrooms: String(property.bathrooms),
@@ -146,16 +151,33 @@ export default function Edit({ property, propertyTypes }: Props) {
                         <Card>
                             <CardHeader>
                                 <CardTitle>Adresse</CardTitle>
+                                <CardDescription>
+                                    Modifiez l'adresse en recherchant une nouvelle
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="address_line1">Adresse *</Label>
-                                    <Input
-                                        id="address_line1"
-                                        value={data.address_line1}
-                                        onChange={(e) => setData('address_line1', e.target.value)}
+                                    <AddressAutocomplete
+                                        initialValue={data.address_line1}
+                                        placeholder="Rechercher une adresse..."
+                                        onAddressSelect={(address) => {
+                                            setData(prev => ({
+                                                ...prev,
+                                                address_line1: address.address_line1,
+                                                city: address.city,
+                                                postal_code: address.postal_code,
+                                                latitude: address.latitude,
+                                                longitude: address.longitude,
+                                            }));
+                                        }}
                                     />
                                     {errors.address_line1 && <p className="text-sm text-red-500">{errors.address_line1}</p>}
+                                    {data.latitude && data.longitude && (
+                                        <p className="text-xs text-green-600">
+                                            ✓ Adresse géolocalisée
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="address_line2">Complément d'adresse</Label>

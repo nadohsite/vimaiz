@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, XCircle, Play, Upload, Trash2 } from 'lucide-react';
+import PropertyMap from '@/components/map/PropertyMap';
 import { useState, useRef } from 'react';
 
 interface Property {
@@ -15,7 +16,10 @@ interface Property {
     type_label: string;
     city: string;
     address_line1: string;
+    address_line2: string | null;
     postal_code: string;
+    latitude: number | null;
+    longitude: number | null;
     access_code: string | null;
     entry_instructions: string | null;
     surface_area: number;
@@ -403,6 +407,14 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     )}
                                 </CardContent>
                             </Card>
+
+                            {/* Map */}
+                            <PropertyMap
+                                latitude={mission.property.latitude}
+                                longitude={mission.property.longitude}
+                                address={`${mission.property.address_line1}, ${mission.property.postal_code} ${mission.property.city}`}
+                                propertyName={mission.property.name || mission.property.type_label}
+                            />
                         </div>
                     </div>
                 </div>

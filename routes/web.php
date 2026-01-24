@@ -40,6 +40,10 @@ Route::get('/agents/{agent}', [AgentController::class, 'show'])->name('agents.sh
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
 
+// Professionals landing page (public)
+Route::get('/professionnels', [\App\Http\Controllers\ProfessionalController::class, 'index'])->name('professionals.index');
+Route::post('/professionnels/inscription', [\App\Http\Controllers\ProfessionalController::class, 'register'])->name('professionals.register');
+
 // Google OAuth routes
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
@@ -69,6 +73,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    // Messages (shared by clients and agents)
+    Route::get('/messages', [\App\Http\Controllers\ConversationController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{conversation}', [\App\Http\Controllers\ConversationController::class, 'show'])->name('messages.show');
+    Route::post('/messages', [\App\Http\Controllers\ConversationController::class, 'store'])->name('messages.store');
+    Route::post('/messages/{conversation}/send', [\App\Http\Controllers\ConversationController::class, 'sendMessage'])->name('messages.send');
 
     // Client routes
     Route::middleware(['role:client'])->prefix('client')->name('client.')->group(function () {

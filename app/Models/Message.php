@@ -46,6 +46,19 @@ class Message extends Model
                 'last_message' => $message->message,
                 'last_message_at' => $message->created_at,
             ]);
+
+            // Notify the recipient
+            $conversation = $message->conversation;
+            $recipientId = $conversation->client_id === $message->sender_id 
+                ? $conversation->agent_id 
+                : $conversation->client_id;
+            
+            if ($recipientId) {
+                $recipient = \App\Models\User::find($recipientId);
+                if ($recipient) {
+                    $recipient->notify(new \App\Notifications\NewMessageNotification($message, $conversation));
+                }
+            }
         });
     }
 

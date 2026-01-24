@@ -6,12 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\StorePropertyRequest;
 use App\Http\Requests\Client\UpdatePropertyRequest;
 use App\Models\Property;
+use App\Services\GeocodingService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PropertyController extends Controller
 {
+    public function __construct(
+        protected GeocodingService $geocodingService
+    ) {}
+
     public function index(): Response
     {
         $properties = auth()->user()
@@ -39,6 +44,9 @@ class PropertyController extends Controller
     {
         $data = $request->validated();
         $data['user_id'] = auth()->id();
+
+        // Geocode address if coordinates not provided
+        $data = $this->geocodingService->geocodeProperty($data);
 
         Property::create($data);
 
@@ -75,7 +83,19 @@ class PropertyController extends Controller
 
     public function update(UpdatePropertyRequest $request, Property $property): RedirectResponse
     {
-        $property->update($request->validated());
+        $data = $request->validated();
+
+        // Re-geocode if address changed and no coordinates provided
+        $addressChanged = 
+            ($data['address_line1'] ?? null) !== $property->address_line1 ||
+            ($data['city'] ?? null) !== $property->city ||
+            ($data['postal_code'] ?? null) !== $property->postal_code;
+
+        if ($addressChanged && empty($data['latitude']) && empty($data['longitude'])) {
+            $data = $this->geocodingService->geocodeProperty($data);
+        }
+
+        $property->update($data);
 
         return redirect()
             ->route('client.properties.show', $property)
