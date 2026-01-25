@@ -274,7 +274,7 @@ export default function Show({ mission }: Props) {
                                     <CardTitle className="text-base dark:text-white">Montant</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{mission.total_price} MAD</p>
+                                    <p className="text-2xl font-bold text-slate-900 dark:text-white">{mission.total_price} €</p>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Payé</p>
                                 </CardContent>
                             </Card>

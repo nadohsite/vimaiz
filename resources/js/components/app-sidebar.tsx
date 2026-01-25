@@ -21,7 +21,8 @@ import {
     Settings,
     Briefcase,
     MessageSquare,
-    Wallet
+    Wallet,
+    FolderCheck
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -80,6 +81,11 @@ export function AppSidebar() {
             title: 'Mes Missions',
             href: route('agent.missions.index'),
             icon: Briefcase,
+        },
+        {
+            title: 'Mes Documents',
+            href: route('agent.documents.index'),
+            icon: FolderCheck,
         },
         {
             title: 'Mon Portefeuille',

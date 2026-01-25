@@ -180,7 +180,7 @@ export default function Professionals({ success }: Props) {
                                 Devenez agent de ménage <span className="text-sky-600">VIMAIZ</span>
                             </h1>
                             <p className="text-xl text-slate-600 mb-8">
-                                Gagnez jusqu'à <strong>4000 MAD/mois</strong> en travaillant à votre rythme. 
+                                Gagnez jusqu'à <strong>4000 €/mois</strong> en travaillant à votre rythme. 
                                 Choisissez vos missions, fixez vos horaires.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">

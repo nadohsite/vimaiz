@@ -172,7 +172,7 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     <h1 className="text-2xl font-bold text-slate-900">{mission.mission_number}</h1>
                                     <Badge className={getStatusColor(mission.status)}>{mission.status_label}</Badge>
                                 </div>
-                                <p className="text-lg font-bold text-green-600 mt-1">{mission.agent_payout} MAD</p>
+                                <p className="text-lg font-bold text-green-600 mt-1">{mission.agent_payout} €</p>
                             </div>
                         </div>
                     </div>

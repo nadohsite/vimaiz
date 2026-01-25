@@ -128,7 +128,7 @@ export default function Index({ requests, statuses }: Props) {
                                                     {request.quote && (
                                                         <div className="text-right">
                                                             <p className="text-lg font-bold text-slate-900 dark:text-white">
-                                                                {request.quote.final_price} MAD
+                                                                {request.quote.final_price} €
                                                             </p>
                                                             <p className="text-xs text-slate-500 dark:text-slate-400">Devis</p>
                                                         </div>

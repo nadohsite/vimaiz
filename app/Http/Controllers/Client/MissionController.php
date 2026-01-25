@@ -16,7 +16,7 @@ class MissionController extends Controller
             ->orderBy('scheduled_at', 'desc')
             ->get();
 
-        return Inertia::render('client/missions/index', [
+        return Inertia::render('Client/Missions/Index', [
             'missions' => $missions,
         ]);
     }
@@ -27,7 +27,7 @@ class MissionController extends Controller
 
         $mission->load(['property', 'serviceRequest', 'quote']);
 
-        return Inertia::render('client/missions/show', [
+        return Inertia::render('Client/Missions/Show', [
             'mission' => $mission,
         ]);
     }

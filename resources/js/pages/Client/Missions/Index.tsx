@@ -27,13 +27,10 @@ interface Mission {
 }
 
 interface Props {
-    missions: {
-        data: Mission[];
-        links: any[];
-    };
+    missions: Mission[];
 }
 
-export default function Index({ missions }: Props) {
+export default function Index({ missions = [] }: Props) {
     const getStatusColor = (status: string) => {
         const colors: Record<string, string> = {
             pending_agent: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
@@ -58,9 +55,9 @@ export default function Index({ missions }: Props) {
                         <p className="text-slate-500 dark:text-slate-400 mt-1">Suivez vos missions de ménage en cours et passées</p>
                     </div>
 
-                    {missions.data.length > 0 ? (
+                    {missions.length > 0 ? (
                         <div className="space-y-4">
-                            {missions.data.map((mission) => (
+                            {missions.map((mission) => (
                                 <Link key={mission.id} href={route('client.missions.show', mission.id)} className="block mb-4 last:mb-0">
                                     <Card className="hover:shadow-md transition-shadow cursor-pointer dark:bg-slate-800 dark:border-slate-700">
                                         <CardContent className="p-4 sm:p-6">

@@ -241,7 +241,7 @@ export default function Create({
                                         Rate
                                     </div>
                                     <div className="text-lg font-bold text-indigo-600">
-                                        {agent.hourly_rate} MAD/hr
+                                        {agent.hourly_rate} €/hr
                                     </div>
                                 </div>
                             </div>
@@ -288,7 +288,7 @@ export default function Create({
                                                         From
                                                     </div>
                                                     <div className="font-bold text-indigo-600">
-                                                        {s.base_price} MAD/hr
+                                                        {s.base_price} €/hr
                                                     </div>
                                                 </div>
                                             </div>
@@ -496,7 +496,7 @@ export default function Create({
                                             </div>
                                             <div className="font-bold text-neutral-900">
                                                 {selectedService?.base_price}{' '}
-                                                MAD/hr
+                                                €/hr
                                             </div>
                                         </div>
                                     </div>
@@ -559,7 +559,7 @@ export default function Create({
                                             Subtotal
                                         </span>
                                         <span className="font-medium text-neutral-900">
-                                            {estimatedPrice.toFixed(2)} MAD
+                                            {estimatedPrice.toFixed(2)} €
                                         </span>
                                     </div>
                                     <div className="mb-2 flex items-center justify-between">
@@ -568,7 +568,7 @@ export default function Create({
                                         </span>
                                         <span className="font-medium text-neutral-900">
                                             {(estimatedPrice * 0.1).toFixed(2)}{' '}
-                                            MAD
+                                            €
                                         </span>
                                     </div>
                                     <div className="mt-2 border-t border-indigo-200 pt-2">
@@ -577,7 +577,7 @@ export default function Create({
                                                 Total
                                             </span>
                                             <span className="text-2xl font-bold text-indigo-600">
-                                                {totalPrice.toFixed(2)} MAD
+                                                {totalPrice.toFixed(2)} €
                                             </span>
                                         </div>
                                     </div>

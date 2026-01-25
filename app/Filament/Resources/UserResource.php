@@ -75,7 +75,7 @@ class UserResource extends Resource
                             ->numeric(),
                         Forms\Components\TextInput::make('hourly_rate')
                             ->numeric()
-                            ->prefix('MAD'),
+                            ->prefix('€'),
                         Forms\Components\TextInput::make('service_radius_km')
                             ->numeric()
                             ->suffix('km'),

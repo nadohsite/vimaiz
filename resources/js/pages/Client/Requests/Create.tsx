@@ -244,7 +244,7 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                                             </h3>
                                             {estimate ? (
                                                 <p className="text-2xl font-bold text-sky-600 mt-2">
-                                                    {estimate.min} - {estimate.max} MAD
+                                                    {estimate.min} - {estimate.max} €
                                                 </p>
                                             ) : (
                                                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">

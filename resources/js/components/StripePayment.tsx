@@ -107,7 +107,7 @@ function PaymentForm({ bookingId, amount, onSuccess, onError }: PaymentFormProps
             <div className="bg-neutral-50 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-neutral-600">Total Amount</span>
-                    <span className="text-2xl font-bold text-neutral-900">{amount.toFixed(2)} MAD</span>
+                    <span className="text-2xl font-bold text-neutral-900">{amount.toFixed(2)} €</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-neutral-500">
                     <Lock className="w-3 h-3" />
@@ -128,7 +128,7 @@ function PaymentForm({ bookingId, amount, onSuccess, onError }: PaymentFormProps
                 ) : (
                     <>
                         <Lock className="w-5 h-5" />
-                        Pay {amount.toFixed(2)} MAD
+                        Pay {amount.toFixed(2)} €
                     </>
                 )}
             </button>

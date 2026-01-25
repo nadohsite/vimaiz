@@ -138,7 +138,7 @@ export default function Show({ agent, availabilities }: Props) {
                                         <span>Hourly Rate</span>
                                     </div>
                                     <span className="font-bold text-neutral-900">
-                                        {agent.hourly_rate} MAD
+                                        {agent.hourly_rate} €
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -291,7 +291,7 @@ export default function Show({ agent, availabilities }: Props) {
                                                 Rate
                                             </div>
                                             <div className="font-medium text-neutral-900">
-                                                {agent.hourly_rate} MAD/hour
+                                                {agent.hourly_rate} €/hour
                                             </div>
                                         </div>
                                     </div>

@@ -88,13 +88,13 @@ class QuoteResource extends Resource
                         Forms\Components\TextInput::make('estimated_price')
                             ->label('Prix estimé (auto)')
                             ->numeric()
-                            ->suffix('MAD')
+                            ->suffix('€')
                             ->disabled()
                             ->dehydrated(true),
                         Forms\Components\TextInput::make('final_price')
                             ->label('Prix final (ajusté)')
                             ->numeric()
-                            ->suffix('MAD')
+                            ->suffix('€')
                             ->helperText('Laissez vide pour utiliser le prix estimé'),
                         Forms\Components\TextInput::make('commission_rate')
                             ->label('Taux commission')
@@ -104,13 +104,13 @@ class QuoteResource extends Resource
                         Forms\Components\TextInput::make('commission_amount')
                             ->label('Montant commission')
                             ->numeric()
-                            ->suffix('MAD')
+                            ->suffix('€')
                             ->disabled()
                             ->dehydrated(true),
                         Forms\Components\TextInput::make('agent_amount')
                             ->label('Montant agent')
                             ->numeric()
-                            ->suffix('MAD')
+                            ->suffix('€')
                             ->disabled()
                             ->dehydrated(true),
                     ])->columns(3),
@@ -173,11 +173,11 @@ class QuoteResource extends Resource
                     ->badge(),
                 Tables\Columns\TextColumn::make('estimated_price')
                     ->label('Estimé')
-                    ->money('MAD')
+                    ->money('€')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('final_price')
                     ->label('Final')
-                    ->money('MAD')
+                    ->money('€')
                     ->sortable()
                     ->placeholder('—'),
                 Tables\Columns\TextColumn::make('status')

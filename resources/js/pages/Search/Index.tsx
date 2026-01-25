@@ -350,7 +350,7 @@ export default function SearchIndex({ agents, filters, services }: Props) {
                                                 <span className="text-xs text-neutral-400">({agent.total_reviews} avis)</span>
                                             </div>
                                             <p className="mb-3 text-sm font-medium text-indigo-600">
-                                                {agent.hourly_rate} MAD<span className="text-[10px] text-neutral-400">/h</span>
+                                                {agent.hourly_rate} €<span className="text-[10px] text-neutral-400">/h</span>
                                             </p>
                                             <div className="flex flex-wrap gap-1.5 mb-4">
                                                 <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-indigo-700 border border-indigo-100">
@@ -444,7 +444,7 @@ export default function SearchIndex({ agents, filters, services }: Props) {
                                                     {agent.name}
                                                 </h3>
                                                 <p className="text-sm font-medium text-indigo-600">
-                                                    {agent.hourly_rate} MAD/h
+                                                    {agent.hourly_rate} €/h
                                                 </p>
                                             </div>
                                         </div>

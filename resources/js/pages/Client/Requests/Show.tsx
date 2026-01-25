@@ -200,7 +200,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                         <div className="flex items-center justify-between mb-4">
                                             <span className="text-slate-600 dark:text-slate-400">Montant total</span>
                                             <span className="text-2xl font-bold text-slate-900 dark:text-white">
-                                                {serviceRequest.quote.final_price} MAD
+                                                {serviceRequest.quote.final_price} €
                                             </span>
                                         </div>
                                         
