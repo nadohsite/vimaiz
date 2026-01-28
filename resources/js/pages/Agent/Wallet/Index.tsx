@@ -136,11 +136,11 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                     {/* Stats Cards */}
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
                         {/* Balance */}
-                        <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0">
+                        <Card className="bg-gradient-to-br from-sky-500 to-blue-600 text-white border-0">
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-emerald-100 text-sm font-medium">Solde disponible</p>
+                                        <p className="text-sky-100 text-sm font-medium">Solde disponible</p>
                                         <p className="text-3xl font-bold mt-1">
                                             {Number(wallet.balance).toFixed(2)} €
                                         </p>
@@ -209,7 +209,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                         <Dialog open={withdrawDialogOpen} onOpenChange={setWithdrawDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button 
-                                    className="bg-emerald-600 hover:bg-emerald-700"
+                                    className="bg-sky-600 hover:bg-sky-700"
                                     disabled={wallet.balance < 100}
                                 >
                                     <Banknote className="mr-2 h-4 w-4" />

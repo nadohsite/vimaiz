@@ -31,20 +31,43 @@ class DashboardController extends Controller
 
         $activeRequests = ServiceRequest::where('client_id', $user->id)
             ->whereNotIn('status', ['completed', 'cancelled'])
+            ->with(['property', 'quote'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $completedCount = Mission::whereHas('serviceRequest', function ($q) use ($user) {
+        $completedMissions = Mission::whereHas('serviceRequest', function ($q) use ($user) {
             $q->where('client_id', $user->id);
-        })->where('status', 'completed')->count();
+        })->where('status', 'completed');
+        
+        $completedCount = $completedMissions->count();
+        $totalSpent = (clone $completedMissions)->sum('total_price');
+
+        $upcomingMissions = Mission::whereHas('serviceRequest', function ($q) use ($user) {
+            $q->where('client_id', $user->id);
+        })->whereIn('status', ['pending_agent', 'agent_accepted'])
+            ->with(['property', 'agent'])
+            ->orderBy('scheduled_at')
+            ->take(3)
+            ->get();
+
+        $recentMissions = Mission::whereHas('serviceRequest', function ($q) use ($user) {
+            $q->where('client_id', $user->id);
+        })->where('status', 'completed')
+            ->with(['property', 'agent'])
+            ->orderBy('completed_at', 'desc')
+            ->take(3)
+            ->get();
 
         return Inertia::render('Dashboard/Client', [
             'properties' => $properties,
             'activeRequests' => $activeRequests,
+            'upcomingMissions' => $upcomingMissions,
+            'recentMissions' => $recentMissions,
             'stats' => [
                 'properties_count' => $properties->count(),
                 'requests_count' => $activeRequests->count(),
                 'completed_count' => $completedCount,
+                'total_spent' => $totalSpent,
             ],
         ]);
     }

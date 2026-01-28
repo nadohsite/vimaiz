@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, XCircle, Play, Upload, Trash2 } from 'lucide-react';
 import PropertyMap from '@/components/map/PropertyMap';
+import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useState, useRef } from 'react';
 
 interface Property {
@@ -67,6 +68,20 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
     const [uploading, setUploading] = useState(false);
     const [photoType, setPhotoType] = useState<'before' | 'after'>('before');
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
+
+    const openLightbox = (photos: Photo[], index: number, type: string) => {
+        const images = photos.map((p, i) => ({
+            src: `/storage/${p.path}`,
+            alt: `Photo ${type} ${i + 1}`,
+            caption: p.description || `Photo ${type} ${i + 1}`,
+        }));
+        setLightboxImages(images);
+        setLightboxIndex(index);
+        setLightboxOpen(true);
+    };
 
     const { data: refuseData, setData: setRefuseData, post: postRefuse, processing: refuseProcessing } = useForm({
         reason: '',
@@ -273,12 +288,17 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {beforePhotos.map((photo) => (
+                                            {beforePhotos.map((photo, idx) => (
                                                 <div key={photo.id} className="relative group">
-                                                    <img src={`/storage/${photo.path}`} alt="Avant" className="w-full h-24 object-cover rounded-lg" />
+                                                    <img 
+                                                        src={`/storage/${photo.path}`} 
+                                                        alt="Avant" 
+                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                                                        onClick={() => openLightbox(beforePhotos, idx, 'avant')}
+                                                    />
                                                     {!photo.validated_at && canUploadBefore && (
                                                         <button
-                                                            onClick={() => handleDeletePhoto(photo.id)}
+                                                            onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
                                                             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                                         >
                                                             <Trash2 className="h-3 w-3" />
@@ -299,12 +319,17 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {afterPhotos.map((photo) => (
+                                            {afterPhotos.map((photo, idx) => (
                                                 <div key={photo.id} className="relative group">
-                                                    <img src={`/storage/${photo.path}`} alt="Après" className="w-full h-24 object-cover rounded-lg" />
+                                                    <img 
+                                                        src={`/storage/${photo.path}`} 
+                                                        alt="Après" 
+                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                                                        onClick={() => openLightbox(afterPhotos, idx, 'après')}
+                                                    />
                                                     {!photo.validated_at && canUploadAfter && (
                                                         <button
-                                                            onClick={() => handleDeletePhoto(photo.id)}
+                                                            onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
                                                             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                                         >
                                                             <Trash2 className="h-3 w-3" />
@@ -330,6 +355,14 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     </CardContent>
                                 </Card>
                             )}
+
+                            {/* Map - Full Width */}
+                            <PropertyMap
+                                latitude={mission.property.latitude}
+                                longitude={mission.property.longitude}
+                                address={`${mission.property.address_line1}, ${mission.property.postal_code} ${mission.property.city}`}
+                                propertyName={mission.property.name || mission.property.type_label}
+                            />
                         </div>
 
                         {/* Sidebar */}
@@ -407,18 +440,17 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     )}
                                 </CardContent>
                             </Card>
-
-                            {/* Map */}
-                            <PropertyMap
-                                latitude={mission.property.latitude}
-                                longitude={mission.property.longitude}
-                                address={`${mission.property.address_line1}, ${mission.property.postal_code} ${mission.property.city}`}
-                                propertyName={mission.property.name || mission.property.type_label}
-                            />
                         </div>
                     </div>
                 </div>
             </div>
+
+            <ImageLightbox
+                images={lightboxImages}
+                initialIndex={lightboxIndex}
+                isOpen={lightboxOpen}
+                onClose={() => setLightboxOpen(false)}
+            />
         </AppLayout>
     );
 }

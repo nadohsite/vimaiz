@@ -66,22 +66,52 @@ function CheckoutForm({ quote }: { quote: Quote }) {
         const { error: submitError, paymentIntent } = await stripe.confirmPayment({
             elements,
             confirmParams: {
-                return_url: window.location.origin + route('client.missions.index'),
+                return_url: route('client.payment.return'),
             },
             redirect: 'if_required',
         });
 
+        console.log('Payment confirmation result:', { submitError, paymentIntent });
+
         if (submitError) {
+            console.error('Payment error:', submitError);
             setError(submitError.message || 'Une erreur est survenue lors du paiement.');
             setIsProcessing(false);
             return;
         }
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
-            router.post(route('client.payment.process', quote.id), {
-                payment_intent_id: paymentIntent.id,
-            });
+            console.log('Payment succeeded, calling process route with ID:', paymentIntent.id);
+            
+            // Use axios instead of router.post to get the redirect URL
+            const axios = (await import('axios')).default;
+            
+            try {
+                const response = await axios.post(route('client.payment.process', quote.id), {
+                    payment_intent_id: paymentIntent.id,
+                }, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    }
+                });
+                
+                console.log('Process route response:', response);
+                
+                // Redirect to the URL returned by the backend
+                if (response.data.redirect) {
+                    window.location.href = response.data.redirect;
+                } else {
+                    // Fallback: redirect to missions index
+                    router.visit(route('client.missions.index'));
+                }
+            } catch (error: any) {
+                console.error('Process route error:', error);
+                setError(error.response?.data?.message || 'Une erreur est survenue lors du traitement du paiement.');
+                setIsProcessing(false);
+            }
         } else {
+            console.warn('Payment not succeeded:', paymentIntent);
             setError('Le paiement n\'a pas pu être confirmé.');
             setIsProcessing(false);
         }

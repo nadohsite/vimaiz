@@ -2,7 +2,10 @@ import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Download, FileText } from 'lucide-react';
+import { ImageLightbox } from '@/components/ui/image-lightbox';
+import { useState } from 'react';
 
 interface Property {
     id: number;
@@ -26,6 +29,12 @@ interface Photo {
     room: string | null;
 }
 
+interface Invoice {
+    id: number;
+    invoice_number: string;
+    total: number;
+}
+
 interface Mission {
     id: number;
     mission_number: string;
@@ -38,14 +47,31 @@ interface Mission {
     status_label: string;
     property: Property;
     agent: Agent | null;
-    photos: Photo[];
+    photos?: Photo[];
+    invoice?: Invoice | null;
 }
 
 interface Props {
     mission: Mission;
+    canDownloadInvoice: boolean;
 }
 
-export default function Show({ mission }: Props) {
+export default function Show({ mission, canDownloadInvoice }: Props) {
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
+
+    const openLightbox = (photos: Photo[], index: number, type: string) => {
+        const images = photos.map((p, i) => ({
+            src: `/storage/${p.path}`,
+            alt: `Photo ${type} ${i + 1}`,
+            caption: p.description || p.room || `Photo ${type} ${i + 1}`,
+        }));
+        setLightboxImages(images);
+        setLightboxIndex(index);
+        setLightboxOpen(true);
+    };
+
     const getStatusColor = (status: string) => {
         const colors: Record<string, string> = {
             pending_agent: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
@@ -57,8 +83,8 @@ export default function Show({ mission }: Props) {
         return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
     };
 
-    const beforePhotos = mission.photos.filter(p => p.type === 'before');
-    const afterPhotos = mission.photos.filter(p => p.type === 'after');
+    const beforePhotos = (mission.photos || []).filter(p => p.type === 'before');
+    const afterPhotos = (mission.photos || []).filter(p => p.type === 'after');
 
     return (
         <AppLayout breadcrumbs={[
@@ -86,6 +112,15 @@ export default function Show({ mission }: Props) {
                                     </Badge>
                                 </div>
                             </div>
+                            {/* Invoice Download Button */}
+                            {canDownloadInvoice && mission.invoice && (
+                                <a href={route('client.invoices.download', mission.invoice.id)}>
+                                    <Button className="bg-sky-600 hover:bg-sky-700">
+                                        <Download className="h-4 w-4 mr-2" />
+                                        Télécharger la facture
+                                    </Button>
+                                </a>
+                            )}
                         </div>
                     </div>
 
@@ -126,12 +161,12 @@ export default function Show({ mission }: Props) {
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {beforePhotos.map((photo) => (
-                                                <div key={photo.id} className="relative group">
+                                            {beforePhotos.map((photo, idx) => (
+                                                <div key={photo.id} className="relative group cursor-pointer" onClick={() => openLightbox(beforePhotos, idx, 'avant')}>
                                                     <img
                                                         src={`/storage/${photo.path}`}
                                                         alt={photo.description || 'Photo avant'}
-                                                        className="w-full h-32 object-cover rounded-lg"
+                                                        className="w-full h-32 object-cover rounded-lg hover:opacity-90 transition-opacity"
                                                     />
                                                     {photo.room && (
                                                         <span className="absolute bottom-2 left-2 text-xs bg-black/50 text-white px-2 py-1 rounded">
@@ -156,12 +191,12 @@ export default function Show({ mission }: Props) {
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {afterPhotos.map((photo) => (
-                                                <div key={photo.id} className="relative group">
+                                            {afterPhotos.map((photo, idx) => (
+                                                <div key={photo.id} className="relative group cursor-pointer" onClick={() => openLightbox(afterPhotos, idx, 'après')}>
                                                     <img
                                                         src={`/storage/${photo.path}`}
                                                         alt={photo.description || 'Photo après'}
-                                                        className="w-full h-32 object-cover rounded-lg"
+                                                        className="w-full h-32 object-cover rounded-lg hover:opacity-90 transition-opacity"
                                                     />
                                                     {photo.room && (
                                                         <span className="absolute bottom-2 left-2 text-xs bg-black/50 text-white px-2 py-1 rounded">
@@ -278,10 +313,18 @@ export default function Show({ mission }: Props) {
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Payé</p>
                                 </CardContent>
                             </Card>
+
                         </div>
                     </div>
                 </div>
             </div>
+
+            <ImageLightbox
+                images={lightboxImages}
+                initialIndex={lightboxIndex}
+                isOpen={lightboxOpen}
+                onClose={() => setLightboxOpen(false)}
+            />
         </AppLayout>
     );
 }

@@ -115,6 +115,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // VIMAIZ - Paiement (Payment)
         Route::get('/payment/{quote}', [ClientPaymentController::class, 'show'])->name('payment.show');
+        Route::get('/payment/return', [ClientPaymentController::class, 'return'])->name('payment.return');
         Route::post('/payment/{quote}/process', [ClientPaymentController::class, 'process'])->name('payment.process');
 
         // VIMAIZ - Missions
@@ -162,6 +163,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/documents/{type}/upload', [\App\Http\Controllers\Agent\DocumentController::class, 'upload'])->name('documents.upload');
         Route::delete('/documents/{type}', [\App\Http\Controllers\Agent\DocumentController::class, 'destroy'])->name('documents.destroy');
         Route::post('/documents/submit', [\App\Http\Controllers\Agent\DocumentController::class, 'submitForVerification'])->name('documents.submit');
+
+        // VIMAIZ - Avis/Notes Agent
+        Route::get('/reviews', [\App\Http\Controllers\Agent\ReviewController::class, 'index'])->name('reviews.index');
 
         // Legacy booking routes (keeping for compatibility)
         Route::get('/bookings', [BookingController::class, 'agentBookings'])->name('bookings.index');

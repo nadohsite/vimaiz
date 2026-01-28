@@ -44,6 +44,7 @@ class Quote extends Model
     const STATUS_ACCEPTED = 'accepted';
     const STATUS_REFUSED = 'refused';
     const STATUS_EXPIRED = 'expired';
+    const STATUS_PAID = 'paid';
 
     protected static function boot()
     {

@@ -30,8 +30,15 @@ class MissionService
         $request = $quote->serviceRequest;
         $property = $request->property;
         
+        // Extract time from scheduled_time (might be datetime or just time)
+        $timeString = $request->scheduled_time;
+        if (strpos($timeString, ' ') !== false) {
+            // If it contains a space, it's likely a full datetime, extract time only
+            $timeString = \Carbon\Carbon::parse($timeString)->format('H:i:s');
+        }
+        
         $scheduledAt = \Carbon\Carbon::parse(
-            $request->scheduled_date->format('Y-m-d') . ' ' . $request->scheduled_time
+            $request->scheduled_date->format('Y-m-d') . ' ' . $timeString
         );
         
         $effectivePrice = $quote->final_price ?? $quote->estimated_price;
@@ -61,6 +68,11 @@ class MissionService
             'payment_status' => Mission::PAYMENT_PAID,
             'payment_intent_id' => $paymentIntentId,
             'paid_at' => now(),
+        ]);
+        
+        // Update quote status to paid
+        $mission->quote->update([
+            'status' => 'paid',
         ]);
         
         $mission->serviceRequest->update([

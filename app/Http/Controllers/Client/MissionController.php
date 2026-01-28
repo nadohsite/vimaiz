@@ -25,10 +25,11 @@ class MissionController extends Controller
     {
         $this->authorize('view', $mission);
 
-        $mission->load(['property', 'serviceRequest', 'quote']);
+        $mission->load(['property', 'serviceRequest', 'quote', 'photos', 'agent', 'invoice']);
 
         return Inertia::render('Client/Missions/Show', [
             'mission' => $mission,
+            'canDownloadInvoice' => $mission->invoice !== null,
         ]);
     }
 }

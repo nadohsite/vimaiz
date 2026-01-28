@@ -186,11 +186,11 @@ export default function PropertyMap({ latitude, longitude, address, propertyName
                     )}
                 </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-0">
                 <div 
                     ref={mapRef} 
-                    className="h-48 rounded-lg overflow-hidden bg-slate-100"
-                    style={{ minHeight: '192px' }}
+                    className="h-64 w-full overflow-hidden bg-slate-100 dark:bg-slate-800"
+                    style={{ minHeight: '256px' }}
                 >
                     {!mapLoaded && (
                         <div className="flex items-center justify-center h-full">
@@ -199,35 +199,37 @@ export default function PropertyMap({ latitude, longitude, address, propertyName
                     )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="px-4 pb-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={openGoogleMaps}
+                            className="text-xs"
+                        >
+                            <Navigation className="h-3 w-3 mr-1" />
+                            Google Maps
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={openWaze}
+                            className="text-xs"
+                        >
+                            <Navigation className="h-3 w-3 mr-1" />
+                            Waze
+                        </Button>
+                    </div>
+
                     <Button
-                        variant="outline"
-                        size="sm"
+                        variant="default"
+                        className="w-full bg-sky-500 hover:bg-sky-600 text-white"
                         onClick={openGoogleMaps}
-                        className="text-xs"
                     >
-                        <Navigation className="h-3 w-3 mr-1" />
-                        Google Maps
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={openWaze}
-                        className="text-xs"
-                    >
-                        <Navigation className="h-3 w-3 mr-1" />
-                        Waze
+                        <Navigation className="h-4 w-4 mr-2" />
+                        Obtenir l'itinéraire
                     </Button>
                 </div>
-
-                <Button
-                    variant="default"
-                    className="w-full bg-sky-500 hover:bg-sky-600"
-                    onClick={openGoogleMaps}
-                >
-                    <Navigation className="h-4 w-4 mr-2" />
-                    Obtenir l'itinéraire
-                </Button>
             </CardContent>
         </Card>
     );

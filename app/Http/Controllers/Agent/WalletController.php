@@ -19,13 +19,27 @@ class WalletController extends Controller
         );
         
         $transactions = $wallet->transactions()
-            ->with('booking')
+            ->with(['mission.property', 'booking'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
+        
+        // Calculate real stats
+        $stats = [
+            'total_missions' => $user->agentMissions()->count(),
+            'completed_missions' => $user->agentMissions()->where('status', 'completed')->count(),
+            'pending_missions' => $user->agentMissions()->whereIn('status', ['pending_agent', 'agent_accepted', 'in_progress'])->count(),
+            'this_month_earned' => $wallet->transactions()
+                ->where('type', 'credit')
+                ->where('status', 'completed')
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->sum('amount'),
+        ];
         
         return Inertia::render('Agent/Wallet/Index', [
             'wallet' => $wallet,
             'transactions' => $transactions,
+            'stats' => $stats,
         ]);
     }
     
