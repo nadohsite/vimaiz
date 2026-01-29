@@ -1,11 +1,11 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageSquare, Send, ArrowLeft, User, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 interface UserType {
     id: number;
@@ -60,6 +60,23 @@ export default function Show({ conversation, messages, otherConversations, curre
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Real-time message listener
+    useEffect(() => {
+        if (!window.Echo || !conversation.id) return;
+
+        const channel = window.Echo.private(`conversation.${conversation.id}`);
+        
+        channel.listen('.new-message', () => {
+            // Refresh messages when new one arrives
+            router.reload({ only: ['messages'] });
+        });
+
+        return () => {
+            channel.stopListening('.new-message');
+            window.Echo.leave(`conversation.${conversation.id}`);
+        };
+    }, [conversation.id]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

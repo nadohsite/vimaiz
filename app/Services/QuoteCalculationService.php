@@ -8,6 +8,7 @@ use App\Models\Quote;
 use App\Models\ServiceRequest;
 use App\Models\User;
 use App\Notifications\NewQuoteNotification;
+use App\Notifications\QuoteAcceptedNotification;
 use App\Notifications\QuoteRefusedNotification;
 use Carbon\Carbon;
 
@@ -117,6 +118,12 @@ class QuoteCalculationService
         $quote->serviceRequest->update([
             'status' => ServiceRequest::STATUS_QUOTE_ACCEPTED,
         ]);
+        
+        // Notify admins of accepted quote
+        $admins = User::role('admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new QuoteAcceptedNotification($quote));
+        }
         
         return $quote->fresh();
     }

@@ -18,7 +18,12 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', 'broadcast'];
+    }
+
+    public function toBroadcast(object $notifiable): array
+    {
+        return $this->toArray($notifiable);
     }
 
     public function toMail(object $notifiable): MailMessage

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Events\ConversationMessageEvent;
+use App\Events\NewMessageEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -53,10 +55,17 @@ class Message extends Model
                 ? $conversation->agent_id 
                 : $conversation->client_id;
             
+            // Broadcast to conversation channel for real-time chat
+            broadcast(new ConversationMessageEvent($message))->toOthers();
+            
             if ($recipientId) {
                 $recipient = \App\Models\User::find($recipientId);
                 if ($recipient) {
+                    // Send database notification
                     $recipient->notify(new \App\Notifications\NewMessageNotification($message, $conversation));
+                    
+                    // Broadcast real-time event to user channel
+                    broadcast(new NewMessageEvent($message, $recipientId))->toOthers();
                 }
             }
         });
