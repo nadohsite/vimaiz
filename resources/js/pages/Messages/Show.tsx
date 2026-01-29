@@ -1,11 +1,12 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageSquare, Send, ArrowLeft, User, Clock } from 'lucide-react';
+import { MessageSquare, Send, ArrowLeft, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 interface UserType {
     id: number;
@@ -45,9 +46,12 @@ interface Props {
     currentUserId: number;
 }
 
-export default function Show({ conversation, messages, otherConversations, currentUserId }: Props) {
+export default function Show({ conversation, messages: initialMessages, otherConversations, currentUserId }: Props) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [isConnected, setIsConnected] = useState(false);
 
     const { data, setData, post, processing, reset } = useForm({
         message: '',
@@ -57,6 +61,11 @@ export default function Show({ conversation, messages, otherConversations, curre
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    // Update messages when props change
+    useEffect(() => {
+        setMessages(initialMessages);
+    }, [initialMessages]);
+
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
@@ -65,18 +74,45 @@ export default function Show({ conversation, messages, otherConversations, curre
     useEffect(() => {
         if (!window.Echo || !conversation.id) return;
 
+        console.log('[Echo] Connecting to conversation.' + conversation.id);
+        
         const channel = window.Echo.private(`conversation.${conversation.id}`);
         
-        channel.listen('.new-message', () => {
-            // Refresh messages when new one arrives
-            router.reload({ only: ['messages'] });
-        });
+        channel
+            .subscribed(() => {
+                console.log('[Echo] Subscribed to conversation.' + conversation.id);
+                setIsConnected(true);
+            })
+            .listen('.new-message', (event: any) => {
+                console.log('[Echo] New message received:', event);
+                // Add the new message to the list if it's not from current user
+                if (event.sender_id !== currentUserId) {
+                    setMessages(prev => {
+                        // Check if message already exists
+                        if (prev.some(m => m.id === event.id)) return prev;
+                        return [...prev, {
+                            id: event.id,
+                            sender_id: event.sender_id,
+                            message: event.message,
+                            created_at: event.created_at,
+                            is_read: false,
+                            sender: { id: event.sender_id, name: event.sender_name }
+                        }];
+                    });
+                }
+            })
+            .error((error: any) => {
+                console.error('[Echo] Error:', error);
+                setIsConnected(false);
+            });
 
         return () => {
+            console.log('[Echo] Leaving conversation.' + conversation.id);
             channel.stopListening('.new-message');
             window.Echo.leave(`conversation.${conversation.id}`);
+            setIsConnected(false);
         };
-    }, [conversation.id]);
+    }, [conversation.id, currentUserId]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -150,54 +186,82 @@ export default function Show({ conversation, messages, otherConversations, curre
         ]}>
             <Head title={`Conversation avec ${otherParticipant.name}`} />
 
-            <div className="py-4 h-[calc(100vh-120px)]">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+            <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 min-h-0 w-full py-4">
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
                         {/* Sidebar - Other conversations */}
                         <div className="hidden lg:block">
-                            <Card className="h-full">
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm flex items-center gap-2">
-                                        <MessageSquare className="h-4 w-4" />
-                                        Conversations
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-0">
-                                    <div className="divide-y max-h-[60vh] overflow-y-auto">
-                                        {otherConversations.map((conv) => (
-                                            <Link
-                                                key={conv.id}
-                                                href={route('messages.show', conv.id)}
-                                                className="flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors"
-                                            >
-                                                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
-                                                    <User className="h-4 w-4 text-slate-500" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium truncate">
-                                                        {conv.agent?.name || conv.client.name}
-                                                    </p>
-                                                    <p className="text-xs text-slate-500 truncate">
-                                                        {conv.last_message || 'Nouvelle conversation'}
-                                                    </p>
-                                                </div>
-                                                {conv.unread_count > 0 && (
-                                                    <Badge className="bg-sky-500 text-white text-xs">
-                                                        {conv.unread_count}
-                                                    </Badge>
-                                                )}
-                                            </Link>
-                                        ))}
+                            <Card className="h-full flex flex-col">
+                                <div className="p-4 border-b flex-shrink-0">
+                                    <div className="flex items-center gap-2">
+                                        <MessageSquare className="h-4 w-4 text-slate-500" />
+                                        <span className="text-sm font-medium">Conversations</span>
+                                        {isConnected && (
+                                            <span className="ml-auto w-2 h-2 bg-green-500 rounded-full" title="Connecté" />
+                                        )}
+                                    </div>
+                                </div>
+                                <CardContent className="p-0 flex-1 overflow-y-auto">
+                                    <div className="divide-y">
+                                        {otherConversations.map((conv) => {
+                                            // Determine the other participant based on current user
+                                            const otherPerson = conv.client.id === currentUserId 
+                                                ? conv.agent 
+                                                : conv.client;
+                                            const isActive = conv.id === conversation.id;
+                                            
+                                            return (
+                                                <Link
+                                                    key={conv.id}
+                                                    href={route('messages.show', conv.id)}
+                                                    className={cn(
+                                                        "flex items-center gap-3 p-3 transition-colors",
+                                                        isActive ? "bg-sky-50 border-l-2 border-sky-500" : "hover:bg-slate-50"
+                                                    )}
+                                                >
+                                                    <div className={cn(
+                                                        "h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0",
+                                                        isActive ? "bg-sky-100" : "bg-slate-100"
+                                                    )}>
+                                                        <User className={cn(
+                                                            "h-5 w-5",
+                                                            isActive ? "text-sky-600" : "text-slate-500"
+                                                        )} />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className={cn(
+                                                            "text-sm truncate",
+                                                            isActive ? "font-semibold text-sky-900" : "font-medium"
+                                                        )}>
+                                                            {otherPerson?.name || 'Support VIMAIZ'}
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 truncate">
+                                                            {conv.last_message || 'Nouvelle conversation'}
+                                                        </p>
+                                                    </div>
+                                                    {conv.unread_count > 0 && (
+                                                        <Badge className="bg-red-500 text-white text-xs min-w-[20px] h-5 flex items-center justify-center">
+                                                            {conv.unread_count}
+                                                        </Badge>
+                                                    )}
+                                                </Link>
+                                            );
+                                        })}
+                                        {otherConversations.length === 0 && (
+                                            <div className="p-4 text-center text-sm text-slate-400">
+                                                Aucune conversation
+                                            </div>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
                         </div>
 
                         {/* Main chat area */}
-                        <div className="lg:col-span-3 flex flex-col h-full">
-                            <Card className="flex flex-col h-full">
-                                {/* Header */}
-                                <CardHeader className="border-b flex-shrink-0">
+                        <div className="lg:col-span-3 flex flex-col h-full min-h-0">
+                            <Card className="flex flex-col h-full overflow-hidden min-h-0">
+                                {/* Sticky Header */}
+                                <div className="border-b flex-shrink-0 bg-white z-10 sticky top-0 p-4">
                                     <div className="flex items-center gap-4">
                                         <Link
                                             href={route('messages.index')}
@@ -205,22 +269,32 @@ export default function Show({ conversation, messages, otherConversations, curre
                                         >
                                             <ArrowLeft className="h-5 w-5" />
                                         </Link>
-                                        <div className="h-10 w-10 rounded-full bg-sky-100 flex items-center justify-center">
-                                            <User className="h-5 w-5 text-sky-600" />
+                                        <div className="h-12 w-12 rounded-full bg-sky-100 flex items-center justify-center">
+                                            <User className="h-6 w-6 text-sky-600" />
                                         </div>
-                                        <div>
-                                            <CardTitle className="text-base">{otherParticipant.name}</CardTitle>
-                                            {conversation.booking && (
-                                                <p className="text-xs text-slate-500">
-                                                    Réservation du {new Date(conversation.booking.check_in).toLocaleDateString('fr-FR')}
-                                                </p>
-                                            )}
+                                        <div className="flex-1">
+                                            <h2 className="text-base font-semibold text-slate-900">{otherParticipant.name}</h2>
+                                            <div className="flex items-center gap-2">
+                                                {isConnected ? (
+                                                    <span className="flex items-center gap-1 text-xs text-green-600">
+                                                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                                                        En ligne
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs text-slate-400">Hors ligne</span>
+                                                )}
+                                                {conversation.booking && (
+                                                    <span className="text-xs text-slate-400">
+                                                        • Réservation du {new Date(conversation.booking.check_in).toLocaleDateString('fr-FR')}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </CardHeader>
+                                </div>
 
                                 {/* Messages */}
-                                <CardContent className="flex-1 overflow-y-auto p-4 space-y-6">
+                                <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-6 min-h-0">
                                     {messages.length === 0 ? (
                                         <div className="flex items-center justify-center h-full">
                                             <div className="text-center">
@@ -271,7 +345,7 @@ export default function Show({ conversation, messages, otherConversations, curre
                                         ))
                                     )}
                                     <div ref={messagesEndRef} />
-                                </CardContent>
+                                </div>
 
                                 {/* Input */}
                                 <div className="border-t p-4 flex-shrink-0">

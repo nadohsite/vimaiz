@@ -55,6 +55,9 @@ class Message extends Model
                 ? $conversation->agent_id 
                 : $conversation->client_id;
             
+            // Load sender for broadcast data
+            $message->load('sender');
+            
             // Broadcast to conversation channel for real-time chat
             broadcast(new ConversationMessageEvent($message))->toOthers();
             

@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
+import { getAvatarUrl } from '@/lib/utils';
 import { type User } from '@/types';
 
 export function UserInfo({
@@ -11,7 +12,7 @@ export function UserInfo({
 }) {
     const getInitials = useInitials();
 
-    const avatarUrl = user.avatar ? `/storage/${user.avatar}` : undefined;
+    const avatarUrl = getAvatarUrl(user.avatar, user.name);
 
     return (
         <>

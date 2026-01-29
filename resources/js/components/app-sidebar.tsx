@@ -28,9 +28,13 @@ import {
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-    const { auth } = usePage<{ auth: { user: User & { role: string } } }>().props;
+    const { auth, unreadMessagesCount } = usePage<{ 
+        auth: { user: User & { role: string } };
+        unreadMessagesCount?: number;
+    }>().props;
     const user = auth.user;
     const isAgent = user.role === 'agent';
+    const unreadCount = unreadMessagesCount ?? 0;
 
     // Navigation Client selon CAHIER_DES_CHARGES VIMAIZ
     const clientNavItems: NavItem[] = [
@@ -63,6 +67,7 @@ export function AppSidebar() {
             title: 'Messages',
             href: route('messages.index'),
             icon: MessageSquare,
+            badge: unreadCount,
         },
         {
             title: 'Mon Profil',
@@ -102,6 +107,7 @@ export function AppSidebar() {
             title: 'Messages',
             href: route('messages.index'),
             icon: MessageSquare,
+            badge: unreadCount,
         },
         {
             title: 'Mon Profil',

@@ -10,6 +10,7 @@ import {
     MapPin,
 } from 'lucide-react';
 import { useState } from 'react';
+import { getAvatarUrl } from '@/lib/utils';
 
 interface Agent {
     id: number;
@@ -221,10 +222,7 @@ export default function Create({
                         <div className="border-b border-indigo-100 bg-indigo-50 p-6">
                             <div className="flex items-center gap-4">
                                 <img
-                                    src={
-                                        agent.user.avatar ? `/storage/${agent.user.avatar}` :
-                                        `https://ui-avatars.com/api/?name=${agent.user.name}&size=64`
-                                    }
+                                    src={getAvatarUrl(agent.user.avatar, agent.user.name)}
                                     alt={agent.user.name}
                                     className="h-16 w-16 rounded-full border-2 border-white shadow"
                                 />

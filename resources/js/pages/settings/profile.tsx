@@ -3,6 +3,7 @@ import { Transition } from '@headlessui/react';
 import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { Camera, User } from 'lucide-react';
+import { getAvatarUrl } from '@/lib/utils';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
@@ -61,7 +62,7 @@ export default function Profile({
         });
     };
 
-    const avatarUrl = avatarPreview || ((auth.user as any).avatar ? `/storage/${(auth.user as any).avatar}` : null);
+    const avatarUrl = avatarPreview || getAvatarUrl((auth.user as any).avatar, auth.user.name);
 
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>

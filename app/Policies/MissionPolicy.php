@@ -61,6 +61,7 @@ class MissionPolicy
                 Mission::STATUS_AGENT_ACCEPTED,
                 Mission::STATUS_IN_PROGRESS,
                 Mission::STATUS_PHOTOS_BEFORE,
+                Mission::STATUS_PHOTOS_AFTER,
             ]);
     }
 

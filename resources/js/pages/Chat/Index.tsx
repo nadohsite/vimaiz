@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Send, Paperclip, Image as ImageIcon, X } from 'lucide-react';
+import { getAvatarUrl } from '@/lib/utils';
 
 interface Message {
     id: number;
@@ -69,7 +70,7 @@ export default function Chat({ booking_id, other_user, messages: initialMessages
                             <X className="w-5 h-5" />
                         </Link>
                         <img
-                            src={other_user.avatar ? `/storage/${other_user.avatar}` : `https://ui-avatars.com/api/?name=${other_user.name}&size=40`}
+                            src={getAvatarUrl(other_user.avatar, other_user.name)}
                             alt={other_user.name}
                             className="w-10 h-10 rounded-full"
                         />
@@ -91,7 +92,7 @@ export default function Chat({ booking_id, other_user, messages: initialMessages
                         <div className={`flex gap-3 max-w-[70%] ${message.is_mine ? 'flex-row-reverse' : 'flex-row'}`}>
                             {!message.is_mine && (
                                 <img
-                                    src={message.sender_avatar || `https://ui-avatars.com/api/?name=${message.sender_name}&size=32`}
+                                    src={getAvatarUrl(message.sender_avatar, message.sender_name)}
                                     alt={message.sender_name}
                                     className="w-8 h-8 rounded-full flex-shrink-0"
                                 />
