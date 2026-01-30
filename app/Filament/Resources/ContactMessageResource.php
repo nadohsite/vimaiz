@@ -3,18 +3,24 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ContactMessageResource\Pages;
+use App\Mail\ContactReplyMail;
 use App\Models\ContactMessage;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Mail;
 use BackedEnum;
 use UnitEnum;
 
@@ -48,7 +54,7 @@ class ContactMessageResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Informations du contact')
+                Section::make('Informations du contact')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Nom')
@@ -62,10 +68,11 @@ class ContactMessageResource extends Resource
                         Forms\Components\Textarea::make('message')
                             ->label('Message')
                             ->disabled()
-                            ->rows(6),
+                            ->rows(6)
+                            ->columnSpanFull(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Gestion')
+                Section::make('Gestion')
                     ->schema([
                         Forms\Components\Select::make('status')
                             ->label('Statut')
@@ -79,7 +86,8 @@ class ContactMessageResource extends Resource
                         Forms\Components\Textarea::make('admin_notes')
                             ->label('Notes admin')
                             ->rows(3)
-                            ->placeholder('Notes internes sur ce message...'),
+                            ->placeholder('Notes internes sur ce message...')
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
@@ -138,29 +146,54 @@ class ContactMessageResource extends Resource
                     ->label('Voir'),
                 EditAction::make()
                     ->label('Gérer'),
-                Action::make('markAsRead')
-                    ->label('Marquer lu')
-                    ->icon('heroicon-o-eye')
-                    ->color('warning')
-                    ->visible(fn (ContactMessage $record) => $record->status === 'unread')
-                    ->action(fn (ContactMessage $record) => $record->markAsRead()),
                 Action::make('reply')
                     ->label('Répondre')
                     ->icon('heroicon-o-paper-airplane')
                     ->color('success')
-                    ->url(fn (ContactMessage $record) => "mailto:{$record->email}?subject=Re: {$record->subject}")
-                    ->openUrlInNewTab(),
+                    ->form([
+                        TextInput::make('subject')
+                            ->label('Sujet')
+                            ->default(fn (ContactMessage $record) => 'Re: ' . $record->subject)
+                            ->required(),
+                        Textarea::make('reply_message')
+                            ->label('Message')
+                            ->required()
+                            ->rows(6)
+                            ->placeholder('Votre réponse...'),
+                    ])
+                    ->action(function (ContactMessage $record, array $data) {
+                        Mail::to($record->email)
+                            ->send(new ContactReplyMail($record, $data['subject'], $data['reply_message']));
+                        $record->markAsReplied();
+                        Notification::make()
+                            ->title('Réponse envoyée')
+                            ->body("Email envoyé à {$record->email}")
+                            ->success()
+                            ->send();
+                    }),
                 Action::make('archive')
                     ->label('Archiver')
                     ->icon('heroicon-o-archive-box')
                     ->color('gray')
                     ->visible(fn (ContactMessage $record) => $record->status !== 'archived')
                     ->requiresConfirmation()
-                    ->action(fn (ContactMessage $record) => $record->archive()),
+                    ->action(function (ContactMessage $record) {
+                        $record->archive();
+                        Notification::make()
+                            ->title('Message archivé')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    BulkAction::make('archiveSelected')
+                        ->label('Archiver la sélection')
+                        ->icon('heroicon-o-archive-box')
+                        ->requiresConfirmation()
+                        ->action(fn ($records) => $records->each->archive())
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }
