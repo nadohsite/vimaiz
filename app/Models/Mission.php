@@ -129,6 +129,11 @@ class Mission extends Model
         return $this->hasOne(Invoice::class);
     }
 
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class);
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === self::PAYMENT_PAID;
@@ -158,7 +163,10 @@ class Mission extends Model
 
     public function canComplete(): bool
     {
-        return $this->hasBeforePhotos() && $this->hasAfterPhotos();
+        return $this->status !== self::STATUS_COMPLETED 
+            && $this->status !== self::STATUS_CANCELLED
+            && $this->hasBeforePhotos() 
+            && $this->hasAfterPhotos();
     }
 
     public function getStatusLabelAttribute(): string

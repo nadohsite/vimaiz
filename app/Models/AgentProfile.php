@@ -52,6 +52,8 @@ class AgentProfile extends Model
         'is_banned',
         'banned_at',
         'ban_reason',
+        'rcp_clause_accepted',
+        'rcp_clause_accepted_at',
     ];
 
     protected $casts = [
@@ -69,6 +71,8 @@ class AgentProfile extends Model
         'max_surface_area' => 'integer',
         'is_banned' => 'boolean',
         'banned_at' => 'datetime',
+        'rcp_clause_accepted' => 'boolean',
+        'rcp_clause_accepted_at' => 'datetime',
     ];
 
     const COMPANY_TYPE_AUTO_ENTREPRENEUR = 'auto_entrepreneur';

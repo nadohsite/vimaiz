@@ -44,6 +44,21 @@ Route::get('/services/{service}', [ServiceController::class, 'show'])->name('ser
 Route::get('/professionnels', [\App\Http\Controllers\ProfessionalController::class, 'index'])->name('professionals.index');
 Route::post('/professionnels/inscription', [\App\Http\Controllers\ProfessionalController::class, 'register'])->name('professionals.register');
 
+// Legal pages (public)
+Route::get('/mentions-legales', function () {
+    return inertia('LegalNotice');
+})->name('legal.notice');
+
+Route::get('/confidentialite', function () {
+    return inertia('Privacy');
+})->name('privacy');
+
+Route::get('/contact', function () {
+    return inertia('Contact');
+})->name('contact.index');
+
+Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
+
 // Google OAuth routes
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
@@ -121,6 +136,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // VIMAIZ - Missions
         Route::get('/missions', [ClientMissionController::class, 'index'])->name('missions.index');
         Route::get('/missions/{mission}', [ClientMissionController::class, 'show'])->name('missions.show');
+        Route::post('/missions/{mission}/review', [ClientMissionController::class, 'storeReview'])->name('missions.review');
 
         // VIMAIZ - Factures (Invoices)
         Route::get('/invoices', [\App\Http\Controllers\Client\InvoiceController::class, 'index'])->name('invoices.index');
@@ -166,6 +182,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // VIMAIZ - Avis/Notes Agent
         Route::get('/reviews', [\App\Http\Controllers\Agent\ReviewController::class, 'index'])->name('reviews.index');
+
+        // VIMAIZ - Clause RCP
+        Route::get('/rcp-acceptance', [\App\Http\Controllers\Agent\RCPAcceptanceController::class, 'index'])->name('rcp-acceptance');
+        Route::post('/rcp-acceptance', [\App\Http\Controllers\Agent\RCPAcceptanceController::class, 'store'])->name('rcp-acceptance.store');
 
         // Legacy booking routes (keeping for compatibility)
         Route::get('/bookings', [BookingController::class, 'agentBookings'])->name('bookings.index');

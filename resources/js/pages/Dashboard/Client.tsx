@@ -98,7 +98,7 @@ export default function Dashboard({ properties = [], activeRequests = [], stats 
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-emerald-100">Total dépensé</p>
-                                <p className="text-2xl font-bold">{(stats?.total_spent ?? 0).toFixed(2)} €</p>
+                                <p className="text-2xl font-bold">{Number(stats?.total_spent ?? 0).toFixed(2)} €</p>
                             </div>
                         </div>
                     </div>

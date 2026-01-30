@@ -69,6 +69,7 @@ class DashboardController extends Controller
             'upcomingMissions' => $upcomingMissions,
             'recentMissions' => $recentMissions,
             'agentProfile' => $agentProfile,
+            'rcpClauseAccepted' => $agentProfile?->rcp_clause_accepted ?? false,
         ]);
     }
 }

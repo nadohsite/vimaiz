@@ -24,7 +24,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 
 export default function Register() {
-  const [role, setRole] = useState('client');
+  // Check URL params for pre-selected role (e.g., from Professionals page)
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialRole = urlParams.get('role') === 'agent' ? 'agent' : 'client';
+  
+  const [role, setRole] = useState(initialRole);
   const [step, setStep] = useState(1);
 
   const { data, setData, post, processing, errors, reset } = useForm({
@@ -32,12 +36,13 @@ export default function Register() {
     email: '',
     password: '',
     password_confirmation: '',
-    role: 'client',
+    role: initialRole,
     agent_type: 'individual',
     phone: '',
     experience_years: '',
     max_surface_area: 'medium',
     supported_property_types: [] as string[],
+    terms_accepted: false,
   });
 
   useEffect(() => {
@@ -56,7 +61,7 @@ export default function Register() {
   };
   const prevStep = () => setStep(1);
 
-  const inputStyles = "h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 shadow-sm transition-all placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20";
+  const inputStyles = "h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 text-base text-slate-900 dark:text-white shadow-sm transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20";
 
   return (
     <AuthLayout
@@ -92,7 +97,7 @@ export default function Register() {
               >
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="grid gap-2">
-                    <Label htmlFor="name" className="text-sm font-semibold text-slate-700">Nom complet</Label>
+                    <Label htmlFor="name" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Nom complet</Label>
                     <input
                       id="name"
                       type="text"
@@ -107,7 +112,7 @@ export default function Register() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="email" className="text-sm font-semibold text-slate-700">Adresse email</Label>
+                    <Label htmlFor="email" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Adresse email</Label>
                     <input
                       id="email"
                       type="email"
@@ -122,7 +127,7 @@ export default function Register() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="password" className="text-sm font-semibold text-slate-700">Mot de passe</Label>
+                    <Label htmlFor="password" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Mot de passe</Label>
                     <PasswordInput
                       id="password"
                       required
@@ -135,7 +140,7 @@ export default function Register() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="password_confirmation" className="text-sm font-semibold text-slate-700">Confirmation</Label>
+                    <Label htmlFor="password_confirmation" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Confirmation</Label>
                     <PasswordInput
                       id="password_confirmation"
                       required
@@ -149,7 +154,7 @@ export default function Register() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label className="text-sm font-semibold text-slate-700">Je souhaite m'inscrire en tant que</Label>
+                  <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 block">Je souhaite m'inscrire en tant que</Label>
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       type="button"
@@ -183,26 +188,47 @@ export default function Register() {
                   <InputError message={errors.role} />
                 </div>
 
+                <div className="flex items-start gap-3">
+                  <Checkbox 
+                    id="terms_accepted"
+                    checked={data.terms_accepted}
+                    onCheckedChange={(checked) => setData('terms_accepted', checked as boolean)}
+                    className="mt-1 border-slate-300 data-[state=checked]:bg-sky-500 data-[state=checked]:border-sky-500"
+                    required
+                  />
+                  <Label htmlFor="terms_accepted" className="text-sm text-slate-600 dark:text-slate-400 cursor-pointer leading-relaxed">
+                    J'accepte les{' '}
+                    <a href="/mentions-legales" target="_blank" className="text-sky-600 hover:underline font-medium">
+                      Mentions légales
+                    </a>{' '}
+                    et la{' '}
+                    <a href="/confidentialite" target="_blank" className="text-sky-600 hover:underline font-medium">
+                      Politique de confidentialité
+                    </a>
+                  </Label>
+                </div>
+                <InputError message={errors.terms_accepted} />
+
                 {role === 'client' ? (
-                  <Button type="submit" className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-sky-500/30 transition-all hover:translate-y-[-2px] active:translate-y-0">
+                  <Button type="submit" disabled={!data.terms_accepted} className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-sky-500/30 transition-all hover:translate-y-[-2px] active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">
                     {processing && <Spinner className="mr-2" />}
                     Créer mon compte client
                   </Button>
                 ) : (
-                  <Button type="button" onClick={nextStep} className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-sky-500/30 transition-all hover:translate-y-[-2px] active:translate-y-0">
+                  <Button type="button" onClick={nextStep} disabled={!data.terms_accepted} className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-sky-500/30 transition-all hover:translate-y-[-2px] active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">
                     Continuer
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
                 )}
 
                 <div className="relative py-2">
-                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-200" /></div>
-                  <div className="relative flex justify-center text-xs uppercase tracking-widest"><span className="bg-white px-4 text-slate-400 font-medium">Ou</span></div>
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-200 dark:border-slate-700" /></div>
+                  <div className="relative flex justify-center text-xs uppercase tracking-widest"><span className="bg-white dark:bg-slate-900 px-4 text-slate-400 font-medium">Ou</span></div>
                 </div>
 
                 <GoogleLoginButton text="Continuer avec Google" role={role} />
 
-                <div className="text-center text-sm text-slate-500 mt-4">
+                <div className="text-center text-sm text-slate-500 dark:text-slate-400 mt-4">
                   Déjà membre ? <TextLink href={login()} className="font-bold text-sky-600 hover:text-sky-700 transition-colors">Se connecter</TextLink>
                 </div>
               </motion.div>

@@ -39,7 +39,7 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email" className="text-sm font-semibold text-slate-700">Adresse email</Label>
+                                <Label htmlFor="email" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Adresse email</Label>
                                 <input
                                     id="email"
                                     type="email"
@@ -49,14 +49,14 @@ export default function Login({
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@exemple.com"
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 shadow-sm transition-all placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                                    className="h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 text-base text-slate-900 dark:text-white shadow-sm transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password" className="text-sm font-semibold text-slate-700">Mot de passe</Label>
+                                    <Label htmlFor="password" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Mot de passe</Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
@@ -85,7 +85,7 @@ export default function Login({
                                     tabIndex={3}
                                     className="border-slate-300 data-[state=checked]:bg-sky-500 data-[state=checked]:border-sky-500"
                                 />
-                                <Label htmlFor="remember" className="text-sm text-slate-600 cursor-pointer">Se souvenir de moi</Label>
+                                <Label htmlFor="remember" className="text-sm text-slate-600 dark:text-slate-400 cursor-pointer">Se souvenir de moi</Label>
                             </div>
 
                             <Button
@@ -101,10 +101,10 @@ export default function Login({
 
                             <div className="relative py-2">
                                 <div className="absolute inset-0 flex items-center">
-                                    <span className="w-full border-t border-slate-200" />
+                                    <span className="w-full border-t border-slate-200 dark:border-slate-700" />
                                 </div>
                                 <div className="relative flex justify-center text-xs uppercase tracking-widest">
-                                    <span className="bg-white px-4 text-slate-400 font-medium">
+                                    <span className="bg-white dark:bg-slate-900 px-4 text-slate-400 font-medium">
                                         Ou
                                     </span>
                                 </div>
@@ -114,7 +114,7 @@ export default function Login({
                         </div>
 
                         {canRegister && (
-                            <div className="text-center text-sm text-slate-500 mt-4">
+                            <div className="text-center text-sm text-slate-500 dark:text-slate-400 mt-4">
                                 Pas encore de compte ?{' '}
                                 <TextLink href={register()} tabIndex={5} className="font-bold text-sky-600 hover:text-sky-700 transition-colors">
                                     S'inscrire

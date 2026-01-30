@@ -106,6 +106,7 @@ class DashboardController extends Controller
                 'completed_count' => $completedCount,
                 'total_earned' => $totalEarned,
             ],
+            'rcpClauseAccepted' => $user->agentProfile?->rcp_clause_accepted ?? false,
         ]);
     }
 }

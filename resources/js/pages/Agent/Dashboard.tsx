@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, CheckCircle2, AlertCircle, Wallet, Star, Home, ChevronRight, Bell } from 'lucide-react';
+import RcpClauseModal from '@/components/RcpClauseModal';
+import { useState } from 'react';
 
 interface Property {
     id: number;
@@ -37,9 +39,12 @@ interface Props {
     pendingMissions: Mission[];
     upcomingMissions: Mission[];
     recentMissions: Mission[];
+    rcpClauseAccepted?: boolean;
 }
 
-export default function Dashboard({ stats, pendingMissions, upcomingMissions, recentMissions }: Props) {
+export default function Dashboard({ stats, pendingMissions, upcomingMissions, recentMissions, rcpClauseAccepted = false }: Props) {
+    const [showRcpModal, setShowRcpModal] = useState(!rcpClauseAccepted);
+
     return (
         <AppSidebarLayout breadcrumbs={[{ title: 'Tableau de bord', href: route('agent.dashboard') }]}>
             <Head title="Tableau de bord Agent" />
@@ -183,6 +188,12 @@ export default function Dashboard({ stats, pendingMissions, upcomingMissions, re
                     </div>
                 </div>
             </div>
+
+            {/* RCP Clause Modal */}
+            <RcpClauseModal 
+                show={showRcpModal} 
+                onAccepted={() => setShowRcpModal(false)} 
+            />
         </AppSidebarLayout>
     );
 }

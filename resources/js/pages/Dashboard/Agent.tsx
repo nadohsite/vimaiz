@@ -2,6 +2,8 @@ import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Briefcase, Clock, CheckCircle, Euro, ArrowRight, MapPin, Calendar } from 'lucide-react';
+import RcpClauseModal from '@/components/RcpClauseModal';
+import { useState } from 'react';
 
 interface Mission {
     id: number;
@@ -34,6 +36,7 @@ interface Props {
     pendingMissions?: Mission[];
     activeMissions?: Mission[];
     stats?: Stats;
+    rcpClauseAccepted?: boolean;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -43,7 +46,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function AgentDashboard({ pendingMissions = [], activeMissions = [], stats }: Props) {
+export default function AgentDashboard({ pendingMissions = [], activeMissions = [], stats, rcpClauseAccepted = false }: Props) {
+    const [showRcpModal, setShowRcpModal] = useState(!rcpClauseAccepted);
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'completed':
@@ -238,6 +242,12 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
                     )}
                 </div>
             </div>
+
+            {/* RCP Clause Modal */}
+            <RcpClauseModal 
+                show={showRcpModal} 
+                onAccepted={() => setShowRcpModal(false)} 
+            />
         </AppSidebarLayout>
     );
 }

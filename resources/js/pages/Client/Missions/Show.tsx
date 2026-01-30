@@ -1,9 +1,10 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Download, FileText } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Download, FileText, Star, Send } from 'lucide-react';
 import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useState } from 'react';
 
@@ -35,6 +36,13 @@ interface Invoice {
     total: number;
 }
 
+interface Review {
+    id: number;
+    rating: number;
+    comment: string | null;
+    created_at: string;
+}
+
 interface Mission {
     id: number;
     mission_number: string;
@@ -49,17 +57,33 @@ interface Mission {
     agent: Agent | null;
     photos?: Photo[];
     invoice?: Invoice | null;
+    review?: Review | null;
 }
 
 interface Props {
     mission: Mission;
     canDownloadInvoice: boolean;
+    canReview?: boolean;
 }
 
-export default function Show({ mission, canDownloadInvoice }: Props) {
+export default function Show({ mission, canDownloadInvoice, canReview = false }: Props) {
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
+    const [hoverRating, setHoverRating] = useState(0);
+
+    const { data, setData, post, processing, reset } = useForm({
+        rating: 0,
+        comment: '',
+    });
+
+    const handleSubmitReview = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (data.rating === 0) return;
+        post(route('client.missions.review', mission.id), {
+            onSuccess: () => reset(),
+        });
+    };
 
     const openLightbox = (photos: Photo[], index: number, type: string) => {
         const images = photos.map((p, i) => ({
@@ -129,13 +153,13 @@ export default function Show({ mission, canDownloadInvoice }: Props) {
                         <div className="lg:col-span-2 space-y-6">
                             {/* Status Timeline */}
                             {mission.status === 'completed' && (
-                                <Card className="bg-green-50 border-green-200">
+                                <Card className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800">
                                     <CardContent className="p-6">
                                         <div className="flex items-center gap-3">
                                             <CheckCircle className="h-8 w-8 text-green-500" />
                                             <div>
-                                                <h3 className="font-semibold text-green-800">Mission terminée</h3>
-                                                <p className="text-sm text-green-700">
+                                                <h3 className="font-semibold text-green-800 dark:text-green-300">Mission terminée</h3>
+                                                <p className="text-sm text-green-700 dark:text-green-400">
                                                     Terminée le {mission.completed_at && new Date(mission.completed_at).toLocaleDateString('fr-FR', {
                                                         day: 'numeric',
                                                         month: 'long',
@@ -146,6 +170,99 @@ export default function Show({ mission, canDownloadInvoice }: Props) {
                                                 </p>
                                             </div>
                                         </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Review Form */}
+                            {canReview && (
+                                <Card className="border-sky-200 dark:border-sky-800 dark:bg-slate-800">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 dark:text-white">
+                                            <Star className="h-5 w-5 text-yellow-500" />
+                                            Donnez votre avis
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <form onSubmit={handleSubmitReview} className="space-y-4">
+                                            <div>
+                                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Comment évaluez-vous cette prestation ?</p>
+                                                <div className="flex gap-1">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <button
+                                                            key={star}
+                                                            type="button"
+                                                            onClick={() => setData('rating', star)}
+                                                            onMouseEnter={() => setHoverRating(star)}
+                                                            onMouseLeave={() => setHoverRating(0)}
+                                                            className="p-1 transition-transform hover:scale-110"
+                                                        >
+                                                            <Star
+                                                                className={`h-8 w-8 ${
+                                                                    star <= (hoverRating || data.rating)
+                                                                        ? 'text-yellow-400 fill-yellow-400'
+                                                                        : 'text-gray-300 dark:text-gray-600'
+                                                                }`}
+                                                            />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <Textarea
+                                                    placeholder="Partagez votre expérience (optionnel)..."
+                                                    value={data.comment}
+                                                    onChange={(e) => setData('comment', e.target.value)}
+                                                    rows={3}
+                                                    className="dark:bg-slate-700 dark:border-slate-600"
+                                                />
+                                            </div>
+                                            <Button 
+                                                type="submit" 
+                                                disabled={processing || data.rating === 0}
+                                                className="bg-sky-600 hover:bg-sky-700"
+                                            >
+                                                <Send className="h-4 w-4 mr-2" />
+                                                Envoyer mon avis
+                                            </Button>
+                                        </form>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Existing Review */}
+                            {mission.review && (
+                                <Card className="border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-900/20">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                            <Star className="h-5 w-5 text-yellow-500" />
+                                            Votre avis
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="flex items-center gap-1 mb-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star
+                                                    key={star}
+                                                    className={`h-5 w-5 ${
+                                                        star <= mission.review!.rating
+                                                            ? 'text-yellow-400 fill-yellow-400'
+                                                            : 'text-gray-300 dark:text-gray-600'
+                                                    }`}
+                                                />
+                                            ))}
+                                            <span className="ml-2 text-sm font-medium text-slate-600 dark:text-slate-400">
+                                                {mission.review.rating}/5
+                                            </span>
+                                        </div>
+                                        {mission.review.comment && (
+                                            <p className="text-sm text-slate-600 dark:text-slate-400 italic">
+                                                "{mission.review.comment}"
+                                            </p>
+                                        )}
+                                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
+                                            Publié le {new Date(mission.review.created_at).toLocaleDateString('fr-FR')}
+                                        </p>
                                     </CardContent>
                                 </Card>
                             )}

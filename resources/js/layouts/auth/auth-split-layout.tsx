@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { type PropsWithChildren } from 'react';
 import { Crown, Shield, Clock, CheckCircle } from 'lucide-react';
 import logoImage from '@/../assets/images/logo.png';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 
 interface AuthLayoutProps {
     title?: string;
@@ -19,12 +20,16 @@ export default function AuthSplitLayout({
     reverse = true,
 }: PropsWithChildren<AuthLayoutProps>) {
     return (
-        <div className="relative grid min-h-svh flex-col items-center justify-center sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0 bg-white">
+        <div className="relative grid min-h-svh flex-col items-center justify-center sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0 bg-white dark:bg-slate-900">
             {/* Form Column */}
             <div className={cn(
-                "w-full lg:p-8 flex flex-col justify-center min-h-svh bg-white",
+                "w-full lg:p-8 flex flex-col justify-center min-h-svh bg-white dark:bg-slate-900 relative",
                 reverse ? "order-1" : "order-2"
             )}>
+                {/* Dark mode toggle */}
+                <div className="absolute top-4 right-4">
+                    <AppearanceToggleDropdown />
+                </div>
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px] p-6">
                     <Link
                         href={home()}
@@ -38,8 +43,8 @@ export default function AuthSplitLayout({
                         />
                     </Link>
                     <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center mb-4">
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">{title}</h1>
-                        <p className="text-base text-slate-500 max-w-[350px]">
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h1>
+                        <p className="text-base text-slate-500 dark:text-slate-400 max-w-[350px]">
                             {description}
                         </p>
                     </div>

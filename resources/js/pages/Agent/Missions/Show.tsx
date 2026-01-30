@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, XCircle, Play, Upload, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, XCircle, Play, Upload, Trash2, Star, Award } from 'lucide-react';
 import PropertyMap from '@/components/map/PropertyMap';
 import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useState, useRef } from 'react';
@@ -54,6 +54,13 @@ interface Mission {
     property: Property;
     client: Client;
     photos: Photo[];
+    internal_quality_score: number | null;
+    internal_quality_notes: string | null;
+    client_review?: {
+        rating: number;
+        comment: string | null;
+        created_at: string;
+    } | null;
 }
 
 interface Props {
@@ -352,6 +359,85 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                         <Button onClick={handleComplete} className="bg-green-500 hover:bg-green-600">
                                             Terminer la mission
                                         </Button>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Mission Completed Card */}
+                            {mission.status === 'completed' && (
+                                <Card className="border-green-300 bg-green-50">
+                                    <CardContent className="p-6">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <Award className="h-8 w-8 text-green-500" />
+                                            <div>
+                                                <h3 className="font-semibold text-green-800">Mission terminée</h3>
+                                                <p className="text-sm text-green-600">
+                                                    {mission.completed_at && new Date(mission.completed_at).toLocaleDateString('fr-FR', {
+                                                        day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                                                    })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Admin Quality Review */}
+                                        {mission.internal_quality_score && (
+                                            <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
+                                                <h4 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
+                                                    <Star className="h-4 w-4 text-yellow-500" />
+                                                    Évaluation qualité (Admin)
+                                                </h4>
+                                                <div className="flex items-center gap-1 mb-2">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <Star
+                                                            key={star}
+                                                            className={`h-5 w-5 ${
+                                                                star <= mission.internal_quality_score!
+                                                                    ? 'text-yellow-400 fill-yellow-400'
+                                                                    : 'text-gray-300'
+                                                            }`}
+                                                        />
+                                                    ))}
+                                                    <span className="ml-2 text-sm font-medium text-slate-600">
+                                                        {mission.internal_quality_score}/5
+                                                    </span>
+                                                </div>
+                                                {mission.internal_quality_notes && (
+                                                    <p className="text-sm text-slate-600 mt-2">
+                                                        {mission.internal_quality_notes}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Client Review */}
+                                        {mission.client_review && (
+                                            <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
+                                                <h4 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
+                                                    <User className="h-4 w-4 text-sky-500" />
+                                                    Avis du client
+                                                </h4>
+                                                <div className="flex items-center gap-1 mb-2">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <Star
+                                                            key={star}
+                                                            className={`h-5 w-5 ${
+                                                                star <= mission.client_review!.rating
+                                                                    ? 'text-yellow-400 fill-yellow-400'
+                                                                    : 'text-gray-300'
+                                                            }`}
+                                                        />
+                                                    ))}
+                                                    <span className="ml-2 text-sm font-medium text-slate-600">
+                                                        {mission.client_review.rating}/5
+                                                    </span>
+                                                </div>
+                                                {mission.client_review.comment && (
+                                                    <p className="text-sm text-slate-600 italic">
+                                                        "{mission.client_review.comment}"
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
                                     </CardContent>
                                 </Card>
                             )}

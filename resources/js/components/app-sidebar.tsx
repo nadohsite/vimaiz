@@ -23,7 +23,8 @@ import {
     MessageSquare,
     Wallet,
     FolderCheck,
-    Star
+    Star,
+    Shield
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -92,6 +93,11 @@ export function AppSidebar() {
             title: 'Mes Documents',
             href: route('agent.documents.index'),
             icon: FolderCheck,
+        },
+        {
+            title: 'Clause RCP',
+            href: route('agent.rcp-acceptance'),
+            icon: Shield,
         },
         {
             title: 'Mon Portefeuille',
