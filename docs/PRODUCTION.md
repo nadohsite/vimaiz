@@ -135,8 +135,97 @@ npm ci
 
 # Copier .env
 cp .env.example .env
-nano .env  # Éditer les valeurs
+```
 
+### 3.1. Configurer MySQL
+
+**⚠️ À faire AVANT d'éditer le .env**
+
+```bash
+# Se connecter à MySQL en root
+sudo mysql
+```
+
+**Dans la console MySQL, exécuter :**
+
+```sql
+-- Créer la base de données
+CREATE DATABASE vimaiz CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Créer un utilisateur dédié (CHANGEZ le mot de passe !)
+CREATE USER 'vimaiz_user'@'localhost' IDENTIFIED BY 'VotreMotDePasseSecurise123!';
+
+-- Donner tous les privilèges sur la base vimaiz
+GRANT ALL PRIVILEGES ON vimaiz.* TO 'vimaiz_user'@'localhost';
+
+-- Appliquer les changements
+FLUSH PRIVILEGES;
+
+-- Vérifier
+SHOW DATABASES;
+
+-- Quitter MySQL
+EXIT;
+```
+
+**Tester la connexion :**
+
+```bash
+mysql -u vimaiz_user -p vimaiz
+# Entrez le mot de passe, puis tapez EXIT si ça fonctionne
+```
+
+### 3.2. Configurer le fichier .env
+
+```bash
+nano .env  # Éditer les valeurs
+```
+
+**Variables essentielles à modifier :**
+
+```bash
+# Application
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://votre-domaine.com
+
+# Base de données MySQL
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=vimaiz
+DB_USERNAME=vimaiz_user
+DB_PASSWORD=VotreMotDePasseSecurise123!  # MÊME mot de passe que CREATE USER
+
+# Mail (configurez avec vos identifiants)
+MAIL_MAILER=smtp
+MAIL_HOST=votre-smtp.com
+MAIL_PORT=587
+MAIL_USERNAME=votre-email@example.com
+MAIL_PASSWORD=votre-password-mail
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@vimaiz.com
+MAIL_FROM_NAME="${APP_NAME}"
+
+# Stripe (clés LIVE en production)
+STRIPE_KEY=pk_live_...
+STRIPE_SECRET=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Reverb (WebSocket)
+REVERB_APP_ID=vimaiz
+REVERB_APP_KEY=votre-cle-reverb
+REVERB_APP_SECRET=votre-secret-reverb
+REVERB_HOST=votre-domaine.com
+REVERB_PORT=443
+REVERB_SCHEME=https
+```
+
+**Sauvegarder :** `Ctrl+O`, `Entrée`, `Ctrl+X`
+
+### 3.3. Finaliser l'installation
+
+```bash
 # Générer la clé
 php artisan key:generate
 
