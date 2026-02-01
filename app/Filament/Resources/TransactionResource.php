@@ -43,7 +43,7 @@ class TransactionResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('amount')
                     ->numeric()
-                    ->prefix('MAD')
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\Select::make('status')
                     ->options([
@@ -74,7 +74,7 @@ class TransactionResource extends Resource
                         'refund' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('amount')
-                    ->money('MAD')
+                    ->money('€')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()

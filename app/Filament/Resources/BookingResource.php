@@ -48,7 +48,7 @@ class BookingResource extends Resource
                 Forms\Components\TextInput::make('total_price')
                     ->required()
                     ->numeric()
-                    ->prefix('MAD'),
+                    ->prefix('€'),
                 Forms\Components\Select::make('status')
                     ->options([
                         'pending' => 'Pending',
@@ -87,7 +87,7 @@ class BookingResource extends Resource
                         'completed' => 'success',
                         'cancelled', 'rejected' => 'danger',
                     }),
-                Tables\Columns\TextColumn::make('total_price')->money('MAD')->sortable(),
+                Tables\Columns\TextColumn::make('total_price')->money('€')->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

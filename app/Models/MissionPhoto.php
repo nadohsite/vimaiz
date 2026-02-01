@@ -31,6 +31,8 @@ class MissionPhoto extends Model
         'taken_at' => 'datetime',
     ];
 
+    protected $appends = ['path'];
+
     const TYPE_BEFORE = 'before';
     const TYPE_AFTER = 'after';
 
@@ -47,6 +49,11 @@ class MissionPhoto extends Model
     public function getUrlAttribute(): string
     {
         return Storage::url($this->file_path);
+    }
+
+    public function getPathAttribute(): string
+    {
+        return $this->file_path;
     }
 
     public function getFileSizeFormattedAttribute(): string

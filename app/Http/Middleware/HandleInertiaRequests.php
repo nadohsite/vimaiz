@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Conversation;
 use Closure;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -53,14 +54,31 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+        
+        // Count unread messages for sidebar badge
+        $unreadMessagesCount = 0;
+        if ($user) {
+            $unreadMessagesCount = \App\Models\Message::whereHas('conversation', function ($query) use ($user) {
+                $query->where('client_id', $user->id)
+                    ->orWhere('agent_id', $user->id);
+            })
+            ->where('sender_id', '!=', $user->id)
+            ->where('is_read', false)
+            ->count();
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'notifications' => $user ? $user->notifications()->latest()->take(10)->get() : [],
+            'unreadNotificationsCount' => $user ? $user->unreadNotifications()->count() : 0,
+            'unreadMessagesCount' => $unreadMessagesCount,
         ];
     }
 }

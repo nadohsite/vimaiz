@@ -16,3 +16,25 @@ export function isSameUrl(
 export function resolveUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
+
+/**
+ * Retourne l'URL correcte pour un avatar.
+ * Si l'avatar est une URL externe (Google, etc.), retourne l'URL telle quelle.
+ * Si c'est un chemin local, ajoute /storage/ devant.
+ * Si pas d'avatar, retourne un placeholder avec les initiales.
+ */
+export function getAvatarUrl(avatar: string | null | undefined, name?: string): string {
+    if (!avatar) {
+        return name 
+            ? `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0ea5e9&color=fff`
+            : `https://ui-avatars.com/api/?name=U&background=0ea5e9&color=fff`;
+    }
+    
+    // Si c'est une URL externe (commence par http:// ou https://)
+    if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+        return avatar;
+    }
+    
+    // Sinon, c'est un chemin local
+    return `/storage/${avatar}`;
+}

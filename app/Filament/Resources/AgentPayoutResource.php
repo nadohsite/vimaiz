@@ -36,15 +36,15 @@ class AgentPayoutResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('gross_amount')
                     ->numeric()
-                    ->prefix('MAD')
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\TextInput::make('platform_commission')
                     ->numeric()
-                    ->prefix('MAD')
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\TextInput::make('net_amount')
                     ->numeric()
-                    ->prefix('MAD')
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\Select::make('status')
                     ->options([
@@ -76,7 +76,7 @@ class AgentPayoutResource extends Resource
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('net_amount')
-                    ->money('MAD')
+                    ->money('€')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()

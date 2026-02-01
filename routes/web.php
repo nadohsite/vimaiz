@@ -40,6 +40,25 @@ Route::get('/agents/{agent}', [AgentController::class, 'show'])->name('agents.sh
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
 
+// Professionals landing page (public)
+Route::get('/professionnels', [\App\Http\Controllers\ProfessionalController::class, 'index'])->name('professionals.index');
+Route::post('/professionnels/inscription', [\App\Http\Controllers\ProfessionalController::class, 'register'])->name('professionals.register');
+
+// Legal pages (public)
+Route::get('/mentions-legales', function () {
+    return inertia('LegalNotice');
+})->name('legal.notice');
+
+Route::get('/confidentialite', function () {
+    return inertia('Privacy');
+})->name('privacy');
+
+Route::get('/contact', function () {
+    return inertia('Contact');
+})->name('contact.index');
+
+Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
+
 // Google OAuth routes
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
@@ -63,6 +82,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('settings.appearance.edit');
 
     Route::get('/settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])->name('settings.two-factor.show');
+
+    // Notifications (shared by all authenticated users)
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    // Messages (shared by clients and agents)
+    Route::get('/messages', [\App\Http\Controllers\ConversationController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{conversation}', [\App\Http\Controllers\ConversationController::class, 'show'])->name('messages.show');
+    Route::post('/messages', [\App\Http\Controllers\ConversationController::class, 'store'])->name('messages.store');
+    Route::post('/messages/{conversation}/send', [\App\Http\Controllers\ConversationController::class, 'sendMessage'])->name('messages.send');
 
     // Client routes
     Route::middleware(['role:client'])->prefix('client')->name('client.')->group(function () {
@@ -99,11 +130,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // VIMAIZ - Paiement (Payment)
         Route::get('/payment/{quote}', [ClientPaymentController::class, 'show'])->name('payment.show');
+        Route::get('/payment/return', [ClientPaymentController::class, 'return'])->name('payment.return');
         Route::post('/payment/{quote}/process', [ClientPaymentController::class, 'process'])->name('payment.process');
 
         // VIMAIZ - Missions
         Route::get('/missions', [ClientMissionController::class, 'index'])->name('missions.index');
         Route::get('/missions/{mission}', [ClientMissionController::class, 'show'])->name('missions.show');
+        Route::post('/missions/{mission}/review', [ClientMissionController::class, 'storeReview'])->name('missions.review');
+
+        // VIMAIZ - Factures (Invoices)
+        Route::get('/invoices', [\App\Http\Controllers\Client\InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('/invoices/{invoice}', [\App\Http\Controllers\Client\InvoiceController::class, 'show'])->name('invoices.show');
+        Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Client\InvoiceController::class, 'download'])->name('invoices.download');
 
         // Addresses
         Route::get('/addresses', function () {
@@ -131,6 +169,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/missions/{mission}/photos', [AgentMissionController::class, 'uploadPhoto'])->name('missions.upload-photo');
         Route::delete('/missions/{mission}/photos/{photo}', [AgentMissionController::class, 'deletePhoto'])->name('missions.delete-photo');
         Route::post('/missions/{mission}/complete', [AgentMissionController::class, 'complete'])->name('missions.complete');
+
+        // VIMAIZ - Wallet Agent
+        Route::get('/wallet', [\App\Http\Controllers\Agent\WalletController::class, 'index'])->name('wallet.index');
+        Route::post('/wallet/withdraw', [\App\Http\Controllers\Agent\WalletController::class, 'withdraw'])->name('wallet.withdraw');
+
+        // VIMAIZ - Documents Agent
+        Route::get('/documents', [\App\Http\Controllers\Agent\DocumentController::class, 'index'])->name('documents.index');
+        Route::post('/documents/{type}/upload', [\App\Http\Controllers\Agent\DocumentController::class, 'upload'])->name('documents.upload');
+        Route::delete('/documents/{type}', [\App\Http\Controllers\Agent\DocumentController::class, 'destroy'])->name('documents.destroy');
+        Route::post('/documents/submit', [\App\Http\Controllers\Agent\DocumentController::class, 'submitForVerification'])->name('documents.submit');
+
+        // VIMAIZ - Avis/Notes Agent
+        Route::get('/reviews', [\App\Http\Controllers\Agent\ReviewController::class, 'index'])->name('reviews.index');
+
+        // VIMAIZ - Clause RCP
+        Route::get('/rcp-acceptance', [\App\Http\Controllers\Agent\RCPAcceptanceController::class, 'index'])->name('rcp-acceptance');
+        Route::post('/rcp-acceptance', [\App\Http\Controllers\Agent\RCPAcceptanceController::class, 'store'])->name('rcp-acceptance.store');
 
         // Legacy booking routes (keeping for compatibility)
         Route::get('/bookings', [BookingController::class, 'agentBookings'])->name('bookings.index');

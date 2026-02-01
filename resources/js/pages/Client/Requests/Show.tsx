@@ -200,7 +200,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                         <div className="flex items-center justify-between mb-4">
                                             <span className="text-slate-600 dark:text-slate-400">Montant total</span>
                                             <span className="text-2xl font-bold text-slate-900 dark:text-white">
-                                                {serviceRequest.quote.final_price} MAD
+                                                {serviceRequest.quote.final_price} €
                                             </span>
                                         </div>
                                         
@@ -229,13 +229,20 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                             </div>
                                         )}
 
-                                        {serviceRequest.quote.status === 'accepted' && (
+                                        {serviceRequest.quote.status === 'accepted' && !serviceRequest.mission && (
                                             <Link href={route('client.payment.show', serviceRequest.quote.id)}>
                                                 <Button className="w-full bg-green-500 hover:bg-green-600">
                                                     <CreditCard className="h-4 w-4 mr-2" />
                                                     Procéder au paiement
                                                 </Button>
                                             </Link>
+                                        )}
+
+                                        {(serviceRequest.quote.status === 'paid' || serviceRequest.mission) && (
+                                            <div className="flex items-center justify-center gap-2 py-3 px-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                                <span className="font-medium text-green-700 dark:text-green-300">Paiement effectué</span>
+                                            </div>
                                         )}
                                     </CardContent>
                                 </Card>

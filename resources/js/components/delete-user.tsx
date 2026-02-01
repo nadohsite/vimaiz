@@ -15,9 +15,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form } from '@inertiajs/react';
 import { useRef } from 'react';
+import { usePage } from '@inertiajs/react';
+import { type SharedData } from '@/types';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
+    const { auth } = usePage<SharedData>().props;
+    
+    // Vérifier si l'utilisateur a un mot de passe (utilisateur Google n'en a pas)
+    const hasPassword = (auth.user as any).password !== null;
 
     return (
         <div className="space-y-6">
@@ -48,8 +54,11 @@ export default function DeleteUser() {
                         </DialogTitle>
                         <DialogDescription>
                             Une fois votre compte supprimé, toutes ses ressources
-                            et données seront définitivement effacées. Veuillez
-                            saisir votre mot de passe pour confirmer la suppression.
+                            et données seront définitivement effacées.
+                            {hasPassword 
+                                ? " Veuillez saisir votre mot de passe pour confirmer la suppression."
+                                : " Aucun mot de passe n'est requis pour votre compte Google."
+                            }
                         </DialogDescription>
 
                         <Form
@@ -58,31 +67,33 @@ export default function DeleteUser() {
                             options={{
                                 preserveScroll: true,
                             }}
-                            onError={() => passwordInput.current?.focus()}
+                            onError={() => hasPassword && passwordInput.current?.focus()}
                             resetOnSuccess
                             className="space-y-6"
                         >
                             {({ resetAndClearErrors, processing, errors }) => (
                                 <>
-                                    <div className="grid gap-2">
-                                        <Label
-                                            htmlFor="password"
-                                            className="sr-only"
-                                        >
-                                            Mot de passe
-                                        </Label>
+                                    {hasPassword && (
+                                        <div className="grid gap-2">
+                                            <Label
+                                                htmlFor="password"
+                                                className="sr-only"
+                                            >
+                                                Mot de passe
+                                            </Label>
 
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            name="password"
-                                            ref={passwordInput}
-                                            placeholder="Mot de passe"
-                                            autoComplete="current-password"
-                                        />
+                                            <Input
+                                                id="password"
+                                                type="password"
+                                                name="password"
+                                                ref={passwordInput}
+                                                placeholder="Mot de passe"
+                                                autoComplete="current-password"
+                                            />
 
-                                        <InputError message={errors.password} />
-                                    </div>
+                                            <InputError message={errors.password} />
+                                        </div>
+                                    )}
 
                                     <DialogFooter className="gap-2">
                                         <DialogClose asChild>

@@ -27,7 +27,13 @@ class QuotePolicy
 
     public function update(User $user, Quote $quote): bool
     {
-        return $user->isAdmin();
+        // Admin peut toujours modifier, client peut accepter/refuser si le devis est envoyé
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
+        return $user->id === $quote->serviceRequest->client_id && 
+               in_array($quote->status, [Quote::STATUS_SENT, Quote::STATUS_ACCEPTED]);
     }
 
     public function delete(User $user, Quote $quote): bool

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
+use App\Models\Mission;
 use App\Services\MissionService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -44,11 +45,62 @@ class PaymentController extends Controller
             ],
         ]);
 
-        return Inertia::render('client/payment/show', [
+        return Inertia::render('Client/payment/show', [
             'quote' => $quote,
             'clientSecret' => $paymentIntent->client_secret,
             'stripeKey' => config('services.stripe.key'),
         ]);
+    }
+
+    public function return(Request $request)
+    {
+        $paymentIntentId = $request->query('payment_intent');
+
+        if (!$paymentIntentId) {
+            return redirect()->route('client.requests.index')
+                ->with('error', 'Aucun paiement trouvé.');
+        }
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        try {
+            $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+
+            if ($paymentIntent->status !== 'succeeded') {
+                return redirect()->route('client.requests.index')
+                    ->with('error', 'Le paiement n\'a pas été confirmé.');
+            }
+
+            $quoteId = $paymentIntent->metadata->quote_id ?? null;
+
+            if (!$quoteId) {
+                return redirect()->route('client.requests.index')
+                    ->with('error', 'Devis introuvable.');
+            }
+
+            $quote = Quote::findOrFail($quoteId);
+            $this->authorize('view', $quote);
+
+            // Check if mission already exists
+            $existingMission = Mission::where('quote_id', $quote->id)
+                ->where('payment_intent_id', $paymentIntentId)
+                ->first();
+
+            if ($existingMission) {
+                return redirect()->route('client.missions.show', $existingMission)
+                    ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
+            }
+
+            $mission = $this->missionService->createMissionFromQuote($quote);
+            $mission = $this->missionService->markAsPaid($mission, $paymentIntent->id);
+
+            return redirect()->route('client.missions.show', $mission)
+                ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
+
+        } catch (\Exception $e) {
+            return redirect()->route('client.requests.index')
+                ->with('error', 'Erreur lors du traitement du paiement: ' . $e->getMessage());
+        }
     }
 
     public function process(Request $request, Quote $quote)
@@ -65,16 +117,47 @@ class PaymentController extends Controller
             $paymentIntent = PaymentIntent::retrieve($validated['payment_intent_id']);
 
             if ($paymentIntent->status !== 'succeeded') {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'Le paiement n\'a pas été confirmé.'], 400);
+                }
                 return back()->with('error', 'Le paiement n\'a pas été confirmé.');
+            }
+
+            // Check if mission already exists
+            $existingMission = Mission::where('quote_id', $quote->id)
+                ->where('payment_intent_id', $paymentIntent->id)
+                ->first();
+
+            if ($existingMission) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'redirect' => route('client.missions.show', $existingMission),
+                        'message' => 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.'
+                    ]);
+                }
+                return redirect()->route('client.missions.show', $existingMission)
+                    ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
             }
 
             $mission = $this->missionService->createMissionFromQuote($quote);
             $mission = $this->missionService->markAsPaid($mission, $paymentIntent->id);
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('client.missions.show', $mission),
+                    'message' => 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.'
+                ]);
+            }
+
             return redirect()->route('client.missions.show', $mission)
                 ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
 
         } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Erreur lors du traitement du paiement: ' . $e->getMessage()], 500);
+            }
             return back()->with('error', 'Erreur lors du traitement du paiement: ' . $e->getMessage());
         }
     }

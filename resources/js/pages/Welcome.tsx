@@ -49,12 +49,18 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                 >
                                     Faire le ménage
                                 </a>
-                                <a
-                                    href="#professionnels"
+                                <Link
+                                    href={route('professionals.index')}
                                     className="text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:text-primary"
                                 >
-                                    Professionnels
-                                </a>
+                                    Devenir Agent
+                                </Link>
+                                <Link
+                                    href={route('contact.index')}
+                                    className="text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:text-primary"
+                                >
+                                    Contact
+                                </Link>
                             </div>
                         </div>
 
@@ -619,7 +625,15 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                         <div>
                             <h4 className="font-semibold mb-4">Professionnels</h4>
                             <ul className="space-y-2 text-sm text-slate-400">
-                                <li><Link href={route('register') + '?role=agent'} className="hover:text-white transition">Devenir partenaire</Link></li>
+                                <li><Link href={route('professionals.index')} className="hover:text-white transition">Devenir Agent</Link></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-4">Légal</h4>
+                            <ul className="space-y-2 text-sm text-slate-400">
+                                <li><Link href={route('legal.notice')} className="hover:text-white transition">Mentions légales</Link></li>
+                                <li><Link href={route('privacy')} className="hover:text-white transition">Confidentialité</Link></li>
+                                <li><Link href={route('contact.index')} className="hover:text-white transition">Contact</Link></li>
                             </ul>
                         </div>
                     </div>

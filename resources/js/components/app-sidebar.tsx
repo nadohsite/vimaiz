@@ -19,14 +19,23 @@ import {
     ClipboardList,
     FileText,
     Settings,
-    Briefcase
+    Briefcase,
+    MessageSquare,
+    Wallet,
+    FolderCheck,
+    Star,
+    Shield
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-    const { auth } = usePage<{ auth: { user: User & { role: string } } }>().props;
+    const { auth, unreadMessagesCount } = usePage<{ 
+        auth: { user: User & { role: string } };
+        unreadMessagesCount?: number;
+    }>().props;
     const user = auth.user;
     const isAgent = user.role === 'agent';
+    const unreadCount = unreadMessagesCount ?? 0;
 
     // Navigation Client selon CAHIER_DES_CHARGES VIMAIZ
     const clientNavItems: NavItem[] = [
@@ -56,6 +65,12 @@ export function AppSidebar() {
             icon: FileText,
         },
         {
+            title: 'Messages',
+            href: route('messages.index'),
+            icon: MessageSquare,
+            badge: unreadCount,
+        },
+        {
             title: 'Mon Profil',
             href: route('settings.profile.edit'),
             icon: Settings,
@@ -73,6 +88,32 @@ export function AppSidebar() {
             title: 'Mes Missions',
             href: route('agent.missions.index'),
             icon: Briefcase,
+        },
+        {
+            title: 'Mes Documents',
+            href: route('agent.documents.index'),
+            icon: FolderCheck,
+        },
+        {
+            title: 'Clause RCP',
+            href: route('agent.rcp-acceptance'),
+            icon: Shield,
+        },
+        {
+            title: 'Mon Portefeuille',
+            href: route('agent.wallet.index'),
+            icon: Wallet,
+        },
+        {
+            title: 'Mes Avis',
+            href: route('agent.reviews.index'),
+            icon: Star,
+        },
+        {
+            title: 'Messages',
+            href: route('messages.index'),
+            icon: MessageSquare,
+            badge: unreadCount,
         },
         {
             title: 'Mon Profil',

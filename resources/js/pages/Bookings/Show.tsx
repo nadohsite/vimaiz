@@ -65,7 +65,7 @@ export default function Show({ booking }: Props) {
                                         </div>
                                         <div>
                                             <dt className="text-sm font-medium text-gray-500">Total Price</dt>
-                                            <dd className="mt-1 text-lg font-bold text-indigo-600">{booking.total_price} MAD</dd>
+                                            <dd className="mt-1 text-lg font-bold text-indigo-600">{booking.total_price} €</dd>
                                         </div>
                                     </dl>
                                 </div>

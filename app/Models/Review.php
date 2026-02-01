@@ -11,6 +11,7 @@ class Review extends Model
 
     protected $fillable = [
         'booking_id',
+        'mission_id',
         'client_id',
         'agent_id',
         'rating',
@@ -33,6 +34,11 @@ class Review extends Model
     public function booking()
     {
         return $this->belongsTo(Booking::class);
+    }
+
+    public function mission()
+    {
+        return $this->belongsTo(Mission::class);
     }
 
     public function client()

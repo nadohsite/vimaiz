@@ -2,6 +2,7 @@ import AvailabilityCalendar from '@/components/AvailabilityCalendar';
 import { Head, Link, router } from '@inertiajs/react';
 import { Calendar, Clock, DollarSign, Star } from 'lucide-react';
 import { useState } from 'react';
+import { getAvatarUrl } from '@/lib/utils';
 
 interface Review {
     id: number;
@@ -109,10 +110,7 @@ export default function Show({ agent, availabilities }: Props) {
                             <div className="mb-6 text-center">
                                 <div className="relative inline-block">
                                     <img
-                                        src={
-                                            agent.user.avatar ? `/storage/${agent.user.avatar}` :
-                                            `https://ui-avatars.com/api/?name=${agent.user.name}&size=128`
-                                        }
+                                        src={getAvatarUrl(agent.user.avatar, agent.user.name)}
                                         alt={agent.user.name}
                                         className="mx-auto mb-4 h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg"
                                     />
@@ -138,7 +136,7 @@ export default function Show({ agent, availabilities }: Props) {
                                         <span>Hourly Rate</span>
                                     </div>
                                     <span className="font-bold text-neutral-900">
-                                        {agent.hourly_rate} MAD
+                                        {agent.hourly_rate} €
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
@@ -291,7 +289,7 @@ export default function Show({ agent, availabilities }: Props) {
                                                 Rate
                                             </div>
                                             <div className="font-medium text-neutral-900">
-                                                {agent.hourly_rate} MAD/hour
+                                                {agent.hourly_rate} €/hour
                                             </div>
                                         </div>
                                     </div>

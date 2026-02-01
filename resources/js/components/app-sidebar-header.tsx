@@ -11,6 +11,7 @@ import {
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
+import { getAvatarUrl } from '@/lib/utils';
 import { type BreadcrumbItem as BreadcrumbItemType, SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
@@ -43,7 +44,7 @@ export function AppSidebarHeader({
                         >
                             <Avatar className="size-full rounded-full">
                                 <AvatarImage
-                                    src={auth.user.avatar ? `/storage/${auth.user.avatar}` : undefined}
+                                    src={getAvatarUrl(auth.user.avatar, auth.user.name)}
                                     alt={auth.user.name}
                                 />
                                 <AvatarFallback className="rounded-full bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100 text-xs">

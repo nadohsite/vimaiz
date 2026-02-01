@@ -1,7 +1,7 @@
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Home, Plus, ClipboardList, FileText, ArrowRight } from 'lucide-react';
+import { Home, Plus, ClipboardList, FileText, ArrowRight, Euro, Calendar, CheckCircle } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -10,13 +10,33 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+interface Mission {
+    id: number;
+    mission_number: string;
+    scheduled_at: string;
+    completed_at: string | null;
+    total_price: number;
+    status: string;
+    property: {
+        name: string | null;
+        type: string;
+        city: string;
+    };
+    agent: {
+        name: string;
+    } | null;
+}
+
 interface DashboardProps {
     properties?: any[];
     activeRequests?: any[];
+    upcomingMissions?: Mission[];
+    recentMissions?: Mission[];
     stats?: {
         properties_count: number;
         requests_count: number;
         completed_count: number;
+        total_spent: number;
     };
 }
 
@@ -37,7 +57,7 @@ export default function Dashboard({ properties = [], activeRequests = [], stats 
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
                     <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 shadow-sm border border-slate-200 dark:border-slate-700">
                         <div className="flex items-center gap-4">
                             <div className="rounded-xl bg-sky-100 dark:bg-sky-900/50 p-3">
@@ -63,11 +83,22 @@ export default function Dashboard({ properties = [], activeRequests = [], stats 
                     <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 shadow-sm border border-slate-200 dark:border-slate-700">
                         <div className="flex items-center gap-4">
                             <div className="rounded-xl bg-green-100 dark:bg-green-900/50 p-3">
-                                <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
+                                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Ménages effectués</p>
                                 <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.completed_count ?? 0}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-6 shadow-sm text-white">
+                        <div className="flex items-center gap-4">
+                            <div className="rounded-xl bg-white/20 p-3">
+                                <Euro className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-emerald-100">Total dépensé</p>
+                                <p className="text-2xl font-bold">{Number(stats?.total_spent ?? 0).toFixed(2)} €</p>
                             </div>
                         </div>
                     </div>

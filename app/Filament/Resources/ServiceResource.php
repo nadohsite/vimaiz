@@ -41,7 +41,7 @@ class ServiceResource extends Resource
                 Forms\Components\TextInput::make('base_price')
                     ->required()
                     ->numeric()
-                    ->prefix('MAD'),
+                    ->prefix('€'),
                 Forms\Components\TextInput::make('estimated_duration_minutes')
                     ->required()
                     ->numeric()
@@ -60,7 +60,7 @@ class ServiceResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('category.name')->sortable(),
                 Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('base_price')->money('MAD')->sortable(),
+                Tables\Columns\TextColumn::make('base_price')->money('€')->sortable(),
                 Tables\Columns\TextColumn::make('estimated_duration_minutes')->numeric()->sortable(),
                 Tables\Columns\IconColumn::make('is_active')->boolean(),
                 Tables\Columns\TextColumn::make('created_at')

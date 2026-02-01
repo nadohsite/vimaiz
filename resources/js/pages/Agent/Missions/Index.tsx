@@ -137,7 +137,7 @@ export default function Index({ missions, currentStatus, statuses }: Props) {
                                                 <div className="flex items-center gap-4">
                                                     <div className="text-right">
                                                         <p className="text-lg font-bold text-green-600">
-                                                            {mission.agent_payout} MAD
+                                                            {mission.agent_payout} €
                                                         </p>
                                                         <p className="text-xs text-slate-500">Votre gain</p>
                                                     </div>

@@ -193,7 +193,7 @@ export default function Show({ property }: Props) {
                                                     </div>
                                                     <div className="flex items-center gap-3">
                                                         {request.quote && (
-                                                            <span className="text-sm font-medium dark:text-white">{request.quote.final_price} MAD</span>
+                                                            <span className="text-sm font-medium dark:text-white">{request.quote.final_price} €</span>
                                                         )}
                                                         <Badge className={getStatusColor(request.status)}>
                                                             {request.status_label}

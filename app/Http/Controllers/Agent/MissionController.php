@@ -119,17 +119,12 @@ class MissionController extends Controller
         ]);
 
         try {
-            $path = $request->file('photo')->store(
-                'missions/' . $mission->id . '/' . $validated['type'],
-                'public'
-            );
-
             $photo = $this->missionService->uploadPhoto(
                 $mission,
+                $request->file('photo'),
                 $validated['type'],
-                $path,
-                $validated['description'] ?? null,
-                $validated['room'] ?? null
+                $request->user()->id,
+                $validated['description'] ?? null
             );
 
             return response()->json([

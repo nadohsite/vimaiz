@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Mission extends Model
 {
@@ -123,6 +124,16 @@ class Mission extends Model
         return $this->hasMany(MissionPhoto::class)->where('type', 'after');
     }
 
+    public function invoice(): HasOne
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class);
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === self::PAYMENT_PAID;
@@ -152,7 +163,10 @@ class Mission extends Model
 
     public function canComplete(): bool
     {
-        return $this->hasBeforePhotos() && $this->hasAfterPhotos();
+        return $this->status !== self::STATUS_COMPLETED 
+            && $this->status !== self::STATUS_CANCELLED
+            && $this->hasBeforePhotos() 
+            && $this->hasAfterPhotos();
     }
 
     public function getStatusLabelAttribute(): string

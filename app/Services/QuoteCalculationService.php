@@ -6,6 +6,10 @@ use App\Models\PricingRule;
 use App\Models\Property;
 use App\Models\Quote;
 use App\Models\ServiceRequest;
+use App\Models\User;
+use App\Notifications\NewQuoteNotification;
+use App\Notifications\QuoteAcceptedNotification;
+use App\Notifications\QuoteRefusedNotification;
 use Carbon\Carbon;
 
 class QuoteCalculationService
@@ -95,6 +99,12 @@ class QuoteCalculationService
             'status' => ServiceRequest::STATUS_QUOTE_SENT,
         ]);
         
+        // Notify client of new quote
+        $client = $quote->serviceRequest->client;
+        if ($client) {
+            $client->notify(new NewQuoteNotification($quote));
+        }
+        
         return $quote->fresh();
     }
 
@@ -109,6 +119,12 @@ class QuoteCalculationService
             'status' => ServiceRequest::STATUS_QUOTE_ACCEPTED,
         ]);
         
+        // Notify admins of accepted quote
+        $admins = User::role('admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new QuoteAcceptedNotification($quote));
+        }
+        
         return $quote->fresh();
     }
 
@@ -122,6 +138,12 @@ class QuoteCalculationService
         $quote->serviceRequest->update([
             'status' => ServiceRequest::STATUS_QUOTE_REFUSED,
         ]);
+        
+        // Notify admins of refused quote
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new QuoteRefusedNotification($quote));
+        }
         
         return $quote->fresh();
     }

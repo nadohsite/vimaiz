@@ -32,22 +32,22 @@ class WalletResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('balance')
                     ->numeric()
-                    ->prefix('MAD')
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\TextInput::make('pending_balance')
                     ->numeric()
-                    ->prefix('MAD')
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\TextInput::make('total_earned')
                     ->numeric()
-                    ->prefix('MAD')
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\TextInput::make('total_withdrawn')
                     ->numeric()
-                    ->prefix('MAD')
+                    ->prefix('€')
                     ->required(),
                 Forms\Components\TextInput::make('currency')
-                    ->default('MAD')
+                    ->default('€')
                     ->required(),
             ]);
     }
@@ -60,16 +60,16 @@ class WalletResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('balance')
-                    ->money('MAD')
+                    ->money('€')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('pending_balance')
-                    ->money('MAD')
+                    ->money('€')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_earned')
-                    ->money('MAD')
+                    ->money('€')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_withdrawn')
-                    ->money('MAD')
+                    ->money('€')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()

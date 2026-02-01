@@ -6,7 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, XCircle, Play, Upload, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, XCircle, Play, Upload, Trash2, Star, Award } from 'lucide-react';
+import PropertyMap from '@/components/map/PropertyMap';
+import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useState, useRef } from 'react';
 
 interface Property {
@@ -15,7 +17,10 @@ interface Property {
     type_label: string;
     city: string;
     address_line1: string;
+    address_line2: string | null;
     postal_code: string;
+    latitude: number | null;
+    longitude: number | null;
     access_code: string | null;
     entry_instructions: string | null;
     surface_area: number;
@@ -49,6 +54,13 @@ interface Mission {
     property: Property;
     client: Client;
     photos: Photo[];
+    internal_quality_score: number | null;
+    internal_quality_notes: string | null;
+    client_review?: {
+        rating: number;
+        comment: string | null;
+        created_at: string;
+    } | null;
 }
 
 interface Props {
@@ -63,6 +75,20 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
     const [uploading, setUploading] = useState(false);
     const [photoType, setPhotoType] = useState<'before' | 'after'>('before');
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
+
+    const openLightbox = (photos: Photo[], index: number, type: string) => {
+        const images = photos.map((p, i) => ({
+            src: `/storage/${p.path}`,
+            alt: `Photo ${type} ${i + 1}`,
+            caption: p.description || `Photo ${type} ${i + 1}`,
+        }));
+        setLightboxImages(images);
+        setLightboxIndex(index);
+        setLightboxOpen(true);
+    };
 
     const { data: refuseData, setData: setRefuseData, post: postRefuse, processing: refuseProcessing } = useForm({
         reason: '',
@@ -168,7 +194,7 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     <h1 className="text-2xl font-bold text-slate-900">{mission.mission_number}</h1>
                                     <Badge className={getStatusColor(mission.status)}>{mission.status_label}</Badge>
                                 </div>
-                                <p className="text-lg font-bold text-green-600 mt-1">{mission.agent_payout} MAD</p>
+                                <p className="text-lg font-bold text-green-600 mt-1">{mission.agent_payout} €</p>
                             </div>
                         </div>
                     </div>
@@ -269,12 +295,17 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {beforePhotos.map((photo) => (
+                                            {beforePhotos.map((photo, idx) => (
                                                 <div key={photo.id} className="relative group">
-                                                    <img src={`/storage/${photo.path}`} alt="Avant" className="w-full h-24 object-cover rounded-lg" />
+                                                    <img 
+                                                        src={`/storage/${photo.path}`} 
+                                                        alt="Avant" 
+                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                                                        onClick={() => openLightbox(beforePhotos, idx, 'avant')}
+                                                    />
                                                     {!photo.validated_at && canUploadBefore && (
                                                         <button
-                                                            onClick={() => handleDeletePhoto(photo.id)}
+                                                            onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
                                                             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                                         >
                                                             <Trash2 className="h-3 w-3" />
@@ -295,12 +326,17 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {afterPhotos.map((photo) => (
+                                            {afterPhotos.map((photo, idx) => (
                                                 <div key={photo.id} className="relative group">
-                                                    <img src={`/storage/${photo.path}`} alt="Après" className="w-full h-24 object-cover rounded-lg" />
+                                                    <img 
+                                                        src={`/storage/${photo.path}`} 
+                                                        alt="Après" 
+                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                                                        onClick={() => openLightbox(afterPhotos, idx, 'après')}
+                                                    />
                                                     {!photo.validated_at && canUploadAfter && (
                                                         <button
-                                                            onClick={() => handleDeletePhoto(photo.id)}
+                                                            onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
                                                             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                                         >
                                                             <Trash2 className="h-3 w-3" />
@@ -326,6 +362,93 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     </CardContent>
                                 </Card>
                             )}
+
+                            {/* Mission Completed Card */}
+                            {mission.status === 'completed' && (
+                                <Card className="border-green-300 bg-green-50">
+                                    <CardContent className="p-6">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <Award className="h-8 w-8 text-green-500" />
+                                            <div>
+                                                <h3 className="font-semibold text-green-800">Mission terminée</h3>
+                                                <p className="text-sm text-green-600">
+                                                    {mission.completed_at && new Date(mission.completed_at).toLocaleDateString('fr-FR', {
+                                                        day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                                                    })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Admin Quality Review */}
+                                        {mission.internal_quality_score && (
+                                            <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
+                                                <h4 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
+                                                    <Star className="h-4 w-4 text-yellow-500" />
+                                                    Évaluation qualité (Admin)
+                                                </h4>
+                                                <div className="flex items-center gap-1 mb-2">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <Star
+                                                            key={star}
+                                                            className={`h-5 w-5 ${
+                                                                star <= mission.internal_quality_score!
+                                                                    ? 'text-yellow-400 fill-yellow-400'
+                                                                    : 'text-gray-300'
+                                                            }`}
+                                                        />
+                                                    ))}
+                                                    <span className="ml-2 text-sm font-medium text-slate-600">
+                                                        {mission.internal_quality_score}/5
+                                                    </span>
+                                                </div>
+                                                {mission.internal_quality_notes && (
+                                                    <p className="text-sm text-slate-600 mt-2">
+                                                        {mission.internal_quality_notes}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Client Review */}
+                                        {mission.client_review && (
+                                            <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
+                                                <h4 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
+                                                    <User className="h-4 w-4 text-sky-500" />
+                                                    Avis du client
+                                                </h4>
+                                                <div className="flex items-center gap-1 mb-2">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <Star
+                                                            key={star}
+                                                            className={`h-5 w-5 ${
+                                                                star <= mission.client_review!.rating
+                                                                    ? 'text-yellow-400 fill-yellow-400'
+                                                                    : 'text-gray-300'
+                                                            }`}
+                                                        />
+                                                    ))}
+                                                    <span className="ml-2 text-sm font-medium text-slate-600">
+                                                        {mission.client_review.rating}/5
+                                                    </span>
+                                                </div>
+                                                {mission.client_review.comment && (
+                                                    <p className="text-sm text-slate-600 italic">
+                                                        "{mission.client_review.comment}"
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Map - Full Width */}
+                            <PropertyMap
+                                latitude={mission.property.latitude}
+                                longitude={mission.property.longitude}
+                                address={`${mission.property.address_line1}, ${mission.property.postal_code} ${mission.property.city}`}
+                                propertyName={mission.property.name || mission.property.type_label}
+                            />
                         </div>
 
                         {/* Sidebar */}
@@ -407,6 +530,13 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                     </div>
                 </div>
             </div>
+
+            <ImageLightbox
+                images={lightboxImages}
+                initialIndex={lightboxIndex}
+                isOpen={lightboxOpen}
+                onClose={() => setLightboxOpen(false)}
+            />
         </AppLayout>
     );
 }

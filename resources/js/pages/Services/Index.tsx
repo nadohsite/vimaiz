@@ -42,7 +42,7 @@ export default function Index({ categories }: Props) {
 
                                         <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                                             <div>
-                                                <span className="block text-2xl font-bold text-indigo-600">{service.base_price} MAD</span>
+                                                <span className="block text-2xl font-bold text-indigo-600">{service.base_price} €</span>
                                                 <span className="text-sm text-gray-500">Approx. {service.estimated_duration_minutes} mins</span>
                                             </div>
                                             <Link

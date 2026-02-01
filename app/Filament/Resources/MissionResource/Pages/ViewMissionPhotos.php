@@ -3,20 +3,19 @@
 namespace App\Filament\Resources\MissionResource\Pages;
 
 use App\Filament\Resources\MissionResource;
-use Filament\Resources\Pages\Page;
+use App\Models\Mission;
+use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Facades\Storage;
 
-class ViewMissionPhotos extends Page
+class ViewMissionPhotos extends ViewRecord
 {
     protected static string $resource = MissionResource::class;
 
     protected string $view = 'filament.resources.mission-resource.pages.view-mission-photos';
 
-    public $record;
-
-    public function mount($record): void
+    protected function getHeaderActions(): array
     {
-        $this->record = $this->resolveRecord($record);
+        return [];
     }
 
     public function getTitle(): string
@@ -31,11 +30,11 @@ class ViewMissionPhotos extends Page
 
     public function getBeforePhotos()
     {
-        return $this->record->beforePhotos;
+        return $this->record->beforePhotos()->get();
     }
 
     public function getAfterPhotos()
     {
-        return $this->record->afterPhotos;
+        return $this->record->afterPhotos()->get();
     }
 }

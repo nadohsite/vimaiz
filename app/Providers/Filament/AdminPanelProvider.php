@@ -36,6 +36,7 @@ class AdminPanelProvider extends PanelProvider
                 'info' => Color::Sky,
             ])
             ->brandName('VIMAIZ Admin')
+            ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
                 NavigationGroup::make('Demandes & Missions'),
                 NavigationGroup::make('Clients'),
