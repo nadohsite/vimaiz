@@ -235,6 +235,9 @@ php artisan storage:link
 # Lancer les migrations
 php artisan migrate --force
 
+# ⚠️ IMPORTANT : Exécuter les seeders pour créer les rôles Spatie Permission
+php artisan db:seed --force
+
 # Build des assets
 npm run build
 
@@ -307,52 +310,167 @@ sudo crontab -u www-data -e
 tail -f /var/www/vimaiz/storage/logs/laravel.log
 ```
 
-### 5. Configurer Nginx
+### 5. Configurer le DNS (OVH)
+
+**⚠️ À FAIRE EN PREMIER - Avant Nginx et SSL**
+
+Connectez-vous à votre espace client OVH et configurez les enregistrements DNS :
+
+#### Enregistrements DNS requis :
+
+| Type | Nom | Cible | TTL |
+|------|-----|-------|-----|
+| **A** | @ | `IP_DE_VOTRE_VPS` | 3600 |
+| **A** | www | `IP_DE_VOTRE_VPS` | 3600 |
+
+**Exemple avec l'IP 51.210.xxx.xxx :**
+```
+Type: A
+Nom: @
+Cible: 51.210.xxx.xxx
+TTL: 3600 (1 heure)
+
+Type: A
+Nom: www
+Cible: 51.210.xxx.xxx
+TTL: 3600 (1 heure)
+```
+
+**Vérifier la propagation DNS (peut prendre 1h à 24h) :**
 
 ```bash
+# Depuis votre machine locale ou le VPS
+dig vimaiz.com +short
+dig www.vimaiz.com +short
+
+# Doit afficher l'IP de votre VPS
+```
+
+**Alternative avec nslookup :**
+```bash
+nslookup vimaiz.com
+nslookup www.vimaiz.com
+```
+
+⏳ **Attendez que le DNS soit propagé avant de continuer !**
+
+---
+
+### 6. Configurer Nginx (Étape 1 : HTTP temporaire)
+
+<!-- ```bash
 # Copier le contenu de `docs/nginx/vimaiz.conf` ou voir CONFIGURATION.md
 sudo cp /var/www/vimaiz/docs/nginx/vimaiz.conf /etc/nginx/sites-available/vimaiz
-```
-
-```bash
-# ⚠️ Modifier le domaine avant d'activer
-sudo nano /etc/nginx/sites-available/vimaiz
-# Remplacer "vimaiz.com" par votre vrai domaine
-```
-<!-- ```bash
-# Créer le fichier de config
-sudo nano /etc/nginx/sites-available/vimaiz
 ``` -->
 
+**⚠️ Config temporaire pour obtenir le certificat SSL**
+
+```bash
+# Créer la configuration Nginx temporaire (HTTP seulement)
+sudo nano /etc/nginx/sites-available/vimaiz
+```
+
+**Collez ce contenu :**
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name vimaiz.com www.vimaiz.com;
+
+    root /var/www/vimaiz/public;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
+```
+
+**Sauvegarder :** `Ctrl+O`, Entrée, `Ctrl+X`
+
+**Activer le site :**
 
 ```bash
 # Activer le site
 sudo ln -s /etc/nginx/sites-available/vimaiz /etc/nginx/sites-enabled/
-sudo rm /etc/nginx/sites-enabled/default  # Supprimer le site par défaut
+
+# Supprimer le site par défaut
+sudo rm -f /etc/nginx/sites-enabled/default
 
 # Tester la config
 sudo nginx -t
 
-# Recharger
+# Recharger Nginx
 sudo systemctl reload nginx
 ```
 
-### 6. Configurer SSL avec Let's Encrypt
+**Vérifier que le site est accessible :**
+```bash
+curl -I http://vimaiz.com
+# Doit retourner HTTP/1.1 200 OK ou 302
+```
+
+---
+
+### 7. Configurer SSL avec Let's Encrypt
 
 ```bash
 # Installer Certbot
-sudo apt install certbot python3-certbot-nginx
+sudo apt install certbot python3-certbot-nginx -y
 
 # Obtenir le certificat
 sudo certbot --nginx -d vimaiz.com -d www.vimaiz.com
-
-# Vérifier le renouvellement auto
-sudo certbot renew --dry-run
 ```
+
+**Certbot va vous demander :**
+1. Votre email (pour les alertes d'expiration)
+2. Accepter les conditions (Y)
+3. Partager l'email avec EFF (optionnel)
 
 Le certificat se renouvelle automatiquement tous les 90 jours.
 
-### 7. Optimiser Laravel
+**Vérifier le renouvellement auto :**
+```bash
+sudo certbot renew --dry-run
+```
+
+---
+
+### 8. Activer la Configuration Nginx Complète (avec Reverb)
+
+**⚠️ Maintenant que SSL est installé, remplacer par la config complète**
+
+```bash
+# Remplacer la config temporaire par la version complète
+sudo cp /var/www/vimaiz/docs/nginx/vimaiz.conf /etc/nginx/sites-available/vimaiz
+
+# Tester la config
+sudo nginx -t
+
+# Recharger Nginx
+sudo systemctl reload nginx
+```
+
+**Vérifier que tout fonctionne :**
+```bash
+# HTTPS doit fonctionner
+curl -I https://vimaiz.com
+
+# WebSocket Reverb doit être accessible
+curl -I https://vimaiz.com/app
+```
+
+---
+
+### 9. Optimiser Laravel
 
 ```bash
 cd /var/www/vimaiz
