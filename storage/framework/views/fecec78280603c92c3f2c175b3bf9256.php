@@ -156,11 +156,11 @@
                     <div class="logo">VIMAIZ</div>
                     <div class="logo-subtitle">Services de ménage professionnels</div>
                     <div style="margin-top: 15px; font-size: 11px; color: #64748b;">
-                        <p>VIMAIZ SAS</p>
-                        <p>123 Avenue des Champs-Élysées</p>
-                        <p>75008 Paris, France</p>
-                        <p style="margin-top: 8px;">SIRET: 123 456 789 00012</p>
-                        <p>TVA: FR12345678901</p>
+                        <p>VIMAIZ (anciennement Nettolia)</p>
+                        <p>12 rue porte de la ville</p>
+                        <p>73330 Le Pont de Beauvoisin, France</p>
+                        <p style="margin-top: 8px;">SIRET: 832 759 294 00032</p>
+                        <p style="font-size: 9px; color: #94a3b8;">TVA non applicable – article 293B du CGI</p>
                     </div>
                 </td>
                 <td style="border: none; padding: 0; text-align: right; vertical-align: top;">
@@ -241,17 +241,12 @@
 
         <!-- Totals -->
         <div class="totals">
-            <div class="totals-row">
-                <span>Sous-total HT</span>
-                <span><?php echo e(number_format($invoice->subtotal, 2, ',', ' ')); ?> €</span>
-            </div>
-            <div class="totals-row">
-                <span>TVA (<?php echo e(number_format($invoice->tax_rate, 0)); ?>%)</span>
-                <span><?php echo e(number_format($invoice->tax_amount, 2, ',', ' ')); ?> €</span>
-            </div>
             <div class="totals-row total">
-                <span>Total TTC</span>
+                <span>Montant total</span>
                 <span class="amount"><?php echo e(number_format($invoice->total, 2, ',', ' ')); ?> €</span>
+            </div>
+            <div style="font-size: 9px; color: #94a3b8; text-align: right; margin-top: 10px;">
+                TVA non applicable – article 293B du Code Général des Impôts
             </div>
         </div>
 
@@ -260,11 +255,11 @@
             <p>Merci de votre confiance !</p>
             <p style="margin-top: 5px;">
                 Pour toute question concernant cette facture, contactez-nous à
-                <a href="mailto:facturation@vimaiz.fr">facturation@vimaiz.fr</a>
+                <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>
             </p>
             <div class="company-info">
                 <p style="margin-top: 15px;">
-                    VIMAIZ SAS - Capital social: 10 000 € - RCS Paris 123 456 789
+                    VIMAIZ - Auto-entrepreneur - SIRET: 832 759 294 00032
                 </p>
             </div>
         </div>

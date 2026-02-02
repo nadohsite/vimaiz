@@ -28,10 +28,14 @@ class MissionController extends Controller
 
         $mission->load(['property', 'serviceRequest', 'quote', 'photos', 'agent', 'invoice', 'review']);
 
+        // Ajouter les attributs de retour
+        $mission->append(['return_status_label']);
+
         return Inertia::render('Client/Missions/Show', [
             'mission' => $mission,
             'canDownloadInvoice' => $mission->invoice !== null,
             'canReview' => $mission->status === Mission::STATUS_COMPLETED && !$mission->review,
+            'canRequestReturn' => $mission->canRequestReturn(),
         ]);
     }
 

@@ -930,6 +930,14 @@ sudo systemctl restart php8.3-fpm
 
 ---
 
+## 📖 Guides des Fonctionnalités
+
+Les guides d'utilisation détaillés des fonctionnalités sont dans le dossier `docs/features/` :
+
+- [🔄 Retours Mécontentement](./features/retours-mecontentement.md) - Gestion des demandes de retour client
+
+---
+
 ## 📞 Support et Ressources
 
 - **Laravel Docs**: https://laravel.com/docs

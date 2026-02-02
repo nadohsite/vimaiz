@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Download, FileText, Star, Send } from 'lucide-react';
+import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Download, FileText, Star, Send, AlertTriangle, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useState } from 'react';
 
@@ -58,24 +58,64 @@ interface Mission {
     photos?: Photo[];
     invoice?: Invoice | null;
     review?: Review | null;
+    // Retour mécontentement
+    return_requested: boolean;
+    return_status: string | null;
+    return_status_label: string | null;
+    return_reason: string | null;
+    return_requested_at: string | null;
+    return_completed_at: string | null;
+    return_agent_notes: string | null;
 }
 
 interface Props {
     mission: Mission;
     canDownloadInvoice: boolean;
     canReview?: boolean;
+    canRequestReturn?: boolean;
 }
 
-export default function Show({ mission, canDownloadInvoice, canReview = false }: Props) {
+export default function Show({ mission, canDownloadInvoice, canReview = false, canRequestReturn = false }: Props) {
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
     const [hoverRating, setHoverRating] = useState(0);
+    const [showReturnForm, setShowReturnForm] = useState(false);
+    const [showValidateForm, setShowValidateForm] = useState(false);
 
     const { data, setData, post, processing, reset } = useForm({
         rating: 0,
         comment: '',
     });
+
+    const returnForm = useForm({
+        reason: '',
+    });
+
+    const validateForm = useForm({
+        feedback: '',
+        approved: true,
+    });
+
+    const handleRequestReturn = (e: React.FormEvent) => {
+        e.preventDefault();
+        returnForm.post(route('client.missions.return-request', mission.id), {
+            onSuccess: () => {
+                returnForm.reset();
+                setShowReturnForm(false);
+            },
+        });
+    };
+
+    const handleValidateReturn = (approved: boolean) => {
+        validateForm.setData('approved', approved);
+        validateForm.post(route('client.missions.return-validate', mission.id), {
+            onSuccess: () => {
+                validateForm.reset();
+                setShowValidateForm(false);
+            },
+        });
+    };
 
     const handleSubmitReview = (e: React.FormEvent) => {
         e.preventDefault();
@@ -263,6 +303,172 @@ export default function Show({ mission, canDownloadInvoice, canReview = false }:
                                         <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
                                             Publié le {new Date(mission.review.created_at).toLocaleDateString('fr-FR')}
                                         </p>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Retour mécontentement - Demande */}
+                            {canRequestReturn && !mission.return_requested && (
+                                <Card className="border-amber-200 dark:border-amber-800 dark:bg-slate-800">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 dark:text-white">
+                                            <AlertTriangle className="h-5 w-5 text-amber-500" />
+                                            Pas satisfait ?
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {!showReturnForm ? (
+                                            <div>
+                                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                                                    Si vous n'êtes pas satisfait de la prestation, vous pouvez demander un retour gratuit de l'agent dans les 7 jours suivant la mission.
+                                                </p>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => setShowReturnForm(true)}
+                                                    className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-900/20"
+                                                >
+                                                    <AlertTriangle className="h-4 w-4 mr-2" />
+                                                    Demander un retour
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <form onSubmit={handleRequestReturn} className="space-y-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                                        Décrivez le problème rencontré *
+                                                    </label>
+                                                    <Textarea
+                                                        placeholder="Expliquez pourquoi vous n'êtes pas satisfait..."
+                                                        value={returnForm.data.reason}
+                                                        onChange={(e) => returnForm.setData('reason', e.target.value)}
+                                                        rows={4}
+                                                        required
+                                                        minLength={10}
+                                                        className="dark:bg-slate-700 dark:border-slate-600"
+                                                    />
+                                                    {returnForm.errors.reason && (
+                                                        <p className="text-sm text-red-500 mt-1">{returnForm.errors.reason}</p>
+                                                    )}
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        type="submit"
+                                                        disabled={returnForm.processing}
+                                                        className="bg-amber-500 hover:bg-amber-600"
+                                                    >
+                                                        {returnForm.processing ? 'Envoi...' : 'Envoyer la demande'}
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        onClick={() => setShowReturnForm(false)}
+                                                    >
+                                                        Annuler
+                                                    </Button>
+                                                </div>
+                                            </form>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Retour mécontentement - Statut */}
+                            {mission.return_requested && (
+                                <Card className={`border-2 ${
+                                    mission.return_status === 'validated' ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-900/20' :
+                                    mission.return_status === 'rejected' ? 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/20' :
+                                    'border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-900/20'
+                                }`}>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 dark:text-white">
+                                            <AlertTriangle className={`h-5 w-5 ${
+                                                mission.return_status === 'validated' ? 'text-green-500' :
+                                                mission.return_status === 'rejected' ? 'text-red-500' :
+                                                'text-amber-500'
+                                            }`} />
+                                            Demande de retour
+                                            <Badge className={
+                                                mission.return_status === 'pending' ? 'bg-amber-100 text-amber-800' :
+                                                mission.return_status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                                mission.return_status === 'completed' ? 'bg-purple-100 text-purple-800' :
+                                                mission.return_status === 'validated' ? 'bg-green-100 text-green-800' :
+                                                'bg-red-100 text-red-800'
+                                            }>
+                                                {mission.return_status_label}
+                                            </Badge>
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div>
+                                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Votre motif :</p>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{mission.return_reason}</p>
+                                        </div>
+
+                                        {mission.return_status === 'pending' && (
+                                            <p className="text-sm text-amber-700 dark:text-amber-300">
+                                                ⏳ L'agent a été notifié et va prendre en charge votre demande.
+                                            </p>
+                                        )}
+
+                                        {mission.return_status === 'in_progress' && (
+                                            <p className="text-sm text-blue-700 dark:text-blue-300">
+                                                🔄 L'agent est en train d'effectuer le retour.
+                                            </p>
+                                        )}
+
+                                        {mission.return_status === 'completed' && (
+                                            <div className="space-y-4">
+                                                {mission.return_agent_notes && (
+                                                    <div>
+                                                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Notes de l'agent :</p>
+                                                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{mission.return_agent_notes}</p>
+                                                    </div>
+                                                )}
+                                                <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
+                                                    <p className="text-sm font-medium text-purple-800 dark:text-purple-300 mb-3">
+                                                        L'agent a terminé le retour. Êtes-vous satisfait ?
+                                                    </p>
+                                                    <Textarea
+                                                        placeholder="Commentaire (optionnel)..."
+                                                        value={validateForm.data.feedback}
+                                                        onChange={(e) => validateForm.setData('feedback', e.target.value)}
+                                                        rows={2}
+                                                        className="mb-3 dark:bg-slate-700 dark:border-slate-600"
+                                                    />
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            onClick={() => handleValidateReturn(true)}
+                                                            disabled={validateForm.processing}
+                                                            className="bg-green-500 hover:bg-green-600"
+                                                        >
+                                                            <ThumbsUp className="h-4 w-4 mr-2" />
+                                                            Oui, je suis satisfait
+                                                        </Button>
+                                                        <Button
+                                                            onClick={() => handleValidateReturn(false)}
+                                                            disabled={validateForm.processing}
+                                                            variant="outline"
+                                                            className="border-red-300 text-red-700 hover:bg-red-50"
+                                                        >
+                                                            <ThumbsDown className="h-4 w-4 mr-2" />
+                                                            Non
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {mission.return_status === 'validated' && (
+                                            <p className="text-sm text-green-700 dark:text-green-300">
+                                                ✅ Merci ! Le retour a été validé avec succès.
+                                            </p>
+                                        )}
+
+                                        {mission.return_status === 'rejected' && (
+                                            <p className="text-sm text-red-700 dark:text-red-300">
+                                                ❌ Vous avez indiqué ne pas être satisfait. Notre équipe va examiner votre dossier et vous contacter.
+                                            </p>
+                                        )}
                                     </CardContent>
                                 </Card>
                             )}
