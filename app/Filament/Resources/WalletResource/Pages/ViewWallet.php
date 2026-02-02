@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\WalletResource\Pages;
 
 use App\Filament\Resources\WalletResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\ViewRecord;
 
-class ListWallets extends ListRecords
+class ViewWallet extends ViewRecord
 {
     protected static string $resource = WalletResource::class;
 

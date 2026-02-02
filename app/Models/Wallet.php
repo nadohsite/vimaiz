@@ -68,7 +68,7 @@ class Wallet extends Model
         ]);
     }
 
-    public function withdraw(float $amount, string $reference = null): WalletTransaction
+    public function withdraw(float $amount, string $bankAccount = null): WalletTransaction
     {
         if ($this->balance < $amount) {
             throw new \Exception('Insufficient balance');
@@ -82,9 +82,12 @@ class Wallet extends Model
             'type' => 'withdrawal',
             'amount' => $amount,
             'balance_after' => $this->balance,
-            'reference' => $reference,
+            'reference' => $bankAccount,
             'description' => 'Withdrawal to bank account',
             'status' => 'pending',
+            'metadata' => [
+                'bank_account' => $bankAccount,
+            ],
         ]);
     }
 }

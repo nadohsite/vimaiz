@@ -125,7 +125,9 @@
     <div class="wrapper">
         <div class="container">
             <div class="header">
-                <a href="{{ config('app.url') }}" class="logo">VIMAIZ</a>
+                <a href="{{ config('app.url') }}" class="logo">
+                    <img src="{{ config('app.url') }}/vimaiz-logo.png" alt="VIMAIZ" style="height: 40px; filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%);">
+                </a>
             </div>
             <div class="content">
                 @yield('content')

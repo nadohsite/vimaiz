@@ -1,0 +1,6 @@
+/* Logo bleu pour l'admin Filament */
+.fi-logo img,
+.fi-sidebar-header img,
+[class*="fi-"] img[src*="vimaiz-logo"] {
+    filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%);
+}

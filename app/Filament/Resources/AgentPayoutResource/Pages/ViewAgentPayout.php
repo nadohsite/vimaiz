@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\AgentPayoutResource\Pages;
 
 use App\Filament\Resources\AgentPayoutResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\ViewRecord;
 
-class ListAgentPayouts extends ListRecords
+class ViewAgentPayout extends ViewRecord
 {
     protected static string $resource = AgentPayoutResource::class;
 

@@ -930,7 +930,206 @@ sudo systemctl restart php8.3-fpm
 
 ---
 
-## 📖 Guides des Fonctionnalités
+## � Mise à Jour en Production (Site en Ligne)
+
+### ⚠️ Règles d'Or
+
+1. **TOUJOURS faire un backup avant** toute mise à jour
+2. **Ne JAMAIS modifier directement** les fichiers sur le serveur
+3. **Tester en local/staging** avant de pousser en prod
+4. **Les migrations ne suppriment JAMAIS de colonnes** sans backup préalable
+
+### 📋 Procédure Standard de Mise à Jour
+
+```bash
+# 1. Se connecter au serveur
+ssh root@votre-vps
+
+# 2. Aller dans le dossier du projet
+cd /var/www/vimaiz
+
+# 3. BACKUP OBLIGATOIRE avant toute opération
+mysqldump -u root -p vimaiz > /var/backups/vimaiz/backup_$(date +%Y%m%d_%H%M%S).sql
+
+# 4. Mettre le site en maintenance (optionnel pour grosses mises à jour)
+php artisan down --message="Mise à jour en cours, retour dans quelques minutes"
+
+# 5. Récupérer les dernières modifications
+git fetch origin main
+git reset --hard origin/main
+
+# 6. Installer les dépendances (sans les dev)
+composer install --no-dev --optimize-autoloader
+
+# 7. Installer les dépendances front et builder
+npm ci
+npm run build
+
+# 8. Exécuter les migrations (ATTENTION - voir section migrations)
+php artisan migrate --force
+
+# 9. Vider et reconstruire les caches
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+
+# 10. Corriger les permissions
+sudo chown -R www-data:www-data /var/www/vimaiz
+sudo chmod -R 775 storage bootstrap/cache
+
+# 11. Redémarrer les workers
+sudo supervisorctl restart vimaiz-worker:*
+
+# 12. Remettre le site en ligne
+php artisan up
+
+# 13. Vérifier que tout fonctionne
+curl -I https://vimaiz.com
+```
+
+### 🗄️ Gestion des Migrations (CRITIQUE)
+
+#### ✅ Migrations SÛRES (pas de perte de données)
+
+```php
+// Ajouter une colonne nullable
+Schema::table('properties', function (Blueprint $table) {
+    $table->string('new_field')->nullable()->after('existing_field');
+});
+
+// Ajouter un index
+Schema::table('missions', function (Blueprint $table) {
+    $table->index('status');
+});
+
+// Modifier une colonne pour la rendre nullable
+Schema::table('properties', function (Blueprint $table) {
+    $table->integer('external_surface')->nullable()->change();
+});
+```
+
+#### ⚠️ Migrations DANGEREUSES (nécessitent précautions)
+
+```php
+// DANGER: Supprimer une colonne
+// TOUJOURS faire un backup ET vérifier qu'elle n'est plus utilisée
+Schema::table('properties', function (Blueprint $table) {
+    $table->dropColumn('old_field'); // ⚠️ Données perdues !
+});
+
+// DANGER: Renommer une colonne
+// Le code doit utiliser le nouveau nom AVANT la migration
+Schema::table('users', function (Blueprint $table) {
+    $table->renameColumn('old_name', 'new_name');
+});
+```
+
+#### 🔄 Procédure pour Supprimer une Colonne en Sécurité
+
+```bash
+# 1. Vérifier que la colonne n'est plus utilisée dans le code
+grep -r "nom_colonne" app/ resources/
+
+# 2. Backup spécifique de la table
+mysqldump -u root -p vimaiz table_concernee > backup_table.sql
+
+# 3. Exporter les données de la colonne si nécessaire
+mysql -u root -p -e "SELECT id, nom_colonne FROM table_concernee" vimaiz > export_colonne.csv
+
+# 4. Seulement après, lancer la migration
+php artisan migrate --force
+```
+
+### 🔀 Types de Modifications et Leur Impact
+
+| Modification | Impact BDD | Risque | Action |
+|--------------|------------|--------|--------|
+| Modifier UI (React/Blade) | ❌ Aucun | 🟢 Faible | `npm run build` |
+| Modifier validation | ❌ Aucun | 🟢 Faible | Aucune |
+| Ajouter colonne nullable | ✅ Oui | 🟢 Faible | `migrate` |
+| Ajouter colonne required | ✅ Oui | 🟡 Moyen | Ajouter default |
+| Supprimer colonne | ✅ Oui | 🔴 Élevé | Backup + vérif |
+| Modifier type colonne | ✅ Oui | 🔴 Élevé | Backup + test |
+
+### 📱 Mise à Jour Sans Interruption (Zero Downtime)
+
+Pour les petites mises à jour qui ne touchent pas la BDD :
+
+```bash
+cd /var/www/vimaiz
+
+# Pas besoin de maintenance mode
+git fetch origin main
+git reset --hard origin/main
+
+composer install --no-dev --optimize-autoloader
+npm ci && npm run build
+
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+sudo chown -R www-data:www-data /var/www/vimaiz
+sudo supervisorctl restart vimaiz-worker:*
+
+# Le site reste accessible pendant tout le processus
+```
+
+### 🔙 Rollback en Cas de Problème
+
+```bash
+# 1. Mettre en maintenance
+php artisan down
+
+# 2. Annuler la dernière migration (si c'est le problème)
+php artisan migrate:rollback --step=1
+
+# 3. OU restaurer le backup complet
+mysql -u root -p vimaiz < /var/backups/vimaiz/backup_YYYYMMDD_HHMMSS.sql
+
+# 4. Revenir au commit précédent
+git log --oneline -5  # Trouver le commit précédent
+git reset --hard <commit_hash>
+
+# 5. Reconstruire
+composer install --no-dev --optimize-autoloader
+npm ci && npm run build
+php artisan config:cache
+
+# 6. Remettre en ligne
+php artisan up
+```
+
+### 📝 Checklist Avant Chaque Mise à Jour
+
+- [ ] Code testé en local
+- [ ] Pas de `dd()`, `dump()`, `console.log()` de debug
+- [ ] Migrations réversibles (`down()` défini)
+- [ ] Backup BDD effectué
+- [ ] Heure creuse choisie (éviter heures de pointe)
+- [ ] Accès SSH vérifié
+- [ ] Plan de rollback prêt
+
+### 🎯 Exemple Concret : Notre Mise à Jour Actuelle
+
+Les modifications qu'on vient de faire :
+
+| Fichier | Type | Impact BDD | Risque |
+|---------|------|------------|--------|
+| `Create.tsx`, `Edit.tsx` | UI | ❌ Non | 🟢 Aucun |
+| `Show.tsx` | UI | ❌ Non | 🟢 Aucun |
+| `Welcome.tsx` | UI | ❌ Non | 🟢 Aucun |
+| `Dashboard.tsx` (agent) | UI | ❌ Non | 🟢 Aucun |
+| Ressources Filament | Labels | ❌ Non | 🟢 Aucun |
+
+**→ Aucune migration nécessaire, les données sont préservées.**
+
+Les champs `access_code`, `wifi_code`, `entry_instructions`, `trash_instructions` restent en BDD même s'ils ne sont plus affichés dans le formulaire. Les anciens logements gardent leurs données.
+
+---
+
+## �📖 Guides des Fonctionnalités
 
 Les guides d'utilisation détaillés des fonctionnalités sont dans le dossier `docs/features/` :
 

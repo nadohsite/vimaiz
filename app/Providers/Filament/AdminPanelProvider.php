@@ -12,6 +12,8 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationGroup;
 use Filament\Widgets;
+use Filament\Support\Facades\FilamentView;
+use Illuminate\Support\HtmlString;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -36,6 +38,10 @@ class AdminPanelProvider extends PanelProvider
                 'info' => Color::Sky,
             ])
             ->brandName('VIMAIZ Admin')
+            ->brandLogo(asset('vimaiz-logo.png'))
+            ->darkModeBrandLogo(asset('vimaiz-logo.png'))
+            ->brandLogoHeight('4.5rem')
+            ->favicon(asset('favicon.svg'))
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
                 NavigationGroup::make('Demandes & Missions'),
@@ -70,6 +76,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->renderHook(
+                'panels::head.end',
+                fn () => new HtmlString('<style>img.fi-logo, .fi-logo { filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%); }</style>')
+            );
     }
 }

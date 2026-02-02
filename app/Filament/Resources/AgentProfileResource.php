@@ -97,6 +97,11 @@ class AgentProfileResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('profile_photo')
+                    ->label('Photo')
+                    ->circular()
+                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user?->name ?? 'Agent') . '&background=0ea5e9&color=fff')
+                    ->disk('public'),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Nom')
                     ->searchable()

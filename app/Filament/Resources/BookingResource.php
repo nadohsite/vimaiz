@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Actions\ViewAction;
 use Filament\Schemas\Schema;
 use UnitEnum;
 use BackedEnum;
@@ -27,6 +28,10 @@ class BookingResource extends Resource
     protected static ?string $modelLabel = 'Réservation';
 
     protected static ?string $pluralModelLabel = 'Réservations';
+
+    protected static ?int $navigationSort = 99; // En bas du menu
+
+    protected static bool $shouldRegisterNavigation = false; // Caché par défaut - ancien système
    
     /**
      * Formulaire de création / édition
@@ -36,38 +41,47 @@ class BookingResource extends Resource
         return $schema
             ->schema([
                 Forms\Components\Select::make('client_id')
+                    ->label('Client')
                     ->relationship('client', 'name')
                     ->required()
                     ->searchable(),
                 Forms\Components\Select::make('agent_id')
+                    ->label('Agent')
                     ->relationship('agent', 'name')
                     ->required()
                     ->searchable(),
                 Forms\Components\Select::make('service_id')
+                    ->label('Service')
                     ->relationship('service', 'name')
                     ->required(),
                 Forms\Components\DateTimePicker::make('scheduled_at')
+                    ->label('Date prévue')
                     ->required(),
                 Forms\Components\TextInput::make('duration_minutes')
+                    ->label('Durée (min)')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('total_price')
+                    ->label('Prix total')
                     ->required()
                     ->numeric()
                     ->prefix('€'),
                 Forms\Components\Select::make('status')
+                    ->label('Statut')
                     ->options([
-                        'pending' => 'Pending',
-                        'confirmed' => 'Confirmed',
-                        'in_progress' => 'In Progress',
-                        'completed' => 'Completed',
-                        'cancelled' => 'Cancelled',
-                        'rejected' => 'Rejected',
+                        'pending' => 'En attente',
+                        'confirmed' => 'Confirmée',
+                        'in_progress' => 'En cours',
+                        'completed' => 'Terminée',
+                        'cancelled' => 'Annulée',
+                        'rejected' => 'Rejetée',
                     ])
                     ->required(),
                 Forms\Components\Textarea::make('special_instructions')
+                    ->label('Instructions spéciales')
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('cancellation_reason')
+                    ->label('Raison d\'annulation')
                     ->columnSpanFull(),
             ]);
     }
@@ -79,45 +93,64 @@ class BookingResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('booking_number')->searchable(),
-                Tables\Columns\TextColumn::make('client.name')->searchable(),
-                Tables\Columns\TextColumn::make('agent.name')->searchable(),
-                Tables\Columns\TextColumn::make('service.name')->sortable(),
-                Tables\Columns\TextColumn::make('scheduled_at')->dateTime()->sortable(),
+                Tables\Columns\TextColumn::make('booking_number')
+                    ->label('N° Réservation')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('client.name')
+                    ->label('Client')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('agent.name')
+                    ->label('Agent')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('service.name')
+                    ->label('Service')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('scheduled_at')
+                    ->label('Date prévue')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->label('Statut')
                     ->badge()
-                    ->color(fn (string $state) => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'En attente',
+                        'confirmed' => 'Confirmée',
+                        'in_progress' => 'En cours',
+                        'completed' => 'Terminée',
+                        'cancelled' => 'Annulée',
+                        'rejected' => 'Rejetée',
+                        default => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'confirmed' => 'info',
                         'in_progress' => 'primary',
                         'completed' => 'success',
                         'cancelled', 'rejected' => 'danger',
+                        default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('total_price')->money('€')->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('total_price')
+                    ->label('Prix')
+                    ->money('EUR')
+                    ->sortable(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
+                    ->label('Statut')
                     ->options([
-                        'pending' => 'Pending',
-                        'confirmed' => 'Confirmed',
-                        'in_progress' => 'In Progress',
-                        'completed' => 'Completed',
-                        'cancelled' => 'Cancelled',
-                        'rejected' => 'Rejected',
+                        'pending' => 'En attente',
+                        'confirmed' => 'Confirmée',
+                        'in_progress' => 'En cours',
+                        'completed' => 'Terminée',
+                        'cancelled' => 'Annulée',
+                        'rejected' => 'Rejetée',
                     ]),
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                ViewAction::make()->label('Voir'),
             ])
-            ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
-            ]);
+            ->bulkActions([]);
     }
 
     /**

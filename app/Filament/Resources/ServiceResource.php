@@ -28,6 +28,10 @@ class ServiceResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Services';
 
+    protected static ?int $navigationSort = 98; // En bas du menu
+
+    protected static bool $shouldRegisterNavigation = false; // Caché - non utilisé dans le flux actuel
+
     /**
      * Formulaire de création / édition
      */
@@ -36,23 +40,29 @@ class ServiceResource extends Resource
         return $schema
             ->schema([
                 Forms\Components\Select::make('category_id')
+                    ->label('Catégorie')
                     ->relationship('category', 'name')
                     ->required(),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nom')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
+                    ->label('Description')
                     ->maxLength(65535)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('base_price')
+                    ->label('Prix de base')
                     ->required()
                     ->numeric()
                     ->prefix('€'),
                 Forms\Components\TextInput::make('estimated_duration_minutes')
+                    ->label('Durée estimée')
                     ->required()
                     ->numeric()
                     ->suffix('minutes'),
                 Forms\Components\Toggle::make('is_active')
+                    ->label('Actif')
                     ->required(),
             ]);
     }
@@ -64,27 +74,35 @@ class ServiceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('category.name')->sortable(),
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('base_price')->money('€')->sortable(),
-                Tables\Columns\TextColumn::make('estimated_duration_minutes')->numeric()->sortable(),
-                Tables\Columns\IconColumn::make('is_active')->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Catégorie')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nom')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('base_price')
+                    ->label('Prix de base')
+                    ->money('EUR')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('estimated_duration_minutes')
+                    ->label('Durée (min)')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Actif')
+                    ->boolean(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('category_id')
+                    ->label('Catégorie')
+                    ->relationship('category', 'name'),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Actif'),
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Modifier'),
             ])
-            ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
-            ]);
+            ->bulkActions([]);
     }
 
     /**

@@ -153,7 +153,9 @@
         <table style="margin-bottom: 40px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px;">
             <tr>
                 <td style="border: none; padding: 0;">
-                    <div class="logo">VIMAIZ</div>
+                    <div class="logo">
+                        <img src="{{ public_path('vimaiz-logo.png') }}" alt="VIMAIZ" style="height: 45px; filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%);">
+                    </div>
                     <div class="logo-subtitle">Services de ménage professionnels</div>
                     <div style="margin-top: 15px; font-size: 11px; color: #64748b;">
                         <p>VIMAIZ (anciennement Nettolia)</p>

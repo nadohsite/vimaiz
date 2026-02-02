@@ -28,6 +28,10 @@ class ServiceCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Catégories de services';
 
+    protected static ?int $navigationSort = 97;
+
+    protected static bool $shouldRegisterNavigation = false; // Caché - non utilisé dans le flux actuel
+
     /**
      * Formulaire de création / édition
      */
@@ -36,16 +40,20 @@ class ServiceCategoryResource extends Resource
         return $schema
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nom')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
+                    ->label('Description')
                     ->maxLength(65535)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('sort_order')
+                    ->label('Ordre d\'affichage')
                     ->required()
                     ->numeric()
                     ->default(0),
                 Forms\Components\Toggle::make('is_active')
+                    ->label('Active')
                     ->required(),
             ]);
     }
@@ -57,25 +65,29 @@ class ServiceCategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('sort_order')->numeric()->sortable(),
-                Tables\Columns\IconColumn::make('is_active')->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nom')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Description')
+                    ->limit(50),
+                Tables\Columns\TextColumn::make('sort_order')
+                    ->label('Ordre')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean(),
             ])
+            ->defaultSort('sort_order')
             ->filters([
-                //
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Active'),
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Modifier'),
             ])
-            ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
-            ]);
+            ->bulkActions([]);
     }
 
     /**

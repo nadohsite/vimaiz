@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Wallet;
+use App\Notifications\WithdrawalRequestNotification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Wallet;
 
 class WalletController extends Controller
 {
@@ -57,9 +59,15 @@ class WalletController extends Controller
         }
         
         try {
-            $wallet->withdraw($validated['amount'], $validated['bank_account']);
+            $transaction = $wallet->withdraw($validated['amount'], $validated['bank_account']);
             
-            return redirect()->back()->with('success', 'Withdrawal request submitted successfully!');
+            // Notify all admins about the withdrawal request
+            $admins = User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new WithdrawalRequestNotification($transaction, $request->user()));
+            }
+            
+            return redirect()->back()->with('success', 'Demande de retrait soumise avec succès !');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['amount' => $e->getMessage()]);
         }
