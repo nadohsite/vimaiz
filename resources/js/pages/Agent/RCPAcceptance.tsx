@@ -131,6 +131,18 @@ export default function RCPAcceptance({ agentProfile }: Props) {
                                 <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                                     L'agent reconnaît avoir été informé de l'obligation de disposer d'une RCP et accepte cette clause en toute connaissance de cause.
                                 </p>
+
+                                <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                                    <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-2">
+                                        ⚠️ Satisfaction client & Retour prestation
+                                    </h4>
+                                    <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
+                                        VIMAIZ étant une plateforme de services <strong>haut de gamme</strong>, en cas de mécontentement justifié du client, 
+                                        un retour pour finaliser ou corriger la prestation est <strong>fortement conseillé</strong>. 
+                                        Cette démarche qualité est essentielle pour maintenir la réputation d'excellence de la plateforme 
+                                        et assurer la satisfaction de nos clients.
+                                    </p>
+                                </div>
                             </div>
 
                             {!agentProfile.rcp_clause_accepted && (

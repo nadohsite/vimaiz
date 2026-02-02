@@ -267,7 +267,7 @@ export default function Register() {
                         type="tel"
                         value={data.phone}
                         onChange={(e) => setData('phone', e.target.value)}
-                        placeholder="+212 600 000 000"
+                        placeholder="+33 6 00 00 00 00"
                         className={inputStyles}
                       />
                       <InputError message={errors.phone} />
@@ -314,7 +314,7 @@ export default function Register() {
                   <div className="space-y-3">
                     <Label className="text-sm font-semibold text-slate-700">Types de biens supportés</Label>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                      {['appartement', 'maison', 'villa', 'bureau'].map((type) => (
+                      {['maison', 'villa', 'chalet'].map((type) => (
                         <div key={type} className="flex items-center gap-2">
                           <Checkbox 
                             id={`property-${type}`}

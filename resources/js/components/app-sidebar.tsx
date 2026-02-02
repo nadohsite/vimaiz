@@ -24,7 +24,8 @@ import {
     Wallet,
     FolderCheck,
     Star,
-    Shield
+    Shield,
+    AlertTriangle
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -108,6 +109,11 @@ export function AppSidebar() {
             title: 'Mes Avis',
             href: route('agent.reviews.index'),
             icon: Star,
+        },
+        {
+            title: 'Retours clients',
+            href: route('agent.returns.index'),
+            icon: AlertTriangle,
         },
         {
             title: 'Messages',

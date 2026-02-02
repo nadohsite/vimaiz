@@ -123,9 +123,9 @@ export default function Contact({ success }: Props) {
                                         </div>
                                         <div>
                                             <h3 className="font-semibold text-slate-900 dark:text-white mb-1">Téléphone</h3>
-                                            <a href="tel:+212XXXXXXXXX" className="text-sky-600 hover:underline">
-                                                +212 XX XX XX XX
-                                            </a>
+                                            <span className="text-slate-600 dark:text-slate-300">
+                                                Via email uniquement
+                                            </span>
                                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                                                 Lun-Ven : 9h-18h
                                             </p>
@@ -143,8 +143,8 @@ export default function Contact({ success }: Props) {
                                         <div>
                                             <h3 className="font-semibold text-slate-900 dark:text-white mb-1">Adresse</h3>
                                             <p className="text-slate-600 dark:text-slate-300">
-                                                [Adresse complète]<br />
-                                                [Ville], France
+                                                12 rue porte de la ville<br />
+                                                73330 Le Pont de Beauvoisin, France
                                             </p>
                                         </div>
                                     </div>

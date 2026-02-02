@@ -39,6 +39,16 @@ class Mission extends Model
         'agent_notified_at',
         'agent_responded_at',
         'assignment_attempts',
+        // Retour mécontentement
+        'return_requested',
+        'return_status',
+        'return_reason',
+        'return_requested_at',
+        'return_started_at',
+        'return_completed_at',
+        'return_validated_at',
+        'return_agent_notes',
+        'return_client_feedback',
     ];
 
     protected $casts = [
@@ -53,6 +63,11 @@ class Mission extends Model
         'total_price' => 'decimal:2',
         'agent_payout' => 'decimal:2',
         'platform_fee' => 'decimal:2',
+        'return_requested' => 'boolean',
+        'return_requested_at' => 'datetime',
+        'return_started_at' => 'datetime',
+        'return_completed_at' => 'datetime',
+        'return_validated_at' => 'datetime',
     ];
 
     const STATUS_PENDING_AGENT = 'pending_agent';
@@ -67,6 +82,13 @@ class Mission extends Model
     const PAYMENT_PENDING = 'pending';
     const PAYMENT_PAID = 'paid';
     const PAYMENT_REFUNDED = 'refunded';
+
+    // Statuts de retour mécontentement
+    const RETURN_PENDING = 'pending';
+    const RETURN_IN_PROGRESS = 'in_progress';
+    const RETURN_COMPLETED = 'completed';
+    const RETURN_VALIDATED = 'validated';
+    const RETURN_REJECTED = 'rejected';
 
     protected static function boot()
     {
@@ -206,6 +228,52 @@ class Mission extends Model
             self::PAYMENT_PAID => 'Payé',
             self::PAYMENT_REFUNDED => 'Remboursé',
             default => $this->payment_status,
+        };
+    }
+
+    // Méthodes pour la gestion des retours mécontentement
+    public function hasReturnRequested(): bool
+    {
+        return $this->return_requested === true;
+    }
+
+    public function canRequestReturn(): bool
+    {
+        return $this->status === self::STATUS_COMPLETED 
+            && !$this->return_requested
+            && $this->completed_at 
+            && $this->completed_at->diffInDays(now()) <= 7; // 7 jours pour demander un retour
+    }
+
+    public function getReturnStatusLabelAttribute(): ?string
+    {
+        if (!$this->return_status) {
+            return null;
+        }
+
+        return match($this->return_status) {
+            self::RETURN_PENDING => 'Retour demandé',
+            self::RETURN_IN_PROGRESS => 'Retour en cours',
+            self::RETURN_COMPLETED => 'Retour effectué',
+            self::RETURN_VALIDATED => 'Retour validé',
+            self::RETURN_REJECTED => 'Retour refusé',
+            default => $this->return_status,
+        };
+    }
+
+    public function getReturnStatusColorAttribute(): ?string
+    {
+        if (!$this->return_status) {
+            return null;
+        }
+
+        return match($this->return_status) {
+            self::RETURN_PENDING => 'warning',
+            self::RETURN_IN_PROGRESS => 'info',
+            self::RETURN_COMPLETED => 'primary',
+            self::RETURN_VALIDATED => 'success',
+            self::RETURN_REJECTED => 'danger',
+            default => 'secondary',
         };
     }
 }

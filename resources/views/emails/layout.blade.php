@@ -133,8 +133,8 @@
             <div class="footer">
                 <p>© {{ date('Y') }} VIMAIZ - Tous droits réservés</p>
                 <p>
-                    <a href="{{ config('app.url') }}">vimaiz.fr</a> |
-                    <a href="mailto:contact@vimaiz.fr">contact@vimaiz.fr</a>
+                    <a href="{{ config('app.url') }}">vimaiz.com</a> |
+                    <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>
                 </p>
                 <p style="margin-top: 16px; font-size: 11px;">
                     Cet email a été envoyé à {{ $notifiable->email ?? '' }}.<br>

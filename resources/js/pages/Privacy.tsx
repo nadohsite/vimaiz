@@ -146,7 +146,7 @@ export default function Privacy() {
 
                             <section>
                                 <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">6. Vos droits</h2>
-                                <p className="text-slate-600 dark:text-slate-300 mb-4">Conformément à la législation marocaine, vous disposez des droits suivants :</p>
+                                <p className="text-slate-600 dark:text-slate-300 mb-4">Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés, vous disposez des droits suivants :</p>
                                 <ul className="text-slate-600 dark:text-slate-300 list-disc pl-6 space-y-2">
                                     <li><strong>Droit d'accès :</strong> consulter les données que nous détenons sur vous</li>
                                     <li><strong>Droit de rectification :</strong> corriger vos données inexactes ou incomplètes</li>
@@ -179,9 +179,9 @@ export default function Privacy() {
                             <section>
                                 <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">8. Transferts internationaux</h2>
                                 <p className="text-slate-600 dark:text-slate-300">
-                                    Vos données peuvent être transférées et stockées sur des serveurs situés en dehors du Maroc. 
+                                    Vos données peuvent être transférées et stockées sur des serveurs situés en dehors de l'Union Européenne. 
                                     Dans ce cas, nous nous assurons que des garanties appropriées sont en place pour protéger vos 
-                                    données conformément aux standards internationaux.
+                                    données conformément au RGPD et aux standards internationaux.
                                 </p>
                             </section>
 
@@ -209,9 +209,8 @@ export default function Privacy() {
                                     Pour toute question concernant cette politique de confidentialité ou vos données personnelles :
                                 </p>
                                 <ul className="text-slate-600 dark:text-slate-300 list-none pl-0 space-y-2 mt-4">
-                                    <li><strong>Email :</strong> <a href="mailto:privacy@vimaiz.com" className="text-sky-600 hover:underline">privacy@vimaiz.com</a></li>
-                                    <li><strong>Adresse :</strong> [Adresse complète VIMAIZ]</li>
-                                    <li><strong>Téléphone :</strong> [Numéro de téléphone]</li>
+                                    <li><strong>Email :</strong> <a href="mailto:contact@vimaiz.com" className="text-sky-600 hover:underline">contact@vimaiz.com</a></li>
+                                    <li><strong>Adresse :</strong> 12 rue porte de la ville, 73330 Le Pont de Beauvoisin, France</li>
                                 </ul>
                             </section>
                         </div>

@@ -241,6 +241,11 @@ php artisan db:seed --force
 # Build des assets
 npm run build
 
+# ⚠️ IMPORTANT : Publier les assets Livewire (Filament Admin)
+php artisan livewire:publish --assets
+# Vérifier le bon chemin
+ls -la public/vendor/livewire/
+
 # Permissions
 sudo chown -R www-data:www-data /var/www/vimaiz
 sudo chmod -R 755 /var/www/vimaiz

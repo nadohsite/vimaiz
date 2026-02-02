@@ -67,14 +67,11 @@ export default function LegalNotice() {
                                     Le site VIMAIZ est édité par :
                                 </p>
                                 <ul className="text-slate-600 dark:text-slate-300 list-disc pl-6 space-y-2">
-                                    <li><strong>Raison sociale :</strong> VIMAIZ SARL</li>
-                                    <li><strong>Forme juridique :</strong> Société à Responsabilité Limitée</li>
-                                    <li><strong>Capital social :</strong> 10 000 €</li>
-                                    <li><strong>Siège social :</strong> [Adresse complète]</li>
-                                    <li><strong>SIRET :</strong> [Numéro SIRET]</li>
-                                    <li><strong>RCS :</strong> [Numéro RCS]</li>
+                                    <li><strong>Raison sociale :</strong> VIMAIZ (anciennement Nettolia)</li>
+                                    <li><strong>Forme juridique :</strong> Auto-entrepreneur (Entreprise Individuelle)</li>
+                                    <li><strong>Siège social :</strong> 12 rue porte de la ville, 73330 Le Pont de Beauvoisin, France</li>
+                                    <li><strong>SIRET :</strong> 832 759 294 00032</li>
                                     <li><strong>Email :</strong> contact@vimaiz.com</li>
-                                    <li><strong>Téléphone :</strong> [Numéro de téléphone]</li>
                                 </ul>
                             </section>
 
@@ -91,9 +88,9 @@ export default function LegalNotice() {
                                     Le site est hébergé par :
                                 </p>
                                 <ul className="text-slate-600 dark:text-slate-300 list-disc pl-6 space-y-2">
-                                    <li><strong>Nom de l'hébergeur :</strong> [Nom hébergeur]</li>
-                                    <li><strong>Adresse :</strong> [Adresse hébergeur]</li>
-                                    <li><strong>Site web :</strong> [URL hébergeur]</li>
+                                    <li><strong>Nom de l'hébergeur :</strong> OVHcloud</li>
+                                    <li><strong>Adresse :</strong> 2 rue Kellermann, 59100 Roubaix, France</li>
+                                    <li><strong>Site web :</strong> <a href="https://www.ovhcloud.com/fr/" className="text-sky-600 hover:underline" target="_blank" rel="noopener noreferrer">https://www.ovhcloud.com/fr/</a></li>
                                 </ul>
                             </section>
 

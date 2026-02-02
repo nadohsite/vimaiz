@@ -18,6 +18,7 @@ use App\Http\Controllers\Client\PaymentController as ClientPaymentController;
 use App\Http\Controllers\Client\MissionController as ClientMissionController;
 use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
 use App\Http\Controllers\Agent\MissionController as AgentMissionController;
+use App\Http\Controllers\MissionReturnController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -137,6 +138,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/missions', [ClientMissionController::class, 'index'])->name('missions.index');
         Route::get('/missions/{mission}', [ClientMissionController::class, 'show'])->name('missions.show');
         Route::post('/missions/{mission}/review', [ClientMissionController::class, 'storeReview'])->name('missions.review');
+        
+        // VIMAIZ - Retours mécontentement (Client)
+        Route::post('/missions/{mission}/return-request', [MissionReturnController::class, 'requestReturn'])->name('missions.return-request');
+        Route::post('/missions/{mission}/return-validate', [MissionReturnController::class, 'validateReturn'])->name('missions.return-validate');
 
         // VIMAIZ - Factures (Invoices)
         Route::get('/invoices', [\App\Http\Controllers\Client\InvoiceController::class, 'index'])->name('invoices.index');
@@ -186,6 +191,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // VIMAIZ - Clause RCP
         Route::get('/rcp-acceptance', [\App\Http\Controllers\Agent\RCPAcceptanceController::class, 'index'])->name('rcp-acceptance');
         Route::post('/rcp-acceptance', [\App\Http\Controllers\Agent\RCPAcceptanceController::class, 'store'])->name('rcp-acceptance.store');
+
+        // VIMAIZ - Retours mécontentement (Agent)
+        Route::get('/returns', [MissionReturnController::class, 'agentReturns'])->name('returns.index');
+        Route::post('/missions/{mission}/return-start', [MissionReturnController::class, 'startReturn'])->name('missions.return-start');
+        Route::post('/missions/{mission}/return-complete', [MissionReturnController::class, 'completeReturn'])->name('missions.return-complete');
 
         // Legacy booking routes (keeping for compatibility)
         Route::get('/bookings', [BookingController::class, 'agentBookings'])->name('bookings.index');

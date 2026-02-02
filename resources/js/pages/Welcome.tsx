@@ -538,7 +538,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             </h2>
                             <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">
                                 VIMAIZ est une plateforme innovante qui révolutionne le service de ménage à domicile.
-                                Inspirée du modèle Uber, notre approche centralise tout le processus pour garantir
+                                Notre approche centralise tout le processus pour garantir
                                 une expérience simple et sécurisée.
                             </p>
                             <p className="text-slate-600 dark:text-slate-400 mb-8">
