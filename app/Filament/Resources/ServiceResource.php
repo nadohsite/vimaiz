@@ -20,7 +20,13 @@ class ServiceResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
     
     // Groupe de navigation
-    protected static string|UnitEnum|null $navigationGroup = 'Service Management';
+    protected static string|UnitEnum|null $navigationGroup = 'Gestion des Services';
+
+    protected static ?string $navigationLabel = 'Services';
+
+    protected static ?string $modelLabel = 'Service';
+
+    protected static ?string $pluralModelLabel = 'Services';
 
     /**
      * Formulaire de création / édition

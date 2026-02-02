@@ -211,53 +211,25 @@ export default function Show({ property }: Props) {
                             </Card>
                         </div>
 
-                        {/* Sidebar - Access Info */}
+                        {/* Sidebar - Informations pour l'agent */}
                         <div className="space-y-6">
                             <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 dark:text-white">
                                         <Key className="h-5 w-5 text-sky-500 dark:text-sky-400" />
-                                        Accès
+                                        Informations pour l'agent
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    {property.access_code && (
-                                        <div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Code d'accès</p>
-                                            <p className="font-mono bg-slate-100 dark:bg-slate-700 dark:text-white px-2 py-1 rounded">{property.access_code}</p>
-                                        </div>
-                                    )}
-                                    {property.wifi_code && (
-                                        <div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                                                <Wifi className="h-3 w-3" /> Wi-Fi
-                                            </p>
-                                            <p className="font-mono bg-slate-100 dark:bg-slate-700 dark:text-white px-2 py-1 rounded">{property.wifi_code}</p>
-                                        </div>
-                                    )}
-                                    {property.entry_instructions && (
-                                        <div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Instructions d'entrée</p>
-                                            <p className="text-sm dark:text-slate-300">{property.entry_instructions}</p>
-                                        </div>
-                                    )}
-                                    {property.trash_instructions && (
-                                        <div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                                                <Trash2 className="h-3 w-3" /> Poubelles
-                                            </p>
-                                            <p className="text-sm dark:text-slate-300">{property.trash_instructions}</p>
-                                        </div>
-                                    )}
                                     {property.additional_info && (
                                         <div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Informations</p>
-                                            <p className="text-sm dark:text-slate-300">{property.additional_info}</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Informations supplémentaires</p>
+                                            <p className="text-sm dark:text-slate-300 whitespace-pre-line">{property.additional_info}</p>
                                         </div>
                                     )}
-                                    {!property.access_code && !property.wifi_code && !property.entry_instructions && (
+                                    {!property.additional_info && (
                                         <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-2">
-                                            Aucune information d'accès renseignée
+                                            Aucune information supplémentaire
                                         </p>
                                     )}
                                 </CardContent>

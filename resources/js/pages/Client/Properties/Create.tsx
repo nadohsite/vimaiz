@@ -239,7 +239,7 @@ export default function Create({ propertyTypes }: Props) {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="external_surface">Surface extérieure (m²)</Label>
+                                    <Label htmlFor="external_surface">Surface extérieure en m² (optionnel)</Label>
                                     <Input
                                         id="external_surface"
                                         type="number"
@@ -252,60 +252,21 @@ export default function Create({ propertyTypes }: Props) {
                             </CardContent>
                         </Card>
 
-                        {/* Access & Instructions */}
+                        {/* Informations supplémentaires */}
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="dark:text-white">Accès et instructions</CardTitle>
-                                <CardDescription className="dark:text-slate-400">Informations utiles pour l'agent de ménage</CardDescription>
+                                <CardTitle className="dark:text-white">Informations pour l'agent de ménage</CardTitle>
+                                <CardDescription className="dark:text-slate-400">Optionnel - Ajoutez des informations utiles si nécessaire</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="access_code">Code d'accès</Label>
-                                        <Input
-                                            id="access_code"
-                                            value={data.access_code}
-                                            onChange={(e) => setData('access_code', e.target.value)}
-                                            placeholder="Digicode, interphone..."
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="wifi_code">Code Wi-Fi</Label>
-                                        <Input
-                                            id="wifi_code"
-                                            value={data.wifi_code}
-                                            onChange={(e) => setData('wifi_code', e.target.value)}
-                                        />
-                                    </div>
-                                </div>
+                            <CardContent>
                                 <div className="space-y-2">
-                                    <Label htmlFor="entry_instructions">Instructions d'entrée</Label>
-                                    <Textarea
-                                        id="entry_instructions"
-                                        value={data.entry_instructions}
-                                        onChange={(e) => setData('entry_instructions', e.target.value)}
-                                        placeholder="Comment accéder au logement..."
-                                        rows={3}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="trash_instructions">Instructions poubelles</Label>
-                                    <Textarea
-                                        id="trash_instructions"
-                                        value={data.trash_instructions}
-                                        onChange={(e) => setData('trash_instructions', e.target.value)}
-                                        placeholder="Où sont les poubelles..."
-                                        rows={2}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="additional_info">Informations supplémentaires</Label>
+                                    <Label htmlFor="additional_info">Informations supplémentaires (optionnel)</Label>
                                     <Textarea
                                         id="additional_info"
                                         value={data.additional_info}
                                         onChange={(e) => setData('additional_info', e.target.value)}
-                                        placeholder="Toute autre information utile..."
-                                        rows={3}
+                                        placeholder="Code d'accès, instructions particulières, où trouver les clés, etc."
+                                        rows={4}
                                     />
                                 </div>
                             </CardContent>

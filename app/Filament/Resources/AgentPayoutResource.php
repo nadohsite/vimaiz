@@ -18,7 +18,13 @@ class AgentPayoutResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Finance';
+    protected static string|UnitEnum|null $navigationGroup = 'Finances';
+
+    protected static ?string $navigationLabel = 'Paiements agents';
+
+    protected static ?string $modelLabel = 'Paiement agent';
+
+    protected static ?string $pluralModelLabel = 'Paiements agents';
 
     public static function form(Schema $schema): Schema
     {

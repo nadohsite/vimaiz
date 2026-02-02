@@ -21,7 +21,13 @@ class TransactionResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-currency-dollar';
     
-    protected static string|UnitEnum|null $navigationGroup = 'Finance';
+    protected static string|UnitEnum|null $navigationGroup = 'Finances';
+
+    protected static ?string $navigationLabel = 'Transactions';
+
+    protected static ?string $modelLabel = 'Transaction';
+
+    protected static ?string $pluralModelLabel = 'Transactions';
 
     public static function form(Schema $schema): Schema
     {

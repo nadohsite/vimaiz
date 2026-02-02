@@ -21,7 +21,13 @@ class WalletResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-wallet';
     
-    protected static string|UnitEnum|null $navigationGroup = 'Finance';
+    protected static string|UnitEnum|null $navigationGroup = 'Finances';
+
+    protected static ?string $navigationLabel = 'Portefeuilles';
+
+    protected static ?string $modelLabel = 'Portefeuille';
+
+    protected static ?string $pluralModelLabel = 'Portefeuilles';
 
     public static function form(Schema $schema): Schema
     {

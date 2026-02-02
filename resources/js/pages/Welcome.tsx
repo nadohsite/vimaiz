@@ -452,7 +452,6 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                     'Auto-entrepreneur ou société (SIRET obligatoire)',
                                     'Missions attribuées automatiquement',
                                     'Paiement garanti après chaque intervention',
-                                    'Aucune commission sur vos revenus visibles',
                                 ].map((item, index) => (
                                     <motion.li 
                                         key={item} 

@@ -20,7 +20,13 @@ class ReviewResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
     
     // Groupe de navigation (optionnel)
-    protected static string|UnitEnum|null $navigationGroup = 'Review Management';
+    protected static string|UnitEnum|null $navigationGroup = 'Gestion des Avis';
+
+    protected static ?string $navigationLabel = 'Avis clients';
+
+    protected static ?string $modelLabel = 'Avis';
+
+    protected static ?string $pluralModelLabel = 'Avis';
 
     /**
      * Formulaire de création / édition

@@ -20,7 +20,13 @@ class ServiceCategoryResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
     
     // Groupe de navigation
-    protected static string|UnitEnum|null $navigationGroup = 'Service Management';
+    protected static string|UnitEnum|null $navigationGroup = 'Gestion des Services';
+
+    protected static ?string $navigationLabel = 'Catégories de services';
+
+    protected static ?string $modelLabel = 'Catégorie de service';
+
+    protected static ?string $pluralModelLabel = 'Catégories de services';
 
     /**
      * Formulaire de création / édition

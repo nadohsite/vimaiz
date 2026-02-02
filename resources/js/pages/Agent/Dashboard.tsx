@@ -54,6 +54,9 @@ export default function Dashboard({ stats, pendingMissions, upcomingMissions, re
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Tableau de bord</h1>
                         <p className="text-slate-500 dark:text-slate-400 mt-1">Bienvenue sur votre espace agent VIMAIZ</p>
+                        <p className="text-sm text-slate-400 dark:text-slate-500 mt-2">
+                            💡 VIMAIZ prélève 30% de commission sur chaque intervention pour couvrir les frais de gestion, assurance et mise en relation.
+                        </p>
                     </div>
 
                     {!stats?.is_eligible && (

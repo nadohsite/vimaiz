@@ -20,7 +20,13 @@ class BookingResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-calendar';
     
     // Groupe de navigation
-    protected static string|UnitEnum|null $navigationGroup = 'Booking Management';
+    protected static string|UnitEnum|null $navigationGroup = 'Gestion des Réservations';
+
+    protected static ?string $navigationLabel = 'Réservations';
+
+    protected static ?string $modelLabel = 'Réservation';
+
+    protected static ?string $pluralModelLabel = 'Réservations';
    
     /**
      * Formulaire de création / édition

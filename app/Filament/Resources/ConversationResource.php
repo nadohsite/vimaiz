@@ -23,6 +23,12 @@ class ConversationResource extends Resource
     
     protected static string|UnitEnum|null $navigationGroup = 'Communication';
 
+    protected static ?string $navigationLabel = 'Conversations';
+
+    protected static ?string $modelLabel = 'Conversation';
+
+    protected static ?string $pluralModelLabel = 'Conversations';
+
     public static function form(Schema $schema): Schema
     {
         return $schema
