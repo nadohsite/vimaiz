@@ -181,7 +181,7 @@ export default function Professionals({ success }: Props) {
                             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
                                 Devenez agent de ménage <span className="text-sky-600 dark:text-sky-400">VIMAIZ</span>
                             </h1>
-                            <p className="text-xl text-slate-600 dark:text-slate-300 mb-8">
+                            <p className="text-base text-slate-600 dark:text-slate-300 mb-8">
                                 Travaillez régulièrement avec des clients vérifiés, selon vos disponibilités.
                                 <br />
                                 <strong className="text-slate-900 dark:text-white">Vimaiz vous apporte des missions</strong>, vous restez maître de votre emploi du temps.

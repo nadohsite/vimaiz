@@ -1,4 +1,5 @@
 import { Head, useForm, Link, router } from '@inertiajs/react';
+import axios from 'axios';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,22 +46,14 @@ export default function Create({ properties, minDate, maxDate }: Props) {
         
         setLoadingEstimate(true);
         try {
-            const response = await fetch(route('client.requests.estimate'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: JSON.stringify({
-                    property_id: data.property_id,
-                    scheduled_date: data.scheduled_date,
-                    scheduled_time: data.scheduled_time,
-                    requested_hours: data.requested_hours,
-                }),
+            const response = await axios.post(route('client.requests.estimate'), {
+                property_id: data.property_id,
+                scheduled_date: data.scheduled_date,
+                scheduled_time: data.scheduled_time,
+                requested_hours: data.requested_hours,
             });
-            const result = await response.json();
-            if (result.success) {
-                setEstimate(result.estimate);
+            if (response.data.success) {
+                setEstimate(response.data.estimate);
             }
         } catch (error) {
             console.error('Error fetching estimate:', error);
@@ -256,7 +249,7 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                                             type="button" 
                                             variant="outline"
                                             onClick={fetchEstimate}
-                                            disabled={loadingEstimate}
+                                            disabled={loadingEstimate || !data.property_id || !data.scheduled_date || !data.requested_hours}
                                         >
                                             {loadingEstimate ? 'Calcul...' : 'Estimer'}
                                         </Button>

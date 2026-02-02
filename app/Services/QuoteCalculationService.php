@@ -150,19 +150,30 @@ class QuoteCalculationService
 
     public function getEstimateForProperty(
         Property $property,
-        int $requestedHours,
+        float $requestedHours,
         Carbon $scheduledAt
     ): array {
         if (!$this->pricingRule) {
             throw new \Exception('No active pricing rule found');
         }
         
-        return $this->pricingRule->calculatePrice(
+        $calculation = $this->pricingRule->calculatePrice(
             $property->type,
             $property->surface_area,
-            $requestedHours,
+            (int) $requestedHours,
             $scheduledAt,
             $property->postal_code
         );
+        
+        // Retourner une fourchette de prix (±10%)
+        $price = $calculation['estimated_price'];
+        $margin = round($price * 0.10, 2);
+        
+        return [
+            'min' => round($price - $margin, 2),
+            'max' => round($price + $margin, 2),
+            'estimated_price' => $price,
+            'details' => $calculation,
+        ];
     }
 }

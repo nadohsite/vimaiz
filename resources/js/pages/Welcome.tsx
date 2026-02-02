@@ -151,7 +151,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                 <span className="block text-primary">VIMAIZ s'occupe du reste.</span>
                             </h1>
 
-                            <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-xl">
+                            <p className="text-base text-slate-600 dark:text-slate-300 mb-8 max-w-xl">
                                 Confiez votre maison, villa ou chalet à des professionnels qualifiés.
                                 Nous orchestrons tout : devis, paiement sécurisé et intervention.
                             </p>
