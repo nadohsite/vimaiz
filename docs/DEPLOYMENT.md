@@ -827,6 +827,27 @@ tail -f /var/log/php8.2-fpm.log
 
 ---
 
+
+<!-- ```bash
+cd /var/www/vimaiz
+git fetch origin main
+git reset --hard origin/main
+composer install --no-dev --optimize-autoloader
+npm ci && npm run build
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+php artisan optimize:clear
+php artisan filament:cache-components
+php artisan optimize
+
+sudo chown -R www-data:www-data /var/www/vimaiz
+sudo chmod -R 775 storage bootstrap/cache
+sudo supervisorctl restart vimaiz-worker:*
+``` -->
+
 **Document créé le** : Janvier 2026  
 **Application** : VIMAIZ  
 **Domaine** : vimaiz.com

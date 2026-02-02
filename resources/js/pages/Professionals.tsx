@@ -103,7 +103,7 @@ export default function Professionals({ success }: Props) {
     const faqs = [
         {
             question: 'Quelles sont les conditions pour devenir agent ?',
-            answer: 'Vous devez être majeur, avoir une pièce d\'identité valide, et être motivé pour offrir un service de qualité. Aucune expérience préalable n\'est requise.',
+            answer: 'Être majeur, disposer d\'un numéro SIRET (auto-entrepreneur ou société) et être autonome dans ses déplacements.',
         },
         {
             question: 'Comment suis-je payé ?',
@@ -182,8 +182,9 @@ export default function Professionals({ success }: Props) {
                                 Devenez agent de ménage <span className="text-sky-600 dark:text-sky-400">VIMAIZ</span>
                             </h1>
                             <p className="text-xl text-slate-600 dark:text-slate-300 mb-8">
-                                Gagnez jusqu'à <strong className="text-slate-900 dark:text-white">4000 €/mois</strong> en travaillant à votre rythme. 
-                                Choisissez vos missions, fixez vos horaires.
+                                Travaillez régulièrement avec des clients vérifiés, selon vos disponibilités.
+                                <br />
+                                <strong className="text-slate-900 dark:text-white">Vimaiz vous apporte des missions</strong>, vous restez maître de votre emploi du temps.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Link href={route('register') + '?role=agent'}>
@@ -212,8 +213,8 @@ export default function Professionals({ success }: Props) {
                         <div className="relative">
                             <div className="bg-gradient-to-br from-sky-500 to-cyan-500 rounded-3xl p-8 text-white shadow-2xl">
                                 <div className="text-center">
-                                    <div className="text-6xl font-bold mb-2">25€</div>
-                                    <div className="text-xl opacity-90">par heure en moyenne</div>
+                                    <div className="text-3xl font-bold mb-2">Rémunération par mission (€)</div>
+                                    <div className="text-base opacity-90">Le montant dépend du type de logement, de la surface et de la prestation.</div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 mt-8">
                                     <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
