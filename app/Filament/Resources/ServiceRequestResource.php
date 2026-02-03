@@ -48,12 +48,14 @@ class ServiceRequestResource extends Resource
                         Forms\Components\Select::make('client_id')
                             ->label('Client')
                             ->relationship('client', 'name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? $record->email ?? "Client #{$record->id}")
                             ->searchable()
                             ->preload()
                             ->required(),
                         Forms\Components\Select::make('property_id')
                             ->label('Logement')
                             ->relationship('property', 'name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? "Logement #{$record->id}")
                             ->searchable()
                             ->preload()
                             ->required(),
