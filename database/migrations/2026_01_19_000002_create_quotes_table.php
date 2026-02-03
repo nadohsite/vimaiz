@@ -35,7 +35,8 @@ return new class extends Migration
                 'sent',         // Envoyé au client
                 'accepted',     // Accepté par le client
                 'refused',      // Refusé par le client
-                'expired'       // Expiré
+                'expired',      // Expiré
+                'paid'          // Payé
             ])->default('draft');
             
             // Admin who validated
