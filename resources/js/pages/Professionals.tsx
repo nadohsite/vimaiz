@@ -33,8 +33,8 @@ export default function Professionals({ success }: Props) {
         },
         {
             icon: Euro,
-            title: 'Revenus attractifs',
-            description: 'Jusqu\'à 25€/h net. Paiement rapide et sécurisé.',
+            title: 'Revenus liés à votre activité',
+            description: 'Vos revenus dépendent du nombre et du type de missions que vous réalisez.',
         },
         {
             icon: Shield,
@@ -240,7 +240,8 @@ export default function Professionals({ success }: Props) {
                             Pourquoi rejoindre VIMAIZ ?
                         </h2>
                         <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                            Des avantages concrets pour vous simplifier la vie
+                            {/* Des avantages concrets pour vous simplifier la vie */}
+                            Une organisation simple pour vous concentrer sur votre travail
                         </p>
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
