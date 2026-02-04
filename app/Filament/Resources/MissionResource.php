@@ -49,10 +49,12 @@ class MissionResource extends Resource
                         Forms\Components\Select::make('client_id')
                             ->label('Client')
                             ->relationship('client', 'name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? $record->email ?? "Client #{$record->id}")
                             ->disabled(),
                         Forms\Components\Select::make('agent_id')
                             ->label('Agent')
                             ->relationship('agent', 'name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? $record->email ?? "Agent #{$record->id}")
                             ->searchable()
                             ->preload(),
                     ])->columns(3),
@@ -62,6 +64,7 @@ class MissionResource extends Resource
                         Forms\Components\Select::make('property_id')
                             ->label('Logement')
                             ->relationship('property', 'name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? "Logement #{$record->id}")
                             ->disabled(),
                     ]),
 

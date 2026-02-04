@@ -19,7 +19,7 @@ class ConversationController extends Controller
                 $q->where('client_id', $user->id)
                   ->orWhere('agent_id', $user->id);
             })
-            ->with(['client:id,name,email', 'agent:id,name,email', 'booking:id,check_in,check_out'])
+            ->with(['client:id,name,email', 'agent:id,name,email', 'booking:id,scheduled_at,status'])
             ->withCount(['messages as unread_count' => function ($q) use ($user) {
                 $q->where('sender_id', '!=', $user->id)
                   ->where('is_read', false);

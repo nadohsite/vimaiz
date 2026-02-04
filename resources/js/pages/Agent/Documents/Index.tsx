@@ -1,4 +1,4 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,7 +80,12 @@ export default function DocumentsIndex({ agentProfile, documents, verificationSt
     const [uploading, setUploading] = useState<string | null>(null);
     const [deleteType, setDeleteType] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
     const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+    
+    const { props } = usePage<{ flash?: { success?: string; error?: string }; errors?: Record<string, string> }>();
+    const flash = props.flash;
+    const errors = props.errors;
 
     const documentsList = Object.values(documents);
     const uploadedCount = documentsList.filter(d => d.uploaded).length;
@@ -94,6 +99,17 @@ export default function DocumentsIndex({ agentProfile, documents, verificationSt
         const file = event.target.files?.[0];
         if (!file) return;
 
+        // Validation côté client
+        const maxSizeBytes = (documents[type]?.maxSize || 5120) * 1024; // Convert KB to bytes
+        if (file.size > maxSizeBytes) {
+            setUploadError(`Le fichier "${file.name}" dépasse la taille maximale de ${(documents[type]?.maxSize || 5120) / 1024} Mo.`);
+            if (fileInputRefs.current[type]) {
+                fileInputRefs.current[type]!.value = '';
+            }
+            return;
+        }
+
+        setUploadError(null);
         setUploading(type);
 
         const formData = new FormData();
@@ -106,6 +122,10 @@ export default function DocumentsIndex({ agentProfile, documents, verificationSt
                 if (fileInputRefs.current[type]) {
                     fileInputRefs.current[type]!.value = '';
                 }
+            },
+            onError: (errors) => {
+                const errorMessage = errors.document || 'Une erreur est survenue lors du téléchargement.';
+                setUploadError(errorMessage);
             },
         });
     };
@@ -138,6 +158,38 @@ export default function DocumentsIndex({ agentProfile, documents, verificationSt
                             Téléchargez vos documents pour la vérification de votre profil
                         </p>
                     </div>
+
+                    {/* Flash Messages & Errors */}
+                    {(flash?.error || flash?.success || uploadError || (errors && Object.keys(errors).length > 0)) && (
+                        <div className="mb-6 space-y-3">
+                            {flash?.success && (
+                                <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-3">
+                                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                    <p className="text-green-800 dark:text-green-300">{flash.success}</p>
+                                </div>
+                            )}
+                            {(flash?.error || uploadError) && (
+                                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-3">
+                                    <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                                    <p className="text-red-800 dark:text-red-300">{flash?.error || uploadError}</p>
+                                    {uploadError && (
+                                        <button 
+                                            onClick={() => setUploadError(null)} 
+                                            className="ml-auto text-red-500 hover:text-red-700"
+                                        >
+                                            ✕
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                            {errors && Object.entries(errors).map(([key, message]) => (
+                                <div key={key} className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-3">
+                                    <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                                    <p className="text-red-800 dark:text-red-300">{message}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Status Card */}
                     <Card className="mb-8 dark:bg-slate-800 dark:border-slate-700">
