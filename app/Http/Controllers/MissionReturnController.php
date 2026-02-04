@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mission;
+use App\Models\User;
+use App\Notifications\ReturnRequestedNotification;
+use App\Notifications\ReturnCompletedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -35,7 +38,11 @@ class MissionReturnController extends Controller
             'return_requested_at' => now(),
         ]);
 
-        // TODO: Envoyer notification à l'agent
+        // Notify admins of return request
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new ReturnRequestedNotification($mission));
+        }
 
         return back()->with('success', 'Votre demande de retour a été envoyée à l\'agent.');
     }
@@ -86,7 +93,11 @@ class MissionReturnController extends Controller
             'return_agent_notes' => $validated['notes'] ?? null,
         ]);
 
-        // TODO: Envoyer notification au client pour validation
+        // Notify admins that return is completed
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new ReturnCompletedNotification($mission));
+        }
 
         return back()->with('success', 'Le retour a été marqué comme terminé. En attente de validation client.');
     }

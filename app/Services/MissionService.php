@@ -7,10 +7,14 @@ use App\Models\Mission;
 use App\Models\MissionPhoto;
 use App\Models\Quote;
 use App\Models\ServiceRequest;
+use App\Models\User;
 use App\Notifications\AgentAcceptedMissionNotification;
+use App\Notifications\AgentAcceptedMissionAdminNotification;
 use App\Notifications\AgentPayoutNotification;
+use App\Notifications\AgentRefusedMissionNotification;
 use App\Notifications\MissionAssignedNotification;
 use App\Notifications\MissionCompletedNotification;
+use App\Notifications\MissionCompletedAdminNotification;
 use App\Notifications\MissionStartedNotification;
 use App\Notifications\PaymentReceivedNotification;
 use Illuminate\Http\UploadedFile;
@@ -109,11 +113,19 @@ class MissionService
         // Notify client that agent accepted
         $mission->client->notify(new AgentAcceptedMissionNotification($mission));
         
+        // Notify admins
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new AgentAcceptedMissionAdminNotification($mission));
+        }
+        
         return $mission->fresh();
     }
 
     public function agentRefuseMission(Mission $mission, string $reason = null): Mission
     {
+        $agentName = $mission->agent?->name;
+        
         $mission->update([
             'status' => Mission::STATUS_AGENT_REFUSED,
             'agent_responded_at' => now(),
@@ -124,11 +136,13 @@ class MissionService
             $mission->agent->agentProfile->incrementMissionsRefused();
         }
         
-        $newAgent = $this->assignmentService->reassignMission($mission);
-        
-        if (!$newAgent) {
-            // TODO: Notify admin that no agent is available
+        // Notify admins that agent refused
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new AgentRefusedMissionNotification($mission, $reason));
         }
+        
+        $newAgent = $this->assignmentService->reassignMission($mission);
         
         return $mission->fresh();
     }
@@ -218,6 +232,12 @@ class MissionService
         
         // Notify client that mission is completed
         $mission->client->notify(new MissionCompletedNotification($mission));
+        
+        // Notify admins that mission is completed
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new MissionCompletedAdminNotification($mission));
+        }
         
         return $mission->fresh();
     }

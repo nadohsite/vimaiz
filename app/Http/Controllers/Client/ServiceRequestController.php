@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\StoreServiceRequestRequest;
 use App\Models\Property;
 use App\Models\ServiceRequest;
+use App\Models\User;
+use App\Notifications\NewServiceRequestNotification;
 use App\Services\QuoteCalculationService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -68,6 +70,12 @@ class ServiceRequestController extends Controller
             'special_instructions' => $data['special_instructions'] ?? null,
             'status' => ServiceRequest::STATUS_PENDING,
         ]);
+
+        // Notify admins of new service request
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewServiceRequestNotification($serviceRequest));
+        }
 
         return redirect()
             ->route('client.requests.show', $serviceRequest)
