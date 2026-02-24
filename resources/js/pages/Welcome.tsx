@@ -596,7 +596,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
             {/* FOOTER */}
             <footer className="bg-slate-900 text-white py-16">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="grid md:grid-cols-4 gap-8 mb-12">
+                    <div className="grid md:grid-cols-5 gap-8 mb-12">
                         <div>
                             <div className="mb-4">
                                 <img src={logoImage} alt="VIMAIZ" className="h-18 object-contain" />
