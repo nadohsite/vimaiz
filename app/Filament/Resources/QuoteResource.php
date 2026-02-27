@@ -100,7 +100,7 @@ class QuoteResource extends Resource
                             ->label('Taux commission')
                             ->numeric()
                             ->suffix('%')
-                            ->default(20),
+                            ->default(25),
                         Forms\Components\TextInput::make('commission_amount')
                             ->label('Montant commission')
                             ->numeric()

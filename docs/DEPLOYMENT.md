@@ -848,6 +848,13 @@ sudo chmod -R 775 storage bootstrap/cache
 sudo supervisorctl restart vimaiz-worker:*
 ``` -->
 
+<!-- 
+cd /var/www/vimaiz
+git pull origin main
+php artisan migrate
+php artisan cache:clear
+php artisan config:clear -->
+
 **Document créé le** : Janvier 2026  
 **Application** : VIMAIZ  
 **Domaine** : vimaiz.com

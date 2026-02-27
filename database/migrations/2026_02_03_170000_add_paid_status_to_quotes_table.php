@@ -9,11 +9,14 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * 
+     * Note: 'paid' status already exists in the original quotes table migration.
+     * This migration is kept for compatibility but performs no action.
      */
     public function up(): void
     {
-        // MySQL requires raw SQL to modify ENUM
-        DB::statement("ALTER TABLE quotes MODIFY COLUMN status ENUM('draft', 'sent', 'accepted', 'refused', 'expired', 'paid') DEFAULT 'draft'");
+        // 'paid' status already exists in original migration (2026_01_19_000002_create_quotes_table.php)
+        // No action needed
     }
 
     /**
@@ -21,7 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Revert back to original ENUM (only if no 'paid' status exists)
-        DB::statement("ALTER TABLE quotes MODIFY COLUMN status ENUM('draft', 'sent', 'accepted', 'refused', 'expired') DEFAULT 'draft'");
+        // No action needed
     }
 };

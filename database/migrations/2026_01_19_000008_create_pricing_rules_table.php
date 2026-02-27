@@ -41,7 +41,7 @@ return new class extends Migration
             $table->decimal('minimum_price', 8, 2)->default(50.00);
             
             // Commission
-            $table->decimal('platform_commission_rate', 5, 2)->default(20.00); // %
+            $table->decimal('platform_commission_rate', 5, 2)->default(25.00); // %
             
             // Active status
             $table->boolean('is_active')->default(true);
@@ -63,7 +63,7 @@ return new class extends Migration
             'evening_multiplier' => 1.10,
             'minimum_hours' => 2,
             'minimum_price' => 50.00,
-            'platform_commission_rate' => 20.00,
+            'platform_commission_rate' => 25.00,
             'is_active' => true,
             'created_at' => now(),
             'updated_at' => now(),
