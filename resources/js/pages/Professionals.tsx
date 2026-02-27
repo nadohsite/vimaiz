@@ -384,11 +384,11 @@ export default function Professionals({ success }: Props) {
             {/* FOOTER - Same as Welcome */}
             <footer className="bg-slate-900 text-white py-16 mt-auto">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="grid md:grid-cols-5 gap-8 mb-12">
+                    <div className="grid md:grid-cols-5 gap-8 mb-12 items-start">
                         <div>
-                            <div className="mb-4">
-                                <img src={logoImage} alt="VIMAIZ" className="h-18 object-contain" />
-                            </div>
+                            <h4 className="font-semibold mb-4">
+                                <img src={logoImage} alt="VIMAIZ" className="h-6 object-contain" />
+                            </h4>
                             <p className="text-slate-400 text-sm">
                                 Planifiez votre ménage.<br />
                                 VIMAIZ s'occupe du reste.
