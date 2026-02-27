@@ -852,6 +852,7 @@ sudo supervisorctl restart vimaiz-worker:*
 cd /var/www/vimaiz
 git pull origin main
 php artisan migrate
+npm run build
 php artisan cache:clear
 php artisan config:clear -->
 

@@ -234,7 +234,7 @@ export default function Privacy() {
                     <div className="grid md:grid-cols-5 gap-8 mb-12 items-start">
                         <div>
                             <h4 className="font-semibold mb-4">
-                                <img src={logoImage} alt="VIMAIZ" className="h-6 object-contain" />
+                                <img src={logoImage} alt="VIMAIZ" className="h-8 object-contain" />
                             </h4>
                             <p className="text-slate-400 text-sm">
                                 Planifiez votre ménage.<br />
