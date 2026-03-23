@@ -78,7 +78,7 @@ export default function LegalNotice() {
                             <section>
                                 <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">2. Directeur de la publication</h2>
                                 <p className="text-slate-600 dark:text-slate-300">
-                                    Le directeur de la publication est : [Nom du gérant]
+                                    Le directeur de la publication est : Jean Bernard Stephane Mbarga Bilounga
                                 </p>
                             </section>
 
