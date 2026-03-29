@@ -11,6 +11,7 @@ class PricingRule extends Model
 
     protected $fillable = [
         'base_hourly_rate',
+        'appartement_multiplier',
         'maison_multiplier',
         'villa_multiplier',
         'chalet_multiplier',
@@ -29,6 +30,7 @@ class PricingRule extends Model
 
     protected $casts = [
         'base_hourly_rate' => 'decimal:2',
+        'appartement_multiplier' => 'decimal:2',
         'maison_multiplier' => 'decimal:2',
         'villa_multiplier' => 'decimal:2',
         'chalet_multiplier' => 'decimal:2',
@@ -51,6 +53,7 @@ class PricingRule extends Model
     public function getPropertyTypeMultiplier(string $type): float
     {
         return match($type) {
+            'appartement' => $this->appartement_multiplier ?? 1.00,
             'maison' => $this->maison_multiplier,
             'villa' => $this->villa_multiplier,
             'chalet' => $this->chalet_multiplier,

@@ -152,7 +152,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             </h1>
 
                             <p className="text-base text-slate-600 dark:text-slate-300 mb-8 max-w-xl">
-                                Confiez votre maison, villa ou chalet à des professionnels qualifiés.
+                                Confiez votre appartement, maison, villa ou chalet à des professionnels qualifiés.
                                 Nous orchestrons tout : devis, paiement sécurisé et intervention.
                             </p>
 
@@ -209,7 +209,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                         </div>
                                         <div>
                                             <p className="text-sm font-medium dark:text-white">Type de logement</p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400">Maison, Villa, Chalet</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Appartement, Maison, Villa, Chalet</p>
                                         </div>
                                     </motion.div>
                                     <motion.div 
@@ -298,7 +298,7 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                     step: '1',
                                     icon: Home,
                                     title: 'Ajoutez votre logement',
-                                    description: 'Renseignez les détails de votre maison, villa ou chalet',
+                                    description: 'Renseignez les détails de votre appartement, maison, villa ou chalet',
                                 },
                                 {
                                     step: '2',
@@ -365,8 +365,13 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {[
+                            {
+                                title: 'Appartement',
+                                description: 'Studios, T1, T2 et plus — tous types d\'appartements',
+                                features: ['Petites surfaces', 'Grands appartements', 'Résidences'],
+                            },
                             {
                                 title: 'Maison',
                                 description: 'Entretien complet de votre maison individuelle',

@@ -36,7 +36,7 @@
         <p>- Les documents doivent être en cours de validité</p>
     </div>
     
-    <p>Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:support@vimaiz.fr">support@vimaiz.fr</a>.</p>
+    <p>Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>.</p>
     
     <p>L'équipe VIMAIZ</p>
 @endsection

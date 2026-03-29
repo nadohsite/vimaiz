@@ -36,7 +36,7 @@
     
     <h2 style="margin-top: 30px;">Que faire ?</h2>
     
-    <p>Si vous pensez que cette suspension est injustifiée, vous pouvez faire appel en nous contactant à <a href="mailto:support@vimaiz.fr">support@vimaiz.fr</a>.</p>
+    <p>Si vous pensez que cette suspension est injustifiée, vous pouvez faire appel en nous contactant à <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>.</p>
     
     <p>Votre compte sera automatiquement réactivé le <strong>{{ $suspendedUntil->format('d/m/Y à H:i') }}</strong>.</p>
     

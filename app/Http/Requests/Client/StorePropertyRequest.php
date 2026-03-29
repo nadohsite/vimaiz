@@ -43,7 +43,7 @@ class StorePropertyRequest extends FormRequest
     {
         return [
             'type.required' => 'Le type de logement est obligatoire.',
-            'type.in' => 'Le type de logement doit être maison, villa ou chalet.',
+            'type.in' => 'Le type de logement doit être appartement, maison, villa ou chalet.',
             'address_line1.required' => 'L\'adresse est obligatoire.',
             'city.required' => 'La ville est obligatoire.',
             'postal_code.required' => 'Le code postal est obligatoire.',

@@ -30,7 +30,7 @@
         <li>Nous contacter si vous pensez qu'il y a eu une erreur</li>
     </ul>
     
-    <p>Si vous avez des questions ou souhaitez contester cet avertissement, contactez-nous à <a href="mailto:support@vimaiz.fr">support@vimaiz.fr</a>.</p>
+    <p>Si vous avez des questions ou souhaitez contester cet avertissement, contactez-nous à <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>.</p>
     
     <p>L'équipe VIMAIZ</p>
 @endsection

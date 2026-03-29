@@ -109,7 +109,7 @@ class ViewAgentDocuments extends Page
             'siret_document' => [
                 'label' => 'Document SIRET',
                 'icon' => 'heroicon-o-document-text',
-                'required' => $this->record->agent_type === 'company',
+                'required' => true,
             ],
             'driving_license_document' => [
                 'label' => 'Permis de conduire',

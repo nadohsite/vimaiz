@@ -12,11 +12,13 @@ class Property extends Model
 {
     use HasFactory, SoftDeletes;
 
+    const TYPE_APPARTEMENT = 'appartement';
     const TYPE_MAISON = 'maison';
     const TYPE_VILLA = 'villa';
     const TYPE_CHALET = 'chalet';
 
     const TYPES = [
+        self::TYPE_APPARTEMENT => 'Appartement',
         self::TYPE_MAISON => 'Maison',
         self::TYPE_VILLA => 'Villa',
         self::TYPE_CHALET => 'Chalet',

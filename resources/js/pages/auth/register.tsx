@@ -314,7 +314,7 @@ export default function Register() {
                   <div className="space-y-3">
                     <Label className="text-sm font-semibold text-slate-700">Types de biens supportés</Label>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                      {['maison', 'villa', 'chalet'].map((type) => (
+                      {['appartement', 'maison', 'villa', 'chalet'].map((type) => (
                         <div key={type} className="flex items-center gap-2">
                           <Checkbox 
                             id={`property-${type}`}
