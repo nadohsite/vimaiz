@@ -26,7 +26,7 @@ class StoreServiceRequestRequest extends FormRequest
             ],
             'scheduled_date' => ['required', 'date', 'after:today'],
             'scheduled_time' => ['required', 'date_format:H:i'],
-            'requested_hours' => ['required', 'numeric', 'min:2', 'max:12'],
+            'requested_hours' => ['required', 'numeric', 'min:1', 'max:12'],
             'special_instructions' => ['nullable', 'string', 'max:2000'],
         ];
     }
@@ -41,7 +41,7 @@ class StoreServiceRequestRequest extends FormRequest
             'scheduled_time.required' => 'L\'heure est obligatoire.',
             'scheduled_time.date_format' => 'Le format de l\'heure est invalide.',
             'requested_hours.required' => 'La durée est obligatoire.',
-            'requested_hours.min' => 'La durée minimum est de 2 heures.',
+            'requested_hours.min' => 'La durée minimum est de 1 heure.',
             'requested_hours.max' => 'La durée maximum est de 12 heures.',
         ];
     }

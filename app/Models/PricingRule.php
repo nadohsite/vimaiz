@@ -99,7 +99,7 @@ class PricingRule extends Model
         \DateTime $scheduledAt,
         string $postalCode
     ): array {
-        $hours = max($hours, $this->minimum_hours);
+        $hours = max($hours, 1);
         
         $basePrice = $this->base_hourly_rate * $hours;
         

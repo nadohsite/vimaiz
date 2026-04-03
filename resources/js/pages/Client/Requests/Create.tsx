@@ -22,14 +22,15 @@ interface Props {
     properties: Property[];
     minDate: string;
     maxDate: string;
+    selectedPropertyId?: string | null;
 }
 
-export default function Create({ properties, minDate, maxDate }: Props) {
+export default function Create({ properties, minDate, maxDate, selectedPropertyId }: Props) {
     const [estimate, setEstimate] = useState<{ min: number; max: number } | null>(null);
     const [loadingEstimate, setLoadingEstimate] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
-        property_id: '',
+        property_id: selectedPropertyId ? String(selectedPropertyId) : '',
         scheduled_date: '',
         scheduled_time: '09:00',
         requested_hours: '3',
@@ -188,9 +189,9 @@ export default function Create({ properties, minDate, maxDate }: Props) {
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {[2, 3, 4, 5, 6, 7, 8, 10, 12].map((hours) => (
+                                            {[1, 2, 3, 4, 5, 6, 7, 8, 10, 12].map((hours) => (
                                                 <SelectItem key={hours} value={String(hours)}>
-                                                    {hours} heures
+                                                    {hours} {hours === 1 ? 'heure' : 'heures'}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>

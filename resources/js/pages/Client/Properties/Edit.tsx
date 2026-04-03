@@ -88,6 +88,18 @@ export default function Edit({ property, propertyTypes }: Props) {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Global error banner */}
+                        {Object.keys(errors).length > 0 && (
+                            <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-4">
+                                <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-2">Veuillez corriger les erreurs suivantes :</p>
+                                <ul className="list-disc list-inside space-y-1">
+                                    {Object.values(errors).map((error, i) => (
+                                        <li key={i} className="text-sm text-red-600 dark:text-red-400">{error}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
                         {/* Status */}
                         <Card>
                             <CardHeader>
@@ -235,9 +247,11 @@ export default function Edit({ property, propertyTypes }: Props) {
                                             id="bedrooms"
                                             type="number"
                                             min="0"
+                                            max="50"
                                             value={data.bedrooms}
                                             onChange={(e) => setData('bedrooms', e.target.value)}
                                         />
+                                        {errors.bedrooms && <p className="text-sm text-red-500">{errors.bedrooms}</p>}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="bathrooms">Salles de bain</Label>
@@ -245,9 +259,11 @@ export default function Edit({ property, propertyTypes }: Props) {
                                             id="bathrooms"
                                             type="number"
                                             min="0"
+                                            max="20"
                                             value={data.bathrooms}
                                             onChange={(e) => setData('bathrooms', e.target.value)}
                                         />
+                                        {errors.bathrooms && <p className="text-sm text-red-500">{errors.bathrooms}</p>}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="toilets">Toilettes</Label>
@@ -255,9 +271,11 @@ export default function Edit({ property, propertyTypes }: Props) {
                                             id="toilets"
                                             type="number"
                                             min="0"
+                                            max="20"
                                             value={data.toilets}
                                             onChange={(e) => setData('toilets', e.target.value)}
                                         />
+                                        {errors.toilets && <p className="text-sm text-red-500">{errors.toilets}</p>}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="other_rooms">Autres pièces</Label>
@@ -265,9 +283,11 @@ export default function Edit({ property, propertyTypes }: Props) {
                                             id="other_rooms"
                                             type="number"
                                             min="0"
+                                            max="50"
                                             value={data.other_rooms}
                                             onChange={(e) => setData('other_rooms', e.target.value)}
                                         />
+                                        {errors.other_rooms && <p className="text-sm text-red-500">{errors.other_rooms}</p>}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="floors">Étages</Label>
@@ -275,9 +295,11 @@ export default function Edit({ property, propertyTypes }: Props) {
                                             id="floors"
                                             type="number"
                                             min="0"
+                                            max="10"
                                             value={data.floors}
                                             onChange={(e) => setData('floors', e.target.value)}
                                         />
+                                        {errors.floors && <p className="text-sm text-red-500">{errors.floors}</p>}
                                     </div>
                                 </div>
                                 <div className="space-y-2">

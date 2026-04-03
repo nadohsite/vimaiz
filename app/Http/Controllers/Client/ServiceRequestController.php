@@ -54,6 +54,7 @@ class ServiceRequestController extends Controller
             'properties' => $properties,
             'minDate' => now()->addDay()->format('Y-m-d'),
             'maxDate' => now()->addMonths(3)->format('Y-m-d'),
+            'selectedPropertyId' => request()->query('property_id'),
         ]);
     }
 
@@ -125,7 +126,7 @@ class ServiceRequestController extends Controller
             'property_id' => ['required', 'exists:properties,id'],
             'scheduled_date' => ['required', 'date'],
             'scheduled_time' => ['required', 'date_format:H:i'],
-            'requested_hours' => ['required', 'numeric', 'min:2', 'max:12'],
+            'requested_hours' => ['required', 'numeric', 'min:1', 'max:12'],
         ]);
 
         $property = Property::findOrFail($validated['property_id']);
