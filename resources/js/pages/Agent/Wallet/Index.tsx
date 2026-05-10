@@ -210,7 +210,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                             <DialogTrigger asChild>
                                 <Button 
                                     className="bg-sky-600 hover:bg-sky-700"
-                                    disabled={wallet.balance < 100}
+                                    disabled={wallet.balance < 1}
                                 >
                                     <Banknote className="mr-2 h-4 w-4" />
                                     Demander un retrait
@@ -220,7 +220,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                 <DialogHeader>
                                     <DialogTitle>Demander un retrait</DialogTitle>
                                     <DialogDescription>
-                                        Solde disponible : {Number(wallet.balance).toFixed(2)} € (minimum 100 €)
+                                        Solde disponible : {Number(wallet.balance).toFixed(2)} €
                                     </DialogDescription>
                                 </DialogHeader>
                                 <form onSubmit={handleWithdraw}>
@@ -230,10 +230,10 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                             <Input
                                                 id="amount"
                                                 type="number"
-                                                min="100"
+                                                min="1"
                                                 max={wallet.balance}
                                                 step="0.01"
-                                                placeholder="100.00"
+                                                placeholder="1.00"
                                                 value={data.amount}
                                                 onChange={(e) => setData('amount', e.target.value)}
                                             />
