@@ -75,6 +75,7 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
     const [uploading, setUploading] = useState(false);
     const [photoType, setPhotoType] = useState<'before' | 'after'>('before');
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const cameraInputRef = useRef<HTMLInputElement>(null);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
@@ -151,6 +152,7 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
         }
         setUploading(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
+        if (cameraInputRef.current) cameraInputRef.current.value = '';
     };
 
     const handleDeletePhoto = async (photoId: number) => {
@@ -266,23 +268,44 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                             </Button>
                                         </div>
                                         
+                                        {/* Input pour galerie (sans capture) */}
                                         <input
                                             ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handlePhotoUpload}
+                                            className="hidden"
+                                        />
+                                        {/* Input pour caméra (avec capture) */}
+                                        <input
+                                            ref={cameraInputRef}
                                             type="file"
                                             accept="image/*"
                                             capture="environment"
                                             onChange={handlePhotoUpload}
                                             className="hidden"
                                         />
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => fileInputRef.current?.click()}
-                                            disabled={uploading}
-                                            className="w-full"
-                                        >
-                                            <Upload className="h-4 w-4 mr-2" />
-                                            {uploading ? 'Envoi...' : `Ajouter une photo ${photoType === 'before' ? 'AVANT' : 'APRÈS'}`}
-                                        </Button>
+                                        
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => cameraInputRef.current?.click()}
+                                                disabled={uploading}
+                                                className="w-full"
+                                            >
+                                                <Camera className="h-4 w-4 mr-2" />
+                                                {uploading ? 'Envoi...' : 'Prendre photo'}
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                disabled={uploading}
+                                                className="w-full"
+                                            >
+                                                <Upload className="h-4 w-4 mr-2" />
+                                                {uploading ? 'Envoi...' : 'Galerie'}
+                                            </Button>
+                                        </div>
                                     </CardContent>
                                 </Card>
                             )}
