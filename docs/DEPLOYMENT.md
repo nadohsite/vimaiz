@@ -686,6 +686,118 @@ Rendre exécutable :
 chmod +x /var/www/vimaiz.com/deploy.sh
 ```
 
+<!-- 
+# Sur le serveur de production
+cd /var/www/vimaiz
+
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+php artisan route:clear
+
+# Reconstruire les caches
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+
+# Redémarrer les queues
+sudo supervisorctl restart vimaiz-worker:* -->
+
+
+
+
+
+
+
+<!-- 
+# 1. Aller dans le dossier
+cd /var/www/vimaiz
+
+# 2. Récupérer les modifications
+git pull origin main
+
+# 3. Supprimer TOUS les fichiers de cache
+rm -rf bootstrap/cache/*.php
+rm -rf storage/framework/cache/*
+rm -rf storage/framework/sessions/*
+rm -rf storage/framework/views/*
+
+# 4. Vider tous les caches Laravel
+php artisan optimize:clear
+
+# 5. Reconstruire les caches avec les BONS chemins
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# 6. Permissions
+sudo chown -R www-data:www-data storage bootstrap/cache
+sudo chmod -R 775 storage bootstrap/cache
+
+# 7. Redémarrer les services
+sudo systemctl restart php8.2-fpm
+sudo systemctl restart nginx
+
+# 8. Vérifier que les chemins sont corrects
+head -5 bootstrap/cache/config.php
+# Devrait afficher /var/www/vimaiz/ et PAS /Volumes/Robert/ -->
+
+
+
+
+
+<!-- 
+
+Pour corriger le problème de toekn expiré sur le serveur
+
+# 1. Aller dans le dossier
+cd /var/www/vimaiz
+
+# 2. Récupérer les modifications
+git pull origin main
+
+# 3. Supprimer TOUS les fichiers de cache
+rm -rf bootstrap/cache/*.php
+rm -rf storage/framework/cache/*
+rm -rf storage/framework/sessions/*
+rm -rf storage/framework/views/*
+
+# 4. Vider tous les caches Laravel
+php artisan optimize:clear
+
+# 5.  Vider les caches Laravel
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan event:clear
+
+# 5.1. Reconstruire les caches avec les bons chemins
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+
+# 5.2. Optimiser pour la production
+php artisan optimize
+
+# 6. Permissions
+sudo chown -R www-data:www-data storage bootstrap/cache
+sudo chmod -R 775 storage bootstrap/cache
+
+# 7. Redémarrer les services
+sudo systemctl restart php8.2-fpm
+sudo systemctl restart nginx
+
+# 8. Vérifier que les chemins sont corrects
+head -5 bootstrap/cache/config.php
+# Devrait afficher /var/www/vimaiz/ et PAS /Volumes/Robert/ -->
+
+
+
+
+
 ### 13.2 Utilisation
 
 Pour déployer une mise à jour :
