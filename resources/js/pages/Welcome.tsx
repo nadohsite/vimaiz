@@ -555,29 +555,47 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             <p className="text-slate-600 dark:text-slate-300 mb-8">
                                 Suivi des prestations, organisation des missions, visibilité sur les interventions, centralisation des échanges VIMAIZ aide les conciergeries et propriétaires à gagner du temps, et travailler dans de meilleures conditions avec des agents sélectionnés minutieusement.
                             </p>
+                            <div className="grid grid-cols-3 gap-6">
+                                {[
+                                    { value: '100%', label: 'Sécurisé' },
+                                    { value: '24h', label: 'Réponse max' },
+                                    { value: '5★', label: 'Qualité' },
+                                ].map((stat, index) => (
+                                    <motion.div 
+                                        key={stat.label} 
+                                        className="text-center"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.3 + index * 0.1 }}
+                                        viewport={{ once: true }}
+                                    >
+                                        <p className="text-2xl font-bold text-primary">{stat.value}</p>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
+                                    </motion.div>
+                                ))}
+                            </div>
                         </motion.div>
                         <div className="grid grid-cols-2 gap-4">
                             {[
-                                { icon: Shield, value: '100%', label: 'Sécurisé', desc: 'Agents vérifiés avec SIRET' },
-                                { icon: Clock, value: '24h', label: 'Réponse max', desc: 'Devis sous 24h' },
-                                { icon: Star, value: '5★', label: 'Qualité', desc: 'Photos avant/après' },
-                                { icon: MapPin, value: 'France', label: 'National', desc: 'Réseau d\'agents' },
+                                { icon: Shield, title: 'Agents vérifiés', desc: 'SIRET et documents contrôlés' },
+                                { icon: CreditCard, title: 'Paiement sécurisé', desc: 'Avant chaque intervention' },
+                                { icon: Star, title: 'Qualité garantie', desc: 'Photos avant/après obligatoires' },
+                                { icon: MapPin, title: 'Partout en France', desc: 'Réseau national d\'agents' },
                             ].map((item, index) => (
-                                <motion.div
-                                    key={item.label}
-                                    className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-6 hover:bg-primary/5 dark:hover:bg-primary/10 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group text-center"
+                                <motion.div 
+                                    key={item.title} 
+                                    className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-6 hover:bg-primary/5 dark:hover:bg-primary/10 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group"
                                     initial={{ opacity: 0, y: 20, scale: 0.95 }}
                                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
                                     viewport={{ once: true }}
                                     whileHover={{ y: -5 }}
                                 >
-                                    <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="flex justify-center">
-                                        <item.icon className="h-8 w-8 text-primary mb-3 group-hover:text-primary transition-colors" />
+                                    <motion.div whileHover={{ scale: 1.1, rotate: 5 }}>
+                                        <item.icon className="h-8 w-8 text-primary mb-4 group-hover:text-primary transition-colors" />
                                     </motion.div>
-                                    <p className="text-3xl font-bold text-primary mb-1">{item.value}</p>
-                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{item.label}</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
+                                    <h4 className="font-semibold text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors">{item.title}</h4>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">{item.desc}</p>
                                 </motion.div>
                             ))}
                         </div>
