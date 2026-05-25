@@ -756,6 +756,8 @@ cd /var/www/vimaiz
 
 # 2. Récupérer les modifications
 git pull origin main
+ (git checkout -- storage/logs/laravel.log
+git pull origin main)
 
 # 3. Supprimer TOUS les fichiers de cache
 rm -rf bootstrap/cache/*.php
