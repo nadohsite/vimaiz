@@ -5,6 +5,7 @@ import {
     ArrowRight,
     Calendar,
     CheckCircle,
+    Clock,
     CreditCard,
     Home,
     MapPin,
@@ -147,13 +148,12 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                             </div>
 
                             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight mb-6">
-                                Planifiez votre ménage.
-                                <span className="block text-primary">VIMAIZ s'occupe du reste.</span>
+                                Conciergeries et propriétaires Airbnb
+                                <span className="block text-primary">automatisez et suivez le ménage de vos locations saisonnières.</span>
                             </h1>
 
                             <p className="text-base text-slate-600 dark:text-slate-300 mb-8 max-w-xl">
-                                Confiez votre appartement, maison, villa ou chalet à des professionnels qualifiés.
-                                Nous orchestrons tout : devis, paiement sécurisé et intervention.
+                                Confiez la gestion du ménage de vos logements à des professionnels qualifiés et minutieusement sélectionnés.
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4">
@@ -541,56 +541,43 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                                 À propos de VIMAIZ
                             </h2>
                             <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">
-                                VIMAIZ est une plateforme innovante qui révolutionne le service de ménage à domicile.
-                                Notre approche centralise tout le processus pour garantir
-                                une expérience simple et sécurisée.
+                                VIMAIZ est une plateforme qui met en relation les conciergeries et propriétaires Airbnb avec des professionnels du ménage qualifiés et disposant d'un SIRET, tout en automatisant la gestion et le suivi des missions.
                             </p>
-                            <p className="text-slate-600 dark:text-slate-400 mb-8">
-                                Vous ne cherchez pas un agent, l'agent ne vous cherche pas.
-                                <strong className="text-slate-900 dark:text-white"> VIMAIZ orchestre la relation</strong> pour
-                                vous offrir un service de qualité, sans surprise.
+                            <p className="text-slate-600 dark:text-slate-300 mb-6">
+                                Nous sommes partis d'un constat simple, dans la location saisonnière, gérer les logements, les voyageurs et trouver des agents de ménage fiables, sérieux et professionnels est devenu un véritable défi.
                             </p>
-                            <div className="grid grid-cols-3 gap-6">
-                                {[
-                                    { value: '100%', label: 'Sécurisé' },
-                                    { value: '24h', label: 'Réponse max' },
-                                    { value: '5★', label: 'Qualité' },
-                                ].map((stat, index) => (
-                                    <motion.div 
-                                        key={stat.label} 
-                                        className="text-center"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.3 + index * 0.1 }}
-                                        viewport={{ once: true }}
-                                    >
-                                        <p className="text-2xl font-bold text-primary">{stat.value}</p>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
-                                    </motion.div>
-                                ))}
-                            </div>
+                            <p className="text-slate-600 dark:text-slate-300 mb-6">
+                                Le ménage est l'un des éléments les plus importants dans l'expérience des voyageurs, mais aussi l'un des plus difficiles à organiser et suivre au quotidien pour les conciergeries et propriétaires.
+                            </p>
+                            <p className="text-slate-600 dark:text-slate-300 mb-6">
+                                VIMAIZ a été créé pour simplifier cette gestion grâce à une plateforme pensée comme un véritable assistant opérationnel pour les locations saisonnières.
+                            </p>
+                            <p className="text-slate-600 dark:text-slate-300 mb-8">
+                                Suivi des prestations, organisation des missions, visibilité sur les interventions, centralisation des échanges VIMAIZ aide les conciergeries et propriétaires à gagner du temps, et travailler dans de meilleures conditions avec des agents sélectionnés minutieusement.
+                            </p>
                         </motion.div>
                         <div className="grid grid-cols-2 gap-4">
                             {[
-                                { icon: Shield, title: 'Agents vérifiés', desc: 'SIRET et documents contrôlés' },
-                                { icon: CreditCard, title: 'Paiement sécurisé', desc: 'Avant chaque intervention' },
-                                { icon: Star, title: 'Qualité garantie', desc: 'Photos avant/après obligatoires' },
-                                { icon: MapPin, title: 'Partout en France', desc: 'Réseau national d\'agents' },
+                                { icon: Shield, value: '100%', label: 'Sécurisé', desc: 'Agents vérifiés avec SIRET' },
+                                { icon: Clock, value: '24h', label: 'Réponse max', desc: 'Devis sous 24h' },
+                                { icon: Star, value: '5★', label: 'Qualité', desc: 'Photos avant/après' },
+                                { icon: MapPin, value: 'France', label: 'National', desc: 'Réseau d\'agents' },
                             ].map((item, index) => (
-                                <motion.div 
-                                    key={item.title} 
-                                    className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-6 hover:bg-primary/5 dark:hover:bg-primary/10 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group"
+                                <motion.div
+                                    key={item.label}
+                                    className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-6 hover:bg-primary/5 dark:hover:bg-primary/10 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group text-center"
                                     initial={{ opacity: 0, y: 20, scale: 0.95 }}
                                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
                                     viewport={{ once: true }}
                                     whileHover={{ y: -5 }}
                                 >
-                                    <motion.div whileHover={{ scale: 1.1, rotate: 5 }}>
-                                        <item.icon className="h-8 w-8 text-primary mb-4 group-hover:text-primary transition-colors" />
+                                    <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="flex justify-center">
+                                        <item.icon className="h-8 w-8 text-primary mb-3 group-hover:text-primary transition-colors" />
                                     </motion.div>
-                                    <h4 className="font-semibold text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors">{item.title}</h4>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400">{item.desc}</p>
+                                    <p className="text-3xl font-bold text-primary mb-1">{item.value}</p>
+                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{item.label}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
                                 </motion.div>
                             ))}
                         </div>

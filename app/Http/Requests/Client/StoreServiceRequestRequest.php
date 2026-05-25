@@ -26,7 +26,7 @@ class StoreServiceRequestRequest extends FormRequest
             ],
             'scheduled_date' => ['required', 'date', 'after:today'],
             'scheduled_time' => ['required', 'date_format:H:i'],
-            'requested_hours' => ['required', 'numeric', 'min:1', 'max:12'],
+            'requested_hours' => ['nullable', 'numeric', 'min:1', 'max:12'],
             'special_instructions' => ['nullable', 'string', 'max:2000'],
         ];
     }

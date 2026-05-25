@@ -67,7 +67,7 @@ class ServiceRequestController extends Controller
             'property_id' => $data['property_id'],
             'scheduled_date' => $data['scheduled_date'],
             'scheduled_time' => $data['scheduled_time'],
-            'requested_hours' => $data['requested_hours'],
+            'requested_hours' => $data['requested_hours'] ?? null,
             'special_instructions' => $data['special_instructions'] ?? null,
             'status' => ServiceRequest::STATUS_PENDING,
         ]);

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Home, Calendar, Clock, Send, Calculator } from 'lucide-react';
+import { ArrowLeft, Home, Calendar, Clock, FileText, Send } from 'lucide-react';
 import { useState } from 'react';
 
 interface Property {
@@ -26,14 +26,10 @@ interface Props {
 }
 
 export default function Create({ properties, minDate, maxDate, selectedPropertyId }: Props) {
-    const [estimate, setEstimate] = useState<{ min: number; max: number } | null>(null);
-    const [loadingEstimate, setLoadingEstimate] = useState(false);
-
     const { data, setData, post, processing, errors } = useForm({
         property_id: selectedPropertyId ? String(selectedPropertyId) : '',
         scheduled_date: '',
         scheduled_time: '09:00',
-        requested_hours: '3',
         special_instructions: '',
     });
 
@@ -42,25 +38,6 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
         post(route('client.requests.store'));
     };
 
-    const fetchEstimate = async () => {
-        if (!data.property_id || !data.scheduled_date || !data.requested_hours) return;
-        
-        setLoadingEstimate(true);
-        try {
-            const response = await axios.post(route('client.requests.estimate'), {
-                property_id: data.property_id,
-                scheduled_date: data.scheduled_date,
-                scheduled_time: data.scheduled_time,
-                requested_hours: data.requested_hours,
-            });
-            if (response.data.success) {
-                setEstimate(response.data.estimate);
-            }
-        } catch (error) {
-            console.error('Error fetching estimate:', error);
-        }
-        setLoadingEstimate(false);
-    };
 
     const selectedProperty = properties.find(p => p.id === Number(data.property_id));
 
@@ -100,10 +77,7 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                                     <Label htmlFor="property_id">Logement *</Label>
                                     <Select 
                                         value={data.property_id} 
-                                        onValueChange={(value) => {
-                                            setData('property_id', value);
-                                            setEstimate(null);
-                                        }}
+                                        onValueChange={(value) => setData('property_id', value)}
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Sélectionner un logement..." />
@@ -137,7 +111,7 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 dark:text-white">
                                     <Calendar className="h-5 w-5 text-sky-500 dark:text-sky-400" />
-                                    Date et durée
+                                    Date et heure d'intervention
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -150,10 +124,7 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                                             min={minDate}
                                             max={maxDate}
                                             value={data.scheduled_date}
-                                            onChange={(e) => {
-                                                setData('scheduled_date', e.target.value);
-                                                setEstimate(null);
-                                            }}
+                                            onChange={(e) => setData('scheduled_date', e.target.value)}
                                         />
                                         {errors.scheduled_date && <p className="text-sm text-red-500">{errors.scheduled_date}</p>}
                                     </div>
@@ -176,33 +147,6 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="requested_hours">Durée estimée *</Label>
-                                    <Select 
-                                        value={data.requested_hours} 
-                                        onValueChange={(value) => {
-                                            setData('requested_hours', value);
-                                            setEstimate(null);
-                                        }}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {[1, 2, 3, 4, 5, 6, 7, 8, 10, 12].map((hours) => (
-                                                <SelectItem key={hours} value={String(hours)}>
-                                                    {hours} {hours === 1 ? 'heure' : 'heures'}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.requested_hours && <p className="text-sm text-red-500">{errors.requested_hours}</p>}
-                                    {selectedProperty && (
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                                            Recommandé pour {selectedProperty.surface_area} m² : environ {Math.ceil(selectedProperty.surface_area / 25)} heures
-                                        </p>
-                                    )}
-                                </div>
                             </CardContent>
                         </Card>
 
@@ -226,41 +170,17 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                             </CardContent>
                         </Card>
 
-                        {/* Estimate */}
-                        {data.property_id && data.scheduled_date && (
-                            <Card className="bg-gradient-to-r from-sky-50 to-cyan-50 dark:from-sky-900/30 dark:to-cyan-900/30 border-sky-200 dark:border-sky-800">
-                                <CardContent className="p-6">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                                                <Calculator className="h-5 w-5 text-sky-500" />
-                                                Estimation du prix
-                                            </h3>
-                                            {estimate ? (
-                                                <p className="text-2xl font-bold text-sky-600 mt-2">
-                                                    {estimate.min} - {estimate.max} €
-                                                </p>
-                                            ) : (
-                                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                                    Cliquez pour obtenir une estimation
-                                                </p>
-                                            )}
-                                        </div>
-                                        <Button 
-                                            type="button" 
-                                            variant="outline"
-                                            onClick={fetchEstimate}
-                                            disabled={loadingEstimate || !data.property_id || !data.scheduled_date || !data.requested_hours}
-                                        >
-                                            {loadingEstimate ? 'Calcul...' : 'Estimer'}
-                                        </Button>
-                                    </div>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
-                                        * Le prix final sera confirmé dans le devis envoyé sous 24h
+                        {/* Info devis */}
+                        <Card className="bg-gradient-to-r from-sky-50 to-cyan-50 dark:from-sky-900/30 dark:to-cyan-900/30 border-sky-200 dark:border-sky-800">
+                            <CardContent className="p-6">
+                                <div className="flex items-start gap-3">
+                                    <FileText className="h-5 w-5 text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
+                                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                                        <strong>Devis personnalisé</strong> : Nous vous enverrons un devis détaillé sous 24h après réception de votre demande.
                                     </p>
-                                </CardContent>
-                            </Card>
-                        )}
+                                </div>
+                            </CardContent>
+                        </Card>
 
                         {/* Submit */}
                         <div className="flex justify-end gap-4">

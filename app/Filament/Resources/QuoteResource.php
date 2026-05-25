@@ -59,20 +59,7 @@ class QuoteResource extends Resource
                                     if ($request && $request->property) {
                                         $pricingRule = PricingRule::getActive();
                                         if ($pricingRule) {
-                                            $scheduledAt = \Carbon\Carbon::parse(
-                                                $request->scheduled_date->format('Y-m-d') . ' ' . $request->scheduled_time
-                                            );
-                                            $calculation = $pricingRule->calculatePrice(
-                                                $request->property->type,
-                                                $request->property->surface_area,
-                                                $request->requested_hours,
-                                                $scheduledAt,
-                                                $request->property->postal_code
-                                            );
-                                            $set('estimated_price', $calculation['estimated_price']);
-                                            $set('commission_rate', $calculation['commission_rate']);
-                                            $set('commission_amount', $calculation['commission_amount']);
-                                            $set('agent_amount', $calculation['agent_amount']);
+                                            $set('commission_rate', $pricingRule->platform_commission_rate);
                                         }
                                     }
                                 }
@@ -83,24 +70,85 @@ class QuoteResource extends Resource
                             ->dehydrated(false),
                     ])->columns(2),
 
+                Section::make('Informations du logement')
+                    ->description('Données pour aider au calcul du prix')
+                    ->schema([
+                        Forms\Components\TextInput::make('property_type')
+                            ->label('Type de logement')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->formatStateUsing(fn ($state, Get $get): string => 
+                                ServiceRequest::with('property')->find($get('service_request_id'))?->property?->type ?? '-'
+                            ),
+                        Forms\Components\TextInput::make('property_surface')
+                            ->label('Surface')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->suffix('m²')
+                            ->formatStateUsing(fn ($state, Get $get): string => 
+                                (string) (ServiceRequest::with('property')->find($get('service_request_id'))?->property?->surface_area ?? '-')
+                            ),
+                        Forms\Components\TextInput::make('property_city')
+                            ->label('Ville')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->formatStateUsing(fn ($state, Get $get): string => 
+                                ServiceRequest::with('property')->find($get('service_request_id'))?->property?->city ?? '-'
+                            ),
+                        Forms\Components\TextInput::make('property_postal_code')
+                            ->label('Code postal')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->formatStateUsing(fn ($state, Get $get): string => 
+                                ServiceRequest::with('property')->find($get('service_request_id'))?->property?->postal_code ?? '-'
+                            ),
+                        Forms\Components\TextInput::make('intervention_date')
+                            ->label('Date d\'intervention')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->formatStateUsing(fn ($state, Get $get): string => 
+                                ServiceRequest::find($get('service_request_id'))?->scheduled_date?->format('d/m/Y') ?? '-'
+                            ),
+                        Forms\Components\TextInput::make('intervention_time')
+                            ->label('Heure d\'intervention')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->formatStateUsing(fn ($state, Get $get): string => 
+                                ServiceRequest::find($get('service_request_id'))?->scheduled_time ?? '-'
+                            ),
+                    ])->columns(3),
+
                 Section::make('Tarification')
                     ->schema([
-                        Forms\Components\TextInput::make('estimated_price')
-                            ->label('Prix estimé (auto)')
-                            ->numeric()
-                            ->suffix('€')
-                            ->disabled()
-                            ->dehydrated(true),
                         Forms\Components\TextInput::make('final_price')
-                            ->label('Prix final (ajusté)')
+                            ->label('Prix final')
                             ->numeric()
                             ->suffix('€')
-                            ->helperText('Laissez vide pour utiliser le prix estimé'),
+                            ->required()
+                            ->live()
+                            ->helperText('Définissez le prix final pour cette mission')
+                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                $rate = (float) ($get('commission_rate') ?? 25);
+                                $final = (float) ($state ?? 0);
+                                $commission = round($final * ($rate / 100), 2);
+                                $agent = round($final - $commission, 2);
+                                $set('commission_amount', $commission);
+                                $set('agent_amount', $agent);
+                            }),
                         Forms\Components\TextInput::make('commission_rate')
                             ->label('Taux commission')
                             ->numeric()
                             ->suffix('%')
-                            ->default(25),
+                            ->default(25)
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                $rate = (float) ($state ?? 25);
+                                $final = (float) ($get('final_price') ?? 0);
+                                $commission = round($final * ($rate / 100), 2);
+                                $agent = round($final - $commission, 2);
+                                $set('commission_amount', $commission);
+                                $set('agent_amount', $agent);
+                            }),
                         Forms\Components\TextInput::make('commission_amount')
                             ->label('Montant commission')
                             ->numeric()

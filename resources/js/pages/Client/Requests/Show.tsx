@@ -348,10 +348,6 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                         <span className="text-slate-500 dark:text-slate-400">Heure</span>
                                         <span className="font-medium dark:text-white">{serviceRequest.scheduled_time}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500 dark:text-slate-400">Durée</span>
-                                        <span className="font-medium dark:text-white">{serviceRequest.requested_hours}h</span>
-                                    </div>
                                 </CardContent>
                             </Card>
 

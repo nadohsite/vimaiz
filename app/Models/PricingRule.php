@@ -95,11 +95,11 @@ class PricingRule extends Model
     public function calculatePrice(
         string $propertyType,
         float $surfaceM2,
-        int $hours,
+        ?int $hours,
         \DateTime $scheduledAt,
         string $postalCode
     ): array {
-        $hours = max($hours, 1);
+        $hours = max($hours ?? (int) ceil($surfaceM2 / 25), 1);
         
         $basePrice = $this->base_hourly_rate * $hours;
         
