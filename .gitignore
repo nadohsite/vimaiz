@@ -14,7 +14,7 @@
 /storage/framework/sessions/*
 /storage/framework/views/*
 /storage/logs/laravel.log
-
+/storage/logs/*.log
 /vendor
 .DS_Store
 .env
