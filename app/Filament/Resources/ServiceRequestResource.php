@@ -72,9 +72,9 @@ class ServiceRequestResource extends Resource
                         Forms\Components\TextInput::make('requested_hours')
                             ->label('Heures demandées')
                             ->numeric()
-                            ->required()
-                            ->minValue(2)
-                            ->suffix('heures'),
+                            ->minValue(1)
+                            ->suffix('heures')
+                            ->placeholder('Non spécifié'),
                     ])->columns(3),
 
                 Section::make('Détails')
