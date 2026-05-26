@@ -20,6 +20,8 @@ interface Quote {
     quote_number: string;
     final_price: number;
     estimated_price: number;
+    estimated_hours: number | null;
+    price_adjustment_reason: string | null;
     commission_amount: number;
     status: string;
     status_label: string;
@@ -197,16 +199,36 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                         </div>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="flex items-center justify-between mb-4">
-                                            <span className="text-slate-600 dark:text-slate-400">Montant total</span>
-                                            <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                                        <div className="space-y-3 mb-4 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-slate-600 dark:text-slate-400">Surface</span>
+                                                <span className="font-medium dark:text-white">{serviceRequest.property.surface_area} m²</span>
+                                            </div>
+                                            {serviceRequest.quote.estimated_hours && (
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <span className="text-slate-600 dark:text-slate-400">Durée estimée</span>
+                                                    <span className="font-medium dark:text-white">{serviceRequest.quote.estimated_hours} heure(s)</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {serviceRequest.quote.price_adjustment_reason && (
+                                            <div className="mb-4 p-3 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-lg">
+                                                <p className="text-sm font-medium text-sky-900 dark:text-sky-100 mb-1">💬 Détails de la prestation</p>
+                                                <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line">{serviceRequest.quote.price_adjustment_reason}</p>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="flex items-center justify-between mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                            <span className="text-slate-600 dark:text-slate-400 font-medium">Montant total</span>
+                                            <span className="text-2xl font-bold text-green-700 dark:text-green-400">
                                                 {serviceRequest.quote.final_price} €
                                             </span>
                                         </div>
                                         
                                         {serviceRequest.quote.expires_at && serviceRequest.quote.status === 'sent' && (
                                             <p className="text-sm text-orange-600 mb-4">
-                                                Expire le {new Date(serviceRequest.quote.expires_at).toLocaleDateString('fr-FR')}
+                                                ⏰ Expire le {new Date(serviceRequest.quote.expires_at).toLocaleDateString('fr-FR')}
                                             </p>
                                         )}
 

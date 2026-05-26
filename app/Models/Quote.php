@@ -16,6 +16,7 @@ class Quote extends Model
         'service_request_id',
         'estimated_price',
         'final_price',
+        'estimated_hours',
         'commission_rate',
         'commission_amount',
         'agent_amount',
@@ -31,6 +32,7 @@ class Quote extends Model
     protected $casts = [
         'estimated_price' => 'decimal:2',
         'final_price' => 'decimal:2',
+        'estimated_hours' => 'decimal:2',
         'commission_rate' => 'decimal:2',
         'commission_amount' => 'decimal:2',
         'agent_amount' => 'decimal:2',

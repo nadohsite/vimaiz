@@ -135,6 +135,12 @@ class QuoteResource extends Resource
                                 $set('commission_amount', $commission);
                                 $set('agent_amount', $agent);
                             }),
+                        Forms\Components\TextInput::make('estimated_hours')
+                            ->label('Durée estimée')
+                            ->numeric()
+                            ->suffix('h')
+                            ->step(0.5)
+                            ->helperText('Nombre d\'heures prévu pour cette intervention'),
                         Forms\Components\TextInput::make('commission_rate')
                             ->label('Taux commission')
                             ->numeric()
@@ -170,7 +176,7 @@ class QuoteResource extends Resource
                             ->rows(2)
                             ->helperText('Visible uniquement par les admins'),
                         Forms\Components\Textarea::make('price_adjustment_reason')
-                            ->label('Raison de l\'ajustement')
+                            ->label(' Détails sur le devis')
                             ->rows(2)
                             ->visible(fn (Get $get) => filled($get('final_price'))),
                     ])->columns(2),

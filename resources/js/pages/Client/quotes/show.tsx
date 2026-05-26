@@ -41,6 +41,7 @@ interface Quote {
     quote_number: string;
     estimated_price: number;
     final_price: number | null;
+    estimated_hours: number | null;
     commission_rate: number;
     admin_notes: string | null;
     price_adjustment_reason: string | null;
@@ -206,11 +207,26 @@ export default function QuoteShow({ quote }: Props) {
                                         <div>
                                             <p className="text-sm text-slate-500 dark:text-slate-400">Horaire</p>
                                             <p className="font-medium text-slate-900 dark:text-white">
-                                                {serviceRequest.scheduled_time} ({serviceRequest.requested_hours}h)
+                                                {serviceRequest.scheduled_time}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Estimated Hours */}
+                                {quote.estimated_hours && (
+                                    <div className="flex items-center gap-3 p-4 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800">
+                                        <div className="rounded-lg bg-sky-100 dark:bg-sky-900/30 p-2">
+                                            <Clock className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400">Durée estimée</p>
+                                            <p className="font-medium text-slate-900 dark:text-white">
+                                                {quote.estimated_hours} heure(s)
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Special Instructions */}
                                 {serviceRequest.special_instructions && (
