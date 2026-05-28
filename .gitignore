@@ -1,3 +1,4 @@
+/docs
 /.phpunit.cache
 /bootstrap/ssr
 /bootstrap/cache/*.php
@@ -33,6 +34,6 @@ yarn-error.log
 /.vscode
 /.zed
 /docs/*
-docs
+/docs
 
 
