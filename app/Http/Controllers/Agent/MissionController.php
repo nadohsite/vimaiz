@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Mission;
 use App\Models\MissionPhoto;
 use App\Services\MissionService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -107,19 +106,25 @@ class MissionController extends Controller
         }
     }
 
-    public function uploadPhoto(Request $request, Mission $mission): JsonResponse
+    public function uploadPhoto(Request $request, Mission $mission): RedirectResponse
     {
         $this->authorize('uploadPhotos', $mission);
 
         $validated = $request->validate([
-            'photo' => ['required', 'image', 'max:10240'], // 10MB max
+            'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp,gif', 'max:10240'],
             'type' => ['required', 'in:before,after'],
             'description' => ['nullable', 'string', 'max:255'],
-            'room' => ['nullable', 'string', 'max:100'],
+        ], [
+            'photo.required' => 'Veuillez sélectionner une photo.',
+            'photo.image' => 'Le fichier doit être une image.',
+            'photo.mimes' => 'Formats acceptés : JPEG, PNG, WebP ou GIF.',
+            'photo.max' => 'La photo ne doit pas dépasser 10 Mo.',
+            'type.required' => 'Le type de photo est requis.',
+            'type.in' => 'Type de photo invalide.',
         ]);
 
         try {
-            $photo = $this->missionService->uploadPhoto(
+            $this->missionService->uploadPhoto(
                 $mission,
                 $request->file('photo'),
                 $validated['type'],
@@ -127,38 +132,24 @@ class MissionController extends Controller
                 $validated['description'] ?? null
             );
 
-            return response()->json([
-                'success' => true,
-                'photo' => $photo,
-                'message' => 'Photo uploadée avec succès.',
-            ]);
+            return back()->with('success', 'Photo uploadée avec succès.');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+            return back()->with('error', $e->getMessage());
         }
     }
 
-    public function deletePhoto(Mission $mission, MissionPhoto $photo): JsonResponse
+    public function deletePhoto(Mission $mission, MissionPhoto $photo): RedirectResponse
     {
         $this->authorize('uploadPhotos', $mission);
 
         if ($photo->mission_id !== $mission->id) {
-            return response()->json(['error' => 'Photo non trouvée'], 404);
+            return back()->with('error', 'Photo non trouvée.');
         }
 
-        if ($photo->validated_at) {
-            return response()->json(['error' => 'Photo déjà validée'], 403);
-        }
-
-        Storage::disk('public')->delete($photo->path);
+        Storage::disk('public')->delete($photo->file_path);
         $photo->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Photo supprimée.',
-        ]);
+        return back()->with('success', 'Photo supprimée.');
     }
 
     public function complete(Mission $mission): RedirectResponse

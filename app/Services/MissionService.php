@@ -160,7 +160,10 @@ class MissionService
         
         // Notify client that mission started
         $mission->client->notify(new MissionStartedNotification($mission));
-        
+
+        $mission = $mission->fresh();
+        $this->updateMissionPhotoStatus($mission);
+
         return $mission->fresh();
     }
 
