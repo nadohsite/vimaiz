@@ -1,4 +1,5 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
+
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,43 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, XCircle, Play, Upload, Trash2, Star, Award } from 'lucide-react';
 import PropertyMap from '@/components/map/PropertyMap';
 import { ImageLightbox } from '@/components/ui/image-lightbox';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from '@/hooks/use-toast';
+import { cn, getStorageUrl } from '@/lib/utils';
 import { useState, useRef } from 'react';
+
+const MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+
+function validatePhotoFile(file: File): string | null {
+    const isHeic =
+        file.type === 'image/heic' ||
+        file.type === 'image/heif' ||
+        file.name.toLowerCase().endsWith('.heic') ||
+        file.name.toLowerCase().endsWith('.heif');
+
+    if (isHeic) {
+        return 'Format HEIC non supporté. Réglez l’iPhone sur « Formats les plus compatibles » (JPEG) ou choisissez une photo JPEG dans la galerie.';
+    }
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        return 'Format non supporté. Utilisez JPEG, PNG ou WebP.';
+    }
+
+    if (file.size > MAX_PHOTO_SIZE_BYTES) {
+        return `La photo dépasse 10 Mo (${(file.size / (1024 * 1024)).toFixed(1)} Mo).`;
+    }
+
+    return null;
+}
+
+function firstValidationError(errors: Record<string, string | string[]>): string {
+    const first = Object.values(errors)[0];
+    if (!first) {
+        return 'Erreur lors de l’envoi de la photo.';
+    }
+    return Array.isArray(first) ? first[0] : first;
+}
 
 interface Property {
     id: number;
@@ -73,16 +110,19 @@ interface Props {
 
 export default function Show({ mission, canAccept, canStart, canComplete, requiredPhotos }: Props) {
     const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
     const [photoType, setPhotoType] = useState<'before' | 'after'>('before');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const cameraInputRef = useRef<HTMLInputElement>(null);
+    const isMobile = useIsMobile();
+    const { flash } = usePage<{ flash?: { success?: string; error?: string } }>().props;
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
 
     const openLightbox = (photos: Photo[], index: number, type: string) => {
         const images = photos.map((p, i) => ({
-            src: `/storage/${p.path}`,
+            src: getStorageUrl(p.path),
             alt: `Photo ${type} ${i + 1}`,
             caption: p.description || `Photo ${type} ${i + 1}`,
         }));
@@ -126,49 +166,70 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
         }
     };
 
-    const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (!files || files.length === 0) return;
-
-        setUploading(true);
-        const formData = new FormData();
-        formData.append('photo', files[0]);
-        formData.append('type', photoType);
-
-        try {
-            const response = await fetch(route('agent.missions.upload-photo', mission.id), {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: formData,
-            });
-            
-            if (response.ok) {
-                router.reload();
-            }
-        } catch (error) {
-            console.error('Upload error:', error);
+    const resetFileInputs = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
         }
-        setUploading(false);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-        if (cameraInputRef.current) cameraInputRef.current.value = '';
+        if (cameraInputRef.current) {
+            cameraInputRef.current.value = '';
+        }
     };
 
-    const handleDeletePhoto = async (photoId: number) => {
-        if (!confirm('Supprimer cette photo ?')) return;
-        
-        try {
-            await fetch(route('agent.missions.delete-photo', [mission.id, photoId]), {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-            });
-            router.reload();
-        } catch (error) {
-            console.error('Delete error:', error);
+    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) {
+            return;
         }
+
+        const validationError = validatePhotoFile(file);
+        if (validationError) {
+            setUploadError(validationError);
+            resetFileInputs();
+            return;
+        }
+
+        setUploadError(null);
+        setUploading(true);
+
+        const formData = new FormData();
+        formData.append('photo', file);
+        formData.append('type', photoType);
+
+        router.post(route('agent.missions.upload-photo', mission.id), formData, {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                toast({
+                    title: 'Photo envoyée',
+                    description: 'La photo a été ajoutée à la mission.',
+                });
+            },
+            onFinish: () => {
+                setUploading(false);
+                resetFileInputs();
+            },
+            onError: (errors) => {
+                setUploadError(firstValidationError(errors));
+            },
+        });
+    };
+
+    const handleDeletePhoto = (photoId: number) => {
+        if (!confirm('Supprimer cette photo ?')) {
+            return;
+        }
+
+        router.delete(route('agent.missions.delete-photo', [mission.id, photoId]), {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast({
+                    title: 'Photo supprimée',
+                });
+            },
+            onError: () => {
+                setUploadError('Impossible de supprimer cette photo.');
+            },
+        });
     };
 
     const beforePhotos = mission.photos.filter(p => p.type === 'before');
@@ -289,23 +350,37 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                         <div className="grid grid-cols-2 gap-3">
                                             <Button
                                                 variant="outline"
-                                                onClick={() => cameraInputRef.current?.click()}
+                                                onClick={() => {
+                                                    setUploadError(null);
+                                                    cameraInputRef.current?.click();
+                                                }}
                                                 disabled={uploading}
-                                                className="w-full"
+                                                className="w-full min-h-11"
                                             >
                                                 <Camera className="h-4 w-4 mr-2" />
                                                 {uploading ? 'Envoi...' : 'Prendre photo'}
                                             </Button>
                                             <Button
                                                 variant="outline"
-                                                onClick={() => fileInputRef.current?.click()}
+                                                onClick={() => {
+                                                    setUploadError(null);
+                                                    fileInputRef.current?.click();
+                                                }}
                                                 disabled={uploading}
-                                                className="w-full"
+                                                className="w-full min-h-11"
                                             >
                                                 <Upload className="h-4 w-4 mr-2" />
                                                 {uploading ? 'Envoi...' : 'Galerie'}
                                             </Button>
                                         </div>
+                                        {(uploadError || flash?.error) && (
+                                            <p className="mt-3 text-sm text-red-600" role="alert">
+                                                {uploadError || flash?.error}
+                                            </p>
+                                        )}
+                                        <p className="mt-2 text-xs text-slate-500">
+                                            JPEG, PNG ou WebP — max. 10 Mo par photo
+                                        </p>
                                     </CardContent>
                                 </Card>
                             )}
@@ -320,16 +395,23 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                             {beforePhotos.map((photo, idx) => (
                                                 <div key={photo.id} className="relative group">
-                                                    <img 
-                                                        src={`/storage/${photo.path}`} 
-                                                        alt="Avant" 
-                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                                                    <img
+                                                        src={getStorageUrl(photo.path)}
+                                                        alt="Avant"
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity bg-slate-100"
                                                         onClick={() => openLightbox(beforePhotos, idx, 'avant')}
                                                     />
-                                                    {!photo.validated_at && canUploadBefore && (
+                                                    {canUploadBefore && (
                                                         <button
+                                                            type="button"
                                                             onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
-                                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            className={cn(
+                                                                'absolute top-1 right-1 p-1.5 bg-red-500 text-white rounded-full shadow-sm transition-opacity',
+                                                                isMobile ? 'opacity-90' : 'opacity-0 group-hover:opacity-100',
+                                                            )}
+                                                            aria-label="Supprimer la photo"
                                                         >
                                                             <Trash2 className="h-3 w-3" />
                                                         </button>
@@ -351,16 +433,23 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                             {afterPhotos.map((photo, idx) => (
                                                 <div key={photo.id} className="relative group">
-                                                    <img 
-                                                        src={`/storage/${photo.path}`} 
-                                                        alt="Après" 
-                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                                                    <img
+                                                        src={getStorageUrl(photo.path)}
+                                                        alt="Après"
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity bg-slate-100"
                                                         onClick={() => openLightbox(afterPhotos, idx, 'après')}
                                                     />
-                                                    {!photo.validated_at && canUploadAfter && (
+                                                    {canUploadAfter && (
                                                         <button
+                                                            type="button"
                                                             onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
-                                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            className={cn(
+                                                                'absolute top-1 right-1 p-1.5 bg-red-500 text-white rounded-full shadow-sm transition-opacity',
+                                                                isMobile ? 'opacity-90' : 'opacity-0 group-hover:opacity-100',
+                                                            )}
+                                                            aria-label="Supprimer la photo"
                                                         >
                                                             <Trash2 className="h-3 w-3" />
                                                         </button>

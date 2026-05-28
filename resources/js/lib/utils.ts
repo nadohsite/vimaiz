@@ -38,3 +38,16 @@ export function getAvatarUrl(avatar: string | null | undefined, name?: string): 
     // Sinon, c'est un chemin local
     return `/storage/${avatar}`;
 }
+
+/**
+ * URL publique pour un fichier stocké sur le disque public (missions, documents, etc.).
+ */
+export function getStorageUrl(path: string | null | undefined): string {
+    if (!path) {
+        return '';
+    }
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('/')) {
+        return path;
+    }
+    return `/storage/${path}`;
+}
