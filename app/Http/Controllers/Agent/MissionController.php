@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Mission;
 use App\Models\MissionPhoto;
 use App\Services\MissionService;
+use App\Support\UploadHelper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -110,18 +111,24 @@ class MissionController extends Controller
     {
         $this->authorize('uploadPhotos', $mission);
 
+        if ($response = UploadHelper::invalidUploadFlash($request, 'photo')) {
+            return $response;
+        }
+
         $validated = $request->validate([
-            'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp,gif', 'max:10240'],
+            'photo' => [
+                'required',
+                'file',
+                'max:'.UploadHelper::missionPhotoMaxKb(),
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! UploadHelper::isImageUpload($value)) {
+                        $fail('Le fichier doit être une image.');
+                    }
+                },
+            ],
             'type' => ['required', 'in:before,after'],
             'description' => ['nullable', 'string', 'max:255'],
-        ], [
-            'photo.required' => 'Veuillez sélectionner une photo.',
-            'photo.image' => 'Le fichier doit être une image.',
-            'photo.mimes' => 'Formats acceptés : JPEG, PNG, WebP ou GIF.',
-            'photo.max' => 'La photo ne doit pas dépasser 10 Mo.',
-            'type.required' => 'Le type de photo est requis.',
-            'type.in' => 'Type de photo invalide.',
-        ]);
+        ], UploadHelper::missionPhotoValidationMessages());
 
         try {
             $this->missionService->uploadPhoto(
