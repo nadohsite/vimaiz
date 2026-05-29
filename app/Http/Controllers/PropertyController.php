@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Property;
+use App\Support\UploadHelper;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -53,7 +54,15 @@ class PropertyController extends Controller
             'access_code' => 'nullable|string',
             'entry_instructions' => 'nullable|string',
             'photos' => 'nullable|array',
-            'photos.*' => 'image|max:10240', // 10MB max per photo
+            'photos.*' => [
+                'file',
+                'max:'.UploadHelper::propertyPhotoMaxKb(),
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! UploadHelper::isImageUpload($value)) {
+                        $fail('Chaque fichier doit être une image.');
+                    }
+                },
+            ],
         ]);
 
         $photoPaths = [];
@@ -119,7 +128,15 @@ class PropertyController extends Controller
             'access_code' => 'nullable|string',
             'entry_instructions' => 'nullable|string',
             'photos' => 'nullable|array',
-            'photos.*' => 'image|max:10240',
+            'photos.*' => [
+                'file',
+                'max:'.UploadHelper::propertyPhotoMaxKb(),
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! UploadHelper::isImageUpload($value)) {
+                        $fail('Chaque fichier doit être une image.');
+                    }
+                },
+            ],
         ]);
 
         // Handle Photos

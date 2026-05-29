@@ -13,32 +13,31 @@ import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/hooks/use-toast';
 import { cn, getStorageUrl } from '@/lib/utils';
+import { prepareImageForUpload } from '@/lib/prepare-image-upload';
 import { useState, useRef } from 'react';
 
-const MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+const PREPARE_TIMEOUT_MS = 12000;
 
 function validatePhotoFile(file: File): string | null {
-    const isHeic =
-        file.type === 'image/heic' ||
-        file.type === 'image/heif' ||
-        file.name.toLowerCase().endsWith('.heic') ||
-        file.name.toLowerCase().endsWith('.heif');
-
-    if (isHeic) {
-        return 'Format HEIC non supporté. Réglez l’iPhone sur « Formats les plus compatibles » (JPEG) ou choisissez une photo JPEG dans la galerie.';
+    if (file.type.startsWith('image/')) {
+        return null;
     }
 
-    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        return 'Format non supporté. Utilisez JPEG, PNG ou WebP.';
+    if (/\.(jpe?g|png|webp|heic|heif|gif|bmp)$/i.test(file.name)) {
+        return null;
     }
 
-    if (file.size > MAX_PHOTO_SIZE_BYTES) {
-        return `La photo dépasse 10 Mo (${(file.size / (1024 * 1024)).toFixed(1)} Mo).`;
-    }
-
-    return null;
+    return 'Le fichier doit être une image.';
 }
+
+const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> => {
+    return await Promise.race([
+        promise,
+        new Promise<T>((_, reject) => {
+            window.setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+        }),
+    ]);
+};
 
 function firstValidationError(errors: Record<string, string | string[]>): string {
     const first = Object.values(errors)[0];
@@ -175,7 +174,7 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
         }
     };
 
-    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) {
             return;
@@ -188,30 +187,57 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
             return;
         }
 
+        const canUploadSelected = photoType === 'before' ? canUploadBefore : canUploadAfter;
+        if (!canUploadSelected) {
+            setUploadError(
+                photoType === 'after' && mission.status === 'agent_accepted'
+                    ? 'Démarrez la mission avant d\'envoyer les photos après.'
+                    : 'Vous ne pouvez plus envoyer de photos pour cette catégorie.',
+            );
+            resetFileInputs();
+            return;
+        }
+
         setUploadError(null);
         setUploading(true);
 
-        const formData = new FormData();
-        formData.append('photo', file);
-        formData.append('type', photoType);
+        try {
+            const prepared = await withTimeout(
+                prepareImageForUpload(file),
+                PREPARE_TIMEOUT_MS,
+                'Préparation de la photo trop longue. Réessayez.',
+            );
 
-        router.post(route('agent.missions.upload-photo', mission.id), formData, {
-            forceFormData: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                toast({
-                    title: 'Photo envoyée',
-                    description: 'La photo a été ajoutée à la mission.',
-                });
-            },
-            onFinish: () => {
-                setUploading(false);
-                resetFileInputs();
-            },
-            onError: (errors) => {
-                setUploadError(firstValidationError(errors));
-            },
-        });
+            const formData = new FormData();
+            formData.append('photo', prepared);
+            formData.append('type', photoType);
+
+            router.post(route('agent.missions.upload-photo', mission.id), formData, {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast({
+                        title: 'Photo envoyée',
+                        description: 'La photo a été ajoutée à la mission.',
+                    });
+                },
+                onFinish: () => {
+                    setUploading(false);
+                    resetFileInputs();
+                },
+                onError: (errors) => {
+                    setUploadError(firstValidationError(errors));
+                },
+            });
+        } catch (error) {
+            setUploading(false);
+            resetFileInputs();
+            setUploadError(
+                error instanceof Error
+                    ? error.message
+                    : 'Erreur lors de la préparation de la photo.',
+            );
+        }
     };
 
     const handleDeletePhoto = (photoId: number) => {
@@ -236,6 +262,20 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
     const afterPhotos = mission.photos.filter(p => p.type === 'after');
     const canUploadBefore = ['agent_accepted', 'in_progress', 'photos_before'].includes(mission.status);
     const canUploadAfter = ['in_progress', 'photos_before', 'photos_after'].includes(mission.status);
+    const canUploadSelectedType = photoType === 'before' ? canUploadBefore : canUploadAfter;
+    const uploadHint =
+        photoType === 'after' && !canUploadAfter && mission.status === 'agent_accepted'
+            ? 'Démarrez la mission pour envoyer les photos après.'
+            : photoType === 'before' && !canUploadBefore
+              ? 'Les photos avant ne peuvent plus être modifiées à ce stade.'
+              : photoType === 'after' && !canUploadAfter
+                ? 'Les photos après ne peuvent plus être envoyées.'
+                : beforePhotos.length >= requiredPhotos &&
+                    photoType === 'before' &&
+                    canUploadAfter &&
+                    afterPhotos.length < requiredPhotos
+                  ? `Minimum atteint pour l'avant. Passez à « Après » pour continuer.`
+                  : null;
 
     return (
         <AppLayout breadcrumbs={[
@@ -312,22 +352,34 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                     <CardContent>
                                         <div className="flex gap-4 mb-4">
                                             <Button
+                                                type="button"
                                                 variant={photoType === 'before' ? 'default' : 'outline'}
-                                                onClick={() => setPhotoType('before')}
-                                                disabled={!canUploadBefore}
+                                                onClick={() => {
+                                                    setPhotoType('before');
+                                                    setUploadError(null);
+                                                }}
                                                 className={photoType === 'before' ? 'bg-sky-500' : ''}
                                             >
                                                 Avant ({beforePhotos.length}/{requiredPhotos})
                                             </Button>
                                             <Button
+                                                type="button"
                                                 variant={photoType === 'after' ? 'default' : 'outline'}
-                                                onClick={() => setPhotoType('after')}
-                                                disabled={!canUploadAfter}
+                                                onClick={() => {
+                                                    setPhotoType('after');
+                                                    setUploadError(null);
+                                                }}
                                                 className={photoType === 'after' ? 'bg-green-500' : ''}
                                             >
                                                 Après ({afterPhotos.length}/{requiredPhotos})
                                             </Button>
                                         </div>
+
+                                        {uploadHint && !uploadError && (
+                                            <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800" role="status">
+                                                {uploadHint}
+                                            </p>
+                                        )}
                                         
                                         {/* Input pour galerie (sans capture) */}
                                         <input
@@ -349,24 +401,26 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                         
                                         <div className="grid grid-cols-2 gap-3">
                                             <Button
+                                                type="button"
                                                 variant="outline"
                                                 onClick={() => {
                                                     setUploadError(null);
                                                     cameraInputRef.current?.click();
                                                 }}
-                                                disabled={uploading}
+                                                disabled={uploading || !canUploadSelectedType}
                                                 className="w-full min-h-11"
                                             >
                                                 <Camera className="h-4 w-4 mr-2" />
                                                 {uploading ? 'Envoi...' : 'Prendre photo'}
                                             </Button>
                                             <Button
+                                                type="button"
                                                 variant="outline"
                                                 onClick={() => {
                                                     setUploadError(null);
                                                     fileInputRef.current?.click();
                                                 }}
-                                                disabled={uploading}
+                                                disabled={uploading || !canUploadSelectedType}
                                                 className="w-full min-h-11"
                                             >
                                                 <Upload className="h-4 w-4 mr-2" />
@@ -379,7 +433,7 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                             </p>
                                         )}
                                         <p className="mt-2 text-xs text-slate-500">
-                                            JPEG, PNG ou WebP — max. 10 Mo par photo
+                                            Toutes images acceptées (HEIC converti automatiquement). Compression avant envoi.
                                         </p>
                                     </CardContent>
                                 </Card>
