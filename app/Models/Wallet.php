@@ -34,14 +34,18 @@ class Wallet extends Model
         return $this->hasMany(WalletTransaction::class);
     }
 
-    public function credit(float $amount, string $description = null, $booking = null): WalletTransaction
+    public function credit(float $amount, string $description = null, Booking|Mission|null $related = null): WalletTransaction
     {
         $this->balance += $amount;
         $this->total_earned += $amount;
         $this->save();
 
+        $bookingId = $related instanceof Booking ? $related->id : null;
+        $missionId = $related instanceof Mission ? $related->id : null;
+
         return $this->transactions()->create([
-            'booking_id' => $booking?->id,
+            'booking_id' => $bookingId,
+            'mission_id' => $missionId,
             'type' => 'credit',
             'amount' => $amount,
             'balance_after' => $this->balance,
