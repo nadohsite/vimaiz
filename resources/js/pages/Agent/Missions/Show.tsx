@@ -1,15 +1,11 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, XCircle, Play, Upload, Trash2, Star, Award } from 'lucide-react';
+import { ArrowLeft, Calendar, Home, MapPin, User, CheckCircle, XCircle, Play, Star, Award, AlertCircle, Maximize, BedDouble, Bath, Layers, DoorOpen, Wifi, Trash2 } from 'lucide-react';
 import PropertyMap from '@/components/map/PropertyMap';
-import { ImageLightbox } from '@/components/ui/image-lightbox';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 
 interface Property {
     id: number;
@@ -21,24 +17,24 @@ interface Property {
     postal_code: string;
     latitude: number | null;
     longitude: number | null;
+    surface_area: number;
+    bedrooms: number;
+    bathrooms: number;
+    toilets: number;
+    other_rooms: number;
+    floors: number;
+    external_surface: number | null;
     access_code: string | null;
     entry_instructions: string | null;
-    surface_area: number;
+    wifi_code: string | null;
+    trash_instructions: string | null;
+    additional_info: string | null;
 }
 
 interface Client {
     id: number;
     name: string;
     phone: string | null;
-}
-
-interface Photo {
-    id: number;
-    type: 'before' | 'after';
-    path: string;
-    description: string | null;
-    room: string | null;
-    validated_at: string | null;
 }
 
 interface Mission {
@@ -53,7 +49,6 @@ interface Mission {
     status_label: string;
     property: Property;
     client: Client;
-    photos: Photo[];
     internal_quality_score: number | null;
     internal_quality_notes: string | null;
     client_review?: {
@@ -68,30 +63,19 @@ interface Props {
     canAccept: boolean;
     canStart: boolean;
     canComplete: boolean;
-    requiredPhotos: number;
 }
 
-export default function Show({ mission, canAccept, canStart, canComplete, requiredPhotos }: Props) {
-    const [uploading, setUploading] = useState(false);
-    const [photoType, setPhotoType] = useState<'before' | 'after'>('before');
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const cameraInputRef = useRef<HTMLInputElement>(null);
-    const [lightboxOpen, setLightboxOpen] = useState(false);
-    const [lightboxIndex, setLightboxIndex] = useState(0);
-    const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
+const charTileClass = 'flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-700 rounded-lg border border-slate-100 dark:border-slate-600';
+const charLabelClass = 'text-xs text-slate-500 dark:text-slate-400';
+const charValueClass = 'text-sm font-medium text-slate-900 dark:text-white';
 
-    const openLightbox = (photos: Photo[], index: number, type: string) => {
-        const images = photos.map((p, i) => ({
-            src: `/storage/${p.path}`,
-            alt: `Photo ${type} ${i + 1}`,
-            caption: p.description || `Photo ${type} ${i + 1}`,
-        }));
-        setLightboxImages(images);
-        setLightboxIndex(index);
-        setLightboxOpen(true);
-    };
+export default function Show({ mission, canAccept, canStart, canComplete }: Props) {
+    const { props } = usePage<{ flash?: { success?: string; error?: string } }>();
+    const flash = props.flash;
+    const [starting, setStarting] = useState(false);
+    const [locationError, setLocationError] = useState<string | null>(null);
 
-    const { data: refuseData, setData: setRefuseData, post: postRefuse, processing: refuseProcessing } = useForm({
+    const { post: postRefuse, processing: refuseProcessing } = useForm({
         reason: '',
     });
 
@@ -117,7 +101,53 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
     };
 
     const handleStart = () => {
-        router.post(route('agent.missions.start', mission.id));
+        if (!mission.property.latitude || !mission.property.longitude) {
+            setLocationError(
+                'Nous ne pouvons pas confirmer automatiquement l\'emplacement de ce logement. '
+                + 'Vérifiez bien l\'adresse indiquée ci-dessous avant d\'intervenir, puis contactez le support si besoin.',
+            );
+            return;
+        }
+
+        if (!navigator.geolocation) {
+            setLocationError(
+                'Activez la localisation sur votre appareil pour confirmer que vous êtes au bon endroit avant de démarrer.',
+            );
+            return;
+        }
+
+        setStarting(true);
+        setLocationError(null);
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                router.post(
+                    route('agent.missions.start', mission.id),
+                    {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    },
+                    {
+                        preserveScroll: true,
+                        onFinish: () => setStarting(false),
+                        onError: () => setStarting(false),
+                    },
+                );
+            },
+            (error) => {
+                setStarting(false);
+                const messages: Record<number, string> = {
+                    1: 'Pour confirmer que vous êtes au bon logement, autorisez l\'accès à votre position dans les paramètres de votre navigateur ou téléphone.',
+                    2: 'Nous n\'avons pas pu localiser votre position. Placez-vous devant le logement, puis réessayez.',
+                    3: 'La vérification de votre position a pris trop de temps. Restez devant le logement et réessayez.',
+                };
+                setLocationError(
+                    messages[error.code]
+                        || 'Impossible de vérifier votre position pour le moment. Réessayez une fois sur place.',
+                );
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
+        );
     };
 
     const handleComplete = () => {
@@ -126,55 +156,7 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
         }
     };
 
-    const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (!files || files.length === 0) return;
-
-        setUploading(true);
-        const formData = new FormData();
-        formData.append('photo', files[0]);
-        formData.append('type', photoType);
-
-        try {
-            const response = await fetch(route('agent.missions.upload-photo', mission.id), {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: formData,
-            });
-            
-            if (response.ok) {
-                router.reload();
-            }
-        } catch (error) {
-            console.error('Upload error:', error);
-        }
-        setUploading(false);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-        if (cameraInputRef.current) cameraInputRef.current.value = '';
-    };
-
-    const handleDeletePhoto = async (photoId: number) => {
-        if (!confirm('Supprimer cette photo ?')) return;
-        
-        try {
-            await fetch(route('agent.missions.delete-photo', [mission.id, photoId]), {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-            });
-            router.reload();
-        } catch (error) {
-            console.error('Delete error:', error);
-        }
-    };
-
-    const beforePhotos = mission.photos.filter(p => p.type === 'before');
-    const afterPhotos = mission.photos.filter(p => p.type === 'after');
-    const canUploadBefore = ['agent_accepted', 'in_progress', 'photos_before'].includes(mission.status);
-    const canUploadAfter = ['in_progress', 'photos_before', 'photos_after'].includes(mission.status);
+    const hasPropertyCoordinates = Boolean(mission.property.latitude && mission.property.longitude);
 
     return (
         <AppLayout breadcrumbs={[
@@ -201,7 +183,22 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                         </div>
                     </div>
 
-                    {/* Action Card for Pending */}
+                    {(flash?.success || flash?.error || locationError) && (
+                        <div className="mb-6 space-y-3">
+                            {flash?.success && (
+                                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
+                                    {flash.success}
+                                </div>
+                            )}
+                            {(flash?.error || locationError) && (
+                                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm flex items-start gap-2">
+                                    <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                                    <span>{flash?.error || locationError}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {canAccept && (
                         <Card className="mb-6 border-orange-300 bg-orange-50">
                             <CardContent className="p-6">
@@ -220,165 +217,47 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                         </Card>
                     )}
 
-                    {/* Start Mission */}
                     {canStart && (
                         <Card className="mb-6 border-sky-300 bg-sky-50">
-                            <CardContent className="p-6 text-center">
-                                <h3 className="font-semibold text-sky-800 mb-2">Prêt à commencer ?</h3>
-                                <p className="text-sm text-sky-700 mb-4">N'oubliez pas de prendre les photos avant de commencer.</p>
-                                <Button onClick={handleStart} className="bg-sky-500 hover:bg-sky-600">
-                                    <Play className="h-4 w-4 mr-2" />
-                                    Démarrer la mission
-                                </Button>
+                            <CardContent className="p-6">
+                                <h3 className="font-semibold text-sky-800 mb-2 text-center">
+                                    Êtes-vous bien devant le logement ?
+                                </h3>
+                                {!hasPropertyCoordinates && (
+                                    <p className="text-sm text-amber-700 mb-4 text-center">
+                                        La position GPS de ce logement n&apos;est pas enregistrée : vérifiez l&apos;adresse
+                                        manuellement, puis contactez le support si vous avez un doute.
+                                    </p>
+                                )}
+                                <div className="text-center">
+                                    <Button
+                                        onClick={handleStart}
+                                        disabled={starting || !hasPropertyCoordinates}
+                                        className="bg-sky-500 hover:bg-sky-600"
+                                    >
+                                        <Play className="h-4 w-4 mr-2" />
+                                        {starting
+                                            ? 'Vérification que vous êtes sur place...'
+                                            : 'Je suis au bon endroit — démarrer'}
+                                    </Button>
+                                    <p className="text-xs text-sky-600 mt-3">
+                                        En cliquant, vous confirmez être devant le logement de cette mission.
+                                    </p>
+                                </div>
                             </CardContent>
                         </Card>
                     )}
 
                     <div className="grid gap-6 lg:grid-cols-3">
                         <div className="lg:col-span-2 space-y-6">
-                            {/* Photos Upload Section */}
-                            {(canUploadBefore || canUploadAfter) && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <Camera className="h-5 w-5 text-sky-500" />
-                                            Photos obligatoires
-                                        </CardTitle>
-                                        <CardDescription>
-                                            Minimum {requiredPhotos} photos avant et après l'intervention
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="flex gap-4 mb-4">
-                                            <Button
-                                                variant={photoType === 'before' ? 'default' : 'outline'}
-                                                onClick={() => setPhotoType('before')}
-                                                disabled={!canUploadBefore}
-                                                className={photoType === 'before' ? 'bg-sky-500' : ''}
-                                            >
-                                                Avant ({beforePhotos.length}/{requiredPhotos})
-                                            </Button>
-                                            <Button
-                                                variant={photoType === 'after' ? 'default' : 'outline'}
-                                                onClick={() => setPhotoType('after')}
-                                                disabled={!canUploadAfter}
-                                                className={photoType === 'after' ? 'bg-green-500' : ''}
-                                            >
-                                                Après ({afterPhotos.length}/{requiredPhotos})
-                                            </Button>
-                                        </div>
-                                        
-                                        {/* Input pour galerie (sans capture) */}
-                                        <input
-                                            ref={fileInputRef}
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handlePhotoUpload}
-                                            className="hidden"
-                                        />
-                                        {/* Input pour caméra (avec capture) */}
-                                        <input
-                                            ref={cameraInputRef}
-                                            type="file"
-                                            accept="image/*"
-                                            capture="environment"
-                                            onChange={handlePhotoUpload}
-                                            className="hidden"
-                                        />
-                                        
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => cameraInputRef.current?.click()}
-                                                disabled={uploading}
-                                                className="w-full"
-                                            >
-                                                <Camera className="h-4 w-4 mr-2" />
-                                                {uploading ? 'Envoi...' : 'Prendre photo'}
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => fileInputRef.current?.click()}
-                                                disabled={uploading}
-                                                className="w-full"
-                                            >
-                                                <Upload className="h-4 w-4 mr-2" />
-                                                {uploading ? 'Envoi...' : 'Galerie'}
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* Before Photos */}
-                            {beforePhotos.length > 0 && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="text-base">Photos avant ({beforePhotos.length})</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {beforePhotos.map((photo, idx) => (
-                                                <div key={photo.id} className="relative group">
-                                                    <img 
-                                                        src={`/storage/${photo.path}`} 
-                                                        alt="Avant" 
-                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
-                                                        onClick={() => openLightbox(beforePhotos, idx, 'avant')}
-                                                    />
-                                                    {!photo.validated_at && canUploadBefore && (
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
-                                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        >
-                                                            <Trash2 className="h-3 w-3" />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* After Photos */}
-                            {afterPhotos.length > 0 && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="text-base">Photos après ({afterPhotos.length})</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {afterPhotos.map((photo, idx) => (
-                                                <div key={photo.id} className="relative group">
-                                                    <img 
-                                                        src={`/storage/${photo.path}`} 
-                                                        alt="Après" 
-                                                        className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
-                                                        onClick={() => openLightbox(afterPhotos, idx, 'après')}
-                                                    />
-                                                    {!photo.validated_at && canUploadAfter && (
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
-                                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        >
-                                                            <Trash2 className="h-3 w-3" />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* Complete Button */}
                             {canComplete && (
                                 <Card className="border-green-300 bg-green-50">
                                     <CardContent className="p-6 text-center">
                                         <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
-                                        <h3 className="font-semibold text-green-800 mb-2">Prêt à terminer ?</h3>
-                                        <p className="text-sm text-green-700 mb-4">Vérifiez que toutes les photos sont envoyées.</p>
+                                        <h3 className="font-semibold text-green-800 mb-2">Mission en cours</h3>
+                                        <p className="text-sm text-green-700 mb-4">
+                                            Une fois l&apos;intervention terminée, cliquez ci-dessous pour clôturer la mission.
+                                        </p>
                                         <Button onClick={handleComplete} className="bg-green-500 hover:bg-green-600">
                                             Terminer la mission
                                         </Button>
@@ -386,7 +265,6 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                 </Card>
                             )}
 
-                            {/* Mission Completed Card */}
                             {mission.status === 'completed' && (
                                 <Card className="border-green-300 bg-green-50">
                                     <CardContent className="p-6">
@@ -401,8 +279,7 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                                 </p>
                                             </div>
                                         </div>
-                                        
-                                        {/* Admin Quality Review */}
+
                                         {mission.internal_quality_score && (
                                             <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
                                                 <h4 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
@@ -432,7 +309,6 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                             </div>
                                         )}
 
-                                        {/* Client Review */}
                                         {mission.client_review && (
                                             <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
                                                 <h4 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
@@ -456,7 +332,7 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                                 </div>
                                                 {mission.client_review.comment && (
                                                     <p className="text-sm text-slate-600 italic">
-                                                        "{mission.client_review.comment}"
+                                                        &quot;{mission.client_review.comment}&quot;
                                                     </p>
                                                 )}
                                             </div>
@@ -465,7 +341,6 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                 </Card>
                             )}
 
-                            {/* Map - Full Width */}
                             <PropertyMap
                                 latitude={mission.property.latitude}
                                 longitude={mission.property.longitude}
@@ -474,32 +349,138 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                             />
                         </div>
 
-                        {/* Sidebar */}
                         <div className="space-y-6">
-                            <Card>
+                            <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-base">
-                                        <Home className="h-4 w-4 text-sky-500" />
+                                    <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                        <Home className="h-4 w-4 text-sky-500 dark:text-sky-400" />
                                         Logement
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="font-medium">{mission.property.name || mission.property.type_label}</p>
-                                    <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
+                                    <p className="font-medium dark:text-white">{mission.property.name || mission.property.type_label}</p>
+                                    {mission.property.name && (
+                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{mission.property.type_label}</p>
+                                    )}
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-1">
                                         <MapPin className="h-3 w-3" />
                                         {mission.property.address_line1}
                                     </p>
-                                    <p className="text-sm text-slate-500">{mission.property.postal_code} {mission.property.city}</p>
-                                    <p className="text-sm text-slate-500 mt-2">{mission.property.surface_area} m²</p>
-                                    
-                                    {mission.property.access_code && (
-                                        <div className="mt-3 p-2 bg-slate-100 rounded">
-                                            <p className="text-xs text-slate-500">Code d'accès</p>
-                                            <p className="font-mono font-medium">{mission.property.access_code}</p>
-                                        </div>
+                                    {mission.property.address_line2 && (
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">{mission.property.address_line2}</p>
                                     )}
-                                    {mission.property.entry_instructions && (
-                                        <p className="text-sm text-slate-600 mt-2">{mission.property.entry_instructions}</p>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">{mission.property.postal_code} {mission.property.city}</p>
+
+                                    <div className="mt-4 pt-4 border-t dark:border-slate-600">
+                                        <p className={`${charLabelClass} font-medium uppercase tracking-wider mb-3`}>
+                                            Caractéristiques
+                                        </p>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {mission.property.surface_area > 0 && (
+                                                <div className={charTileClass}>
+                                                    <Maximize className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                    <div>
+                                                        <p className={charLabelClass}>Surface</p>
+                                                        <p className={charValueClass}>{mission.property.surface_area} m²</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {mission.property.bedrooms > 0 && (
+                                                <div className={charTileClass}>
+                                                    <BedDouble className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                    <div>
+                                                        <p className={charLabelClass}>Chambres</p>
+                                                        <p className={charValueClass}>{mission.property.bedrooms}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {mission.property.bathrooms > 0 && (
+                                                <div className={charTileClass}>
+                                                    <Bath className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                    <div>
+                                                        <p className={charLabelClass}>Salles de bain</p>
+                                                        <p className={charValueClass}>{mission.property.bathrooms}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {mission.property.toilets > 0 && (
+                                                <div className={charTileClass}>
+                                                    <Bath className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                    <div>
+                                                        <p className={charLabelClass}>Toilettes</p>
+                                                        <p className={charValueClass}>{mission.property.toilets}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {mission.property.other_rooms > 0 && (
+                                                <div className={charTileClass}>
+                                                    <DoorOpen className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                    <div>
+                                                        <p className={charLabelClass}>Autres pièces</p>
+                                                        <p className={charValueClass}>{mission.property.other_rooms}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {mission.property.floors > 0 && (
+                                                <div className={charTileClass}>
+                                                    <Layers className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                    <div>
+                                                        <p className={charLabelClass}>Étages</p>
+                                                        <p className={charValueClass}>{mission.property.floors}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {mission.property.external_surface != null && mission.property.external_surface > 0 && (
+                                                <div className={charTileClass}>
+                                                    <Maximize className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                    <div>
+                                                        <p className={charLabelClass}>Surface ext.</p>
+                                                        <p className={charValueClass}>{mission.property.external_surface} m²</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {(mission.property.access_code || mission.property.entry_instructions || mission.property.wifi_code || mission.property.trash_instructions || mission.property.additional_info) && (
+                                        <div className="mt-4 pt-4 border-t dark:border-slate-600 space-y-3">
+                                            {mission.property.access_code && (
+                                                <div className="p-2 bg-slate-100 dark:bg-slate-700 rounded border border-slate-200 dark:border-slate-600">
+                                                    <p className={charLabelClass}>Code d&apos;accès</p>
+                                                    <p className="font-mono font-medium text-slate-900 dark:text-white">{mission.property.access_code}</p>
+                                                </div>
+                                            )}
+                                            {mission.property.entry_instructions && (
+                                                <div>
+                                                    <p className={`${charLabelClass} mb-1`}>Instructions d&apos;accès</p>
+                                                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line">{mission.property.entry_instructions}</p>
+                                                </div>
+                                            )}
+                                            {mission.property.wifi_code && (
+                                                <div className="flex items-start gap-2">
+                                                    <Wifi className="h-4 w-4 text-sky-500 dark:text-sky-400 mt-0.5 shrink-0" />
+                                                    <div>
+                                                        <p className={charLabelClass}>Code Wi-Fi</p>
+                                                        <p className="text-sm font-medium font-mono text-slate-900 dark:text-white">{mission.property.wifi_code}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {mission.property.trash_instructions && (
+                                                <div className="flex items-start gap-2">
+                                                    <Trash2 className="h-4 w-4 text-sky-500 dark:text-sky-400 mt-0.5 shrink-0" />
+                                                    <div>
+                                                        <p className={charLabelClass}>Consignes poubelles</p>
+                                                        <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line">{mission.property.trash_instructions}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {mission.property.additional_info && (
+                                                <div>
+                                                    <p className={`${charLabelClass} mb-1`}>Informations supplémentaires</p>
+                                                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line">{mission.property.additional_info}</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     )}
                                 </CardContent>
                             </Card>
@@ -530,6 +511,14 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                                         <span className="text-slate-500">Durée</span>
                                         <span className="font-medium">{mission.duration_hours}h</span>
                                     </div>
+                                    {mission.started_at && (
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Démarrée</span>
+                                            <span className="font-medium">
+                                                {new Date(mission.started_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
 
@@ -553,13 +542,6 @@ export default function Show({ mission, canAccept, canStart, canComplete, requir
                     </div>
                 </div>
             </div>
-
-            <ImageLightbox
-                images={lightboxImages}
-                initialIndex={lightboxIndex}
-                isOpen={lightboxOpen}
-                onClose={() => setLightboxOpen(false)}
-            />
         </AppLayout>
     );
 }

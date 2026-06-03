@@ -185,10 +185,11 @@ class Mission extends Model
 
     public function canComplete(): bool
     {
-        return $this->status !== self::STATUS_COMPLETED 
-            && $this->status !== self::STATUS_CANCELLED
-            && $this->hasBeforePhotos() 
-            && $this->hasAfterPhotos();
+        return in_array($this->status, [
+            self::STATUS_IN_PROGRESS,
+            self::STATUS_PHOTOS_BEFORE,
+            self::STATUS_PHOTOS_AFTER,
+        ], true);
     }
 
     public function getStatusLabelAttribute(): string

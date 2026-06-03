@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Storage;
 
 class MissionService
 {
+    public const MAX_START_DISTANCE_METERS = 25;
+
     protected AgentAssignmentService $assignmentService;
 
     public function __construct(AgentAssignmentService $assignmentService)
@@ -147,8 +149,28 @@ class MissionService
         return $mission->fresh();
     }
 
-    public function startMission(Mission $mission): Mission
+    public function startMission(Mission $mission, float $agentLatitude, float $agentLongitude): Mission
     {
+        $property = $mission->property;
+
+        if (!$property || !$property->latitude || !$property->longitude) {
+            throw new \Exception(
+                'Nous ne pouvons pas vérifier l\'emplacement de ce logement pour le moment. '
+                . 'Vérifiez l\'adresse affichée sur la fiche mission, puis contactez le support si besoin.'
+            );
+        }
+
+        $distanceMeters = $property->distanceToInMeters($agentLatitude, $agentLongitude);
+
+        if ($distanceMeters === null || $distanceMeters > self::MAX_START_DISTANCE_METERS) {
+            $address = $property->full_address;
+
+            throw new \Exception(
+                'Vous ne semblez pas encore être devant le bon logement. '
+                . "Avant de démarrer, assurez-vous d'être sur place à l'adresse suivante : {$address}."
+            );
+        }
+
         $mission->update([
             'status' => Mission::STATUS_IN_PROGRESS,
             'started_at' => now(),
@@ -211,7 +233,7 @@ class MissionService
     public function completeMission(Mission $mission): Mission
     {
         if (!$mission->canComplete()) {
-            throw new \Exception('Mission cannot be completed. Photos before and after are required.');
+            throw new \Exception('La mission ne peut pas être terminée dans son état actuel.');
         }
         
         $mission->update([

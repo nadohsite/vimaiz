@@ -57,7 +57,6 @@ class MissionController extends Controller
             'canAccept' => $mission->status === Mission::STATUS_PENDING_AGENT,
             'canStart' => $mission->canStart(),
             'canComplete' => $mission->canComplete(),
-            'requiredPhotos' => 3,
         ]);
     }
 
@@ -94,14 +93,26 @@ class MissionController extends Controller
         }
     }
 
-    public function start(Mission $mission): RedirectResponse
+    public function start(Request $request, Mission $mission): RedirectResponse
     {
         $this->authorize('start', $mission);
 
-        try {
-            $this->missionService->startMission($mission);
+        $validated = $request->validate([
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+        ]);
 
-            return back()->with('success', 'Mission démarrée. N\'oubliez pas les photos avant !');
+        try {
+            $this->missionService->startMission(
+                $mission,
+                (float) $validated['latitude'],
+                (float) $validated['longitude'],
+            );
+
+            return back()->with(
+                'success',
+                'Vous êtes au bon endroit : la mission est démarrée. Bonne intervention !'
+            );
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
