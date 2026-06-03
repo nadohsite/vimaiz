@@ -25,8 +25,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function handle(Request $request, Closure $next)
     {
-        // Skip Inertia middleware for Filament admin routes
-        if ($request->is('admin') || $request->is('admin/*') || $request->is('livewire/*')) {
+        // Skip Inertia for Filament admin + Livewire (paths: livewire-{hash}/…)
+        if (
+            $request->is('admin', 'admin/*', 'livewire/*', 'filament/*')
+            || str_starts_with($request->path(), 'livewire-')
+        ) {
             return $next($request);
         }
 
