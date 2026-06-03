@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { MapPin, Loader2 } from 'lucide-react';
-import debounce from 'lodash/debounce';
 
 interface AddressResult {
     place_id: number;
@@ -61,21 +60,23 @@ export default function AddressAutocomplete({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Debounced search function
-    const searchAddress = useCallback(
-        debounce(async (searchQuery: string) => {
-            if (searchQuery.length < 3) {
-                setResults([]);
-                setShowDropdown(false);
-                return;
-            }
+    useEffect(() => {
+        if (query.length < 3) {
+            setResults([]);
+            setShowDropdown(false);
+            setIsLoading(false);
+            return;
+        }
 
-            setIsLoading(true);
+        setIsLoading(true);
+        const controller = new AbortController();
+
+        const timer = window.setTimeout(async () => {
             try {
                 const response = await fetch(
-                    `https://nominatim.openstreetmap.org/search?` + 
+                    `https://nominatim.openstreetmap.org/search?` +
                     new URLSearchParams({
-                        q: searchQuery,
+                        q: query,
                         format: 'json',
                         addressdetails: '1',
                         limit: '5',
@@ -85,7 +86,8 @@ export default function AddressAutocomplete({
                         headers: {
                             'Accept-Language': 'fr',
                         },
-                    }
+                        signal: controller.signal,
+                    },
                 );
 
                 if (response.ok) {
@@ -95,19 +97,26 @@ export default function AddressAutocomplete({
                     setSelectedIndex(-1);
                 }
             } catch (error) {
+                if (error instanceof DOMException && error.name === 'AbortError') {
+                    return;
+                }
                 console.error('Address search failed:', error);
                 setResults([]);
             } finally {
-                setIsLoading(false);
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
             }
-        }, 300),
-        []
-    );
+        }, 300);
+
+        return () => {
+            window.clearTimeout(timer);
+            controller.abort();
+        };
+    }, [query]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setQuery(value);
-        searchAddress(value);
+        setQuery(e.target.value);
     };
 
     const parseAddress = (result: AddressResult): ParsedAddress => {
