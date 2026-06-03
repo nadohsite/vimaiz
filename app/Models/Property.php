@@ -155,4 +155,23 @@ class Property extends Model
     {
         return !$this->hasActiveRequests();
     }
+
+    public function distanceToInMeters(float $latitude, float $longitude): float
+    {
+        $earthRadius = 6371000;
+
+        $latFrom = deg2rad((float) $this->latitude);
+        $lonFrom = deg2rad((float) $this->longitude);
+        $latTo = deg2rad($latitude);
+        $lonTo = deg2rad($longitude);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $a = sin($latDelta / 2) ** 2
+            + cos($latFrom) * cos($latTo) * sin($lonDelta / 2) ** 2;
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
+    }
 }
