@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Schema;
 
 class Wallet extends Model
 {
@@ -40,18 +41,20 @@ class Wallet extends Model
         $this->total_earned += $amount;
         $this->save();
 
-        $bookingId = $related instanceof Booking ? $related->id : null;
-        $missionId = $related instanceof Mission ? $related->id : null;
-
-        return $this->transactions()->create([
-            'booking_id' => $bookingId,
-            'mission_id' => $missionId,
+        $data = [
+            'booking_id' => $related instanceof Booking ? $related->id : null,
             'type' => 'credit',
             'amount' => $amount,
             'balance_after' => $this->balance,
             'description' => $description,
             'status' => 'completed',
-        ]);
+        ];
+
+        if ($related instanceof Mission && Schema::hasColumn('wallet_transactions', 'mission_id')) {
+            $data['mission_id'] = $related->id;
+        }
+
+        return $this->transactions()->create($data);
     }
 
     public function debit(float $amount, string $description = null): WalletTransaction
