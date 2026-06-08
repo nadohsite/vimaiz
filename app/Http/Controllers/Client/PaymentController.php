@@ -91,8 +91,7 @@ class PaymentController extends Controller
                     ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
             }
 
-            $mission = $this->missionService->createMissionFromQuote($quote);
-            $mission = $this->missionService->markAsPaid($mission, $paymentIntent->id);
+            $mission = $this->missionService->createPaidMissionFromQuote($quote, $paymentIntent->id);
 
             return redirect()->route('client.missions.show', $mission)
                 ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
@@ -140,8 +139,7 @@ class PaymentController extends Controller
                     ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
             }
 
-            $mission = $this->missionService->createMissionFromQuote($quote);
-            $mission = $this->missionService->markAsPaid($mission, $paymentIntent->id);
+            $mission = $this->missionService->createPaidMissionFromQuote($quote, $paymentIntent->id);
 
             if ($request->expectsJson()) {
                 return response()->json([

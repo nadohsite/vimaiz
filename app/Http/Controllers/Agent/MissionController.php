@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mission;
+use App\Models\MissionInvitation;
 use App\Models\MissionPhoto;
 use App\Services\MissionService;
 use App\Support\UploadHelper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,7 +26,14 @@ class MissionController extends Controller
         $user = $request->user();
         $status = $request->query('status');
 
-        $query = Mission::where('agent_id', $user->id)
+        $query = Mission::query()
+            ->where(function ($q) use ($user) {
+                $q->where('agent_id', $user->id)
+                    ->orWhereHas('invitations', function ($iq) use ($user) {
+                        $iq->where('agent_id', $user->id)
+                            ->where('status', MissionInvitation::STATUS_PENDING);
+                    });
+            })
             ->with(['property', 'client']);
 
         if ($status) {
@@ -54,7 +63,8 @@ class MissionController extends Controller
 
         return Inertia::render('Agent/Missions/Show', [
             'mission' => $mission,
-            'canAccept' => $mission->status === Mission::STATUS_PENDING_AGENT,
+            'canAccept' => Gate::allows('accept', $mission),
+            'canRefuse' => Gate::allows('refuse', $mission),
             'canStart' => $mission->canStart(),
             'canComplete' => $mission->canComplete(),
         ]);
@@ -65,10 +75,10 @@ class MissionController extends Controller
         $this->authorize('accept', $mission);
 
         try {
-            $this->missionService->agentAcceptMission($mission);
+            $this->missionService->agentAcceptMission($mission, auth()->user());
 
-            return back()->with('success', 'Mission acceptée. Rendez-vous le ' . 
-                $mission->scheduled_at->format('d/m/Y à H:i'));
+            return back()->with('success', 'Mission acceptée. Rendez-vous le '.
+                $mission->fresh()->scheduled_at->format('d/m/Y à H:i'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -83,7 +93,20 @@ class MissionController extends Controller
         ]);
 
         try {
-            $this->missionService->agentRefuseMission($mission, $validated['reason'] ?? null);
+            $wasAccepted = $mission->agent_id === auth()->id()
+                && $mission->status === Mission::STATUS_AGENT_ACCEPTED;
+
+            $this->missionService->agentRefuseMission(
+                $mission,
+                auth()->user(),
+                $validated['reason'] ?? null
+            );
+
+            if ($wasAccepted) {
+                return redirect()
+                    ->route('agent.missions.index')
+                    ->with('info', 'Mission déclinée. Elle sera reproposée aux autres agents.');
+            }
 
             return redirect()
                 ->route('agent.missions.index')

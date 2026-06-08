@@ -10,12 +10,28 @@ interface Message {
     created_at: string;
 }
 
-interface Notification {
-    id: string;
-    type: string;
-    message: string;
+interface VimaizNotification {
+    type?: string;
+    message?: string;
     url?: string;
-    data: Record<string, unknown>;
+    [key: string]: unknown;
+}
+
+function showBrowserNotification(title: string, body: string) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, {
+            body,
+            icon: '/favicon.ico',
+        });
+    }
+}
+
+function refreshNotifications(notification?: VimaizNotification) {
+    router.reload({ only: ['notifications', 'unreadNotificationsCount'] });
+
+    if (notification?.message) {
+        showBrowserNotification('VIMAIZ', notification.message);
+    }
 }
 
 export function useRealtime(userId: number | null) {
@@ -24,38 +40,29 @@ export function useRealtime(userId: number | null) {
 
         const channel = window.Echo.private(`user.${userId}`);
 
-        // Listen for new messages
         channel.listen('.new-message', (data: Message) => {
-            // Refresh the current page to get new messages
             router.reload({ only: ['messages', 'conversations', 'unreadCount'] });
-            
-            // Show browser notification if permitted
-            if (Notification.permission === 'granted') {
-                new Notification(`Nouveau message de ${data.sender_name}`, {
-                    body: data.message.substring(0, 100),
-                    icon: '/favicon.ico',
-                });
-            }
+            showBrowserNotification(
+                `Nouveau message de ${data.sender_name}`,
+                data.message.substring(0, 100),
+            );
         });
 
-        // Listen for new notifications
-        channel.listen('.new-notification', (data: Notification) => {
-            // Refresh notifications
-            router.reload({ only: ['notifications', 'unreadNotificationsCount'] });
-            
-            // Show browser notification if permitted
-            if (Notification.permission === 'granted') {
-                new Notification('VIMAIZ', {
-                    body: data.message,
-                    icon: '/favicon.ico',
-                });
-            }
+        channel.listen('.new-notification', (data: VimaizNotification) => {
+            refreshNotifications(data);
+        });
+
+        const userChannel = window.Echo.private(`App.Models.User.${userId}`);
+
+        userChannel.notification((notification: VimaizNotification) => {
+            refreshNotifications(notification);
         });
 
         return () => {
             channel.stopListening('.new-message');
             channel.stopListening('.new-notification');
             window.Echo.leave(`user.${userId}`);
+            window.Echo.leave(`App.Models.User.${userId}`);
         };
     }, [userId]);
 }

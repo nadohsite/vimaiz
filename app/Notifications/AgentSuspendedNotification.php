@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Concerns\BroadcastsVimaizNotification;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 class AgentSuspendedNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use BroadcastsVimaizNotification, Queueable;
 
     public function __construct(
         public string $reason,
@@ -19,7 +20,7 @@ class AgentSuspendedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', 'broadcast'];
     }
 
     public function toMail(object $notifiable): MailMessage

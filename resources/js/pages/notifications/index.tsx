@@ -2,7 +2,8 @@ import { Head, router } from '@inertiajs/react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bell, FileText, CreditCard, User, CheckCircle, Play, Wallet, AlertCircle, Trash2, Check } from 'lucide-react';
+import { Bell, Trash2, Check } from 'lucide-react';
+import { getNotificationIcon } from '@/lib/notification-icons';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -36,20 +37,6 @@ interface Props {
 const breadcrumbs = [
     { title: 'Notifications', href: route('notifications.index') },
 ];
-
-const getNotificationIcon = (type: string) => {
-    const icons: Record<string, { icon: typeof Bell; color: string }> = {
-        new_quote: { icon: FileText, color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400' },
-        payment_received: { icon: CreditCard, color: 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400' },
-        mission_assigned: { icon: User, color: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400' },
-        agent_accepted: { icon: CheckCircle, color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400' },
-        mission_started: { icon: Play, color: 'text-sky-600 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-400' },
-        mission_completed: { icon: CheckCircle, color: 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400' },
-        agent_payout: { icon: Wallet, color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400' },
-        quote_refused: { icon: AlertCircle, color: 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400' },
-    };
-    return icons[type] || { icon: Bell, color: 'text-neutral-600 bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-400' };
-};
 
 const formatTime = (dateString: string) => {
     try {

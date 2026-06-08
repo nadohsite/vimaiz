@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Livewire\VimaizDatabaseNotifications;
+use Filament\Enums\DatabaseNotificationsPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -43,6 +45,11 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('4.5rem')
             ->favicon(asset('favicon.svg'))
             ->sidebarCollapsibleOnDesktop()
+            ->databaseNotifications(
+                livewireComponent: VimaizDatabaseNotifications::class,
+                position: DatabaseNotificationsPosition::Topbar,
+            )
+            ->databaseNotificationsPolling('15s')
             ->navigationGroups([
                 NavigationGroup::make('Demandes & Missions'),
                 NavigationGroup::make('Clients'),
@@ -80,6 +87,10 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 'panels::head.end',
                 fn () => new HtmlString('<style>img.fi-logo, .fi-logo { filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%); }</style>')
+            )
+            ->renderHook(
+                'panels::body.end',
+                fn () => view('filament.echo')
             );
     }
 }

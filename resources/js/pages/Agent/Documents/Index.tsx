@@ -209,7 +209,7 @@ export default function DocumentsIndex({ agentProfile, documents, verificationSt
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    {verificationStatus === 'pending' && allRequiredUploaded && (
+                                    {(verificationStatus === 'pending' || verificationStatus === 'rejected') && allRequiredUploaded && (
                                         <Button
                                             onClick={handleSubmit}
                                             disabled={submitting}

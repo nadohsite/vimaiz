@@ -111,6 +111,11 @@ export default function Index({ missions, currentStatus, statuses }: Props) {
                                                             <Badge className={getStatusColor(mission.status)}>
                                                                 {mission.status_label}
                                                             </Badge>
+                                                            {mission.status === 'pending_agent' && (
+                                                                <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+                                                                    Proposition
+                                                                </Badge>
+                                                            )}
                                                         </div>
                                                         <div className="flex items-center gap-4 mt-2 text-sm text-slate-500 flex-wrap">
                                                             <span className="flex items-center gap-1">

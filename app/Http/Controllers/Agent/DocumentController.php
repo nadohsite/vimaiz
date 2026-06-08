@@ -181,8 +181,13 @@ class DocumentController extends Controller
             return back()->with('error', 'Documents manquants : ' . implode(', ', $missingDocs));
         }
 
+        if (! in_array($agentProfile->verification_status, ['pending', 'rejected'], true)) {
+            return back()->with('error', 'Vos documents ont déjà été soumis ou vérifiés.');
+        }
+
         $agentProfile->update([
             'verification_status' => 'submitted',
+            'rejection_reason' => null,
         ]);
 
         return back()->with('success', 'Vos documents ont été soumis pour vérification. Vous serez notifié une fois la vérification terminée.');

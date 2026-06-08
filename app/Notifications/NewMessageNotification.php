@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Notifications\Concerns\BroadcastsVimaizNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,7 +12,7 @@ use Illuminate\Notifications\Notification;
 
 class NewMessageNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use BroadcastsVimaizNotification, Queueable;
 
     public function __construct(
         public Message $message,
@@ -21,11 +22,6 @@ class NewMessageNotification extends Notification implements ShouldQueue
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
-    }
-
-    public function toBroadcast(object $notifiable): array
-    {
-        return $this->toArray($notifiable);
     }
 
     public function toArray(object $notifiable): array

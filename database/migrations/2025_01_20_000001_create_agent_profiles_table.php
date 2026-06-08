@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('profile_photo')->nullable();
             
             // Verification Status
-            $table->enum('verification_status', ['pending', 'verified', 'rejected'])->default('pending');
+            $table->enum('verification_status', ['pending', 'submitted', 'verified', 'rejected'])->default('pending');
             $table->text('rejection_reason')->nullable();
             $table->timestamp('verified_at')->nullable();
             

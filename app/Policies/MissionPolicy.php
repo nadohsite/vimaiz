@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Mission;
+use App\Models\MissionInvitation;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -17,9 +18,18 @@ class MissionPolicy
 
     public function view(User $user, Mission $mission): bool
     {
-        return $user->id === $mission->client_id 
-            || $user->id === $mission->agent_id 
-            || $user->isAdmin();
+        if ($user->isAdmin() || $user->id === $mission->client_id) {
+            return true;
+        }
+
+        if ($user->id === $mission->agent_id) {
+            return true;
+        }
+
+        return $mission->invitations()
+            ->where('agent_id', $user->id)
+            ->where('status', MissionInvitation::STATUS_PENDING)
+            ->exists();
     }
 
     public function create(User $user): bool
@@ -39,14 +49,39 @@ class MissionPolicy
 
     public function accept(User $user, Mission $mission): bool
     {
-        return $user->id === $mission->agent_id 
-            && $mission->status === Mission::STATUS_PENDING_AGENT;
+        if ($mission->status !== Mission::STATUS_PENDING_AGENT) {
+            return false;
+        }
+
+        if ($mission->agent_id === $user->id) {
+            return true;
+        }
+
+        return $mission->agent_id === null
+            && $mission->invitations()
+                ->where('agent_id', $user->id)
+                ->where('status', MissionInvitation::STATUS_PENDING)
+                ->exists();
     }
 
     public function refuse(User $user, Mission $mission): bool
     {
-        return $user->id === $mission->agent_id 
-            && $mission->status === Mission::STATUS_PENDING_AGENT;
+        if ($mission->invitations()
+            ->where('agent_id', $user->id)
+            ->where('status', MissionInvitation::STATUS_PENDING)
+            ->exists()) {
+            return true;
+        }
+
+        if ($user->id !== $mission->agent_id) {
+            return false;
+        }
+
+        if ($mission->status === Mission::STATUS_AGENT_ACCEPTED) {
+            return $mission->canStart();
+        }
+
+        return $mission->status === Mission::STATUS_PENDING_AGENT;
     }
 
     public function start(User $user, Mission $mission): bool
@@ -56,7 +91,7 @@ class MissionPolicy
 
     public function uploadPhotos(User $user, Mission $mission): bool
     {
-        return $user->id === $mission->agent_id 
+        return $user->id === $mission->agent_id
             && in_array($mission->status, [
                 Mission::STATUS_AGENT_ACCEPTED,
                 Mission::STATUS_IN_PROGRESS,

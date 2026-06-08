@@ -156,6 +156,33 @@ class Mission extends Model
         return $this->hasOne(Review::class);
     }
 
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(MissionInvitation::class);
+    }
+
+    public function pendingInvitations(): HasMany
+    {
+        return $this->hasMany(MissionInvitation::class)->where('status', MissionInvitation::STATUS_PENDING);
+    }
+
+    public function hasPendingInvitationFor(int $agentId): bool
+    {
+        return $this->invitations()
+            ->where('agent_id', $agentId)
+            ->where('status', MissionInvitation::STATUS_PENDING)
+            ->exists();
+    }
+
+    public function isVisibleToAgent(int $agentId): bool
+    {
+        if ($this->agent_id === $agentId) {
+            return true;
+        }
+
+        return $this->hasPendingInvitationFor($agentId);
+    }
+
     public function isPaid(): bool
     {
         return $this->payment_status === self::PAYMENT_PAID;

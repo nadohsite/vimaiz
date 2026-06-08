@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\Mission;
+use App\Models\MissionInvitation;
 use App\Models\MissionPhoto;
 use App\Models\Quote;
 use App\Models\ServiceRequest;
@@ -12,12 +13,12 @@ use App\Notifications\AgentAcceptedMissionNotification;
 use App\Notifications\AgentAcceptedMissionAdminNotification;
 use App\Notifications\AgentPayoutNotification;
 use App\Notifications\AgentRefusedMissionNotification;
-use App\Notifications\MissionAssignedNotification;
 use App\Notifications\MissionCompletedNotification;
 use App\Notifications\MissionCompletedAdminNotification;
 use App\Notifications\MissionStartedNotification;
 use App\Notifications\PaymentReceivedNotification;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class MissionService
@@ -68,6 +69,25 @@ class MissionService
         return $mission;
     }
 
+    /**
+     * Crée une mission à partir d'un devis accepté et la marque comme payée
+     * (flux client Stripe ou confirmation manuelle admin).
+     */
+    public function createPaidMissionFromQuote(Quote $quote, string $paymentIntentId): Mission
+    {
+        if ($quote->mission) {
+            throw new \InvalidArgumentException('Une mission existe déjà pour ce devis.');
+        }
+
+        if (! in_array($quote->status, [Quote::STATUS_ACCEPTED, Quote::STATUS_PAID], true)) {
+            throw new \InvalidArgumentException('Le devis doit être accepté par le client avant de créer une mission.');
+        }
+
+        $mission = $this->createMissionFromQuote($quote);
+
+        return $this->markAsPaid($mission, $paymentIntentId);
+    }
+
     public function markAsPaid(Mission $mission, string $paymentIntentId): Mission
     {
         $mission->update([
@@ -84,68 +104,224 @@ class MissionService
         $mission->serviceRequest->update([
             'status' => ServiceRequest::STATUS_PAID,
         ]);
-        
-        $agent = $this->assignmentService->assignAgentToMission($mission);
-        
-        $mission->serviceRequest->update([
-            'status' => ServiceRequest::STATUS_ASSIGNED,
-        ]);
-        
+
+        $this->assignmentService->proposeMissionToAgents($mission);
+
         // Create invoice for the mission
         Invoice::createFromMission($mission);
-        
+
         // Notify client that payment was received
         $mission->client->notify(new PaymentReceivedNotification($mission));
-        
-        // Notify agent of new mission
-        if ($agent) {
-            $agent->notify(new MissionAssignedNotification($mission->fresh()));
-        }
-        
+
         return $mission->fresh();
     }
 
-    public function agentAcceptMission(Mission $mission): Mission
+    public function agentAcceptMission(Mission $mission, User $agent): Mission
+    {
+        return DB::transaction(function () use ($mission, $agent) {
+            $mission = Mission::lockForUpdate()->findOrFail($mission->id);
+
+            if ($mission->status !== Mission::STATUS_PENDING_AGENT) {
+                throw new \Exception('Cette mission n\'est plus disponible.');
+            }
+
+            if ($mission->agent_id === $agent->id) {
+                return $this->agentConfirmLegacyAssignment($mission, $agent);
+            }
+
+            if ($mission->agent_id !== null) {
+                throw new \Exception('Cette mission a déjà été acceptée par un autre agent.');
+            }
+
+            $invitation = MissionInvitation::where('mission_id', $mission->id)
+                ->where('agent_id', $agent->id)
+                ->where('status', MissionInvitation::STATUS_PENDING)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $invitation) {
+                throw new \Exception('Vous n\'avez pas d\'invitation active pour cette mission.');
+            }
+
+            $mission->update([
+                'agent_id' => $agent->id,
+                'status' => Mission::STATUS_AGENT_ACCEPTED,
+                'agent_responded_at' => now(),
+            ]);
+
+            $invitation->update([
+                'status' => MissionInvitation::STATUS_ACCEPTED,
+                'responded_at' => now(),
+            ]);
+
+            MissionInvitation::where('mission_id', $mission->id)
+                ->where('status', MissionInvitation::STATUS_PENDING)
+                ->update([
+                    'status' => MissionInvitation::STATUS_WITHDRAWN,
+                    'responded_at' => now(),
+                ]);
+
+            $mission->serviceRequest->update([
+                'status' => ServiceRequest::STATUS_ASSIGNED,
+            ]);
+
+            $mission->client->notify(new AgentAcceptedMissionNotification($mission));
+
+            $admins = User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new AgentAcceptedMissionAdminNotification($mission));
+            }
+
+            return $mission->fresh();
+        });
+    }
+
+    public function agentRefuseMission(Mission $mission, User $agent, ?string $reason = null): Mission
+    {
+        if ($mission->agent_id === $agent->id
+            && $mission->status === Mission::STATUS_AGENT_ACCEPTED
+            && $mission->canStart()) {
+            return $this->agentDeclineAcceptedMission($mission, $agent, $reason);
+        }
+
+        return $this->agentRefuseInvitation($mission, $agent, $reason);
+    }
+
+    protected function agentRefuseInvitation(Mission $mission, User $agent, ?string $reason): Mission
+    {
+        $invitation = MissionInvitation::where('mission_id', $mission->id)
+            ->where('agent_id', $agent->id)
+            ->where('status', MissionInvitation::STATUS_PENDING)
+            ->first();
+
+        if (! $invitation) {
+            if ($mission->agent_id === $agent->id && $mission->status === Mission::STATUS_PENDING_AGENT) {
+                return $this->agentRefuseLegacyAssignment($mission, $agent, $reason);
+            }
+
+            throw new \Exception('Invitation introuvable ou déjà traitée.');
+        }
+
+        $invitation->update([
+            'status' => MissionInvitation::STATUS_REFUSED,
+            'responded_at' => now(),
+            'refusal_reason' => $reason,
+        ]);
+
+        if ($agent->agentProfile) {
+            $agent->agentProfile->incrementMissionsRefused();
+        }
+
+        $this->assignmentService->fillPendingInvitationSlots($mission);
+
+        return $mission->fresh();
+    }
+
+    /**
+     * Missions assignées directement (admin ou ancien flux) : l'agent confirme sa prise en charge.
+     */
+    protected function agentConfirmLegacyAssignment(Mission $mission, User $agent): Mission
     {
         $mission->update([
             'status' => Mission::STATUS_AGENT_ACCEPTED,
             'agent_responded_at' => now(),
         ]);
-        
-        // Notify client that agent accepted
+
+        MissionInvitation::updateOrCreate(
+            [
+                'mission_id' => $mission->id,
+                'agent_id' => $agent->id,
+            ],
+            [
+                'status' => MissionInvitation::STATUS_ACCEPTED,
+                'responded_at' => now(),
+                'notified_at' => now(),
+            ]
+        );
+
+        $mission->serviceRequest->update([
+            'status' => ServiceRequest::STATUS_ASSIGNED,
+        ]);
+
         $mission->client->notify(new AgentAcceptedMissionNotification($mission));
-        
-        // Notify admins
+
         $admins = User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
             $admin->notify(new AgentAcceptedMissionAdminNotification($mission));
         }
-        
+
         return $mission->fresh();
     }
 
-    public function agentRefuseMission(Mission $mission, string $reason = null): Mission
+    /**
+     * Missions assignées avant le système d'invitations (agent_id direct, sans invitation).
+     */
+    protected function agentRefuseLegacyAssignment(Mission $mission, User $agent, ?string $reason): Mission
     {
-        $agentName = $mission->agent?->name;
-        
+        MissionInvitation::updateOrCreate(
+            [
+                'mission_id' => $mission->id,
+                'agent_id' => $agent->id,
+            ],
+            [
+                'status' => MissionInvitation::STATUS_REFUSED,
+                'responded_at' => now(),
+                'refusal_reason' => $reason,
+                'notified_at' => now(),
+            ]
+        );
+
         $mission->update([
-            'status' => Mission::STATUS_AGENT_REFUSED,
-            'agent_responded_at' => now(),
-            'cancellation_reason' => $reason,
+            'agent_id' => null,
+            'status' => Mission::STATUS_PENDING_AGENT,
+            'agent_responded_at' => null,
         ]);
-        
-        if ($mission->agent && $mission->agent->agentProfile) {
-            $mission->agent->agentProfile->incrementMissionsRefused();
+
+        if ($agent->agentProfile) {
+            $agent->agentProfile->incrementMissionsRefused();
         }
-        
-        // Notify admins that agent refused
+
+        $this->assignmentService->fillPendingInvitationSlots($mission);
+
+        return $mission->fresh();
+    }
+
+    protected function agentDeclineAcceptedMission(Mission $mission, User $agent, ?string $reason): Mission
+    {
+        MissionInvitation::where('mission_id', $mission->id)
+            ->where('agent_id', $agent->id)
+            ->where('status', MissionInvitation::STATUS_ACCEPTED)
+            ->update([
+                'status' => MissionInvitation::STATUS_DECLINED,
+                'responded_at' => now(),
+                'refusal_reason' => $reason,
+            ]);
+
+        $mission->update([
+            'agent_id' => null,
+            'status' => Mission::STATUS_PENDING_AGENT,
+            'agent_responded_at' => null,
+        ]);
+
+        $mission->serviceRequest->update([
+            'status' => ServiceRequest::STATUS_PAID,
+        ]);
+
+        if ($agent->agentProfile) {
+            $agent->agentProfile->incrementMissionsRefused();
+        }
+
+        $missionForNotification = $mission->fresh(['agent']);
+        $missionForNotification->setRelation('agent', $agent);
+
         $admins = User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
-            $admin->notify(new AgentRefusedMissionNotification($mission, $reason));
+            $admin->notify(new AgentRefusedMissionNotification($missionForNotification, $reason));
         }
-        
-        $newAgent = $this->assignmentService->reassignMission($mission);
-        
+
+        $this->assignmentService->reactivateWithdrawnInvitations($mission);
+        $this->assignmentService->fillPendingInvitationSlots($mission);
+
         return $mission->fresh();
     }
 

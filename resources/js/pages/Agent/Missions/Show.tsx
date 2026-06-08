@@ -29,6 +29,7 @@ interface Mission {
     agent_payout: number;
     status: string;
     status_label: string;
+    agent_id: number | null;
     property: Property;
     client: Client;
     internal_quality_score: number | null;
@@ -43,6 +44,7 @@ interface Mission {
 interface Props {
     mission: Mission;
     canAccept: boolean;
+    canRefuse: boolean;
     canStart: boolean;
     canComplete: boolean;
 }
@@ -62,7 +64,7 @@ const geolocationErrorMessages: Record<number, string> = {
     3: 'La localisation a expiré. Réessayez.',
 };
 
-export default function Show({ mission, canAccept, canStart, canComplete }: Props) {
+export default function Show({ mission, canAccept, canRefuse, canStart, canComplete }: Props) {
     const [starting, setStarting] = useState(false);
     const [startError, setStartError] = useState<string | null>(null);
     const [propertyModalOpen, setPropertyModalOpen] = useState(false);
@@ -90,7 +92,12 @@ export default function Show({ mission, canAccept, canStart, canComplete }: Prop
     };
 
     const handleRefuse = () => {
-        if (confirm('Êtes-vous sûr de vouloir refuser cette mission ?')) {
+        const isDecline = mission.status === 'agent_accepted';
+        const message = isDecline
+            ? 'Décliner cette mission ? Elle sera reproposée aux autres agents disponibles.'
+            : 'Êtes-vous sûr de vouloir refuser cette mission ?';
+
+        if (confirm(message)) {
             postRefuse(route('agent.missions.refuse', mission.id));
         }
     };
@@ -184,19 +191,37 @@ export default function Show({ mission, canAccept, canStart, canComplete }: Prop
                         </div>
                     </div>
 
-                    {canAccept && (
+                    {mission.status === 'pending_agent' && (canAccept || canRefuse) && (
                         <Card className="mb-6 border-orange-300 bg-orange-50">
                             <CardContent className="p-6">
-                                <h3 className="font-semibold text-orange-800 mb-4">Répondez à cette mission</h3>
+                                {mission.agent_id ? (
+                                    <>
+                                        <h3 className="font-semibold text-orange-800 mb-2">Mission assignée — confirmez votre disponibilité</h3>
+                                        <p className="text-sm text-orange-700 mb-4">
+                                            Cette mission vous a été attribuée. Confirmez-la pour la verrouiller ou refusez-la si vous n&apos;êtes pas disponible.
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <h3 className="font-semibold text-orange-800 mb-2">Mission proposée — premier accepteur gagne</h3>
+                                        <p className="text-sm text-orange-700 mb-4">
+                                            D&apos;autres agents voient aussi cette mission. Elle disparaîtra chez eux dès qu&apos;un agent l&apos;accepte.
+                                        </p>
+                                    </>
+                                )}
                                 <div className="flex flex-col sm:flex-row gap-4">
-                                    <Button onClick={handleAccept} className="bg-green-500 hover:bg-green-600 flex-1">
-                                        <CheckCircle className="h-4 w-4 mr-2" />
-                                        Accepter
-                                    </Button>
-                                    <Button variant="outline" onClick={handleRefuse} disabled={refuseProcessing} className="flex-1 text-red-600">
-                                        <XCircle className="h-4 w-4 mr-2" />
-                                        Refuser
-                                    </Button>
+                                    {canAccept && (
+                                        <Button onClick={handleAccept} className="bg-green-500 hover:bg-green-600 flex-1">
+                                            <CheckCircle className="h-4 w-4 mr-2" />
+                                            Accepter
+                                        </Button>
+                                    )}
+                                    {canRefuse && (
+                                        <Button variant="outline" onClick={handleRefuse} disabled={refuseProcessing} className="flex-1 text-red-600">
+                                            <XCircle className="h-4 w-4 mr-2" />
+                                            Refuser
+                                        </Button>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
@@ -224,6 +249,22 @@ export default function Show({ mission, canAccept, canStart, canComplete }: Prop
                                     <Play className="h-4 w-4 mr-2" />
                                     {starting ? 'Vérification...' : 'Démarrer la mission'}
                                 </Button>
+                                {canRefuse && (
+                                    <div className="mt-4 pt-4 border-t border-sky-200">
+                                        <Button
+                                            variant="outline"
+                                            onClick={handleRefuse}
+                                            disabled={refuseProcessing}
+                                            className="text-red-600"
+                                        >
+                                            <XCircle className="h-4 w-4 mr-2" />
+                                            Décliner la mission
+                                        </Button>
+                                        <p className="text-xs text-sky-700 mt-2">
+                                            La mission sera reproposée aux autres agents si vous déclinez avant de démarrer.
+                                        </p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     )}
