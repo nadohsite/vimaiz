@@ -64,13 +64,8 @@ Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'send']
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
-// Authenticated routes
-Route::middleware(['auth', 'verified'])->group(function () {
-
-    // Common dashboard (redirects based on role)
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Profile & Settings
+// Account settings (accessible même sans e-mail vérifié)
+Route::middleware(['auth'])->group(function () {
     Route::get('/settings/profile', [ProfileController::class, 'edit'])->name('settings.profile.edit');
     Route::patch('/settings/profile', [ProfileController::class, 'update'])->name('settings.profile.update');
     Route::delete('/settings/profile', [ProfileController::class, 'destroy'])->name('settings.profile.destroy');
@@ -83,6 +78,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('settings.appearance.edit');
 
     Route::get('/settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])->name('settings.two-factor.show');
+});
+
+// Authenticated routes
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Common dashboard (redirects based on role)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Notifications (shared by all authenticated users)
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
@@ -164,6 +166,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:agent'])->prefix('agent')->name('agent.')->group(function () {
         // VIMAIZ - Dashboard Agent
         Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('dashboard');
+
+        // VIMAIZ - Profil professionnel Agent
+        Route::get('/profile', [\App\Http\Controllers\Agent\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [\App\Http\Controllers\Agent\ProfileController::class, 'update'])->name('profile.update');
 
         // VIMAIZ - Missions Agent
         Route::get('/missions', [AgentMissionController::class, 'index'])->name('missions.index');

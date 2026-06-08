@@ -165,14 +165,67 @@ class AgentProfile extends Model
         return $this->suspended_until && $this->suspended_until->isFuture();
     }
 
-    public function isEligibleForMissions(): bool
+    public function isProfessionalInfoComplete(): bool
     {
-        return $this->isVerified() 
-            && $this->is_available 
-            && !$this->isSuspended()
-            && $this->has_own_equipment
+        if (empty($this->siret) || strlen((string) $this->siret) !== 14) {
+            return false;
+        }
+
+        if ($this->company_type === self::COMPANY_TYPE_SOCIETE && empty($this->company_name)) {
+            return false;
+        }
+
+        return $this->has_own_equipment
             && $this->has_driving_license
             && $this->has_vehicle;
+    }
+
+    public function areRequiredDocumentsUploaded(): bool
+    {
+        return ! empty($this->id_document)
+            && ! empty($this->address_proof)
+            && ! empty($this->siret_document);
+    }
+
+    /**
+     * @return array<int, array{key: string, label: string, complete: bool, route: string}>
+     */
+    public function getProfileCompletionSteps(): array
+    {
+        return [
+            [
+                'key' => 'professional',
+                'label' => 'Informations professionnelles',
+                'complete' => $this->isProfessionalInfoComplete(),
+                'route' => 'agent.profile.edit',
+            ],
+            [
+                'key' => 'documents',
+                'label' => 'Documents justificatifs',
+                'complete' => $this->areRequiredDocumentsUploaded(),
+                'route' => 'agent.documents.index',
+            ],
+            [
+                'key' => 'verification',
+                'label' => 'Validation par VIMAIZ',
+                'complete' => $this->isVerified(),
+                'route' => 'agent.documents.index',
+            ],
+            [
+                'key' => 'rcp',
+                'label' => 'Acceptation clause RCP',
+                'complete' => (bool) $this->rcp_clause_accepted,
+                'route' => 'agent.rcp-acceptance',
+            ],
+        ];
+    }
+
+    public function isEligibleForMissions(): bool
+    {
+        return $this->isProfessionalInfoComplete()
+            && $this->isVerified()
+            && $this->is_available
+            && ! $this->isSuspended();
     }
 
     public function coversZone(string $postalCode): bool

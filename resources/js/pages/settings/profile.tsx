@@ -1,6 +1,6 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Head, useForm, usePage, router } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { Camera, User } from 'lucide-react';
 import { getAvatarUrl } from '@/lib/utils';
@@ -16,7 +16,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Paramètres du profil',
+        title: 'Mon compte',
         href: route('settings.profile.edit'),
     },
 ];
@@ -28,18 +28,18 @@ export default function Profile({
     mustVerifyEmail: boolean;
     status?: string;
 }) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, flash } = usePage<SharedData & { flash?: { success?: string } }>().props;
+    const isAgent = (auth.user as { role?: string }).role === 'agent';
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-    const { data, setData, post, errors, processing, recentlySuccessful } = useForm({
+    const { data, setData, patch, errors, processing, recentlySuccessful, reset } = useForm({
         name: auth.user.name || '',
         first_name: (auth.user as any).first_name || '',
         last_name: (auth.user as any).last_name || '',
         email: auth.user.email,
         phone: (auth.user as any).phone || '',
         avatar: null as File | null,
-        _method: 'PATCH',
     });
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,9 +56,13 @@ export default function Profile({
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('settings.profile.update'), {
+        patch(route('settings.profile.update'), {
             preserveScroll: true,
             forceFormData: true,
+            onSuccess: () => {
+                setAvatarPreview(null);
+                reset('avatar');
+            },
         });
     };
 
@@ -66,13 +70,37 @@ export default function Profile({
 
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
-            <Head title="Paramètres du profil" />
+            <Head title="Mon compte" />
 
             <SettingsLayout>
                 <div className="space-y-6">
+                    {isAgent && (
+                        <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 dark:border-sky-800 dark:bg-sky-900/20">
+                            <p className="text-sm text-sky-800 dark:text-sky-200">
+                                Pour vos informations professionnelles (SIRET, équipements, documents), consultez votre{' '}
+                                <Link href={route('agent.profile.edit')} className="font-medium underline">
+                                    profil professionnel
+                                </Link>
+                                .
+                            </p>
+                        </div>
+                    )}
+
+                    {flash?.success && (
+                        <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
+                            {flash.success}
+                        </div>
+                    )}
+
+                    {Object.keys(errors).length > 0 && (
+                        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
+                            Veuillez corriger les erreurs du formulaire.
+                        </div>
+                    )}
+
                     <HeadingSmall
-                        title="Informations du profil"
-                        description="Mettez à jour votre nom et votre adresse e-mail"
+                        title="Informations du compte"
+                        description="Nom, e-mail, téléphone et photo de profil"
                     />
 
                     <form onSubmit={submit} className="space-y-6">

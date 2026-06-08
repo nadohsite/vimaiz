@@ -10,7 +10,7 @@ import { LogoutConfirmationDialog } from '@/components/logout-confirmation-dialo
 
 import { type User } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LogOut, Settings } from 'lucide-react';
+import { KeyRound, LogOut, Settings } from 'lucide-react';
 import { useState } from 'react';
 
 interface UserMenuContentProps {
@@ -39,7 +39,19 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                         onClick={cleanup}
                     >
                         <Settings className="mr-2 h-4 w-4" />
-                        Mon profil
+                        Mon compte
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link
+                        className="block w-full"
+                        href={route('settings.password.edit')}
+                        as="button"
+                        prefetch
+                        onClick={cleanup}
+                    >
+                        <KeyRound className="mr-2 h-4 w-4" />
+                        Mot de passe
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>

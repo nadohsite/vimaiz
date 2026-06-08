@@ -14,7 +14,17 @@ export function isSameUrl(
 }
 
 export function resolveUrl(url: NonNullable<InertiaLinkProps['href']>): string {
-    return typeof url === 'string' ? url : url.url;
+    const resolved = typeof url === 'string' ? url : url.url;
+
+    if (resolved.startsWith('http://') || resolved.startsWith('https://')) {
+        try {
+            return new URL(resolved).pathname;
+        } catch {
+            return resolved;
+        }
+    }
+
+    return resolved;
 }
 
 /**
@@ -35,6 +45,14 @@ export function getAvatarUrl(avatar: string | null | undefined, name?: string): 
         return avatar;
     }
     
+    if (avatar.startsWith('/storage/')) {
+        return avatar;
+    }
+
+    if (avatar.startsWith('storage/')) {
+        return `/${avatar}`;
+    }
+
     // Sinon, c'est un chemin local
     return `/storage/${avatar}`;
 }

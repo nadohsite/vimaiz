@@ -25,7 +25,8 @@ import {
     FolderCheck,
     Star,
     Shield,
-    AlertTriangle
+    AlertTriangle,
+    User as UserIcon
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -36,7 +37,26 @@ export function AppSidebar() {
     }>().props;
     const user = auth.user;
     const isAgent = user.role === 'agent';
+    const isAdmin = user.role === 'admin';
     const unreadCount = unreadMessagesCount ?? 0;
+
+    const adminNavItems: NavItem[] = [
+        {
+            title: 'Administration',
+            href: '/admin',
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Paramètres plateforme',
+            href: '/admin/platform-settings',
+            icon: Settings,
+        },
+        {
+            title: 'Mon compte',
+            href: route('settings.profile.edit'),
+            icon: UserIcon,
+        },
+    ];
 
     // Navigation Client selon CAHIER_DES_CHARGES VIMAIZ
     const clientNavItems: NavItem[] = [
@@ -72,9 +92,9 @@ export function AppSidebar() {
             badge: unreadCount,
         },
         {
-            title: 'Mon Profil',
+            title: 'Mon compte',
             href: route('settings.profile.edit'),
-            icon: Settings,
+            icon: UserIcon,
         },
     ];
 
@@ -89,6 +109,11 @@ export function AppSidebar() {
             title: 'Mes Missions',
             href: route('agent.missions.index'),
             icon: Briefcase,
+        },
+        {
+            title: 'Mon profil pro',
+            href: route('agent.profile.edit'),
+            icon: Settings,
         },
         {
             title: 'Mes Documents',
@@ -122,13 +147,13 @@ export function AppSidebar() {
             badge: unreadCount,
         },
         {
-            title: 'Mon Profil',
+            title: 'Paramètres compte',
             href: route('settings.profile.edit'),
-            icon: Settings,
+            icon: UserIcon,
         },
     ];
 
-    const mainNavItems = isAgent ? agentNavItems : clientNavItems;
+    const mainNavItems = isAdmin ? adminNavItems : isAgent ? agentNavItems : clientNavItems;
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -136,7 +161,10 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={route('dashboard')} prefetch>
+                            <Link
+                                href={isAdmin ? '/admin' : route('dashboard')}
+                                prefetch={!isAdmin}
+                            >
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

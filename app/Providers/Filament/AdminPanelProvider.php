@@ -8,6 +8,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -55,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Clients'),
                 NavigationGroup::make('Gestion Utilisateurs'),
                 NavigationGroup::make('Finance'),
+                NavigationGroup::make('Configuration'),
                 NavigationGroup::make('Service Management'),
                 NavigationGroup::make('Booking Management'),
                 NavigationGroup::make('Communication'),
@@ -83,6 +85,17 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->userMenuItems([
+                'profile' => MenuItem::make()
+                    ->label('Mon compte')
+                    ->url(fn (): string => route('settings.profile.edit'))
+                    ->icon('heroicon-o-user-circle'),
+                MenuItem::make()
+                    ->label('Mot de passe')
+                    ->url(fn (): string => route('settings.password.edit'))
+                    ->icon('heroicon-o-key')
+                    ->sort(0),
             ])
             ->renderHook(
                 'panels::head.end',

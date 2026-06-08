@@ -4,45 +4,44 @@ import { Separator } from '@/components/ui/separator';
 import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
 
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { type PropsWithChildren } from 'react';
-
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profil',
-        href: route('settings.profile.edit'),
-        icon: null,
-    },
-    {
-        title: 'Mot de passe',
-        href: route('settings.password.edit'),
-        icon: null,
-    },
-    {
-        title: 'Sécurité',
-        href: route('settings.two-factor.show'),
-        icon: null,
-    },
-    {
-        title: 'Apparence',
-        href: route('settings.appearance.edit'),
-        icon: null,
-    },
-];
+import { Link, usePage } from '@inertiajs/react';
+import { type PropsWithChildren, useMemo } from 'react';
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    // When server-side rendering, we only render the layout on the client...
-    if (typeof window === 'undefined') {
-        return null;
-    }
+    const { url } = usePage();
+    const currentPath = url.split('?')[0] ?? '/';
 
-    const currentPath = window.location.pathname;
+    const sidebarNavItems: NavItem[] = useMemo(
+        () => [
+            {
+                title: 'Mon compte',
+                href: route('settings.profile.edit'),
+                icon: null,
+            },
+            {
+                title: 'Mot de passe',
+                href: route('settings.password.edit'),
+                icon: null,
+            },
+            {
+                title: 'Sécurité',
+                href: route('settings.two-factor.show'),
+                icon: null,
+            },
+            {
+                title: 'Apparence',
+                href: route('settings.appearance.edit'),
+                icon: null,
+            },
+        ],
+        [],
+    );
 
     return (
         <div className="px-4 py-6">
             <Heading
-                title="Paramètres"
-                description="Gérez votre profil et les paramètres de votre compte"
+                title="Mon compte"
+                description="Modifiez vos informations personnelles, votre mot de passe et vos préférences"
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">

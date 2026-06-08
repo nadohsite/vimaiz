@@ -31,20 +31,17 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
-        
-        // Handle avatar upload
+        $data = $request->safe()->except('avatar');
+
         if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists
-            if ($user->avatar) {
+            if ($user->avatar && ! str_starts_with($user->avatar, 'http')) {
                 Storage::disk('public')->delete($user->avatar);
             }
-            
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $path;
+
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
-        
-        // Fill other fields (excluding avatar which is handled above)
-        $user->fill($request->safe()->except('avatar'));
+
+        $user->fill($data);
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -52,7 +49,7 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return to_route('settings.profile.edit')->with('success', 'Profil mis a jour.');
+        return to_route('settings.profile.edit')->with('success', 'Profil mis à jour.');
     }
 
     /**

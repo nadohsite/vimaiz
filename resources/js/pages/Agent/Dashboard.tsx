@@ -34,15 +34,23 @@ interface Stats {
     is_eligible: boolean;
 }
 
+interface CompletionStep {
+    key: string;
+    label: string;
+    complete: boolean;
+    route: string;
+}
+
 interface Props {
     stats: Stats;
     pendingMissions: Mission[];
     upcomingMissions: Mission[];
     recentMissions: Mission[];
     rcpClauseAccepted?: boolean;
+    profileCompletionSteps?: CompletionStep[];
 }
 
-export default function Dashboard({ stats, pendingMissions, upcomingMissions, recentMissions, rcpClauseAccepted = false }: Props) {
+export default function Dashboard({ stats, pendingMissions, upcomingMissions, recentMissions, rcpClauseAccepted = false, profileCompletionSteps = [] }: Props) {
     const [showRcpModal, setShowRcpModal] = useState(!rcpClauseAccepted);
 
     return (
@@ -65,9 +73,18 @@ export default function Dashboard({ stats, pendingMissions, upcomingMissions, re
                                 <AlertCircle className="h-6 w-6 text-orange-500" />
                                 <div className="flex-1">
                                     <p className="font-medium text-orange-800 dark:text-orange-300">Profil incomplet</p>
-                                    <p className="text-sm text-orange-700 dark:text-orange-400">Complétez votre profil et soumettez vos documents pour recevoir des missions.</p>
+                                    <p className="text-sm text-orange-700 dark:text-orange-400">
+                                        Complétez votre profil professionnel, vos documents et attendez la validation VIMAIZ pour recevoir des missions.
+                                    </p>
+                                    {profileCompletionSteps.length > 0 && (
+                                        <ul className="mt-2 space-y-1 text-sm text-orange-700 dark:text-orange-400">
+                                            {profileCompletionSteps.filter((step) => !step.complete).map((step) => (
+                                                <li key={step.key}>• {step.label}</li>
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
-                                <Link href={route('agent.documents.index')}>
+                                <Link href={route('agent.profile.edit')}>
                                     <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
                                         Compléter mon profil
                                     </Button>

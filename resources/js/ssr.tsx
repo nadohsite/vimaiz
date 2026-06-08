@@ -2,6 +2,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import ReactDOMServer from 'react-dom/server';
+import { route } from 'ziggy-js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -16,6 +17,13 @@ createServer((page) =>
                 import.meta.glob('./pages/**/*.tsx'),
             ),
         setup: ({ App, props }) => {
+            // @ts-expect-error Ziggy route helper for SSR
+            global.route = (name, params, absolute) =>
+                route(name, params, absolute, {
+                    ...page.props.ziggy,
+                    location: new URL(page.props.ziggy.location),
+                });
+
             return <App {...props} />;
         },
     }),
