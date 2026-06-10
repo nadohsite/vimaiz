@@ -33,7 +33,8 @@ export default function Profile({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-    const { data, setData, patch, errors, processing, recentlySuccessful, reset } = useForm({
+    const { data, setData, post, errors, processing, recentlySuccessful, reset } = useForm({
+        _method: 'patch',
         name: auth.user.name || '',
         first_name: (auth.user as any).first_name || '',
         last_name: (auth.user as any).last_name || '',
@@ -56,7 +57,8 @@ export default function Profile({
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        patch(route('settings.profile.update'), {
+        // POST + _method=patch : PHP ne parse pas le multipart (upload avatar) sur un vrai PATCH
+        post(route('settings.profile.update'), {
             preserveScroll: true,
             forceFormData: true,
             onSuccess: () => {

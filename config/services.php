@@ -48,4 +48,11 @@ return [
         'currency' => env('STRIPE_CURRENCY', 'eur'),
     ],
 
+    'meta' => [
+        'enabled' => env('META_PIXEL_ENABLED', false),
+        'pixel_id' => env('META_PIXEL_ID'),
+        'access_token' => env('META_ACCESS_TOKEN'),
+        'test_event_code' => env('META_TEST_EVENT_CODE'),
+    ],
+
 ];

@@ -1,8 +1,9 @@
 import AvailabilityCalendar from '@/components/AvailabilityCalendar';
 import { Head, Link, router } from '@inertiajs/react';
 import { Calendar, Clock, DollarSign, Star } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getAvatarUrl } from '@/lib/utils';
+import { trackMetaEvent } from '@/lib/meta-pixel';
 
 interface Review {
     id: number;
@@ -50,6 +51,14 @@ export default function Show({ agent, availabilities }: Props) {
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
+
+    useEffect(() => {
+        trackMetaEvent('ViewContent', {
+            content_type: 'agent',
+            content_ids: [String(agent.id)],
+            content_name: agent.user.name,
+        });
+    }, [agent.id, agent.user.name]);
 
     const handleSlotSelect = (date: string, slot: TimeSlot) => {
         setSelectedDate(date);

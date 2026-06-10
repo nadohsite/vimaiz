@@ -49,20 +49,25 @@ jobs:
               echo "🔹 Installation des dépendances PHP"
               composer install --no-dev --optimize-autoloader
 
-              # ---- Laravel ----
-              echo "🔹 Exécution des migrations et optimisation"
+              # ---- Laravel migrations ----
+              echo "🔹 Exécution des migrations"
               php artisan migrate --force
-              php artisan optimize
 
               # ---- NPM / React / Vite ----
               echo "🔹 Installation et build du front"
               npm ci
               npm run build
 
-              # ---- Redémarrage services ----
-              echo "🔹 Redémarrage PHP-FPM et queues"
-              sudo systemctl restart php8.4-fpm
+              # ---- Laravel cache & workers ----
+              echo "🔹 Optimisation Laravel"
+              php artisan optimize:clear
+              php artisan optimize
               php artisan queue:restart || true
+              php artisan up
+
+              # ---- Redémarrage services ----
+              echo "🔹 Redémarrage PHP-FPM"
+              sudo systemctl restart php8.4-fpm
 
               echo "✅ Déploiement terminé : $(date)"
             else

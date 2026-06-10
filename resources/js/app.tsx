@@ -5,8 +5,10 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import MetaPixelProvider from '@/components/meta-pixel-provider';
 import { initializeTheme } from './hooks/use-appearance';
 import { route } from 'ziggy-js';
+import { type SharedData } from '@/types';
 
 // Make route function available globally
 window.route = route;
@@ -22,10 +24,12 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
+        const sharedProps = props.initialPage.props as SharedData;
 
         root.render(
             <StrictMode>
                 <App {...props} />
+                <MetaPixelProvider pixelId={sharedProps.meta?.pixelId ?? null} />
             </StrictMode>,
         );
     },

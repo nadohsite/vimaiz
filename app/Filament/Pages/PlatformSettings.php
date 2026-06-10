@@ -88,6 +88,17 @@ class PlatformSettings extends Page
                             ->required(),
                     ])
                     ->columns(2),
+                Section::make('Marketing')
+                    ->schema([
+                        Toggle::make('meta_pixel_enabled')
+                            ->label('Activer Meta Pixel')
+                            ->columnSpanFull(),
+                        TextInput::make('meta_pixel_id')
+                            ->label('ID Meta Pixel')
+                            ->placeholder('Ex : 123456789012345')
+                            ->maxLength(20),
+                    ])
+                    ->columns(2),
             ]);
     }
 

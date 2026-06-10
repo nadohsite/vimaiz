@@ -28,6 +28,10 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    meta?: {
+        pixelId?: string | null;
+    };
+    cookieConsent?: string | null;
     [key: string]: unknown;
 }
 

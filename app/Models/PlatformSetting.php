@@ -50,6 +50,24 @@ class PlatformSetting extends Model
             'minimum_advance_hours' => (int) static::get('minimum_advance_hours', config('vimaiz.booking.minimum_advance_hours')),
             'maximum_advance_days' => (int) static::get('maximum_advance_days', config('vimaiz.booking.maximum_advance_days')),
             'cancellation_deadline_hours' => (int) static::get('cancellation_deadline_hours', config('vimaiz.booking.cancellation_deadline_hours')),
+            'meta_pixel_enabled' => static::metaPixelEnabled(),
+            'meta_pixel_id' => static::get('meta_pixel_id', config('services.meta.pixel_id')) ?? '',
         ];
+    }
+
+    public static function metaPixelEnabled(): bool
+    {
+        return (bool) static::get('meta_pixel_enabled', config('services.meta.enabled', false));
+    }
+
+    public static function metaPixelId(): ?string
+    {
+        if (! static::metaPixelEnabled()) {
+            return null;
+        }
+
+        $id = static::get('meta_pixel_id', config('services.meta.pixel_id'));
+
+        return is_string($id) && $id !== '' ? $id : null;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Conversation;
+use App\Models\PlatformSetting;
 use Closure;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -89,6 +90,10 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
+            'meta' => [
+                'pixelId' => PlatformSetting::metaPixelId(),
+            ],
+            'cookieConsent' => $request->cookie('cookie_consent'),
         ];
     }
 }

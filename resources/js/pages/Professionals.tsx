@@ -14,9 +14,10 @@ import {
     Briefcase,
     ChevronDown
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import logoImage from '@/../assets/images/logo.png';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
+import { trackMetaEvent } from '@/lib/meta-pixel';
 
 interface Props {
     success?: boolean;
@@ -24,6 +25,10 @@ interface Props {
 
 export default function Professionals({ success }: Props) {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+    useEffect(() => {
+        trackMetaEvent('ViewContent', { content_category: 'agent_recruitment' });
+    }, []);
 
     const benefits = [
         {

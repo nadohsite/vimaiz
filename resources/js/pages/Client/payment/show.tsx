@@ -1,13 +1,14 @@
 import { Head, router } from '@inertiajs/react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, CreditCard, Shield, Clock, Home, Calendar, CheckCircle, Loader2 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { trackMetaEvent } from '@/lib/meta-pixel';
 
 interface Property {
     id: number;
@@ -166,6 +167,15 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
     const price = Number(quote.final_price ?? quote.estimated_price);
     const serviceRequest = quote.service_request;
     const property = serviceRequest.property;
+
+    useEffect(() => {
+        trackMetaEvent('InitiateCheckout', {
+            content_type: 'quote',
+            content_ids: [String(quote.id)],
+            currency: 'EUR',
+            value: price,
+        });
+    }, [quote.id, price]);
 
     const formatDate = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString('fr-FR', {

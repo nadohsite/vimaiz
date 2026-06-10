@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
+import { trackMetaEvent } from '@/lib/meta-pixel';
 
 export default function Register() {
   // Check URL params for pre-selected role (e.g., from Professionals page)
@@ -49,9 +50,20 @@ export default function Register() {
     setData('role', role);
   }, [role]);
 
+  useEffect(() => {
+    if (role === 'agent') {
+      trackMetaEvent('Lead', { content_category: 'agent_registration' });
+    }
+  }, [role]);
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     post(route('register'), {
+      onSuccess: () => {
+        trackMetaEvent('CompleteRegistration', {
+          content_category: role === 'agent' ? 'agent' : 'client',
+        });
+      },
       onFinish: () => reset('password', 'password_confirmation'),
     });
   };

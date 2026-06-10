@@ -13,14 +13,15 @@ composer install --no-dev --optimize-autoloader
 # Run migrations
 php artisan migrate --force
 
-# Clear cache & optimize
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
 # Node dependencies & build React frontend
 npm install
 npm run build
+
+# Clear cache, optimize, restart workers & bring app up
+php artisan optimize:clear
+php artisan optimize
+php artisan queue:restart || true
+php artisan up
 
 # Restart PHP-FPM
 sudo systemctl restart php8.4-fpm

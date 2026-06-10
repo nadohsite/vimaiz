@@ -113,6 +113,8 @@ class MissionService
         // Notify client that payment was received
         $mission->client->notify(new PaymentReceivedNotification($mission));
 
+        app(MetaConversionsService::class)->trackPurchase($mission->fresh(['quote', 'client']));
+
         return $mission->fresh();
     }
 
