@@ -149,12 +149,13 @@ export default function Welcome({ canLogin, canRegister }: Props) {
 
                             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight mb-6">
                                 Conciergeries et propriétaires Airbnb
-                                <span className="block text-primary">automatisez et suivez le ménage de vos locations saisonnières.</span>
+                                <span className="block text-primary">
+                                Vimaiz organise le ménage premium de vos locations saisonnières.
+                                </span>
                             </h1>
 
                             <p className="text-base text-slate-600 dark:text-slate-300 mb-8 max-w-xl">
-                                Confiez la gestion du ménage de vos logements à des professionnels qualifiés et minutieusement sélectionnés.
-                            </p>
+                            Travaillez avec des agents professionnels sélectionnés et gardez une visibilité complète sur chaque intervention, même à distance.                            </p>
 
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Link href={canLogin ? route('dashboard') : route('register')}>
@@ -369,8 +370,8 @@ export default function Welcome({ canLogin, canRegister }: Props) {
                         {[
                             {
                                 title: 'Appartement',
-                                description: 'Studios, T1, T2 et plus — tous types d\'appartements',
-                                features: ['Petites surfaces', 'Grands appartements', 'Résidences'],
+                                description: 'Élégance et confort au cœur de votre quotidien.',
+                                features: ['Grands appartements', 'Petites surfaces', 'Résidences'],
                             },
                             {
                                 title: 'Maison',
