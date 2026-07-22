@@ -1,7 +1,19 @@
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { Home, Plus, ClipboardList, FileText, ArrowRight, Euro, Calendar, CheckCircle } from 'lucide-react';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
+import {
+    ArrowRight,
+    Calendar,
+    CheckCircle,
+    ClipboardList,
+    Euro,
+    FileText,
+    Home,
+    MapPin,
+    Plus,
+    Sparkles,
+    User,
+} from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -40,165 +52,357 @@ interface DashboardProps {
     };
 }
 
-export default function Dashboard({ properties = [], activeRequests = [], stats }: DashboardProps) {
+const MISSION_STATUS: Record<string, { label: string; className: string }> = {
+    pending_agent: {
+        label: 'En attente d’agent',
+        className:
+            'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+    },
+    agent_accepted: {
+        label: 'Agent confirmé',
+        className: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300',
+    },
+    in_progress: {
+        label: 'En cours',
+        className: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300',
+    },
+    completed: {
+        label: 'Terminé',
+        className:
+            'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
+    },
+};
+
+function formatDate(value: string) {
+    return new Date(value).toLocaleDateString('fr-FR', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+function MissionRow({ mission }: { mission: Mission }) {
+    const status = MISSION_STATUS[mission.status] ?? {
+        label: mission.status,
+        className:
+            'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+    };
+
+    return (
+        <Link
+            href={route('client.missions.show', mission.id)}
+            className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary/40 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:hover:border-primary/40"
+        >
+            <div className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-primary/10">
+                <Sparkles className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold text-slate-900 dark:text-white">
+                    {mission.property.name ||
+                        `${mission.property.type} — ${mission.property.city}`}
+                </p>
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="inline-flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5" />
+                        {formatDate(mission.completed_at ?? mission.scheduled_at)}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5" />
+                        {mission.property.city}
+                    </span>
+                    {mission.agent && (
+                        <span className="inline-flex items-center gap-1">
+                            <User className="h-3.5 w-3.5" />
+                            {mission.agent.name}
+                        </span>
+                    )}
+                </p>
+            </div>
+            <div className="flex flex-none flex-col items-end gap-1.5">
+                <span
+                    className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${status.className}`}
+                >
+                    {status.label}
+                </span>
+                <span className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
+                    {Number(mission.total_price).toFixed(0)} €
+                </span>
+            </div>
+        </Link>
+    );
+}
+
+export default function Dashboard({
+    properties = [],
+    activeRequests = [],
+    upcomingMissions = [],
+    recentMissions = [],
+    stats,
+}: DashboardProps) {
+    const { auth } = usePage<SharedData>().props;
+    const firstName = auth.user?.name?.split(' ')[0] ?? '';
+
+    const statCards = [
+        {
+            icon: Home,
+            label: 'Logements',
+            value: stats?.properties_count ?? properties.length,
+            iconClass: 'bg-sky-100 text-sky-600 dark:bg-sky-900/50 dark:text-sky-400',
+        },
+        {
+            icon: ClipboardList,
+            label: 'Demandes en cours',
+            value: stats?.requests_count ?? activeRequests.length,
+            iconClass:
+                'bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400',
+        },
+        {
+            icon: CheckCircle,
+            label: 'Ménages effectués',
+            value: stats?.completed_count ?? 0,
+            iconClass:
+                'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400',
+        },
+        {
+            icon: Euro,
+            label: 'Total dépensé',
+            value: `${Number(stats?.total_spent ?? 0).toFixed(2)} €`,
+            iconClass: 'bg-primary/10 text-primary',
+        },
+    ];
+
+    const quickLinks = [
+        {
+            href: route('client.properties.index'),
+            icon: Home,
+            title: 'Mes logements',
+            description: 'Gérez vos propriétés',
+        },
+        {
+            href: route('client.requests.index'),
+            icon: ClipboardList,
+            title: 'Mes demandes',
+            description: 'Suivez vos demandes',
+        },
+        {
+            href: route('client.missions.index'),
+            icon: FileText,
+            title: 'Historique',
+            description: 'Factures et ménages passés',
+        },
+    ];
+
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
             <Head title="Tableau de bord - VIMAIZ" />
 
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 sm:p-6 lg:p-8">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-                        Bienvenue sur VIMAIZ
-                    </h1>
-                    <p className="mt-2 text-slate-600 dark:text-slate-400">
-                        Gérez vos logements et demandes de ménage en toute simplicité.
-                    </p>
-                </div>
-
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-                    <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-                        <div className="flex items-center gap-4">
-                            <div className="rounded-xl bg-sky-100 dark:bg-sky-900/50 p-3">
-                                <Home className="h-6 w-6 text-sky-600 dark:text-sky-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Logements</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.properties_count ?? properties.length}</p>
-                            </div>
+            <div className="min-h-screen bg-slate-50 p-4 dark:bg-slate-900 sm:p-6 lg:p-8">
+                {/* Welcome banner */}
+                <div className="relative mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800 sm:p-8">
+                    <div
+                        className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl"
+                        aria-hidden="true"
+                    />
+                    <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
+                                Bonjour{firstName ? ` ${firstName}` : ''} 👋
+                            </h1>
+                            <p className="mt-1.5 text-slate-600 dark:text-slate-400">
+                                Gérez vos logements et demandes de ménage en toute simplicité.
+                            </p>
                         </div>
-                    </div>
-                    <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-                        <div className="flex items-center gap-4">
-                            <div className="rounded-xl bg-amber-100 dark:bg-amber-900/50 p-3">
-                                <ClipboardList className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Demandes en cours</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.requests_count ?? activeRequests.length}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-                        <div className="flex items-center gap-4">
-                            <div className="rounded-xl bg-green-100 dark:bg-green-900/50 p-3">
-                                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Ménages effectués</p>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.completed_count ?? 0}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-6 shadow-sm text-white">
-                        <div className="flex items-center gap-4">
-                            <div className="rounded-xl bg-white/20 p-3">
-                                <Euro className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-emerald-100">Total dépensé</p>
-                                <p className="text-2xl font-bold">{Number(stats?.total_spent ?? 0).toFixed(2)} €</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Quick Actions */}
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Actions rapides</h2>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                    <Link
-                        href={route('client.requests.create')}
-                        className="group rounded-2xl bg-sky-500 p-6 text-white transition-all hover:bg-sky-600 hover:shadow-lg"
-                    >
-                        <div className="mb-4 w-fit rounded-xl bg-white/20 p-3">
-                            <Plus className="h-6 w-6" />
-                        </div>
-                        <h3 className="text-lg font-semibold mb-1">Demander un ménage</h3>
-                        <p className="text-sm text-sky-100">Planifiez votre prochain ménage</p>
-                        <ArrowRight className="mt-4 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    </Link>
-
-                    <Link
-                        href={route('client.properties.index')}
-                        className="group rounded-2xl bg-white dark:bg-slate-800 p-6 border border-slate-200 dark:border-slate-700 transition-all hover:border-sky-300 dark:hover:border-sky-600 hover:shadow-md"
-                    >
-                        <div className="mb-4 w-fit rounded-xl bg-slate-100 dark:bg-slate-700 p-3">
-                            <Home className="h-6 w-6 text-slate-600 dark:text-slate-300" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Mes logements</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">Gérez vos propriétés</p>
-                        <ArrowRight className="mt-4 h-5 w-5 text-slate-400 transition-transform group-hover:translate-x-1" />
-                    </Link>
-
-                    <Link
-                        href={route('client.requests.index')}
-                        className="group rounded-2xl bg-white dark:bg-slate-800 p-6 border border-slate-200 dark:border-slate-700 transition-all hover:border-sky-300 dark:hover:border-sky-600 hover:shadow-md"
-                    >
-                        <div className="mb-4 w-fit rounded-xl bg-slate-100 dark:bg-slate-700 p-3">
-                            <ClipboardList className="h-6 w-6 text-slate-600 dark:text-slate-300" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Mes demandes</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">Suivez vos demandes</p>
-                        <ArrowRight className="mt-4 h-5 w-5 text-slate-400 transition-transform group-hover:translate-x-1" />
-                    </Link>
-
-                    <Link
-                        href={route('client.missions.index')}
-                        className="group rounded-2xl bg-white dark:bg-slate-800 p-6 border border-slate-200 dark:border-slate-700 transition-all hover:border-sky-300 dark:hover:border-sky-600 hover:shadow-md"
-                    >
-                        <div className="mb-4 w-fit rounded-xl bg-slate-100 dark:bg-slate-700 p-3">
-                            <FileText className="h-6 w-6 text-slate-600 dark:text-slate-300" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Historique</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">Factures et ménages passés</p>
-                        <ArrowRight className="mt-4 h-5 w-5 text-slate-400 transition-transform group-hover:translate-x-1" />
-                    </Link>
-                </div>
-
-                {/* Recent Properties */}
-                {properties.length > 0 && (
-                    <div className="mb-8">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Mes logements</h2>
-                            <Link href={route('client.properties.index')} className="text-sm font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300">
-                                Voir tout →
-                            </Link>
-                        </div>
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {properties.slice(0, 3).map((property: any) => (
-                                <div key={property.id} className="rounded-2xl bg-white dark:bg-slate-800 p-5 border border-slate-200 dark:border-slate-700">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <span className="inline-flex items-center rounded-full bg-sky-100 dark:bg-sky-900/50 px-2.5 py-0.5 text-xs font-medium text-sky-800 dark:text-sky-300 capitalize">
-                                            {property.type}
-                                        </span>
-                                    </div>
-                                    <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{property.name || `${property.type} - ${property.city}`}</h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">{property.city}, {property.postal_code}</p>
-                                    <p className="text-sm text-slate-400 dark:text-slate-500 mt-2">{property.surface_area} m² • {property.bedrooms} ch.</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Empty State */}
-                {properties.length === 0 && (
-                    <div className="rounded-2xl bg-white dark:bg-slate-800 p-8 border border-slate-200 dark:border-slate-700 text-center">
-                        <div className="mx-auto w-fit rounded-full bg-sky-100 dark:bg-sky-900/50 p-4 mb-4">
-                            <Home className="h-8 w-8 text-sky-600 dark:text-sky-400" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Aucun logement enregistré</h3>
-                        <p className="text-slate-500 dark:text-slate-400 mb-4">Commencez par ajouter votre premier logement pour demander un ménage.</p>
                         <Link
-                            href={route('client.properties.create')}
-                            className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-4 py-2 text-white font-medium hover:bg-sky-600 transition-colors"
+                            href={route('client.requests.create')}
+                            className="group inline-flex flex-none items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:brightness-110"
                         >
-                            <Plus className="h-4 w-4" />
-                            Ajouter un logement
+                            <Plus className="h-5 w-5" />
+                            Demander un ménage
+                            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Link>
                     </div>
-                )}
+                </div>
+
+                {/* Stats */}
+                <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {statCards.map((card) => (
+                        <div
+                            key={card.label}
+                            className="rounded-2xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className={`rounded-xl p-3 ${card.iconClass}`}>
+                                    <card.icon className="h-6 w-6" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="truncate text-sm font-medium text-slate-500 dark:text-slate-400">
+                                        {card.label}
+                                    </p>
+                                    <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                                        {card.value}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="grid grid-cols-1 gap-8 xl:grid-cols-3">
+                    {/* Missions column */}
+                    <div className="space-y-8 xl:col-span-2">
+                        {/* Upcoming */}
+                        <section>
+                            <div className="mb-4 flex items-center justify-between">
+                                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                    Prochains ménages
+                                </h2>
+                                <Link
+                                    href={route('client.missions.index')}
+                                    className="text-sm font-medium text-primary hover:underline"
+                                >
+                                    Voir tout →
+                                </Link>
+                            </div>
+                            {upcomingMissions.length > 0 ? (
+                                <div className="space-y-3">
+                                    {upcomingMissions.map((mission) => (
+                                        <MissionRow key={mission.id} mission={mission} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center dark:border-slate-600 dark:bg-slate-800">
+                                    <div className="mx-auto mb-3 w-fit rounded-full bg-primary/10 p-3">
+                                        <Calendar className="h-6 w-6 text-primary" />
+                                    </div>
+                                    <p className="font-medium text-slate-900 dark:text-white">
+                                        Aucun ménage planifié
+                                    </p>
+                                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                        Planifiez votre prochain ménage en quelques clics.
+                                    </p>
+                                    <Link
+                                        href={route('client.requests.create')}
+                                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        Nouvelle demande
+                                    </Link>
+                                </div>
+                            )}
+                        </section>
+
+                        {/* Recent */}
+                        {recentMissions.length > 0 && (
+                            <section>
+                                <div className="mb-4 flex items-center justify-between">
+                                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                        Derniers ménages effectués
+                                    </h2>
+                                </div>
+                                <div className="space-y-3">
+                                    {recentMissions.map((mission) => (
+                                        <MissionRow key={mission.id} mission={mission} />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                    </div>
+
+                    {/* Side column */}
+                    <div className="space-y-8">
+                        {/* Quick links */}
+                        <section>
+                            <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+                                Accès rapide
+                            </h2>
+                            <div className="space-y-3">
+                                {quickLinks.map((link) => (
+                                    <Link
+                                        key={link.title}
+                                        href={link.href}
+                                        className="group flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary/40 hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+                                    >
+                                        <div className="rounded-xl bg-slate-100 p-2.5 transition-colors group-hover:bg-primary/10 dark:bg-slate-700">
+                                            <link.icon className="h-5 w-5 text-slate-600 transition-colors group-hover:text-primary dark:text-slate-300" />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-semibold text-slate-900 dark:text-white">
+                                                {link.title}
+                                            </p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                {link.description}
+                                            </p>
+                                        </div>
+                                        <ArrowRight className="h-4 w-4 flex-none text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                                    </Link>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* Properties */}
+                        <section>
+                            <div className="mb-4 flex items-center justify-between">
+                                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                    Mes logements
+                                </h2>
+                                {properties.length > 0 && (
+                                    <Link
+                                        href={route('client.properties.index')}
+                                        className="text-sm font-medium text-primary hover:underline"
+                                    >
+                                        Voir tout →
+                                    </Link>
+                                )}
+                            </div>
+                            {properties.length > 0 ? (
+                                <div className="space-y-3">
+                                    {properties.slice(0, 3).map((property: any) => (
+                                        <div
+                                            key={property.id}
+                                            className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800"
+                                        >
+                                            <span className="mb-2 inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary capitalize">
+                                                {property.type}
+                                            </span>
+                                            <h3 className="font-semibold text-slate-900 dark:text-white">
+                                                {property.name ||
+                                                    `${property.type} - ${property.city}`}
+                                            </h3>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                                                {property.city}, {property.postal_code}
+                                            </p>
+                                            <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                                                {property.surface_area} m² • {property.bedrooms}{' '}
+                                                ch.
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center dark:border-slate-600 dark:bg-slate-800">
+                                    <div className="mx-auto mb-3 w-fit rounded-full bg-primary/10 p-3">
+                                        <Home className="h-6 w-6 text-primary" />
+                                    </div>
+                                    <p className="font-medium text-slate-900 dark:text-white">
+                                        Aucun logement enregistré
+                                    </p>
+                                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                        Ajoutez votre premier logement pour demander un ménage.
+                                    </p>
+                                    <Link
+                                        href={route('client.properties.create')}
+                                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        Ajouter un logement
+                                    </Link>
+                                </div>
+                            )}
+                        </section>
+                    </div>
+                </div>
             </div>
         </AppSidebarLayout>
     );

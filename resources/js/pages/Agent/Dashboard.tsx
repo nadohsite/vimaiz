@@ -1,16 +1,30 @@
-import { Head, Link } from '@inertiajs/react';
-import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, CheckCircle2, AlertCircle, Wallet, Star, Home, ChevronRight, Bell } from 'lucide-react';
 import RcpClauseModal from '@/components/RcpClauseModal';
+import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
+import { type SharedData } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
+import {
+    AlertCircle,
+    ArrowRight,
+    Bell,
+    Calendar,
+    CheckCircle2,
+    ChevronRight,
+    Clock,
+    FileText,
+    Hourglass,
+    MapPin,
+    Sparkles,
+    Star,
+    User,
+    Wallet,
+} from 'lucide-react';
 import { useState } from 'react';
 
 interface Property {
     id: number;
     name: string | null;
-    type_label: string;
+    type_label?: string;
+    type?: string;
     city: string;
 }
 
@@ -21,6 +35,9 @@ interface Mission {
     duration_hours: number;
     agent_payout: number;
     property: Property;
+    client?: {
+        name: string;
+    };
 }
 
 interface Stats {
@@ -42,161 +59,414 @@ interface Props {
     rcpClauseAccepted?: boolean;
 }
 
-export default function Dashboard({ stats, pendingMissions, upcomingMissions, recentMissions, rcpClauseAccepted = false }: Props) {
+function formatDate(value: string) {
+    return new Date(value).toLocaleDateString('fr-FR', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+function propertyLabel(property: Property) {
+    return property.name || `${property.type_label ?? property.type ?? 'Logement'} — ${property.city}`;
+}
+
+export default function Dashboard({
+    stats,
+    pendingMissions,
+    upcomingMissions,
+    recentMissions,
+    rcpClauseAccepted = false,
+}: Props) {
     const [showRcpModal, setShowRcpModal] = useState(!rcpClauseAccepted);
+    const { auth } = usePage<SharedData>().props;
+    const firstName = auth.user?.name?.split(' ')[0] ?? '';
+
+    const statCards = [
+        {
+            icon: Wallet,
+            label: 'Solde disponible',
+            value: `${Number(stats?.available_balance ?? 0).toFixed(2)} €`,
+            iconClass:
+                'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400',
+        },
+        {
+            icon: Hourglass,
+            label: 'En attente de paiement',
+            value: `${Number(stats?.pending_earnings ?? 0).toFixed(2)} €`,
+            iconClass:
+                'bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400',
+        },
+        {
+            icon: CheckCircle2,
+            label: 'Missions terminées',
+            value: stats?.missions_completed ?? 0,
+            iconClass: 'bg-sky-100 text-sky-600 dark:bg-sky-900/50 dark:text-sky-400',
+        },
+        {
+            icon: Star,
+            label: 'Note interne',
+            value: `${Number(stats?.internal_rating ?? 5).toFixed(1)}/5`,
+            iconClass: 'bg-primary/10 text-primary',
+        },
+    ];
+
+    const quickLinks = [
+        {
+            href: route('agent.missions.index'),
+            icon: Sparkles,
+            title: 'Mes missions',
+            description: 'Toutes vos interventions',
+        },
+        {
+            href: route('agent.wallet.index'),
+            icon: Wallet,
+            title: 'Mon portefeuille',
+            description: 'Gains et retraits',
+        },
+        {
+            href: route('agent.documents.index'),
+            icon: FileText,
+            title: 'Mes documents',
+            description: 'Profil et vérification',
+        },
+    ];
 
     return (
-        <AppSidebarLayout breadcrumbs={[{ title: 'Tableau de bord', href: route('agent.dashboard') }]}>
-            <Head title="Tableau de bord Agent" />
+        <AppSidebarLayout
+            breadcrumbs={[{ title: 'Tableau de bord', href: route('agent.dashboard') }]}
+        >
+            <Head title="Tableau de bord Agent - VIMAIZ" />
 
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 sm:p-6 lg:p-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Tableau de bord</h1>
-                        <p className="text-slate-500 dark:text-slate-400 mt-1">Bienvenue sur votre espace agent VIMAIZ</p>
-                        <p className="text-sm text-slate-400 dark:text-slate-500 mt-2">
-                            Vimaiz prélève une commission de 25 % sur chaque intervention pour couvrir les frais de mise en relation, de gestion de la plateforme et de support.
-                        </p>
+            <div className="min-h-screen bg-slate-50 p-4 dark:bg-slate-900 sm:p-6 lg:p-8">
+                <div className="mx-auto max-w-7xl">
+                    {/* Welcome banner */}
+                    <div className="relative mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800 sm:p-8">
+                        <div
+                            className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl"
+                            aria-hidden="true"
+                        />
+                        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h1 className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
+                                    Bonjour{firstName ? ` ${firstName}` : ''} 👋
+                                </h1>
+                                <p className="mt-1.5 text-slate-600 dark:text-slate-400">
+                                    Gérez vos missions de ménage et suivez vos revenus.
+                                </p>
+                                <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
+                                    Vimaiz prélève une commission de 25 % sur chaque intervention
+                                    pour couvrir la mise en relation, la gestion de la plateforme
+                                    et le support.
+                                </p>
+                            </div>
+                            {(stats?.missions_in_progress ?? 0) > 0 && (
+                                <div className="flex flex-none items-center gap-3 rounded-xl bg-sky-50 px-4 py-3 dark:bg-sky-900/30">
+                                    <span className="relative flex h-2.5 w-2.5">
+                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75" />
+                                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-sky-500" />
+                                    </span>
+                                    <span className="text-sm font-semibold text-sky-800 dark:text-sky-300">
+                                        {stats.missions_in_progress} mission
+                                        {stats.missions_in_progress > 1 ? 's' : ''} en cours
+                                    </span>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
+                    {/* Eligibility warning */}
                     {!stats?.is_eligible && (
-                        <Card className="mb-6 border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20">
-                            <CardContent className="p-4 flex items-center gap-4">
+                        <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-orange-200 bg-orange-50 p-5 dark:border-orange-800 dark:bg-orange-900/20 sm:flex-row sm:items-center">
+                            <div className="flex flex-none items-center justify-center rounded-xl bg-orange-100 p-3 dark:bg-orange-900/50">
                                 <AlertCircle className="h-6 w-6 text-orange-500" />
-                                <div className="flex-1">
-                                    <p className="font-medium text-orange-800 dark:text-orange-300">Profil incomplet</p>
-                                    <p className="text-sm text-orange-700 dark:text-orange-400">Complétez votre profil et soumettez vos documents pour recevoir des missions.</p>
-                                </div>
-                                <Link href={route('agent.documents.index')}>
-                                    <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
-                                        Compléter mon profil
-                                    </Button>
-                                </Link>
-                            </CardContent>
-                        </Card>
+                            </div>
+                            <div className="flex-1">
+                                <p className="font-semibold text-orange-800 dark:text-orange-300">
+                                    Profil incomplet — vous ne recevez pas encore de missions
+                                </p>
+                                <p className="text-sm text-orange-700 dark:text-orange-400">
+                                    Complétez votre profil et soumettez vos documents pour être
+                                    éligible.
+                                </p>
+                            </div>
+                            <Link
+                                href={route('agent.documents.index')}
+                                className="inline-flex flex-none items-center gap-2 rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+                            >
+                                Compléter mon profil
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </div>
                     )}
 
-                    {pendingMissions.length > 0 && (
-                        <Card className="mb-6 border-sky-200 dark:border-sky-800 bg-sky-50 dark:bg-sky-900/20">
-                            <CardContent className="p-4 flex items-center gap-4">
-                                <Bell className="h-6 w-6 text-sky-500 animate-pulse" />
-                                <div className="flex-1">
-                                    <p className="font-medium text-sky-800 dark:text-sky-300">{pendingMissions.length} mission(s) en attente</p>
-                                </div>
-                                <Link href={route('agent.missions.index')}>
-                                    <Button size="sm" className="bg-sky-500 hover:bg-sky-600">Voir</Button>
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                        <Card className="dark:bg-slate-800 dark:border-slate-700">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">Solde disponible</p>
-                                        <p className="text-2xl font-bold dark:text-white">{stats?.available_balance ?? 0} €</p>
+                    {/* Stats */}
+                    <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        {statCards.map((card) => (
+                            <div
+                                key={card.label}
+                                className="rounded-2xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`rounded-xl p-3 ${card.iconClass}`}>
+                                        <card.icon className="h-6 w-6" />
                                     </div>
-                                    <Wallet className="h-8 w-8 text-green-500 dark:text-green-300" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card className="dark:bg-slate-800 dark:border-slate-700">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">Missions terminées</p>
-                                        <p className="text-2xl font-bold dark:text-white">{stats?.missions_completed ?? 0}</p>
+                                    <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium text-slate-500 dark:text-slate-400">
+                                            {card.label}
+                                        </p>
+                                        <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                                            {card.value}
+                                        </p>
                                     </div>
-                                    <CheckCircle2 className="h-8 w-8 text-sky-500 dark:text-sky-300" />
                                 </div>
-                            </CardContent>
-                        </Card>
-                        <Card className="dark:bg-slate-800 dark:border-slate-700">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">En attente</p>
-                                        <p className="text-2xl font-bold dark:text-white">{stats?.missions_pending ?? 0}</p>
-                                    </div>
-                                    <Clock className="h-8 w-8 text-yellow-500 dark:text-yellow-300" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card className="dark:bg-slate-800 dark:border-slate-700">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">Note interne</p>
-                                        <p className="text-2xl font-bold dark:text-white">{Number(stats?.internal_rating ?? 5).toFixed(1)}/5</p>
-                                    </div>
-                                    <Star className="h-8 w-8 text-purple-500 dark:text-purple-300" />
-                                </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        ))}
                     </div>
 
-                    <div className="grid gap-6 lg:grid-cols-2">
-                        <Card className="dark:bg-slate-800 dark:border-slate-700">
-                            <CardHeader>
-                                <CardTitle className="dark:text-white">Missions à venir</CardTitle>
-                                <CardDescription className="dark:text-slate-400">Vos prochaines interventions</CardDescription>
-                            </CardHeader>
-                            <CardContent>
+                    {/* Pending missions — needs response */}
+                    {pendingMissions.length > 0 && (
+                        <section className="mb-8">
+                            <div className="mb-4 flex items-center gap-2">
+                                <Bell className="h-5 w-5 animate-pulse text-amber-500" />
+                                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                    Missions en attente de votre réponse
+                                </h2>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                {pendingMissions.map((mission) => (
+                                    <div
+                                        key={mission.id}
+                                        className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-5 dark:border-amber-800 dark:bg-amber-900/20"
+                                    >
+                                        <div className="mb-3 flex items-start justify-between">
+                                            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">
+                                                À confirmer
+                                            </span>
+                                            <span className="font-mono text-lg font-bold text-slate-900 dark:text-white">
+                                                {Number(mission.agent_payout).toFixed(0)} €
+                                            </span>
+                                        </div>
+                                        <h3 className="font-semibold text-slate-900 capitalize dark:text-white">
+                                            {propertyLabel(mission.property)}
+                                        </h3>
+                                        <div className="mt-2 mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600 dark:text-slate-400">
+                                            <span className="inline-flex items-center gap-1.5">
+                                                <Calendar className="h-4 w-4" />
+                                                {formatDate(mission.scheduled_at)}
+                                            </span>
+                                            {mission.duration_hours && (
+                                                <span className="inline-flex items-center gap-1.5">
+                                                    <Clock className="h-4 w-4" />
+                                                    {mission.duration_hours}h
+                                                </span>
+                                            )}
+                                            {mission.client && (
+                                                <span className="inline-flex items-center gap-1.5">
+                                                    <User className="h-4 w-4" />
+                                                    {mission.client.name}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <Link
+                                            href={route('agent.missions.show', mission.id)}
+                                            className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-600"
+                                        >
+                                            Voir et répondre
+                                            <ArrowRight className="h-4 w-4" />
+                                        </Link>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    <div className="grid grid-cols-1 gap-8 xl:grid-cols-3">
+                        {/* Missions column */}
+                        <div className="space-y-8 xl:col-span-2">
+                            {/* Upcoming */}
+                            <section>
+                                <div className="mb-4 flex items-center justify-between">
+                                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                        Missions à venir
+                                    </h2>
+                                    <Link
+                                        href={route('agent.missions.index')}
+                                        className="text-sm font-medium text-primary hover:underline"
+                                    >
+                                        Voir tout →
+                                    </Link>
+                                </div>
                                 {upcomingMissions.length > 0 ? (
                                     <div className="space-y-3">
-                                        {upcomingMissions.map((m) => (
-                                            <Link key={m.id} href={route('agent.missions.show', m.id)} className="flex items-center justify-between p-3 rounded-lg border dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700">
-                                                <div>
-                                                    <p className="font-medium text-sm dark:text-white">{m.mission_number}</p>
-                                                    <p className="text-xs text-slate-500 dark:text-slate-400">{m.property.city} - {new Date(m.scheduled_at).toLocaleDateString('fr-FR')}</p>
+                                        {upcomingMissions.map((mission) => (
+                                            <Link
+                                                key={mission.id}
+                                                href={route('agent.missions.show', mission.id)}
+                                                className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary/40 hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+                                            >
+                                                <div className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-primary/10">
+                                                    <Sparkles className="h-5 w-5 text-primary" />
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-green-600">{m.agent_payout} €</span>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="truncate font-semibold text-slate-900 dark:text-white">
+                                                        {propertyLabel(mission.property)}
+                                                    </p>
+                                                    <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                                                        <span className="inline-flex items-center gap-1">
+                                                            <Calendar className="h-3.5 w-3.5" />
+                                                            {formatDate(mission.scheduled_at)}
+                                                        </span>
+                                                        <span className="inline-flex items-center gap-1">
+                                                            <MapPin className="h-3.5 w-3.5" />
+                                                            {mission.property.city}
+                                                        </span>
+                                                        <span className="font-mono">
+                                                            {mission.mission_number}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                                <div className="flex flex-none items-center gap-2">
+                                                    <span className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                                                        {Number(mission.agent_payout).toFixed(0)} €
+                                                    </span>
                                                     <ChevronRight className="h-4 w-4 text-slate-400" />
                                                 </div>
                                             </Link>
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-center text-slate-500 dark:text-slate-400 py-4">Aucune mission à venir</p>
+                                    <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center dark:border-slate-600 dark:bg-slate-800">
+                                        <div className="mx-auto mb-3 w-fit rounded-full bg-primary/10 p-3">
+                                            <Calendar className="h-6 w-6 text-primary" />
+                                        </div>
+                                        <p className="font-medium text-slate-900 dark:text-white">
+                                            Aucune mission à venir
+                                        </p>
+                                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                            Les nouvelles missions vous seront proposées ici.
+                                        </p>
+                                    </div>
                                 )}
-                            </CardContent>
-                        </Card>
+                            </section>
 
-                        <Card className="dark:bg-slate-800 dark:border-slate-700">
-                            <CardHeader>
-                                <CardTitle className="dark:text-white">Missions récentes</CardTitle>
-                                <CardDescription className="dark:text-slate-400">Dernières missions terminées</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {recentMissions.length > 0 ? (
+                            {/* Recent */}
+                            {recentMissions.length > 0 && (
+                                <section>
+                                    <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+                                        Dernières missions terminées
+                                    </h2>
                                     <div className="space-y-3">
-                                        {recentMissions.map((m) => (
-                                            <Link key={m.id} href={route('agent.missions.show', m.id)} className="flex items-center justify-between p-3 rounded-lg border dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700">
-                                                <div>
-                                                    <p className="font-medium text-sm dark:text-white">{m.mission_number}</p>
-                                                    <p className="text-xs text-slate-500 dark:text-slate-400">{m.property.city}</p>
+                                        {recentMissions.map((mission) => (
+                                            <Link
+                                                key={mission.id}
+                                                href={route('agent.missions.show', mission.id)}
+                                                className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary/40 hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+                                            >
+                                                <div className="flex h-11 w-11 flex-none items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/40">
+                                                    <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                                                 </div>
-                                                <Badge className="bg-green-100 text-green-800">Terminée</Badge>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="truncate font-semibold text-slate-900 dark:text-white">
+                                                        {propertyLabel(mission.property)}
+                                                    </p>
+                                                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                                                        {mission.mission_number} — {mission.property.city}
+                                                    </p>
+                                                </div>
+                                                <div className="flex flex-none flex-col items-end gap-1">
+                                                    <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                                                        Terminée
+                                                    </span>
+                                                    <span className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
+                                                        {Number(mission.agent_payout).toFixed(0)} €
+                                                    </span>
+                                                </div>
                                             </Link>
                                         ))}
                                     </div>
-                                ) : (
-                                    <p className="text-center text-slate-500 dark:text-slate-400 py-4">Aucune mission récente</p>
-                                )}
-                            </CardContent>
-                        </Card>
+                                </section>
+                            )}
+                        </div>
+
+                        {/* Side column */}
+                        <div className="space-y-8">
+                            <section>
+                                <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+                                    Accès rapide
+                                </h2>
+                                <div className="space-y-3">
+                                    {quickLinks.map((link) => (
+                                        <Link
+                                            key={link.title}
+                                            href={link.href}
+                                            className="group flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-primary/40 hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+                                        >
+                                            <div className="rounded-xl bg-slate-100 p-2.5 transition-colors group-hover:bg-primary/10 dark:bg-slate-700">
+                                                <link.icon className="h-5 w-5 text-slate-600 transition-colors group-hover:text-primary dark:text-slate-300" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="font-semibold text-slate-900 dark:text-white">
+                                                    {link.title}
+                                                </p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                    {link.description}
+                                                </p>
+                                            </div>
+                                            <ArrowRight className="h-4 w-4 flex-none text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                                        </Link>
+                                    ))}
+                                </div>
+                            </section>
+
+                            {/* Earnings summary */}
+                            <section>
+                                <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+                                    Mes revenus
+                                </h2>
+                                <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800">
+                                    <div className="flex items-center justify-between border-b border-dashed border-slate-200 pb-3 dark:border-slate-700">
+                                        <span className="text-sm text-slate-500 dark:text-slate-400">
+                                            Total gagné
+                                        </span>
+                                        <span className="font-mono text-lg font-bold text-slate-900 dark:text-white">
+                                            {Number(stats?.total_earnings ?? 0).toFixed(2)} €
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between border-b border-dashed border-slate-200 py-3 dark:border-slate-700">
+                                        <span className="text-sm text-slate-500 dark:text-slate-400">
+                                            En attente
+                                        </span>
+                                        <span className="font-mono font-semibold text-amber-600 dark:text-amber-400">
+                                            {Number(stats?.pending_earnings ?? 0).toFixed(2)} €
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between pt-3">
+                                        <span className="text-sm text-slate-500 dark:text-slate-400">
+                                            Disponible
+                                        </span>
+                                        <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                                            {Number(stats?.available_balance ?? 0).toFixed(2)} €
+                                        </span>
+                                    </div>
+                                    <Link
+                                        href={route('agent.wallet.index')}
+                                        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-110"
+                                    >
+                                        <Wallet className="h-4 w-4" />
+                                        Gérer mon portefeuille
+                                    </Link>
+                                </div>
+                            </section>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* RCP Clause Modal */}
-            <RcpClauseModal 
-                show={showRcpModal} 
-                onAccepted={() => setShowRcpModal(false)} 
-            />
+            <RcpClauseModal show={showRcpModal} onAccepted={() => setShowRcpModal(false)} />
         </AppSidebarLayout>
     );
 }

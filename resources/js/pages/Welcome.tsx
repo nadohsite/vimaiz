@@ -1,656 +1,658 @@
-import { Button } from '@/components/ui/button';
-import { Head, Link } from '@inertiajs/react';
-import AppearanceToggleDropdown from '@/components/appearance-dropdown';
-import {
-    ArrowRight,
-    Calendar,
-    CheckCircle,
-    Clock,
-    CreditCard,
-    Home,
-    MapPin,
-    Shield,
-    Star,
-    Users,
-    Brush,
-    Zap,
-    PartyPopper,
-} from 'lucide-react';
-import { motion } from 'motion/react';
-import logoImage from '@/../assets/images/logo.png';
+import PublicLayout from '@/components/public/public-layout';
+import { type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-interface Props {
-    canLogin: boolean;
-    canRegister: boolean;
+const TYPE_OPTIONS = [
+    { value: 45, label: 'Appartement' },
+    { value: 65, label: 'Maison' },
+    { value: 95, label: 'Villa' },
+    { value: 80, label: 'Chalet' },
+] as const;
+
+const DURATION_OPTIONS = [
+    { value: 0, label: '2h' },
+    { value: 20, label: '3h' },
+    { value: 38, label: '4h' },
+] as const;
+
+function todayIso() {
+    return new Date().toISOString().split('T')[0];
 }
 
-export default function Welcome({ canLogin, canRegister }: Props) {
+function CheckIcon() {
     return (
-        <div className="min-h-screen bg-white dark:bg-slate-900 font-sans text-slate-900 dark:text-white scroll-smooth">
-            <Head title="VIMAIZ — Planifiez votre ménage" />
+        <svg className="dot-check" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" />
+            <path
+                d="M6 10l2.5 2.5L14 7"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    );
+}
 
-            {/* NAV */}
-            <nav className="fixed z-50 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 items-center justify-between">
-                        <div className="flex items-center gap-8">
-                            <Link href="/" className="flex items-center">
-                                <img 
-                                    src={logoImage} 
-                                    alt="VIMAIZ" 
-                                    className="h-22 object-contain brightness-0 saturate-100 invert-0 sepia-100 hue-rotate-[190deg] saturate-[500%]" 
-                                    style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%)' }}
-                                />
-                            </Link>
+function HomeIcon() {
+    return (
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+                d="M3 11l9-7 9 7"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    );
+}
 
-                            <div className="hidden items-center space-x-6 md:flex">
-                                <a
-                                    href="#comment-ca-marche"
-                                    className="text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:text-primary"
-                                >
-                                    Faire le ménage
-                                </a>
-                                <Link
-                                    href={route('professionals.index')}
-                                    className="text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:text-primary"
-                                >
-                                    Devenir Agent
-                                </Link>
-                                <Link
-                                    href={route('contact.index')}
-                                    className="text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:text-primary"
-                                >
-                                    Contact
-                                </Link>
-                            </div>
-                        </div>
+export default function Welcome() {
+    const { auth } = usePage<SharedData>().props;
+    const isLoggedIn = Boolean(auth.user);
+    const ctaHref = isLoggedIn ? route('dashboard') : route('register');
 
-                        <div className="hidden items-center space-x-6 md:flex">
-                            <div className="relative group">
-                                <button className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary">
-                                    À propos
-                                </button>
-                                <div className="absolute right-0 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-100 dark:border-slate-700 py-2">
-                                    <a href="#about" className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">À propos de VIMAIZ</a>
-                                    <a href="#services" className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">Service</a>
-                                    <a href="#comment-ca-marche" className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">Fonctionnement</a>
-                                </div>
-                            </div>
-                        </div>
+    const [typeValue, setTypeValue] = useState(45);
+    const [durationValue, setDurationValue] = useState(0);
+    const [dateValue, setDateValue] = useState(todayIso);
+    const [displayEstimate, setDisplayEstimate] = useState(45);
+    const [flash, setFlash] = useState(false);
+    const estimateRef = useRef(45);
 
-                        <div className="flex items-center space-x-3">
-                            <AppearanceToggleDropdown />
-                            {canLogin ? (
-                                <Link href={route('dashboard')}>
-                                    <Button variant="default" size="sm">
-                                        Mon Espace
-                                    </Button>
-                                </Link>
-                            ) : (
-                                <>
-                                    <Link
-                                        href={route('login')}
-                                        className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary"
-                                    >
-                                        Connexion
-                                    </Link>
-                                    <Link href={route('register')}>
-                                        <Button size="sm">
-                                            Inscription
-                                        </Button>
-                                    </Link>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </nav>
+    const total = typeValue + durationValue;
+    const typeLabel = TYPE_OPTIONS.find((t) => t.value === typeValue)?.label ?? 'Appartement';
+    const durationLabel = DURATION_OPTIONS.find((d) => d.value === durationValue)?.label ?? '2h';
 
-            {/* HERO */}
-            <section className="relative bg-gradient-to-br from-sky-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-16 overflow-hidden">
-                <div className="absolute inset-0 overflow-hidden">
-                    <motion.div 
-                        className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl"
-                        animate={{ 
-                            scale: [1, 1.2, 1],
-                            opacity: [0.5, 0.8, 0.5]
-                        }}
-                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                    <motion.div 
-                        className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-cyan-200/30 blur-3xl"
-                        animate={{ 
-                            scale: [1.2, 1, 1.2],
-                            opacity: [0.6, 0.9, 0.6]
-                        }}
-                        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                    <motion.div 
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-primary/5 blur-3xl"
-                        animate={{ 
-                            scale: [1, 1.3, 1],
-                            rotate: [0, 180, 360]
-                        }}
-                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    />
-                </div>
+    const agentCount = useMemo(() => {
+        const day = new Date(dateValue).getDate();
+        return (day % 3) + 2;
+    }, [dateValue]);
 
-                <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-                                <Brush className="h-4 w-4" />
-                                Service de ménage professionnel
-                            </div>
+    useEffect(() => {
+        let frame = 0;
+        let startTime: number | null = null;
+        const start = estimateRef.current;
+        const target = total;
 
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-tight mb-6">
-                                Conciergeries et propriétaires Airbnb
-                                <span className="block text-primary">automatisez et suivez le ménage de vos locations saisonnières.</span>
+        if (start === target) {
+            return;
+        }
+
+        setFlash(true);
+        const flashTimeout = window.setTimeout(() => setFlash(false), 180);
+
+        const step = (ts: number) => {
+            if (startTime === null) {
+                startTime = ts;
+            }
+            const progress = Math.min((ts - startTime) / 320, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const value = Math.round(start + (target - start) * eased);
+            estimateRef.current = value;
+            setDisplayEstimate(value);
+            if (progress < 1) {
+                frame = requestAnimationFrame(step);
+            }
+        };
+
+        frame = requestAnimationFrame(step);
+
+        return () => {
+            cancelAnimationFrame(frame);
+            window.clearTimeout(flashTimeout);
+        };
+    }, [total]);
+
+    return (
+        <PublicLayout title="VIMAIZ — Le ménage de vos locations saisonnières, organisé">
+            <section className="hero wrap">
+                    <div className="hero-grid">
+                        <div>
+                            <span className="eyebrow rise-1">Service de ménage professionnel</span>
+                            <h1 className="rise-2">
+                                Le ménage de vos locations,
+                                <br />
+                                casé entre deux voyageurs
+                                <span className="accent">, sans y penser.</span>
                             </h1>
-
-                            <p className="text-base text-slate-600 dark:text-slate-300 mb-8 max-w-xl">
-                                Confiez la gestion du ménage de vos logements à des professionnels qualifiés et minutieusement sélectionnés.
+                            <p className="hero-sub rise-3">
+                                Vimaiz relie conciergeries et propriétaires Airbnb à des agents de
+                                ménage vérifiés, et suit chaque intervention du début à la fin —
+                                même à distance.
                             </p>
-
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <Link href={canLogin ? route('dashboard') : route('register')}>
-                                    <Button size="lg" className="w-full sm:w-auto gap-2">
-                                        Demander un ménage
-                                        <ArrowRight className="h-5 w-5" />
-                                    </Button>
-                                </Link>
-                                <a href="#comment-ca-marche">
-                                    <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                                        Comment ça marche
-                                    </Button>
+                            <div className="hero-ctas rise-4">
+                                <a className="btn btn-primary" href="#service">
+                                    Demander un ménage →
+                                </a>
+                                <a className="btn btn-ghost" href="#steps">
+                                    Comment ça marche
                                 </a>
                             </div>
-
-                            <div className="mt-10 flex items-center gap-8 text-sm text-slate-500 dark:text-slate-400">
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle className="h-5 w-5 text-green-500" />
+                            <div className="trust-row">
+                                <span>
+                                    <CheckIcon />
                                     Paiement sécurisé
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Shield className="h-5 w-5 text-primary" />
-                                    Agents vérifiés
-                                </div>
+                                </span>
+                                <span>
+                                    <CheckIcon />
+                                    Agents vérifiés SIRET
+                                </span>
+                                <span>
+                                    <CheckIcon />
+                                    Réponse sous 24h
+                                </span>
                             </div>
-                        </motion.div>
 
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.3, type: "spring", stiffness: 100 }}
-                            className="relative hidden lg:block"
-                        >
-                            <div className="relative rounded-3xl bg-white dark:bg-slate-800 p-8 shadow-2xl shadow-primary/20 border border-slate-100 dark:border-slate-700 hover:shadow-3xl hover:shadow-primary/30 transition-all duration-500">
-                                <motion.div 
-                                    className="absolute -top-4 -right-4 rounded-full bg-primary p-3 shadow-lg"
-                                    animate={{ rotate: [0, 10, -10, 0] }}
-                                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                                >
-                                    <Zap className="h-6 w-6 text-white" />
-                                </motion.div>
-                                
-                                <h3 className="text-lg font-semibold mb-6 dark:text-white">Demande rapide</h3>
-                                
-                                <div className="space-y-4">
-                                    <motion.div 
-                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-primary/5 dark:hover:bg-primary/10 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-                                        whileHover={{ x: 5 }}
-                                    >
-                                        <div className="p-2 rounded-lg bg-primary/10">
-                                            <Home className="h-5 w-5 text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium dark:text-white">Type de logement</p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400">Appartement, Maison, Villa, Chalet</p>
-                                        </div>
-                                    </motion.div>
-                                    <motion.div 
-                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-primary/5 dark:hover:bg-primary/10 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-                                        whileHover={{ x: 5 }}
-                                    >
-                                        <div className="p-2 rounded-lg bg-primary/10">
-                                            <Calendar className="h-5 w-5 text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium dark:text-white">Date & Heure</p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400">Choisissez votre créneau</p>
-                                        </div>
-                                    </motion.div>
-                                    <motion.div 
-                                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-primary/5 dark:hover:bg-primary/10 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-                                        whileHover={{ x: 5 }}
-                                    >
-                                        <div className="p-2 rounded-lg bg-primary/10">
-                                            <CreditCard className="h-5 w-5 text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium dark:text-white">Paiement sécurisé</p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400">Avant l'intervention</p>
-                                        </div>
-                                    </motion.div>
+                            <div className="dial">
+                                <div className="dial-label">
+                                    Une fenêtre de ménage, gérée de bout en bout
                                 </div>
-
-                                <Link href={canLogin ? route('dashboard') : route('register')}>
-                                    <Button className="w-full mt-6">
-                                        Commencer
-                                    </Button>
-                                </Link>
-                            </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* COMMENT ÇA MARCHE */}
-            <section id="comment-ca-marche" className="py-24 bg-white dark:bg-slate-900">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                            Comment ça marche ?
-                        </h2>
-                        <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-                            Un processus simple et transparent en 4 étapes
-                        </p>
-                    </div>
-
-                    <div className="relative">
-                        {/* Connecting lines - positioned to touch icons directly */}
-                        <div className="hidden md:block absolute top-[4.5rem] left-0 right-0 z-0">
-                            <svg className="w-full h-4" preserveAspectRatio="none">
-                                {/* Line 1→2: touches icon 1 right edge to icon 2 left edge */}
-                                <line 
-                                    x1="16%" y1="50%" x2="34%" y2="50%" 
-                                    stroke="#0ea5e9" 
-                                    strokeWidth="2" 
-                                    strokeDasharray="8 6"
-                                    strokeOpacity="0.5"
-                                />
-                                {/* Line 2→3: touches icon 2 right edge to icon 3 left edge */}
-                                <line 
-                                    x1="41%" y1="50%" x2="59%" y2="50%" 
-                                    stroke="#0ea5e9" 
-                                    strokeWidth="2" 
-                                    strokeDasharray="8 6"
-                                    strokeOpacity="0.5"
-                                />
-                                {/* Line 3→4: touches icon 3 right edge to icon 4 left edge */}
-                                <line 
-                                    x1="66%" y1="50%" x2="84%" y2="50%" 
-                                    stroke="#0ea5e9" 
-                                    strokeWidth="2" 
-                                    strokeDasharray="8 6"
-                                    strokeOpacity="0.5"
-                                />
-                            </svg>
-                        </div>
-                        
-                        <div className="grid md:grid-cols-4 gap-8 relative z-10">
-                            {[
-                                {
-                                    step: '1',
-                                    icon: Home,
-                                    title: 'Ajoutez votre logement',
-                                    description: 'Renseignez les détails de votre appartement, maison, villa ou chalet',
-                                },
-                                {
-                                    step: '2',
-                                    icon: Calendar,
-                                    title: 'Planifiez',
-                                    description: 'Choisissez la date, l\'heure et la durée souhaitée',
-                                },
-                                {
-                                    step: '3',
-                                    icon: CreditCard,
-                                    title: 'Validez & Payez',
-                                    description: 'Recevez un devis, acceptez et payez en ligne',
-                                },
-                                {
-                                    step: '4',
-                                    icon: PartyPopper,
-                                    title: 'C\'est fait !',
-                                    description: 'Un agent qualifié intervient chez vous',
-                                },
-                            ].map((item, index) => (
-                                <motion.div
-                                    key={item.step}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.6, delay: index * 0.15, type: "spring", stiffness: 100 }}
-                                    viewport={{ once: true, margin: "-50px" }}
-                                    whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                                    className="relative group"
-                                >
-                                    <div className="text-center p-6 rounded-2xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-transparent group-hover:border-primary/20 group-hover:bg-white dark:group-hover:bg-slate-800 group-hover:shadow-xl group-hover:shadow-primary/10 transition-all duration-500">
-                                        <div className="relative inline-flex mb-6">
-                                            <motion.div 
-                                                className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300"
-                                                whileHover={{ scale: 1.1, rotate: 5 }}
-                                            >
-                                                <item.icon className="h-8 w-8 text-primary" />
-                                            </motion.div>
-                                            <motion.span 
-                                                className="absolute -top-2 -right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-lg"
-                                                whileHover={{ scale: 1.2 }}
-                                            >
-                                                {item.step}
-                                            </motion.span>
-                                        </div>
-                                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
-                                        <p className="text-sm text-slate-600 dark:text-slate-400">{item.description}</p>
+                                <div className="dial-track">
+                                    <div className="dial-line" aria-hidden="true" />
+                                    <div className="dial-point">
+                                        <div className="dial-time">11:00</div>
+                                        <div className="dial-tag">Départ voyageur</div>
                                     </div>
-                                </motion.div>
-                            ))}
+                                    <div className="dial-mid">Agent Vimaiz sur place</div>
+                                    <div className="dial-point">
+                                        <div className="dial-time">15:00</div>
+                                        <div className="dial-tag">Arrivée voyageur</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="card-wrap">
+                            <div className="float-badge" aria-hidden="true">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"
+                                        stroke="currentColor"
+                                        strokeWidth="1.6"
+                                        strokeLinejoin="round"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                            </div>
+                            <div className="card-request" id="service">
+                                <div className="card-head">
+                                    <h3>Demande rapide</h3>
+                                    <span className="live-pill">
+                                        <span className="live-dot" aria-hidden="true" />
+                                        Agents dispo aujourd&apos;hui
+                                    </span>
+                                </div>
+
+                                <div className="req-row">
+                                    <div className="req-icon">
+                                        <HomeIcon />
+                                    </div>
+                                    <div className="req-body">
+                                        <div className="req-sub">Type de logement</div>
+                                        <select
+                                            className="req-field"
+                                            aria-label="Type de logement"
+                                            value={typeValue}
+                                            onChange={(e) => setTypeValue(Number(e.target.value))}
+                                        >
+                                            {TYPE_OPTIONS.map((option) => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="req-check on" aria-hidden="true">
+                                        <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
+                                            <path
+                                                d="M5 10l3.2 3.2L15 6.5"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <div className="req-row">
+                                    <div className="req-icon">
+                                        <svg
+                                            width="19"
+                                            height="19"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            aria-hidden="true"
+                                        >
+                                            <rect
+                                                x="4"
+                                                y="5"
+                                                width="16"
+                                                height="15"
+                                                rx="2"
+                                                stroke="currentColor"
+                                                strokeWidth="1.7"
+                                            />
+                                            <path
+                                                d="M4 9h16M8 3v4M16 3v4"
+                                                stroke="currentColor"
+                                                strokeWidth="1.7"
+                                                strokeLinecap="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div className="req-body">
+                                        <div className="req-sub">Date et créneau</div>
+                                        <div className="req-row-split">
+                                            <input
+                                                className="req-field"
+                                                type="date"
+                                                aria-label="Date de l'intervention"
+                                                min={todayIso()}
+                                                value={dateValue}
+                                                onChange={(e) => setDateValue(e.target.value)}
+                                            />
+                                            <select
+                                                className="req-field"
+                                                aria-label="Durée du ménage"
+                                                style={{ maxWidth: 110 }}
+                                                value={durationValue}
+                                                onChange={(e) =>
+                                                    setDurationValue(Number(e.target.value))
+                                                }
+                                            >
+                                                {DURATION_OPTIONS.map((option) => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="req-check on" aria-hidden="true">
+                                        <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
+                                            <path
+                                                d="M5 10l3.2 3.2L15 6.5"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <div className="req-row">
+                                    <div className="req-icon">
+                                        <svg
+                                            width="19"
+                                            height="19"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            aria-hidden="true"
+                                        >
+                                            <rect
+                                                x="3"
+                                                y="6"
+                                                width="18"
+                                                height="13"
+                                                rx="2"
+                                                stroke="currentColor"
+                                                strokeWidth="1.7"
+                                            />
+                                            <path
+                                                d="M3 10h18"
+                                                stroke="currentColor"
+                                                strokeWidth="1.7"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div className="req-body">
+                                        <div className="req-title">Paiement sécurisé</div>
+                                        <div className="req-sub">
+                                            Débité après validation, avant l&apos;intervention
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="avatar-stack">
+                                    <div className="avatars">
+                                        <div className="avatar">ML</div>
+                                        <div className="avatar">KB</div>
+                                        <div className="avatar">SR</div>
+                                    </div>
+                                    <span className="avatar-note">
+                                        <strong>{agentCount} agents</strong> disponibles pour ce
+                                        créneau
+                                    </span>
+                                </div>
+
+                                <div className="estimate-box">
+                                    <div className="estimate-top">
+                                        <span className="estimate-label">
+                                            Estimation de la mission
+                                        </span>
+                                        <span
+                                            className={`estimate-value${flash ? ' flash' : ''}`}
+                                        >
+                                            {displayEstimate} €
+                                        </span>
+                                    </div>
+                                    <div className="estimate-breakdown">
+                                        <span>
+                                            {typeLabel} · {durationLabel}
+                                        </span>
+                                        <span>{total} €</span>
+                                    </div>
+                                </div>
+
+                                <Link className="btn btn-primary" href={ctaHref}>
+                                    Réserver pour {total} €
+                                </Link>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* SERVICES */}
-            <section id="services" className="py-24 bg-slate-50 dark:bg-slate-800">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                            Types de logements
-                        </h2>
-                        <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-                            VIMAIZ intervient exclusivement dans ces types de propriétés
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {[
-                            {
-                                title: 'Appartement',
-                                description: 'Studios, T1, T2 et plus — tous types d\'appartements',
-                                features: ['Petites surfaces', 'Grands appartements', 'Résidences'],
-                            },
-                            {
-                                title: 'Maison',
-                                description: 'Entretien complet de votre maison individuelle',
-                                features: ['Toutes surfaces', 'Intérieur complet', 'Espaces de vie'],
-                            },
-                            {
-                                title: 'Villa',
-                                description: 'Service premium pour villas et grandes propriétés',
-                                features: ['Grandes surfaces', 'Multiples pièces', 'Finitions soignées'],
-                            },
-                            {
-                                title: 'Chalet',
-                                description: 'Spécialistes des chalets et résidences secondaires',
-                                features: ['Zones montagnardes', 'Bois et matériaux', 'Accès spécifiques'],
-                            },
-                        ].map((service, index) => (
-                            <motion.div
-                                key={service.title}
-                                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                                transition={{ duration: 0.6, delay: index * 0.15, type: "spring", stiffness: 100 }}
-                                viewport={{ once: true, margin: "-50px" }}
-                                whileHover={{ y: -10, scale: 1.02 }}
-                                className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:shadow-primary/15 hover:border-primary/30 transition-all duration-500 group"
-                            >
-                                <motion.div 
-                                    className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 mb-6 group-hover:bg-primary group-hover:shadow-lg group-hover:shadow-primary/30 transition-all duration-300"
-                                    whileHover={{ rotate: 10 }}
-                                >
-                                    <Home className="h-7 w-7 text-primary group-hover:text-white transition-colors" />
-                                </motion.div>
-                                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors">{service.title}</h3>
-                                <p className="text-slate-600 dark:text-slate-400 mb-6">{service.description}</p>
-                                <ul className="space-y-3">
-                                    {service.features.map((feature, featureIndex) => (
-                                        <motion.li 
-                                            key={feature} 
-                                            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"
-                                            initial={{ opacity: 0, x: -10 }}
-                                            whileInView={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.3 + featureIndex * 0.1 }}
-                                            viewport={{ once: true }}
-                                        >
-                                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                                            {feature}
-                                        </motion.li>
-                                    ))}
-                                </ul>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* PROFESSIONNELS CTA */}
-            <section id="professionnels" className="py-24 bg-primary relative overflow-hidden">
-                <motion.div 
-                    className="absolute inset-0"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                >
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-                    <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-400/10 rounded-full blur-3xl" />
-                </motion.div>
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, type: "spring" }}
-                            viewport={{ once: true }}
-                        >
-                            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                                Vous êtes professionnel du ménage ?
-                            </h2>
-                            <p className="text-lg text-white/80 mb-8">
-                                Rejoignez le réseau VIMAIZ et recevez des missions qualifiées.
-                                Nous nous occupons de trouver les clients, vous vous concentrez sur votre métier.
+                <section id="steps" className="welcome-section">
+                    <div className="wrap">
+                        <div className="sec-head">
+                            <div className="sec-eyebrow">Le parcours</div>
+                            <h2>Comment ça marche</h2>
+                            <p className="sec-sub">
+                                Un processus en quatre temps, du même rythme qu&apos;une rotation de
+                                logement.
                             </p>
-                            <ul className="space-y-4 mb-8">
-                                {[
-                                    'Auto-entrepreneur ou société (SIRET obligatoire)',
-                                    'Missions attribuées automatiquement',
-                                    'Paiement garanti après chaque intervention',
-                                ].map((item, index) => (
-                                    <motion.li 
-                                        key={item} 
-                                        className="flex items-center gap-3 text-white"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        whileInView={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.2 + index * 0.1 }}
-                                        viewport={{ once: true }}
-                                    >
-                                        <CheckCircle className="h-5 w-5 text-white/80" />
-                                        {item}
-                                    </motion.li>
-                                ))}
-                            </ul>
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                <Link href={route('register') + '?role=agent'}>
-                                    <Button size="lg" variant="secondary" className="gap-2 shadow-xl shadow-black/20 hover:shadow-2xl hover:shadow-black/30 transition-shadow">
-                                        Devenir partenaire
-                                        <ArrowRight className="h-5 w-5" />
-                                    </Button>
-                                </Link>
-                            </motion.div>
-                        </motion.div>
-                        <motion.div 
-                            className="hidden lg:flex justify-center"
-                            initial={{ opacity: 0, x: 30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
-                            viewport={{ once: true }}
-                        >
-                            <div className="relative">
-                                <motion.div 
-                                    className="absolute inset-0 bg-white/10 rounded-3xl blur-2xl"
-                                    animate={{ scale: [1, 1.1, 1] }}
-                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                />
-                                <div className="relative bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20 hover:bg-white/15 transition-colors duration-500">
-                                    {/* Illustration style unDraw - Professional cleaner */}
-                                    <svg className="w-64 h-48 mx-auto" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        {/* Person */}
-                                        <circle cx="200" cy="80" r="35" fill="white" fillOpacity="0.9"/>
-                                        <path d="M200 115C170 115 150 145 150 180V240H250V180C250 145 230 115 200 115Z" fill="white" fillOpacity="0.9"/>
-                                        {/* Cleaning tools */}
-                                        <rect x="260" y="120" width="8" height="120" rx="4" fill="white" fillOpacity="0.7"/>
-                                        <ellipse cx="264" cy="110" rx="20" ry="15" fill="white" fillOpacity="0.6"/>
-                                        {/* Bucket */}
-                                        <path d="M120 200L130 260H170L180 200H120Z" fill="white" fillOpacity="0.7"/>
-                                        <path d="M115 200H185" stroke="white" strokeOpacity="0.8" strokeWidth="4" strokeLinecap="round"/>
-                                        {/* Sparkles */}
-                                        <circle cx="300" cy="160" r="8" fill="white" fillOpacity="0.5"/>
-                                        <circle cx="320" cy="140" r="5" fill="white" fillOpacity="0.4"/>
-                                        <circle cx="100" cy="150" r="6" fill="white" fillOpacity="0.5"/>
-                                        <circle cx="80" cy="180" r="4" fill="white" fillOpacity="0.4"/>
-                                        {/* Checkmark badge */}
-                                        <circle cx="280" cy="80" r="25" fill="white" fillOpacity="0.8"/>
-                                        <path d="M268 80L276 88L292 72" stroke="#0ea5e9" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                    <p className="text-center text-white/80 text-sm mt-4">
-                                        Rejoignez notre réseau d'agents professionnels
+                        </div>
+                        <div className="steps">
+                            <div className="step">
+                                <div className="step-stamp">01</div>
+                                <div>
+                                    <h3>Ajoutez votre logement</h3>
+                                    <p>
+                                        Appartement, maison, villa ou chalet — renseignez ses
+                                        spécificités une fois pour toutes.
                                     </p>
                                 </div>
                             </div>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* ABOUT */}
-            <section id="about" className="py-24 bg-white dark:bg-slate-900">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
-                        <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, type: "spring" }}
-                            viewport={{ once: true }}
-                        >
-                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">
-                                À propos de VIMAIZ
-                            </h2>
-                            <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">
-                                VIMAIZ est une plateforme qui met en relation les conciergeries et propriétaires Airbnb avec des professionnels du ménage qualifiés et disposant d'un SIRET, tout en automatisant la gestion et le suivi des missions.
-                            </p>
-                            <p className="text-slate-600 dark:text-slate-300 mb-6">
-                                Nous sommes partis d'un constat simple, dans la location saisonnière, gérer les logements, les voyageurs et trouver des agents de ménage fiables, sérieux et professionnels est devenu un véritable défi.
-                            </p>
-                            <p className="text-slate-600 dark:text-slate-300 mb-6">
-                                Le ménage est l'un des éléments les plus importants dans l'expérience des voyageurs, mais aussi l'un des plus difficiles à organiser et suivre au quotidien pour les conciergeries et propriétaires.
-                            </p>
-                            <p className="text-slate-600 dark:text-slate-300 mb-6">
-                                VIMAIZ a été créé pour simplifier cette gestion grâce à une plateforme pensée comme un véritable assistant opérationnel pour les locations saisonnières.
-                            </p>
-                            <p className="text-slate-600 dark:text-slate-300 mb-8">
-                                Suivi des prestations, organisation des missions, visibilité sur les interventions, centralisation des échanges VIMAIZ aide les conciergeries et propriétaires à gagner du temps, et travailler dans de meilleures conditions avec des agents sélectionnés minutieusement.
-                            </p>
-                            <div className="grid grid-cols-3 gap-6">
-                                {[
-                                    { value: '100%', label: 'Sécurisé' },
-                                    { value: '24h', label: 'Réponse max' },
-                                    { value: '5★', label: 'Qualité' },
-                                ].map((stat, index) => (
-                                    <motion.div 
-                                        key={stat.label} 
-                                        className="text-center"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.3 + index * 0.1 }}
-                                        viewport={{ once: true }}
-                                    >
-                                        <p className="text-2xl font-bold text-primary">{stat.value}</p>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
-                                    </motion.div>
-                                ))}
+                            <div className="step">
+                                <div className="step-stamp">02</div>
+                                <div>
+                                    <h3>Planifiez le créneau</h3>
+                                    <p>
+                                        Calez la date, l&apos;heure et la durée en fonction du départ
+                                        et de l&apos;arrivée du voyageur.
+                                    </p>
+                                </div>
                             </div>
-                        </motion.div>
-                        <div className="grid grid-cols-2 gap-4">
+                            <div className="step">
+                                <div className="step-stamp">03</div>
+                                <div>
+                                    <h3>Validez et payez</h3>
+                                    <p>
+                                        Recevez un devis, acceptez-le et réglez en ligne avant
+                                        l&apos;intervention.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="step">
+                                <div className="step-stamp">04</div>
+                                <div>
+                                    <h3>C&apos;est fait</h3>
+                                    <p>
+                                        Un agent qualifié intervient chez vous : son arrivée sur
+                                        place est vérifiée par géolocalisation et chaque mission est
+                                        horodatée.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="welcome-section">
+                    <div className="wrap">
+                        <div className="sec-head">
+                            <div className="sec-eyebrow">Ce que Vimaiz couvre</div>
+                            <h2>Quatre types de logements, un seul standard</h2>
+                            <p className="sec-sub">
+                                Vimaiz intervient exclusivement sur ces types de propriétés.
+                            </p>
+                        </div>
+                        <div className="types">
                             {[
-                                { icon: Shield, title: 'Agents vérifiés', desc: 'SIRET et documents contrôlés' },
-                                { icon: CreditCard, title: 'Paiement sécurisé', desc: 'Avant chaque intervention' },
-                                { icon: Star, title: 'Qualité garantie', desc: 'Photos avant/après obligatoires' },
-                                { icon: MapPin, title: 'Partout en France', desc: 'Réseau national d\'agents' },
-                            ].map((item, index) => (
-                                <motion.div 
-                                    key={item.title} 
-                                    className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-6 hover:bg-primary/5 dark:hover:bg-primary/10 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group"
-                                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                                    viewport={{ once: true }}
-                                    whileHover={{ y: -5 }}
-                                >
-                                    <motion.div whileHover={{ scale: 1.1, rotate: 5 }}>
-                                        <item.icon className="h-8 w-8 text-primary mb-4 group-hover:text-primary transition-colors" />
-                                    </motion.div>
-                                    <h4 className="font-semibold text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors">{item.title}</h4>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400">{item.desc}</p>
-                                </motion.div>
+                                {
+                                    title: 'Appartement',
+                                    description: 'Élégance et confort au cœur du quotidien.',
+                                    features: ['Grands appartements', 'Petites surfaces', 'Résidences'],
+                                },
+                                {
+                                    title: 'Maison',
+                                    description: 'Entretien complet de votre maison individuelle.',
+                                    features: ['Toutes surfaces', 'Intérieur complet', 'Espaces de vie'],
+                                },
+                                {
+                                    title: 'Villa',
+                                    description: 'Service premium pour villas et grandes propriétés.',
+                                    features: [
+                                        'Grandes surfaces',
+                                        'Multiples pièces',
+                                        'Finitions soignées',
+                                    ],
+                                },
+                                {
+                                    title: 'Chalet',
+                                    description: 'Spécialistes des chalets et résidences secondaires.',
+                                    features: [
+                                        'Zones montagnardes',
+                                        'Bois et matériaux',
+                                        'Accès spécifiques',
+                                    ],
+                                },
+                            ].map((type) => (
+                                <div className="type-card" key={type.title}>
+                                    <div className="type-icon">
+                                        <HomeIcon />
+                                    </div>
+                                    <h3>{type.title}</h3>
+                                    <p>{type.description}</p>
+                                    <ul>
+                                        {type.features.map((feature) => (
+                                            <li key={feature}>{feature}</li>
+                                        ))}
+                                    </ul>
+                                </div>
                             ))}
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* FOOTER */}
-            <footer className="bg-slate-900 text-white py-16">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="grid md:grid-cols-5 gap-8 mb-12 items-start">
-                        <div>
-                            <h4 className="font-semibold mb-4">
-                                <img src={logoImage} alt="VIMAIZ" className="h-8 object-contain" />
-                            </h4>
-                            <p className="text-slate-400 text-sm">
-                                Planifiez votre ménage.<br />
-                                VIMAIZ s'occupe du reste.
-                            </p>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold mb-4">À propos</h4>
-                            <ul className="space-y-2 text-sm text-slate-400">
-                                <li><a href="#about" className="hover:text-white transition">À propos de VIMAIZ</a></li>
-                                <li><a href="#services" className="hover:text-white transition">Service</a></li>
-                                <li><a href="#comment-ca-marche" className="hover:text-white transition">Fonctionnement</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold mb-4">Clients</h4>
-                            <ul className="space-y-2 text-sm text-slate-400">
-                                <li><Link href={route('register')} className="hover:text-white transition">Inscription</Link></li>
-                                <li><Link href={route('login')} className="hover:text-white transition">Connexion</Link></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold mb-4">Professionnels</h4>
-                            <ul className="space-y-2 text-sm text-slate-400">
-                                <li><Link href={route('professionals.index')} className="hover:text-white transition">Devenir Agent</Link></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold mb-4">Légal</h4>
-                            <ul className="space-y-2 text-sm text-slate-400">
-                                <li><Link href={route('legal.notice')} className="hover:text-white transition">Mentions légales</Link></li>
-                                <li><Link href={route('privacy')} className="hover:text-white transition">Confidentialité</Link></li>
-                                <li><Link href={route('contact.index')} className="hover:text-white transition">Contact</Link></li>
-                            </ul>
+                <section id="agent" className="welcome-section">
+                    <div className="wrap">
+                        <div className="agent-band">
+                            <div>
+                                <h2>Vous êtes professionnel du ménage ?</h2>
+                                <p>
+                                    Rejoignez le réseau Vimaiz et recevez des missions qualifiées.
+                                    Nous trouvons les clients, vous vous concentrez sur votre métier.
+                                </p>
+                                <ul className="agent-list">
+                                    <li>Auto-entrepreneur ou société — SIRET obligatoire</li>
+                                    <li>Missions attribuées automatiquement</li>
+                                    <li>Paiement garanti après chaque intervention</li>
+                                </ul>
+                                <Link
+                                    className="btn btn-primary"
+                                    href={route('professionals.index')}
+                                >
+                                    Devenir partenaire →
+                                </Link>
+                            </div>
+                            <div className="agent-visual">
+                                <div className="badge-num">24h</div>
+                                <div className="badge-cap">Délai de réponse maximum</div>
+                                <hr />
+                                <div className="badge-num">5★</div>
+                                <div className="badge-cap">Qualité exigée à chaque mission</div>
+                            </div>
                         </div>
                     </div>
-                    <div className="border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
-                        <p>&copy; {new Date().getFullYear()} VIMAIZ. Tous droits réservés.</p>
+                </section>
+
+                <section id="about" className="welcome-section">
+                    <div className="wrap">
+                        <div className="about-grid">
+                            <div>
+                                <div className="sec-eyebrow">La plateforme</div>
+                                <h2 style={{ marginBottom: 16 }}>À propos de Vimaiz</h2>
+                                <p>
+                                    Vimaiz met en relation les conciergeries et propriétaires Airbnb
+                                    avec des professionnels du ménage qualifiés et disposant d&apos;un
+                                    SIRET, tout en automatisant la gestion et le suivi des missions.
+                                </p>
+                                <p>
+                                    Dans la location saisonnière, gérer les logements, les voyageurs
+                                    et trouver des agents fiables est un défi quotidien. Le ménage
+                                    reste l&apos;un des éléments les plus décisifs pour
+                                    l&apos;expérience des voyageurs — et l&apos;un des plus
+                                    difficiles à organiser.
+                                </p>
+                                <p>
+                                    Vimaiz centralise le suivi des prestations, l&apos;organisation
+                                    des missions et les échanges, pour faire gagner du temps aux
+                                    conciergeries tout en travaillant avec des agents sélectionnés
+                                    avec soin.
+                                </p>
+                                <div className="about-stats">
+                                    <div>
+                                        <div className="stat-num">100%</div>
+                                        <div className="stat-cap">Sécurisé</div>
+                                    </div>
+                                    <div>
+                                        <div className="stat-num">24h</div>
+                                        <div className="stat-cap">Réponse max</div>
+                                    </div>
+                                    <div>
+                                        <div className="stat-num">5★</div>
+                                        <div className="stat-cap">Qualité</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="about-cards">
+                                <div className="about-card">
+                                    <div className="type-icon">
+                                        <svg
+                                            width="19"
+                                            height="19"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3z"
+                                                stroke="currentColor"
+                                                strokeWidth="1.6"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <h3>Agents vérifiés</h3>
+                                    <p>SIRET et documents contrôlés avant intégration au réseau.</p>
+                                </div>
+                                <div className="about-card">
+                                    <div className="type-icon">
+                                        <svg
+                                            width="19"
+                                            height="19"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            aria-hidden="true"
+                                        >
+                                            <rect
+                                                x="3"
+                                                y="6"
+                                                width="18"
+                                                height="13"
+                                                rx="2"
+                                                stroke="currentColor"
+                                                strokeWidth="1.6"
+                                            />
+                                            <path
+                                                d="M3 10h18"
+                                                stroke="currentColor"
+                                                strokeWidth="1.6"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <h3>Paiement sécurisé</h3>
+                                    <p>Débité avant chaque intervention, jamais avant validation.</p>
+                                </div>
+                                <div className="about-card">
+                                    <div className="type-icon">
+                                        <svg
+                                            width="19"
+                                            height="19"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                d="M12 17.3l-5.4 3 1-6-4.4-4.3 6.1-.9L12 3l2.7 5.1 6.1.9-4.4 4.3 1 6z"
+                                                stroke="currentColor"
+                                                strokeWidth="1.6"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <h3>Qualité garantie</h3>
+                                    <p>
+                                        Chaque mission est géolocalisée et horodatée : l&apos;agent
+                                        démarre à proximité immédiate du logement.
+                                    </p>
+                                </div>
+                                <div className="about-card">
+                                    <div className="type-icon">
+                                        <svg
+                                            width="19"
+                                            height="19"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                d="M12 21s-7-6.3-7-11.5A7 7 0 0 1 12 2a7 7 0 0 1 7 7.5C19 14.7 12 21 12 21z"
+                                                stroke="currentColor"
+                                                strokeWidth="1.6"
+                                                strokeLinejoin="round"
+                                            />
+                                            <circle
+                                                cx="12"
+                                                cy="9.5"
+                                                r="2.4"
+                                                stroke="currentColor"
+                                                strokeWidth="1.6"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <h3>Partout en France</h3>
+                                    <p>
+                                        Un réseau national d&apos;agents, disponible où que vous
+                                        soyez.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </footer>
-        </div>
+                </section>
+        </PublicLayout>
     );
 }

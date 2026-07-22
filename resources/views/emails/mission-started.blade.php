@@ -19,7 +19,7 @@
         <p><strong>Durée prévue :</strong> {{ $mission->duration_hours }} heure(s)</p>
     </div>
     
-    <p>L'agent a pris des photos <strong>AVANT</strong> intervention qui seront disponibles dans votre espace client une fois la mission terminée.</p>
+    <p>La présence de l'agent sur place a été <strong>vérifiée par géolocalisation</strong> et le début de la mission est <strong>horodaté</strong>. Vous pouvez suivre l'avancement depuis votre espace client.</p>
     
     <p style="text-align: center;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">

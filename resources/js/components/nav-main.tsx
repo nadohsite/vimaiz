@@ -30,7 +30,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                 <span>{item.title}</span>
                             </Link>
                         </SidebarMenuButton>
-                        {item.badge && item.badge > 0 && (
+                        {(item.badge ?? 0) > 0 && (
                             <SidebarMenuBadge className="bg-red-500 text-white text-xs">
                                 {item.badge > 99 ? '99+' : item.badge}
                             </SidebarMenuBadge>

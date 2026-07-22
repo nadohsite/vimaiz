@@ -533,13 +533,14 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 </Card>
                             )}
 
-                            {/* No Photos Yet */}
-                            {mission.photos.length === 0 && (
+                            {/* Suivi géolocalisé */}
+                            {(mission.photos || []).length === 0 && (
                                 <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardContent className="p-6 text-center">
-                                        <Camera className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                                        <MapPin className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                                         <p className="text-slate-500 dark:text-slate-400">
-                                            Les photos seront disponibles une fois la mission commencée.
+                                            L&apos;arrivée de l&apos;agent est vérifiée par géolocalisation à proximité
+                                            du logement, et le début comme la fin de la mission sont horodatés.
                                         </p>
                                     </CardContent>
                                 </Card>

@@ -60,6 +60,7 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'is_active' => 'boolean',
+            'last_reminder_sent_at' => 'datetime',
         ];
     }
 

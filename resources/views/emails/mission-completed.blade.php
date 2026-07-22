@@ -26,11 +26,11 @@
         <p><strong>Durée effective :</strong> {{ floor($duration / 60) }}h{{ $duration % 60 > 0 ? sprintf('%02d', $duration % 60) : '' }}</p>
     </div>
     
-    <p>Les photos <strong>AVANT</strong> et <strong>APRÈS</strong> intervention sont maintenant disponibles dans votre espace client.</p>
+    <p>La mission a été <strong>géolocalisée</strong> et <strong>horodatée</strong> : le début et la fin de l'intervention sont enregistrés ci-dessus. Retrouvez tous les détails dans votre espace client.</p>
     
     <p style="text-align: center;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">
-            Voir les photos
+            Voir la mission
         </a>
     </p>
     

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIMAIZ — Le ménage de vos locations saisonnières, organisé</title>
+<script>
+  // Applique le thème avant le premier rendu pour éviter tout flash,
+  // en respectant la préférence système (clair par défaut si non précisée).
+  (function(){
+    try{
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    }catch(e){
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --radius:14px;
+    --maxw:1160px;
+  }
+  html[data-theme="dark"]{
+    --bg:#0A121D;
+    --bg-soft:#0E1826;
+    --surface:#121F30;
+    --surface-2:#17263A;
+    --border:#233348;
+    --border-strong:#2E4562;
+    --ink:#F2F6FA;
+    --stone:#8FA1B5;
+    --accent:#2FB2E8;
+    --accent-dark:#1E8CBD;
+    --accent-tint:#12293A;
+    --accent-ink:#7FD4F5;
+    --on-accent:#04212F;
+  }
+  html[data-theme="light"]{
+    --bg:#F4F8FB;
+    --bg-soft:#EAF1F7;
+    --surface:#FFFFFF;
+    --surface-2:#FFFFFF;
+    --border:#DCE6EF;
+    --border-strong:#C2D3E1;
+    --ink:#0B1420;
+    --stone:#5A6E80;
+    --accent:#1594CC;
+    --accent-dark:#0E729F;
+    --accent-tint:#E4F3FA;
+    --accent-ink:#0E729F;
+    --on-accent:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    transition:background .2s ease, color .2s ease;
+  }
+  h1,h2,h3,.display{font-family:'Space Grotesk',system-ui,sans-serif;letter-spacing:-0.01em;}
+  .mono{font-family:'IBM Plex Mono',monospace;letter-spacing:0.02em;}
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* NAV */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  nav.wrap{display:flex;align-items:center;justify-content:space-between;height:76px;gap:24px;}
+  .logo{display:flex;align-items:center;gap:8px;font-family:'Space Grotesk';font-weight:700;font-size:20px;color:var(--accent-ink);}
+  .logo-mark{width:30px;height:30px;border-radius:9px;background:var(--accent);position:relative;flex:none;}
+  .logo-mark::after{
+    content:"";position:absolute;left:8px;top:15px;width:14px;height:2px;
+    background:var(--on-accent);border-radius:2px;
+    box-shadow:0 -5px 0 var(--on-accent), 0 5px 0 var(--on-accent);
+    opacity:0.9;
+  }
+  .navlinks{display:flex;gap:32px;font-size:15px;font-weight:500;}
+  .navlinks a{color:var(--stone);transition:color .15s;position:relative;padding-bottom:2px;}
+  .navlinks a::after{
+    content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--accent);
+    transition:right .2s ease;
+  }
+  .navlinks a:hover{color:var(--ink);}
+  .navlinks a:hover::after{right:0;}
+
+  @keyframes rise-in{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  .rise-1,.rise-2,.rise-3,.rise-4{animation:rise-in .6s ease both;}
+  .rise-2{animation-delay:.08s;}
+  .rise-3{animation-delay:.16s;}
+  .rise-4{animation-delay:.24s;}
+  .navcta{display:flex;align-items:center;gap:16px;}
+  .theme-toggle{
+    width:38px;height:38px;border-radius:10px;border:1px solid var(--border);
+    background:var(--surface);color:var(--stone);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:border-color .15s, color .15s;flex:none;
+  }
+  .theme-toggle:hover{border-color:var(--border-strong);color:var(--ink);}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 22px;border-radius:999px;font-weight:600;font-size:15px;
+    border:1px solid transparent;cursor:pointer;transition:transform .15s, background .15s, border-color .15s;
+    white-space:nowrap;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--accent);color:var(--on-accent);}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-ghost{background:transparent;border-color:var(--border);color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--border-strong);}
+  .btn-link{font-weight:600;font-size:15px;color:var(--ink);}
+
+  /* HERO */
+  .hero{padding:72px 0 40px;}
+  .hero-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:56px;align-items:start;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--accent-tint);color:var(--accent-ink);
+    font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;
+    margin-bottom:22px;border:1px solid var(--border);
+  }
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  h1{font-size:52px;line-height:1.05;font-weight:700;margin-bottom:22px;}
+  h1 .accent{color:var(--accent-ink);}
+  .hero-sub{font-size:18px;color:var(--stone);max-width:46ch;margin-bottom:32px;}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:28px;}
+  .trust-row{display:flex;gap:26px;flex-wrap:wrap;font-size:14px;color:var(--stone);}
+  .trust-row span{display:flex;align-items:center;gap:7px;}
+  .dot-check{width:16px;height:16px;flex:none;}
+
+  /* turnover dial — signature element */
+  .dial{
+    margin-top:44px;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:22px 26px;
+  }
+  .dial-label{font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--stone);margin-bottom:16px;}
+  .dial-track{position:relative;display:flex;align-items:center;justify-content:space-between;}
+  .dial-line{position:absolute;left:44px;right:44px;top:50%;height:2px;background:repeating-linear-gradient(90deg,var(--border) 0 6px,transparent 6px 12px);}
+  .dial-point{position:relative;z-index:1;text-align:center;}
+  .dial-time{font-family:'IBM Plex Mono';font-size:20px;font-weight:500;color:var(--ink);}
+  .dial-tag{font-size:12px;color:var(--stone);margin-top:4px;white-space:nowrap;}
+  .dial-mid{
+    position:relative;z-index:1;background:var(--accent);color:var(--on-accent);
+    font-size:13px;font-weight:600;padding:8px 16px;border-radius:999px;
+  }
+
+  /* request card */
+  .card-request{
+    background:var(--surface);border:1px solid var(--border);border-radius:20px;
+    padding:26px;position:sticky;top:96px;
+  }
+  .card-wrap{position:relative;}
+  .float-badge{
+    position:absolute;top:-20px;right:22px;width:54px;height:54px;border-radius:50%;
+    background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;
+    z-index:2;animation:float-bob 3.2s ease-in-out infinite;
+  }
+  .float-badge::before{
+    content:"";position:absolute;inset:0;border-radius:50%;background:var(--accent);
+    animation:ping 2.4s cubic-bezier(0,0,0.2,1) infinite;z-index:-1;
+  }
+  @keyframes float-bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+  @keyframes ping{0%{opacity:0.55;transform:scale(1);}75%,100%{opacity:0;transform:scale(1.7);}}
+
+  .card-request h3{font-size:17px;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .live-pill{
+    display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--accent-ink);
+    background:var(--accent-tint);border:1px solid var(--border);padding:5px 10px;border-radius:999px;
+  }
+  .live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1.8s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
+
+  .req-row{
+    display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;
+    background:var(--bg-soft);margin-bottom:10px;border:1px solid var(--border);
+    transition:border-color .15s, background .15s;
+  }
+  .req-row:focus-within{border-color:var(--accent);background:var(--surface);}
+  .req-icon{
+    width:38px;height:38px;border-radius:10px;background:var(--accent-tint);color:var(--accent-ink);
+    display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .req-body{flex:1;min-width:0;}
+  .req-title{font-size:14.5px;font-weight:600;margin-bottom:2px;}
+  .req-sub{font-size:12.5px;color:var(--stone);}
+  .req-field{
+    width:100%;border:none;background:transparent;color:var(--ink);
+    font-family:'Inter';font-size:14.5px;font-weight:600;padding:0;outline:none;cursor:pointer;
+  }
+  .req-field:focus{color:var(--accent-ink);}
+  .req-row select.req-field{appearance:none;}
+  .req-row-split{display:flex;gap:10px;}
+  .req-row-split .req-field{font-size:13.5px;}
+
+  .estimate-box{
+    padding:16px 18px;border-radius:12px;background:var(--surface-2);border:1.5px solid var(--accent);
+    margin:16px 0 14px;
+  }
+  .estimate-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .estimate-label{font-size:12.5px;color:var(--stone);text-transform:uppercase;letter-spacing:0.05em;}
+  .estimate-value{font-family:'IBM Plex Mono';font-size:30px;font-weight:500;color:var(--accent-ink);transition:transform .18s;line-height:1;}
+  .estimate-value.flash{transform:scale(1.1);}
+  .estimate-breakdown{display:flex;justify-content:space-between;font-size:12.5px;color:var(--stone);border-top:1px dashed var(--border);padding-top:8px;}
+  .estimate-breakdown span:last-child{color:var(--ink);font-weight:500;}
+
+  .avatar-stack{display:flex;align-items:center;gap:10px;margin:2px 0 16px;}
+  .avatars{display:flex;}
+  .avatar{
+    width:26px;height:26px;border-radius:50%;background:var(--accent-tint);color:var(--accent-ink);
+    display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;
+    border:2px solid var(--surface);margin-left:-8px;
+  }
+  .avatar:first-child{margin-left:0;}
+  .avatar-note{font-size:12.5px;color:var(--stone);}
+  .avatar-note strong{color:var(--ink);font-weight:600;}
+
+  .req-check{
+    width:18px;height:18px;border-radius:50%;background:var(--accent);color:var(--on-accent);
+    display:flex;align-items:center;justify-content:center;flex:none;opacity:0;transform:scale(0.6);
+    transition:opacity .15s, transform .15s;
+  }
+  .req-check.on{opacity:1;transform:scale(1);}
+  .card-request .btn-primary{width:100%;margin-top:2px;padding:14px;font-size:15.5px;}
+
+  /* SECTION shared */
+  section{padding:76px 0;}
+  .sec-head{max-width:640px;margin:0 auto 48px;text-align:center;}
+  .sec-eyebrow{font-family:'IBM Plex Mono';font-size:12.5px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+  h2{font-size:34px;font-weight:700;margin-bottom:10px;}
+  .sec-sub{color:var(--stone);font-size:16.5px;}
+
+  /* how it works — connected thread */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;}
+  .steps::before{
+    content:"";position:absolute;top:26px;left:calc(12.5% + 4px);right:calc(12.5% + 4px);
+    height:2px;background:repeating-linear-gradient(90deg,var(--border) 0 6px,transparent 6px 12px);
+    z-index:0;
+  }
+  .step{position:relative;z-index:1;text-align:center;padding:0 14px;}
+  .step-stamp{
+    width:52px;height:52px;border-radius:12px;background:var(--surface);border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+    font-family:'IBM Plex Mono';font-weight:500;font-size:13px;color:var(--accent-ink);
+  }
+  .step h3{font-size:16.5px;margin-bottom:6px;}
+  .step p{font-size:14px;color:var(--stone);}
+
+  /* property types */
+  .types{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .type-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 20px;
+    transition:border-color .15s, transform .15s;
+  }
+  .type-card:hover{border-color:var(--accent);transform:translateY(-3px);}
+  .type-icon{width:42px;height:42px;border-radius:10px;background:var(--accent-tint);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+  .type-card h3{font-size:17px;margin-bottom:6px;}
+  .type-card p{font-size:13.5px;color:var(--stone);margin-bottom:14px;}
+  .type-card ul{list-style:none;font-size:13.5px;}
+  .type-card li{display:flex;align-items:center;gap:8px;padding:4px 0;color:var(--ink);}
+  .type-card li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none;}
+
+  /* agent band */
+  .agent-band{
+    background:linear-gradient(180deg, var(--surface-2), var(--bg-soft));
+    border:1px solid var(--border);
+    color:var(--ink);border-radius:24px;
+    padding:56px 52px;display:grid;grid-template-columns:1.1fr 0.7fr;gap:40px;align-items:center;
+  }
+  .agent-band h2{color:var(--ink);}
+  .agent-band p{color:var(--stone);font-size:16px;margin-bottom:20px;max-width:48ch;}
+  .agent-list{list-style:none;margin-bottom:26px;}
+  .agent-list li{display:flex;gap:10px;padding:6px 0;font-size:15px;}
+  .agent-list li::before{content:"✓";color:var(--accent-ink);font-weight:700;flex:none;}
+  .agent-visual{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:18px;padding:30px;text-align:center;
+  }
+  .agent-visual .badge-num{font-family:'IBM Plex Mono';font-size:38px;font-weight:500;color:var(--accent-ink);}
+  .agent-visual .badge-cap{font-size:13.5px;color:var(--stone);margin-top:6px;}
+  .agent-visual hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
+
+  /* about */
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+  .about-grid p{color:var(--stone);margin-bottom:14px;font-size:15.5px;}
+  .about-stats{display:flex;gap:36px;margin-top:24px;padding-top:24px;border-top:1px solid var(--border);}
+  .stat-num{font-family:'IBM Plex Mono';font-size:28px;font-weight:500;color:var(--accent-ink);}
+  .stat-cap{font-size:13px;color:var(--stone);}
+  .about-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .about-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+  .about-card .type-icon{margin-bottom:12px;}
+  .about-card h3{font-size:15.5px;margin-bottom:4px;}
+  .about-card p{font-size:13px;color:var(--stone);margin:0;}
+
+  /* footer */
+  footer{border-top:1px solid var(--border);padding:52px 0 28px;}
+  .foot-grid{display:grid;grid-template-columns:1.3fr repeat(4,1fr);gap:32px;margin-bottom:40px;}
+  .foot-brand p{color:var(--stone);font-size:14px;margin-top:10px;max-width:26ch;}
+  .foot-col h4{font-size:13px;text-transform:uppercase;letter-spacing:0.06em;color:var(--stone);margin-bottom:14px;}
+  .foot-col a{display:block;font-size:14.5px;color:var(--ink);padding:5px 0;}
+  .foot-col a:hover{color:var(--accent-ink);}
+  .foot-bottom{display:flex;justify-content:space-between;color:var(--stone);font-size:13px;padding-top:24px;border-top:1px solid var(--border);}
+
+  @media(max-width:920px){
+    h1{font-size:38px;}
+    .hero-grid{grid-template-columns:1fr;}
+    .card-request{position:static;}
+    .navlinks{display:none;}
+    .steps{grid-template-columns:1fr 1fr;gap:28px;}
+    .steps::before{display:none;}
+    .types{grid-template-columns:1fr 1fr;}
+    .agent-band{grid-template-columns:1fr;padding:36px 24px;}
+    .about-grid{grid-template-columns:1fr;}
+    .foot-grid{grid-template-columns:1fr 1fr;}
+  }
+
+  /* Téléphones : évite tout débordement horizontal et réajuste les tailles */
+  @media(max-width:640px){
+    html,body{overflow-x:hidden;}
+    .wrap{padding:0 18px;}
+    nav.wrap{height:64px;gap:10px;}
+    .logo{font-size:17px;gap:6px;}
+    .logo-mark{width:26px;height:26px;}
+    .navcta{gap:8px;}
+    .btn-ghost{display:none;}
+    .theme-toggle{width:34px;height:34px;}
+    .btn{padding:10px 16px;font-size:14px;}
+
+    .hero{padding:40px 0 28px;}
+    h1{font-size:29px;line-height:1.15;}
+    .hero-sub{font-size:15.5px;max-width:none;}
+    .eyebrow{font-size:12px;padding:6px 12px;}
+    .trust-row{gap:16px;font-size:13px;}
+    .hero-ctas{gap:10px;}
+    .hero-ctas .btn{width:100%;}
+
+    .dial{padding:18px 14px;}
+    .dial-track{flex-direction:column;gap:14px;align-items:stretch;}
+    .dial-line{display:none;}
+    .dial-point{display:flex;align-items:center;justify-content:space-between;text-align:left;}
+    .dial-mid{align-self:center;}
+
+    .card-request{padding:20px;}
+    .float-badge{width:44px;height:44px;top:-16px;right:14px;}
+    .req-row-split{flex-direction:column;gap:8px;}
+    .estimate-value{font-size:26px;}
+
+    section{padding:52px 0;}
+    .sec-head{margin-bottom:32px;}
+    h2{font-size:26px;}
+    .sec-sub{font-size:15px;}
+
+    .steps{grid-template-columns:1fr;gap:24px;}
+    .step{padding:0;text-align:left;display:flex;gap:14px;align-items:flex-start;}
+    .step-stamp{margin:0;flex:none;}
+
+    .types{grid-template-columns:1fr;}
+    .about-cards{grid-template-columns:1fr 1fr;}
+    .about-stats{gap:24px;flex-wrap:wrap;}
+
+    .agent-band{padding:28px 18px;border-radius:18px;}
+    .agent-band h2{font-size:26px;}
+
+    .foot-grid{grid-template-columns:1fr;gap:24px;margin-bottom:28px;}
+    .foot-bottom{flex-direction:column;gap:8px;text-align:center;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important;animation:none!important;}}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="logo"><span class="logo-mark" aria-hidden="true"></span>Vimaiz</div>
+    <div class="navlinks">
+      <a href="#service">Faire le ménage</a>
+      <a href="#agent">Devenir agent</a>
+      <a href="#about">À propos</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="navcta">
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer de thème" title="Changer de thème">
+        <svg id="iconMoon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <svg id="iconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" style="display:none;"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <a class="btn-link" href="#">Connexion</a>
+      <a class="btn btn-primary" href="#">Inscription</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow rise-1">Service de ménage professionnel</span>
+        <h1 class="rise-2">Le ménage de vos locations,<br>casé entre deux voyageurs<span class="accent">, sans y penser.</span></h1>
+        <p class="hero-sub rise-3">Vimaiz relie conciergeries et propriétaires Airbnb à des agents de ménage vérifiés, et suit chaque intervention du début à la fin — même à distance.</p>
+        <div class="hero-ctas rise-4">
+          <a class="btn btn-primary" href="#service">Demander un ménage →</a>
+          <a class="btn btn-ghost" href="#steps">Comment ça marche</a>
+        </div>
+        <div class="trust-row">
+          <span><svg class="dot-check" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M6 10l2.5 2.5L14 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Paiement sécurisé</span>
+          <span><svg class="dot-check" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M6 10l2.5 2.5L14 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Agents vérifiés SIRET</span>
+          <span><svg class="dot-check" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M6 10l2.5 2.5L14 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Réponse sous 24h</span>
+        </div>
+
+        <div class="dial">
+          <div class="dial-label">Une fenêtre de ménage, gérée de bout en bout</div>
+          <div class="dial-track">
+            <div class="dial-line" aria-hidden="true"></div>
+            <div class="dial-point">
+              <div class="dial-time">11:00</div>
+              <div class="dial-tag">Départ voyageur</div>
+            </div>
+            <div class="dial-mid">Agent Vimaiz sur place</div>
+            <div class="dial-point">
+              <div class="dial-time">15:00</div>
+              <div class="dial-tag">Arrivée voyageur</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-wrap">
+        <div class="float-badge" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        </div>
+        <div class="card-request" id="service">
+          <div class="card-head">
+            <h3>Demande rapide</h3>
+            <span class="live-pill"><span class="live-dot" aria-hidden="true"></span>Agents dispo aujourd'hui</span>
+          </div>
+
+          <div class="req-row">
+            <div class="req-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="req-body">
+              <div class="req-sub">Type de logement</div>
+              <select class="req-field" id="typeSelect" aria-label="Type de logement">
+                <option value="45">Appartement</option>
+                <option value="65">Maison</option>
+                <option value="95">Villa</option>
+                <option value="80">Chalet</option>
+              </select>
+            </div>
+            <div class="req-check on" id="checkType" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M5 10l3.2 3.2L15 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+
+          <div class="req-row">
+            <div class="req-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+            <div class="req-body">
+              <div class="req-sub">Date et créneau</div>
+              <div class="req-row-split">
+                <input class="req-field" type="date" id="dateInput" aria-label="Date de l'intervention">
+                <select class="req-field" id="durationSelect" aria-label="Durée du ménage" style="max-width:110px;">
+                  <option value="0">2h</option>
+                  <option value="20">3h</option>
+                  <option value="38">4h</option>
+                </select>
+              </div>
+            </div>
+            <div class="req-check on" id="checkDate" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M5 10l3.2 3.2L15 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+
+          <div class="req-row">
+            <div class="req-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.7"/></svg></div>
+            <div class="req-body">
+              <div class="req-title">Paiement sécurisé</div>
+              <div class="req-sub">Débité après validation, avant l'intervention</div>
+            </div>
+          </div>
+
+          <div class="avatar-stack">
+            <div class="avatars">
+              <div class="avatar">ML</div>
+              <div class="avatar">KB</div>
+              <div class="avatar">SR</div>
+            </div>
+            <span class="avatar-note" id="agentNote"><strong>3 agents</strong> disponibles pour ce créneau</span>
+          </div>
+
+          <div class="estimate-box">
+            <div class="estimate-top">
+              <span class="estimate-label">Estimation de la mission</span>
+              <span class="estimate-value" id="estimateValue">45 €</span>
+            </div>
+            <div class="estimate-breakdown">
+              <span id="breakdownType">Appartement · 2h</span>
+              <span id="breakdownTotal">45 €</span>
+            </div>
+          </div>
+
+          <a class="btn btn-primary" href="#" id="startBtn">Réserver pour 45 €</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="steps">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">Le parcours</div>
+        <h2>Comment ça marche</h2>
+        <p class="sec-sub">Un processus en quatre temps, du même rythme qu'une rotation de logement.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-stamp">01</div>
+          <h3>Ajoutez votre logement</h3>
+          <p>Appartement, maison, villa ou chalet — renseignez ses spécificités une fois pour toutes.</p>
+        </div>
+        <div class="step">
+          <div class="step-stamp">02</div>
+          <h3>Planifiez le créneau</h3>
+          <p>Calez la date, l'heure et la durée en fonction du départ et de l'arrivée du voyageur.</p>
+        </div>
+        <div class="step">
+          <div class="step-stamp">03</div>
+          <h3>Validez et payez</h3>
+          <p>Recevez un devis, acceptez-le et réglez en ligne avant l'intervention.</p>
+        </div>
+        <div class="step">
+          <div class="step-stamp">04</div>
+          <h3>C'est fait</h3>
+          <p>Un agent qualifié intervient chez vous et transmet les photos avant/après.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-eyebrow">Ce que Vimaiz couvre</div>
+        <h2>Quatre types de logements, un seul standard</h2>
+        <p class="sec-sub">Vimaiz intervient exclusivement sur ces types de propriétés.</p>
+      </div>
+      <div class="types">
+        <div class="type-card">
+          <div class="type-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Appartement</h3>
+          <p>Élégance et confort au cœur du quotidien.</p>
+          <ul><li>Grands appartements</li><li>Petites surfaces</li><li>Résidences</li></ul>
+        </div>
+        <div class="type-card">
+          <div class="type-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Maison</h3>
+          <p>Entretien complet de votre maison individuelle.</p>
+          <ul><li>Toutes surfaces</li><li>Intérieur complet</li><li>Espaces de vie</li></ul>
+        </div>
+        <div class="type-card">
+          <div class="type-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Villa</h3>
+          <p>Service premium pour villas et grandes propriétés.</p>
+          <ul><li>Grandes surfaces</li><li>Multiples pièces</li><li>Finitions soignées</li></ul>
+        </div>
+        <div class="type-card">
+          <div class="type-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Chalet</h3>
+          <p>Spécialistes des chalets et résidences secondaires.</p>
+          <ul><li>Zones montagnardes</li><li>Bois et matériaux</li><li>Accès spécifiques</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="agent">
+    <div class="wrap">
+      <div class="agent-band">
+        <div>
+          <h2>Vous êtes professionnel du ménage ?</h2>
+          <p>Rejoignez le réseau Vimaiz et recevez des missions qualifiées. Nous trouvons les clients, vous vous concentrez sur votre métier.</p>
+          <ul class="agent-list">
+            <li>Auto-entrepreneur ou société — SIRET obligatoire</li>
+            <li>Missions attribuées automatiquement</li>
+            <li>Paiement garanti après chaque intervention</li>
+          </ul>
+          <a class="btn btn-primary" href="#">Devenir partenaire →</a>
+        </div>
+        <div class="agent-visual">
+          <div class="badge-num">24h</div>
+          <div class="badge-cap">Délai de réponse maximum</div>
+          <hr>
+          <div class="badge-num">5★</div>
+          <div class="badge-cap">Qualité exigée à chaque mission</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="wrap">
+      <div class="about-grid">
+        <div>
+          <div class="sec-eyebrow">La plateforme</div>
+          <h2 style="margin-bottom:16px;">À propos de Vimaiz</h2>
+          <p>Vimaiz met en relation les conciergeries et propriétaires Airbnb avec des professionnels du ménage qualifiés et disposant d'un SIRET, tout en automatisant la gestion et le suivi des missions.</p>
+          <p>Dans la location saisonnière, gérer les logements, les voyageurs et trouver des agents fiables est un défi quotidien. Le ménage reste l'un des éléments les plus décisifs pour l'expérience des voyageurs — et l'un des plus difficiles à organiser.</p>
+          <p>Vimaiz centralise le suivi des prestations, l'organisation des missions et les échanges, pour faire gagner du temps aux conciergeries tout en travaillant avec des agents sélectionnés avec soin.</p>
+          <div class="about-stats">
+            <div><div class="stat-num">100%</div><div class="stat-cap">Sécurisé</div></div>
+            <div><div class="stat-num">24h</div><div class="stat-cap">Réponse max</div></div>
+            <div><div class="stat-num">5★</div><div class="stat-cap">Qualité</div></div>
+          </div>
+        </div>
+        <div class="about-cards">
+          <div class="about-card">
+            <div class="type-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+            <h3>Agents vérifiés</h3>
+            <p>SIRET et documents contrôlés avant intégration au réseau.</p>
+          </div>
+          <div class="about-card">
+            <div class="type-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.6"/></svg></div>
+            <h3>Paiement sécurisé</h3>
+            <p>Débité avant chaque intervention, jamais avant validation.</p>
+          </div>
+          <div class="about-card">
+            <div class="type-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 17.3l-5.4 3 1-6-4.4-4.3 6.1-.9L12 3l2.7 5.1 6.1.9-4.4 4.3 1 6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+            <h3>Qualité garantie</h3>
+            <p>Photos avant/après obligatoires sur chaque mission.</p>
+          </div>
+          <div class="about-card">
+            <div class="type-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-6.3-7-11.5A7 7 0 0 1 12 2a7 7 0 0 1 7 7.5C19 14.7 12 21 12 21z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.4" stroke="currentColor" stroke-width="1.6"/></svg></div>
+            <h3>Partout en France</h3>
+            <p>Un réseau national d'agents, disponible où que vous soyez.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="logo"><span class="logo-mark" aria-hidden="true"></span>Vimaiz</div>
+        <p>Planifiez votre ménage. Vimaiz s'occupe du reste.</p>
+      </div>
+      <div class="foot-col">
+        <h4>À propos</h4>
+        <a href="#about">À propos de Vimaiz</a>
+        <a href="#service">Service</a>
+        <a href="#steps">Fonctionnement</a>
+      </div>
+      <div class="foot-col">
+        <h4>Clients</h4>
+        <a href="#">Inscription</a>
+        <a href="#">Connexion</a>
+      </div>
+      <div class="foot-col">
+        <h4>Professionnels</h4>
+        <a href="#agent">Devenir agent</a>
+      </div>
+      <div class="foot-col">
+        <h4>Légal</h4>
+        <a href="#">Mentions légales</a>
+        <a href="#">Confidentialité</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Vimaiz. Tous droits réservés.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var root = document.documentElement;
+  var btn = document.getElementById('themeToggle');
+  var moon = document.getElementById('iconMoon');
+  var sun = document.getElementById('iconSun');
+
+  // Synchronise l'icône affichée avec le thème réellement actif
+  // (déterminé plus haut dans <head> selon la préférence système).
+  (function syncIcon(){
+    var isDark = root.getAttribute('data-theme') === 'dark';
+    moon.style.display = isDark ? 'block' : 'none';
+    sun.style.display = isDark ? 'none' : 'block';
+  })();
+
+  btn.addEventListener('click', function(){
+    var isDark = root.getAttribute('data-theme') === 'dark';
+    root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    moon.style.display = isDark ? 'none' : 'block';
+    sun.style.display = isDark ? 'block' : 'none';
+  });
+
+  var typeSelect = document.getElementById('typeSelect');
+  var durationSelect = document.getElementById('durationSelect');
+  var estimateValue = document.getElementById('estimateValue');
+  var startBtn = document.getElementById('startBtn');
+  var dateInput = document.getElementById('dateInput');
+  var breakdownType = document.getElementById('breakdownType');
+  var breakdownTotal = document.getElementById('breakdownTotal');
+  var agentNote = document.getElementById('agentNote');
+
+  var typeNames = {45:'Appartement', 65:'Maison', 95:'Villa', 80:'Chalet'};
+  var currentValue = 45;
+
+  var today = new Date();
+  dateInput.min = today.toISOString().split('T')[0];
+  dateInput.value = today.toISOString().split('T')[0];
+
+  function animateTo(target){
+    var start = currentValue;
+    var startTime = null;
+    function step(ts){
+      if(!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / 320, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var value = Math.round(start + (target - start) * eased);
+      estimateValue.textContent = value + ' €';
+      if(progress < 1){
+        requestAnimationFrame(step);
+      } else {
+        currentValue = target;
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function updateEstimate(){
+    var base = parseInt(typeSelect.value, 10);
+    var add = parseInt(durationSelect.value, 10);
+    var total = base + add;
+    var durationLabel = durationSelect.options[durationSelect.selectedIndex].text;
+
+    animateTo(total);
+    startBtn.textContent = 'Réserver pour ' + total + ' €';
+    breakdownType.textContent = typeNames[base] + ' · ' + durationLabel;
+    breakdownTotal.textContent = total + ' €';
+
+    estimateValue.classList.remove('flash');
+    void estimateValue.offsetWidth;
+    estimateValue.classList.add('flash');
+
+    var dateVal = new Date(dateInput.value);
+    var agentCount = (dateVal.getDate() % 3) + 2;
+    agentNote.innerHTML = '<strong>' + agentCount + ' agents</strong> disponibles pour ce créneau';
+  }
+
+  typeSelect.addEventListener('change', updateEstimate);
+  durationSelect.addEventListener('change', updateEstimate);
+  dateInput.addEventListener('change', updateEstimate);
+
+  var initDate = new Date(dateInput.value);
+  var initAgentCount = (initDate.getDate() % 3) + 2;
+  agentNote.innerHTML = '<strong>' + initAgentCount + ' agents</strong> disponibles pour ce créneau';
+</script>
+
+</body>
+</html>

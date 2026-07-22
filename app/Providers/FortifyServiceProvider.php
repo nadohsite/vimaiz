@@ -48,7 +48,14 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::authenticateUsing(function (Request $request) {
             $user = User::where('email', $request->email)->first();
 
-            if ($user && Hash::check($request->password, $user->password)) {
+            try {
+                $passwordMatches = $user && Hash::check($request->password, $user->password);
+            } catch (\RuntimeException) {
+                // Stored hash uses an unsupported algorithm: treat as failed login
+                $passwordMatches = false;
+            }
+
+            if ($passwordMatches) {
                 // Block admins from logging in through the regular login page
                 if ($user->role === 'admin') {
                     throw ValidationException::withMessages([

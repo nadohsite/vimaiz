@@ -319,7 +319,7 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                         <CheckCircle className="h-4 w-4 text-emerald-500" />
-                                        <span>Photos avant/après garanties</span>
+                                        <span>Intervention géolocalisée et horodatée</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                         <CheckCircle className="h-4 w-4 text-emerald-500" />
