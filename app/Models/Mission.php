@@ -39,6 +39,7 @@ class Mission extends Model
         'agent_notified_at',
         'agent_responded_at',
         'assignment_attempts',
+        'checklist',
         // Retour mécontentement
         'return_requested',
         'return_status',
@@ -63,6 +64,7 @@ class Mission extends Model
         'total_price' => 'decimal:2',
         'agent_payout' => 'decimal:2',
         'platform_fee' => 'decimal:2',
+        'checklist' => 'array',
         'return_requested' => 'boolean',
         'return_requested_at' => 'datetime',
         'return_started_at' => 'datetime',
@@ -190,6 +192,32 @@ class Mission extends Model
             self::STATUS_PHOTOS_BEFORE,
             self::STATUS_PHOTOS_AFTER,
         ], true);
+    }
+
+    public function isChecklistComplete(): bool
+    {
+        return \App\Support\DefaultPropertyChecklist::isComplete($this->checklist);
+    }
+
+    public function checklistProgress(): array
+    {
+        $total = 0;
+        $checked = 0;
+
+        foreach ($this->checklist ?? [] as $section) {
+            foreach ($section['items'] ?? [] as $item) {
+                $total++;
+                if (!empty($item['checked'])) {
+                    $checked++;
+                }
+            }
+        }
+
+        return [
+            'total' => $total,
+            'checked' => $checked,
+            'complete' => $total === 0 || $checked === $total,
+        ];
     }
 
     public function getStatusLabelAttribute(): string

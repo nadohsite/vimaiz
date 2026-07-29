@@ -36,6 +36,13 @@ class StorePropertyRequest extends FormRequest
             'wifi_code' => ['nullable', 'string', 'max:100'],
             'trash_instructions' => ['nullable', 'string', 'max:1000'],
             'additional_info' => ['nullable', 'string', 'max:2000'],
+            'checklist' => ['nullable', 'array'],
+            'checklist.*.id' => ['required_with:checklist', 'string', 'max:100'],
+            'checklist.*.title' => ['required_with:checklist', 'string', 'max:100'],
+            'checklist.*.emoji' => ['nullable', 'string', 'max:16'],
+            'checklist.*.items' => ['required_with:checklist', 'array', 'min:1'],
+            'checklist.*.items.*.id' => ['required', 'string', 'max:100'],
+            'checklist.*.items.*.label' => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -50,6 +57,7 @@ class StorePropertyRequest extends FormRequest
             'postal_code.regex' => 'Le code postal doit contenir 5 chiffres.',
             'surface_area.required' => 'La surface est obligatoire.',
             'surface_area.min' => 'La surface doit être d\'au moins 10 m².',
+            'checklist.*.items.*.label.required' => 'Chaque tâche de la checklist doit avoir un libellé.',
         ];
     }
 
@@ -73,6 +81,7 @@ class StorePropertyRequest extends FormRequest
             'wifi_code' => 'code Wi-Fi',
             'trash_instructions' => 'instructions poubelles',
             'additional_info' => 'informations supplémentaires',
+            'checklist' => 'checklist',
         ];
     }
 }

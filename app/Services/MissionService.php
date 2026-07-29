@@ -17,6 +17,7 @@ use App\Notifications\MissionCompletedNotification;
 use App\Notifications\MissionCompletedAdminNotification;
 use App\Notifications\MissionStartedNotification;
 use App\Notifications\PaymentReceivedNotification;
+use App\Support\DefaultPropertyChecklist;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -58,6 +59,7 @@ class MissionService
             'client_id' => $request->client_id,
             'scheduled_at' => $scheduledAt,
             'duration_hours' => $request->requested_hours,
+            'checklist' => DefaultPropertyChecklist::snapshotForMission($property->checklist),
             'total_price' => $effectivePrice,
             'agent_payout' => $agentPayout,
             'platform_fee' => $commissionAmount,
@@ -235,6 +237,10 @@ class MissionService
         if (!$mission->canComplete()) {
             throw new \Exception('La mission ne peut pas être terminée dans son état actuel.');
         }
+
+        if (!$mission->isChecklistComplete()) {
+            throw new \Exception('Veuillez cocher toutes les tâches de la checklist avant de terminer la mission.');
+        }
         
         $mission->update([
             'status' => Mission::STATUS_COMPLETED,
@@ -261,6 +267,42 @@ class MissionService
             $admin->notify(new MissionCompletedAdminNotification($mission));
         }
         
+        return $mission->fresh();
+    }
+
+    public function updateChecklistItem(Mission $mission, string $sectionId, string $itemId, bool $checked): Mission
+    {
+        if (!$mission->canComplete()) {
+            throw new \Exception('La checklist ne peut être cochée qu\'une fois la mission démarrée.');
+        }
+
+        $checklist = $mission->checklist ?? [];
+        $found = false;
+
+        foreach ($checklist as &$section) {
+            if (($section['id'] ?? null) !== $sectionId) {
+                continue;
+            }
+
+            foreach ($section['items'] as &$item) {
+                if (($item['id'] ?? null) !== $itemId) {
+                    continue;
+                }
+
+                $item['checked'] = $checked;
+                $item['checked_at'] = $checked ? now()->toIso8601String() : null;
+                $found = true;
+                break 2;
+            }
+        }
+        unset($section, $item);
+
+        if (!$found) {
+            throw new \Exception('Tâche introuvable dans la checklist.');
+        }
+
+        $mission->update(['checklist' => $checklist]);
+
         return $mission->fresh();
     }
 

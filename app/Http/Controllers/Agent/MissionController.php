@@ -57,6 +57,7 @@ class MissionController extends Controller
             'canAccept' => $mission->status === Mission::STATUS_PENDING_AGENT,
             'canStart' => $mission->canStart(),
             'canComplete' => $mission->canComplete(),
+            'checklistProgress' => $mission->checklistProgress(),
         ]);
     }
 
@@ -183,6 +184,42 @@ class MissionController extends Controller
                 ->route('agent.missions.show', $mission)
                 ->with('success', 'Mission terminée ! Le paiement sera versé après validation.');
         } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function updateChecklist(Request $request, Mission $mission): RedirectResponse|JsonResponse
+    {
+        $this->authorize('complete', $mission);
+
+        $validated = $request->validate([
+            'section_id' => ['required', 'string', 'max:100'],
+            'item_id' => ['required', 'string', 'max:100'],
+            'checked' => ['required', 'boolean'],
+        ]);
+
+        try {
+            $mission = $this->missionService->updateChecklistItem(
+                $mission,
+                $validated['section_id'],
+                $validated['item_id'],
+                $validated['checked']
+            );
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'checklist' => $mission->checklist,
+                    'progress' => $mission->checklistProgress(),
+                ]);
+            }
+
+            return back()->with('success', 'Checklist mise à jour.');
+        } catch (\Exception $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $e->getMessage()], 422);
+            }
+
             return back()->with('error', $e->getMessage());
         }
     }

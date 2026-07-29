@@ -44,6 +44,12 @@ interface Property {
     trash_instructions: string | null;
     additional_info: string | null;
     is_active: boolean;
+    checklist: Array<{
+        id: string;
+        title: string;
+        emoji?: string;
+        items: Array<{ id: string; label: string }>;
+    }> | null;
     service_requests: ServiceRequest[];
     missions: Mission[];
 }
@@ -166,6 +172,35 @@ export default function Show({ property }: Props) {
                                     )}
                                 </CardContent>
                             </Card>
+
+                            {property.checklist && property.checklist.length > 0 && (
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
+                                    <CardHeader>
+                                        <CardTitle className="dark:text-white">Checklist ménage</CardTitle>
+                                        <CardDescription className="dark:text-slate-400">
+                                            Remise à l&apos;agent automatiquement à chaque mission
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {property.checklist.map((section) => (
+                                            <div key={section.id}>
+                                                <h4 className="font-medium text-slate-900 dark:text-white mb-2">
+                                                    {section.emoji ? `${section.emoji} ` : ''}
+                                                    {section.title}
+                                                </h4>
+                                                <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                                                    {section.items.map((item) => (
+                                                        <li key={item.id} className="flex gap-2">
+                                                            <span className="text-slate-400">☐</span>
+                                                            <span>{item.label}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            )}
 
                             {/* Recent Requests */}
                             <Card className="dark:bg-slate-800 dark:border-slate-700">

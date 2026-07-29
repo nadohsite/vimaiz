@@ -8,12 +8,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Home, Save } from 'lucide-react';
 import AddressAutocomplete from '@/components/address/AddressAutocomplete';
+import PropertyChecklistEditor, {
+    type ChecklistSection,
+} from '@/components/property/PropertyChecklistEditor';
 
 interface Props {
     propertyTypes: Record<string, string>;
+    defaultChecklist: ChecklistSection[];
 }
 
-export default function Create({ propertyTypes }: Props) {
+export default function Create({ propertyTypes, defaultChecklist }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         type: '',
         name: '',
@@ -35,6 +39,7 @@ export default function Create({ propertyTypes }: Props) {
         wifi_code: '',
         trash_instructions: '',
         additional_info: '',
+        checklist: defaultChecklist,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -291,6 +296,25 @@ export default function Create({ propertyTypes }: Props) {
                                         rows={4}
                                     />
                                 </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="dark:bg-slate-800 dark:border-slate-700">
+                            <CardHeader>
+                                <CardTitle className="dark:text-white">Checklist ménage</CardTitle>
+                                <CardDescription className="dark:text-slate-400">
+                                    Personnalisez les tâches à réaliser. Cette checklist sera envoyée
+                                    automatiquement à l&apos;agent à chaque mission.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <PropertyChecklistEditor
+                                    value={data.checklist}
+                                    onChange={(checklist) => setData('checklist', checklist)}
+                                />
+                                {errors.checklist && (
+                                    <p className="text-sm text-red-500 mt-2">{errors.checklist}</p>
+                                )}
                             </CardContent>
                         </Card>
 

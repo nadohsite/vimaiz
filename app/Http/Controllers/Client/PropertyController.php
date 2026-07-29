@@ -37,6 +37,7 @@ class PropertyController extends Controller
     {
         return Inertia::render('Client/Properties/Create', [
             'propertyTypes' => Property::TYPES,
+            'defaultChecklist' => \App\Support\DefaultPropertyChecklist::sections(),
         ]);
     }
 
@@ -78,6 +79,7 @@ class PropertyController extends Controller
         return Inertia::render('Client/Properties/Edit', [
             'property' => $property,
             'propertyTypes' => Property::TYPES,
+            'defaultChecklist' => \App\Support\DefaultPropertyChecklist::sections(),
         ]);
     }
 

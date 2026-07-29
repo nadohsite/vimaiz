@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { ArrowLeft, Home, Save } from 'lucide-react';
 import AddressAutocomplete from '@/components/address/AddressAutocomplete';
+import PropertyChecklistEditor, {
+    type ChecklistSection,
+} from '@/components/property/PropertyChecklistEditor';
 
 interface Property {
     id: number;
@@ -33,14 +36,16 @@ interface Property {
     trash_instructions: string | null;
     additional_info: string | null;
     is_active: boolean;
+    checklist: ChecklistSection[] | null;
 }
 
 interface Props {
     property: Property;
     propertyTypes: Record<string, string>;
+    defaultChecklist: ChecklistSection[];
 }
 
-export default function Edit({ property, propertyTypes }: Props) {
+export default function Edit({ property, propertyTypes, defaultChecklist }: Props) {
     const { data, setData, patch, processing, errors } = useForm({
         type: property.type,
         name: property.name || '',
@@ -63,6 +68,10 @@ export default function Edit({ property, propertyTypes }: Props) {
         trash_instructions: property.trash_instructions || '',
         additional_info: property.additional_info || '',
         is_active: property.is_active,
+        checklist:
+            property.checklist && property.checklist.length > 0
+                ? property.checklist
+                : defaultChecklist,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -333,6 +342,25 @@ export default function Edit({ property, propertyTypes }: Props) {
                                         rows={4}
                                     />
                                 </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="dark:bg-slate-800 dark:border-slate-700">
+                            <CardHeader>
+                                <CardTitle className="dark:text-white">Checklist ménage</CardTitle>
+                                <CardDescription className="dark:text-slate-400">
+                                    Modifiez les tâches envoyées automatiquement à l&apos;agent à chaque
+                                    mission.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <PropertyChecklistEditor
+                                    value={data.checklist}
+                                    onChange={(checklist) => setData('checklist', checklist)}
+                                />
+                                {errors.checklist && (
+                                    <p className="text-sm text-red-500 mt-2">{errors.checklist}</p>
+                                )}
                             </CardContent>
                         </Card>
 

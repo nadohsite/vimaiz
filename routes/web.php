@@ -188,6 +188,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/missions/{mission}/photos', [AgentMissionController::class, 'uploadPhoto'])->name('missions.upload-photo');
         Route::delete('/missions/{mission}/photos/{photo}', [AgentMissionController::class, 'deletePhoto'])->name('missions.delete-photo');
         Route::post('/missions/{mission}/complete', [AgentMissionController::class, 'complete'])->name('missions.complete');
+        Route::patch('/missions/{mission}/checklist', [AgentMissionController::class, 'updateChecklist'])->name('missions.checklist');
 
         // VIMAIZ - Wallet Agent
         Route::get('/wallet', [\App\Http\Controllers\Agent\WalletController::class, 'index'])->name('wallet.index');

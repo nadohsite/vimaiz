@@ -47,6 +47,17 @@ interface Mission {
     agent_payout: number;
     status: string;
     status_label: string;
+    checklist: Array<{
+        id: string;
+        title: string;
+        emoji?: string;
+        items: Array<{
+            id: string;
+            label: string;
+            checked?: boolean;
+            checked_at?: string | null;
+        }>;
+    }> | null;
     property: Property;
     client: Client;
     internal_quality_score: number | null;
@@ -63,17 +74,29 @@ interface Props {
     canAccept: boolean;
     canStart: boolean;
     canComplete: boolean;
+    checklistProgress: {
+        total: number;
+        checked: number;
+        complete: boolean;
+    };
 }
 
 const charTileClass = 'flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-700 rounded-lg border border-slate-100 dark:border-slate-600';
 const charLabelClass = 'text-xs text-slate-500 dark:text-slate-400';
 const charValueClass = 'text-sm font-medium text-slate-900 dark:text-white';
 
-export default function Show({ mission, canAccept, canStart, canComplete }: Props) {
+export default function Show({
+    mission,
+    canAccept,
+    canStart,
+    canComplete,
+    checklistProgress = { total: 0, checked: 0, complete: true },
+}: Props) {
     const { props } = usePage<{ flash?: { success?: string; error?: string } }>();
     const flash = props.flash;
     const [starting, setStarting] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
+    const [togglingItem, setTogglingItem] = useState<string | null>(null);
 
     const { post: postRefuse, processing: refuseProcessing } = useForm({
         reason: '',
@@ -151,9 +174,32 @@ export default function Show({ mission, canAccept, canStart, canComplete }: Prop
     };
 
     const handleComplete = () => {
+        if (!checklistProgress.complete) {
+            alert(
+                `Checklist incomplète (${checklistProgress.checked}/${checklistProgress.total}). Cochez toutes les tâches avant de terminer.`,
+            );
+            return;
+        }
         if (confirm('Confirmer la fin de la mission ?')) {
             router.post(route('agent.missions.complete', mission.id));
         }
+    };
+
+    const handleToggleChecklistItem = (sectionId: string, itemId: string, checked: boolean) => {
+        const key = `${sectionId}:${itemId}`;
+        setTogglingItem(key);
+        router.patch(
+            route('agent.missions.checklist', mission.id),
+            {
+                section_id: sectionId,
+                item_id: itemId,
+                checked,
+            },
+            {
+                preserveScroll: true,
+                onFinish: () => setTogglingItem(null),
+            },
+        );
     };
 
     const hasPropertyCoordinates = Boolean(mission.property.latitude && mission.property.longitude);
@@ -256,11 +302,82 @@ export default function Show({ mission, canAccept, canStart, canComplete }: Prop
                                         <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
                                         <h3 className="font-semibold text-green-800 mb-2">Mission en cours</h3>
                                         <p className="text-sm text-green-700 mb-4">
-                                            Une fois l&apos;intervention terminée, cliquez ci-dessous pour clôturer la mission.
+                                            Cochez toute la checklist ci-dessous, puis clôturez la mission.
                                         </p>
-                                        <Button onClick={handleComplete} className="bg-green-500 hover:bg-green-600">
+                                        <p className="text-sm text-green-800 mb-4 font-medium">
+                                            Checklist : {checklistProgress.checked}/{checklistProgress.total}
+                                        </p>
+                                        <Button
+                                            onClick={handleComplete}
+                                            disabled={!checklistProgress.complete}
+                                            className="bg-green-500 hover:bg-green-600 disabled:opacity-50"
+                                        >
                                             Terminer la mission
                                         </Button>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {mission.checklist && mission.checklist.length > 0 && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Checklist du logement</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-5">
+                                        {mission.checklist.map((section) => (
+                                            <div key={section.id}>
+                                                <h4 className="font-medium text-slate-900 dark:text-white mb-2">
+                                                    {section.emoji ? `${section.emoji} ` : ''}
+                                                    {section.title}
+                                                </h4>
+                                                <ul className="space-y-2">
+                                                    {section.items.map((item) => {
+                                                        const key = `${section.id}:${item.id}`;
+                                                        const disabled =
+                                                            !canComplete || togglingItem === key;
+                                                        return (
+                                                            <li key={item.id}>
+                                                                <label
+                                                                    className={`flex items-start gap-3 rounded-lg border p-3 ${
+                                                                        item.checked
+                                                                            ? 'border-green-200 bg-green-50'
+                                                                            : 'border-slate-200 bg-white'
+                                                                    } ${disabled && !canComplete ? 'opacity-70' : 'cursor-pointer'}`}
+                                                                >
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="mt-1 h-4 w-4"
+                                                                        checked={Boolean(item.checked)}
+                                                                        disabled={disabled}
+                                                                        onChange={(e) =>
+                                                                            handleToggleChecklistItem(
+                                                                                section.id,
+                                                                                item.id,
+                                                                                e.target.checked,
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                    <span
+                                                                        className={`text-sm ${
+                                                                            item.checked
+                                                                                ? 'text-green-800 line-through'
+                                                                                : 'text-slate-700'
+                                                                        }`}
+                                                                    >
+                                                                        {item.label}
+                                                                    </span>
+                                                                </label>
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            </div>
+                                        ))}
+                                        {!canComplete && mission.status !== 'completed' && (
+                                            <p className="text-xs text-slate-500">
+                                                La checklist devient cochable une fois la mission démarrée.
+                                            </p>
+                                        )}
                                     </CardContent>
                                 </Card>
                             )}
