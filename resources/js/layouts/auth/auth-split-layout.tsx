@@ -38,7 +38,7 @@ export default function AuthSplitLayout({
                         <img 
                             src={logoImage} 
                             alt="VIMAIZ" 
-                            className="h-22 object-contain" 
+                            className="h-7 w-auto max-w-full object-contain" 
                             style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%)' }}
                         />
                     </Link>
@@ -68,7 +68,7 @@ export default function AuthSplitLayout({
                     href={home()}
                     className="relative z-20 flex items-center"
                 >
-                    <img src={logoImage} alt="VIMAIZ" className="h-24 object-contain" />
+                    <img src={logoImage} alt="VIMAIZ" className="h-7 w-auto max-w-full object-contain" />
                 </Link>
 
                 <div className="relative z-20 mt-auto mb-10 space-y-8">

@@ -24,7 +24,7 @@ export default function AuthSimpleLayout({
                             className="flex flex-col items-center gap-2 font-medium"
                         >
                             <AppLogoIcon 
-                                className="h-22 object-contain" 
+                                size={28}
                                 style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%)' }}
                             />
                             <span className="sr-only">{title}</span>
