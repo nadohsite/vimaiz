@@ -30,7 +30,21 @@ use Inertia\Inertia;
 
 // Public routes
 Route::get('/', function () {
-    return inertia('Welcome');
+    $availableAgentsCount = \App\Models\AgentProfile::query()
+        ->verified()
+        ->available()
+        ->where(function ($query) {
+            $query->where('is_banned', false)->orWhereNull('is_banned');
+        })
+        ->where(function ($query) {
+            $query->whereNull('suspended_until')
+                ->orWhere('suspended_until', '<=', now());
+        })
+        ->count();
+
+    return inertia('Welcome', [
+        'availableAgentsCount' => $availableAgentsCount,
+    ]);
 })->name('home');
 
 // Agents & Search (Public)

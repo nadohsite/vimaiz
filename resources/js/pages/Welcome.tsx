@@ -1,20 +1,13 @@
 import PublicLayout from '@/components/public/public-layout';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-const TYPE_OPTIONS = [
-    { value: 45, label: 'Appartement' },
-    { value: 65, label: 'Maison' },
-    { value: 95, label: 'Villa' },
-    { value: 80, label: 'Chalet' },
-] as const;
+const TYPE_OPTIONS = ['Appartement', 'Maison', 'Villa', 'Chalet'] as const;
 
-const DURATION_OPTIONS = [
-    { value: 0, label: '2h' },
-    { value: 20, label: '3h' },
-    { value: 38, label: '4h' },
-] as const;
+/** Tarif ménage : 1,40 € / m² */
+const PRICE_PER_M2 = 1.4;
+const DEFAULT_SURFACE = 50;
 
 function todayIso() {
     return new Date().toISOString().split('T')[0];
@@ -56,26 +49,27 @@ function HomeIcon() {
     );
 }
 
-export default function Welcome() {
+export default function Welcome({
+    availableAgentsCount = 0,
+}: {
+    availableAgentsCount?: number;
+}) {
     const { auth } = usePage<SharedData>().props;
     const isLoggedIn = Boolean(auth.user);
     const ctaHref = isLoggedIn ? route('dashboard') : route('register');
 
-    const [typeValue, setTypeValue] = useState(45);
-    const [durationValue, setDurationValue] = useState(0);
+    const [typeValue, setTypeValue] = useState<(typeof TYPE_OPTIONS)[number]>('Appartement');
+    const [surfaceValue, setSurfaceValue] = useState(DEFAULT_SURFACE);
     const [dateValue, setDateValue] = useState(todayIso);
-    const [displayEstimate, setDisplayEstimate] = useState(45);
+    const [timeValue, setTimeValue] = useState('10:00');
+    const initialTotal = Math.round(DEFAULT_SURFACE * PRICE_PER_M2);
+    const [displayEstimate, setDisplayEstimate] = useState(initialTotal);
     const [flash, setFlash] = useState(false);
-    const estimateRef = useRef(45);
+    const estimateRef = useRef(initialTotal);
 
-    const total = typeValue + durationValue;
-    const typeLabel = TYPE_OPTIONS.find((t) => t.value === typeValue)?.label ?? 'Appartement';
-    const durationLabel = DURATION_OPTIONS.find((d) => d.value === durationValue)?.label ?? '2h';
-
-    const agentCount = useMemo(() => {
-        const day = new Date(dateValue).getDate();
-        return (day % 3) + 2;
-    }, [dateValue]);
+    const surface = Math.max(0, surfaceValue);
+    const total = Math.round(surface * PRICE_PER_M2);
+    const agentCount = availableAgentsCount;
 
     useEffect(() => {
         let frame = 0;
@@ -202,11 +196,15 @@ export default function Welcome() {
                                             className="req-field"
                                             aria-label="Type de logement"
                                             value={typeValue}
-                                            onChange={(e) => setTypeValue(Number(e.target.value))}
+                                            onChange={(e) =>
+                                                setTypeValue(
+                                                    e.target.value as (typeof TYPE_OPTIONS)[number],
+                                                )
+                                            }
                                         >
                                             {TYPE_OPTIONS.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
+                                                <option key={option} value={option}>
+                                                    {option}
                                                 </option>
                                             ))}
                                         </select>
@@ -261,22 +259,68 @@ export default function Welcome() {
                                                 value={dateValue}
                                                 onChange={(e) => setDateValue(e.target.value)}
                                             />
-                                            <select
+                                            <input
                                                 className="req-field"
-                                                aria-label="Durée du ménage"
-                                                style={{ maxWidth: 110 }}
-                                                value={durationValue}
-                                                onChange={(e) =>
-                                                    setDurationValue(Number(e.target.value))
-                                                }
-                                            >
-                                                {DURATION_OPTIONS.map((option) => (
-                                                    <option key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                type="time"
+                                                aria-label="Heure de l'intervention"
+                                                value={timeValue}
+                                                onChange={(e) => setTimeValue(e.target.value)}
+                                            />
                                         </div>
+                                    </div>
+                                    <div className="req-check on" aria-hidden="true">
+                                        <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
+                                            <path
+                                                d="M5 10l3.2 3.2L15 6.5"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <div className="req-row">
+                                    <div className="req-icon">
+                                        <svg
+                                            width="19"
+                                            height="19"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                d="M4 20V4h16v16H4z"
+                                                stroke="currentColor"
+                                                strokeWidth="1.7"
+                                            />
+                                            <path
+                                                d="M4 12h16M12 4v16"
+                                                stroke="currentColor"
+                                                strokeWidth="1.7"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div className="req-body">
+                                        <div className="req-sub">Surface (m²)</div>
+                                        <input
+                                            className="req-field"
+                                            type="number"
+                                            min={1}
+                                            step={1}
+                                            inputMode="numeric"
+                                            aria-label="Surface en m²"
+                                            placeholder="ex. 50"
+                                            value={surfaceValue || ''}
+                                            onChange={(e) =>
+                                                setSurfaceValue(
+                                                    e.target.value === ''
+                                                        ? 0
+                                                        : Math.max(0, Number(e.target.value)),
+                                                )
+                                            }
+                                        />
                                     </div>
                                     <div className="req-check on" aria-hidden="true">
                                         <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
@@ -331,8 +375,10 @@ export default function Welcome() {
                                         <div className="avatar">SR</div>
                                     </div>
                                     <span className="avatar-note">
-                                        <strong>{agentCount} agents</strong> disponibles pour ce
-                                        créneau
+                                        <strong>
+                                            {agentCount} agent{agentCount > 1 ? 's' : ''}
+                                        </strong>{' '}
+                                        disponible{agentCount > 1 ? 's' : ''} pour ce créneau
                                     </span>
                                 </div>
 
@@ -349,7 +395,8 @@ export default function Welcome() {
                                     </div>
                                     <div className="estimate-breakdown">
                                         <span>
-                                            {typeLabel} · {durationLabel}
+                                            {typeValue} · {surface || 0} m² × 1,40 € ·{' '}
+                                            {timeValue}
                                         </span>
                                         <span>{total} €</span>
                                     </div>

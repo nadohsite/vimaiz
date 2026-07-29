@@ -370,12 +370,13 @@
 .welcome-page .dial-mid {
     position: relative;
     z-index: 1;
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--surface);
+    color: var(--accent-ink);
     font-size: 13px;
-    font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 999px;
+    font-weight: 500;
+    padding: 0 10px;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
 }
 
 /* request card */
@@ -552,11 +553,14 @@
 
 .welcome-page .req-row-split {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
 }
 
 .welcome-page .req-row-split .req-field {
     font-size: 13.5px;
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .welcome-page .estimate-box {

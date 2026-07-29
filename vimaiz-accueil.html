@@ -151,8 +151,8 @@
   .dial-time{font-family:'IBM Plex Mono';font-size:20px;font-weight:500;color:var(--ink);}
   .dial-tag{font-size:12px;color:var(--stone);margin-top:4px;white-space:nowrap;}
   .dial-mid{
-    position:relative;z-index:1;background:var(--accent);color:var(--on-accent);
-    font-size:13px;font-weight:600;padding:8px 16px;border-radius:999px;
+    position:relative;z-index:1;background:var(--surface);color:var(--accent-ink);
+    font-size:13px;font-weight:500;padding:0 10px;letter-spacing:0.01em;white-space:nowrap;
   }
 
   /* request card */
@@ -201,8 +201,8 @@
   }
   .req-field:focus{color:var(--accent-ink);}
   .req-row select.req-field{appearance:none;}
-  .req-row-split{display:flex;gap:10px;}
-  .req-row-split .req-field{font-size:13.5px;}
+  .req-row-split{display:flex;flex-wrap:wrap;gap:10px;}
+  .req-row-split .req-field{font-size:13.5px;flex:1 1 0;min-width:0;}
 
   .estimate-box{
     padding:16px 18px;border-radius:12px;background:var(--surface-2);border:1.5px solid var(--accent);
@@ -449,10 +449,10 @@
             <div class="req-body">
               <div class="req-sub">Type de logement</div>
               <select class="req-field" id="typeSelect" aria-label="Type de logement">
-                <option value="45">Appartement</option>
-                <option value="65">Maison</option>
-                <option value="95">Villa</option>
-                <option value="80">Chalet</option>
+                <option value="Appartement">Appartement</option>
+                <option value="Maison">Maison</option>
+                <option value="Villa">Villa</option>
+                <option value="Chalet">Chalet</option>
               </select>
             </div>
             <div class="req-check on" id="checkType" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M5 10l3.2 3.2L15 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -464,14 +464,19 @@
               <div class="req-sub">Date et créneau</div>
               <div class="req-row-split">
                 <input class="req-field" type="date" id="dateInput" aria-label="Date de l'intervention">
-                <select class="req-field" id="durationSelect" aria-label="Durée du ménage" style="max-width:110px;">
-                  <option value="0">2h</option>
-                  <option value="20">3h</option>
-                  <option value="38">4h</option>
-                </select>
+                <input class="req-field" type="time" id="timeInput" aria-label="Heure de l'intervention" value="10:00">
               </div>
             </div>
             <div class="req-check on" id="checkDate" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M5 10l3.2 3.2L15 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+
+          <div class="req-row">
+            <div class="req-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M4 20V4h16v16H4z" stroke="currentColor" stroke-width="1.7"/><path d="M4 12h16M12 4v16" stroke="currentColor" stroke-width="1.7"/></svg></div>
+            <div class="req-body">
+              <div class="req-sub">Surface (m²)</div>
+              <input class="req-field" type="number" id="surfaceInput" min="1" step="1" inputmode="numeric" aria-label="Surface en m²" placeholder="ex. 50" value="50">
+            </div>
+            <div class="req-check on" id="checkSurface" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 20 20" fill="none"><path d="M5 10l3.2 3.2L15 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           </div>
 
           <div class="req-row">
@@ -494,15 +499,15 @@
           <div class="estimate-box">
             <div class="estimate-top">
               <span class="estimate-label">Estimation de la mission</span>
-              <span class="estimate-value" id="estimateValue">45 €</span>
+              <span class="estimate-value" id="estimateValue">70 €</span>
             </div>
             <div class="estimate-breakdown">
-              <span id="breakdownType">Appartement · 2h</span>
-              <span id="breakdownTotal">45 €</span>
+              <span id="breakdownType">Appartement · 50 m² × 1,40 € · 10:00</span>
+              <span id="breakdownTotal">70 €</span>
             </div>
           </div>
 
-          <a class="btn btn-primary" href="#" id="startBtn">Réserver pour 45 €</a>
+          <a class="btn btn-primary" href="#" id="startBtn">Réserver pour 70 €</a>
         </div>
       </div>
     </div>
@@ -699,16 +704,17 @@
   });
 
   var typeSelect = document.getElementById('typeSelect');
-  var durationSelect = document.getElementById('durationSelect');
+  var surfaceInput = document.getElementById('surfaceInput');
   var estimateValue = document.getElementById('estimateValue');
   var startBtn = document.getElementById('startBtn');
   var dateInput = document.getElementById('dateInput');
+  var timeInput = document.getElementById('timeInput');
   var breakdownType = document.getElementById('breakdownType');
   var breakdownTotal = document.getElementById('breakdownTotal');
   var agentNote = document.getElementById('agentNote');
 
-  var typeNames = {45:'Appartement', 65:'Maison', 95:'Villa', 80:'Chalet'};
-  var currentValue = 45;
+  var PRICE_PER_M2 = 1.4;
+  var currentValue = 70;
 
   var today = new Date();
   dateInput.min = today.toISOString().split('T')[0];
@@ -733,14 +739,14 @@
   }
 
   function updateEstimate(){
-    var base = parseInt(typeSelect.value, 10);
-    var add = parseInt(durationSelect.value, 10);
-    var total = base + add;
-    var durationLabel = durationSelect.options[durationSelect.selectedIndex].text;
+    var surface = Math.max(0, parseFloat(surfaceInput.value) || 0);
+    var total = Math.round(surface * PRICE_PER_M2);
+    var typeLabel = typeSelect.value;
+    var timeLabel = timeInput.value || '10:00';
 
     animateTo(total);
     startBtn.textContent = 'Réserver pour ' + total + ' €';
-    breakdownType.textContent = typeNames[base] + ' · ' + durationLabel;
+    breakdownType.textContent = typeLabel + ' · ' + surface + ' m² × 1,40 € · ' + timeLabel;
     breakdownTotal.textContent = total + ' €';
 
     estimateValue.classList.remove('flash');
@@ -753,8 +759,10 @@
   }
 
   typeSelect.addEventListener('change', updateEstimate);
-  durationSelect.addEventListener('change', updateEstimate);
+  surfaceInput.addEventListener('input', updateEstimate);
   dateInput.addEventListener('change', updateEstimate);
+  timeInput.addEventListener('change', updateEstimate);
+  timeInput.addEventListener('input', updateEstimate);
 
   var initDate = new Date(dateInput.value);
   var initAgentCount = (initDate.getDate() % 3) + 2;
