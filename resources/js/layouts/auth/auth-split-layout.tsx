@@ -30,19 +30,19 @@ export default function AuthSplitLayout({
                 <div className="absolute top-4 right-4">
                     <AppearanceToggleDropdown />
                 </div>
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px] p-6">
+                <div className="mx-auto flex w-full flex-col justify-center space-y-5 sm:w-[450px] p-6">
                     <Link
                         href={home()}
-                        className="relative z-20 flex items-center justify-center lg:hidden mb-6"
+                        className="relative z-20 flex items-center justify-center lg:hidden mb-2"
                     >
                         <img 
                             src={logoImage} 
                             alt="VIMAIZ" 
-                            className="h-7 w-auto max-w-full object-contain" 
+                            className="h-12 w-auto max-w-full object-contain" 
                             style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%)' }}
                         />
                     </Link>
-                    <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center mb-4">
+                    <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center">
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h1>
                         <p className="text-base text-slate-500 dark:text-slate-400 max-w-[350px]">
                             {description}
@@ -54,7 +54,7 @@ export default function AuthSplitLayout({
 
             {/* Image/Decoration Column */}
             <div className={cn(
-                "relative hidden h-full flex-col p-10 text-white lg:flex",
+                "relative hidden min-h-svh flex-col p-10 text-white lg:flex",
                 reverse ? "order-2" : "order-1"
             )}>
                 <div className="absolute inset-0 bg-gradient-to-br from-sky-500 via-sky-600 to-cyan-600 overflow-hidden">
@@ -68,10 +68,10 @@ export default function AuthSplitLayout({
                     href={home()}
                     className="relative z-20 flex items-center"
                 >
-                    <img src={logoImage} alt="VIMAIZ" className="h-7 w-auto max-w-full object-contain" />
+                    <img src={logoImage} alt="VIMAIZ" className="h-12 w-auto max-w-full object-contain" />
                 </Link>
 
-                <div className="relative z-20 mt-auto mb-10 space-y-8">
+                <div className="relative z-20 mt-14 flex flex-1 flex-col justify-center space-y-8 pb-6">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
