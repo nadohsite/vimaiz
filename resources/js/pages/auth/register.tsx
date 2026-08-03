@@ -71,21 +71,21 @@ export default function Register() {
       <Head title="Inscription" />
       
       {role === 'agent' && (
-        <div className="mb-8 flex items-center justify-center gap-4">
+        <div className="mb-5 flex items-center justify-center gap-3 sm:mb-6 sm:gap-4">
           <div className={cn(
             "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors",
-            step === 1 ? "bg-sky-500 text-white" : "bg-slate-100 text-slate-400"
+            step === 1 ? "bg-sky-500 text-white" : "bg-slate-100 text-slate-400 dark:bg-slate-800"
           )}>1</div>
-          <div className="h-px w-10 bg-slate-200" />
+          <div className="h-px w-8 bg-slate-200 sm:w-10 dark:bg-slate-700" />
           <div className={cn(
             "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors",
-            step === 2 ? "bg-sky-500 text-white" : "bg-slate-100 text-slate-400"
+            step === 2 ? "bg-sky-500 text-white" : "bg-slate-100 text-slate-400 dark:bg-slate-800"
           )}>2</div>
         </div>
       )}
 
-      <form onSubmit={submit} className="flex flex-col gap-6">
-        <div className="relative overflow-hidden min-h-[400px]">
+      <form onSubmit={submit} className="flex flex-col gap-5 sm:gap-6">
+        <div className="relative">
           <AnimatePresence mode="wait">
             {step === 1 ? (
               <motion.div
@@ -93,9 +93,9 @@ export default function Register() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                className="space-y-6"
+                className="space-y-5 sm:space-y-6"
               >
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div className="grid gap-2">
                     <Label htmlFor="name" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Nom complet</Label>
                     <input
@@ -154,34 +154,34 @@ export default function Register() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 block">Je souhaite m'inscrire en tant que</Label>
-                  <div className="grid grid-cols-2 gap-4">
+                  <Label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300 sm:mb-3">Je souhaite m'inscrire en tant que</Label>
+                  <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
                     <button
                       type="button"
                       onClick={() => setRole('client')}
                       className={cn(
-                        "flex flex-col items-center gap-3 rounded-xl border-2 p-4 transition-all text-center",
+                        "flex flex-col items-center gap-2 rounded-xl border-2 p-3 text-center transition-all sm:gap-3 sm:p-4",
                         role === 'client' 
-                          ? "border-sky-500 bg-sky-50 text-sky-700 shadow-sm" 
-                          : "border-slate-200 bg-white text-slate-400 hover:border-slate-300"
+                          ? "border-sky-500 bg-sky-50 text-sky-700 shadow-sm dark:bg-sky-950/40" 
+                          : "border-slate-200 bg-white text-slate-400 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800"
                       )}
                     >
-                      <User className={cn("h-6 w-6", role === 'client' ? "text-sky-600" : "text-slate-300")} />
-                      <div className="text-xs font-bold uppercase tracking-widest">Client</div>
+                      <User className={cn("h-5 w-5 sm:h-6 sm:w-6", role === 'client' ? "text-sky-600" : "text-slate-300")} />
+                      <div className="text-[10px] font-bold uppercase tracking-widest sm:text-xs">Client</div>
                     </button>
                     
                     <button
                       type="button"
                       onClick={() => setRole('agent')}
                       className={cn(
-                        "flex flex-col items-center gap-3 rounded-xl border-2 p-4 transition-all text-center",
+                        "flex flex-col items-center gap-2 rounded-xl border-2 p-3 text-center transition-all sm:gap-3 sm:p-4",
                         role === 'agent' 
-                          ? "border-sky-500 bg-sky-50 text-sky-700 shadow-sm" 
-                          : "border-slate-200 bg-white text-slate-400 hover:border-slate-300"
+                          ? "border-sky-500 bg-sky-50 text-sky-700 shadow-sm dark:bg-sky-950/40" 
+                          : "border-slate-200 bg-white text-slate-400 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800"
                       )}
                     >
-                      <Briefcase className={cn("h-6 w-6", role === 'agent' ? "text-sky-600" : "text-slate-300")} />
-                      <div className="text-xs font-bold uppercase tracking-widest">Agent</div>
+                      <Briefcase className={cn("h-5 w-5 sm:h-6 sm:w-6", role === 'agent' ? "text-sky-600" : "text-slate-300")} />
+                      <div className="text-[10px] font-bold uppercase tracking-widest sm:text-xs">Agent</div>
                     </button>
                     <input type="hidden" name="role" value={role} />
                   </div>
@@ -240,10 +240,10 @@ export default function Register() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                <div className="grid gap-6">
-                  <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-5 sm:gap-6">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <div className="grid gap-2">
-                      <Label className="text-sm font-semibold text-slate-700">Type d'agent</Label>
+                      <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Type d'agent</Label>
                       <Select 
                         name="agent_type" 
                         defaultValue={data.agent_type || "individual"}
@@ -274,9 +274,9 @@ export default function Register() {
                     </div>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <div className="grid gap-2">
-                      <Label htmlFor="experience_years" className="text-sm font-semibold text-slate-700">Expérience (Années)</Label>
+                      <Label htmlFor="experience_years" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Expérience (Années)</Label>
                       <input
                         id="experience_years"
                         type="number"
@@ -338,11 +338,11 @@ export default function Register() {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <Button type="button" onClick={prevStep} variant="outline" className="flex-1 h-12 rounded-xl text-slate-500 font-bold border-slate-200 hover:bg-slate-50 transition-all">
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:gap-4">
+                  <Button type="button" onClick={prevStep} variant="outline" className="h-11 rounded-xl border-slate-200 font-bold text-slate-500 transition-all hover:bg-slate-50 sm:h-12 sm:flex-1 dark:border-slate-700">
                     Retour
                   </Button>
-                  <Button type="submit" className="flex-[2] bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-sky-500/30 transition-all hover:translate-y-[-2px] active:translate-y-0">
+                  <Button type="submit" className="h-11 rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 text-sm font-bold text-white shadow-lg shadow-sky-500/30 transition-all hover:from-sky-600 hover:to-sky-700 hover:translate-y-[-2px] active:translate-y-0 sm:h-12 sm:flex-[2] sm:text-base">
                     {processing && <Spinner className="mr-2" />}
                     Finaliser mon inscription
                   </Button>

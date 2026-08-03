@@ -13,6 +13,9 @@ interface AuthLayoutProps {
     reverse?: boolean;
 }
 
+const LOGO_FILTER =
+    'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%)';
+
 export default function AuthSplitLayout({
     children,
     title,
@@ -20,91 +23,105 @@ export default function AuthSplitLayout({
     reverse = true,
 }: PropsWithChildren<AuthLayoutProps>) {
     return (
-        <div className="relative grid min-h-svh flex-col items-center justify-center sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0 bg-white dark:bg-slate-900">
+        <div className="relative grid min-h-svh bg-white dark:bg-slate-900 lg:grid-cols-2">
             {/* Form Column */}
-            <div className={cn(
-                "w-full lg:p-8 flex flex-col justify-center min-h-svh bg-white dark:bg-slate-900 relative",
-                reverse ? "order-1" : "order-2"
-            )}>
-                {/* Dark mode toggle */}
-                <div className="absolute top-4 right-4">
+            <div
+                className={cn(
+                    'relative flex min-h-svh w-full flex-col bg-white dark:bg-slate-900',
+                    'justify-start lg:justify-center',
+                    reverse ? 'order-1' : 'order-2',
+                )}
+            >
+                <div className="absolute top-3 right-3 z-30 sm:top-4 sm:right-4">
                     <AppearanceToggleDropdown />
                 </div>
-                <div className="mx-auto flex w-full flex-col justify-center space-y-5 sm:w-[450px] p-6">
+
+                <div className="mx-auto flex w-full max-w-[450px] flex-col px-4 pt-14 pb-8 sm:px-6 sm:py-10 lg:p-8">
                     <Link
                         href={home()}
-                        className="relative z-20 flex items-center justify-center lg:hidden mb-2"
+                        className="relative z-20 mb-5 flex items-center justify-center lg:hidden"
                     >
-                        <img 
-                            src={logoImage} 
-                            alt="VIMAIZ" 
-                            className="h-12 w-auto max-w-full object-contain" 
-                            style={{ filter: 'brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%)' }}
+                        <img
+                            src={logoImage}
+                            alt="VIMAIZ"
+                            className="h-10 w-auto max-w-[200px] object-contain sm:h-12"
+                            style={{ filter: LOGO_FILTER }}
                         />
                     </Link>
-                    <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center">
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h1>
-                        <p className="text-base text-slate-500 dark:text-slate-400 max-w-[350px]">
-                            {description}
-                        </p>
+
+                    <div className="mb-5 flex flex-col items-center gap-1.5 text-center sm:mb-6 sm:gap-2">
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+                            {title}
+                        </h1>
+                        {description && (
+                            <p className="max-w-[340px] text-sm text-slate-500 sm:text-base dark:text-slate-400">
+                                {description}
+                            </p>
+                        )}
                     </div>
-                    {children}
+
+                    <div className="w-full">{children}</div>
                 </div>
             </div>
 
-            {/* Image/Decoration Column */}
-            <div className={cn(
-                "relative hidden min-h-svh flex-col p-10 text-white lg:flex",
-                reverse ? "order-2" : "order-1"
-            )}>
-                <div className="absolute inset-0 bg-gradient-to-br from-sky-500 via-sky-600 to-cyan-600 overflow-hidden">
-                    {/* Decorative circles */}
-                    <div className="absolute -top-20 -right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-                    <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-400/10 rounded-full blur-3xl" />
+            {/* Image/Decoration Column — desktop only */}
+            <div
+                className={cn(
+                    'relative hidden min-h-svh flex-col p-8 xl:p-10 text-white lg:flex',
+                    reverse ? 'order-2' : 'order-1',
+                )}
+            >
+                <div className="absolute inset-0 overflow-hidden bg-gradient-to-br from-sky-500 via-sky-600 to-cyan-600">
+                    <div className="absolute -top-20 -right-20 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
+                    <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl" />
+                    <div className="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-400/10 blur-3xl" />
                 </div>
-                
-                <Link
-                    href={home()}
-                    className="relative z-20 flex items-center"
-                >
-                    <img src={logoImage} alt="VIMAIZ" className="h-12 w-auto max-w-full object-contain" />
+
+                <Link href={home()} className="relative z-20 flex items-center">
+                    <img
+                        src={logoImage}
+                        alt="VIMAIZ"
+                        className="h-11 w-auto max-w-[220px] object-contain xl:h-12"
+                    />
                 </Link>
 
-                <div className="relative z-20 mt-14 flex flex-1 flex-col justify-center space-y-8 pb-6">
-                    <motion.div 
+                <div className="relative z-20 mt-10 flex flex-1 flex-col justify-center space-y-6 pb-4 xl:mt-14 xl:space-y-8">
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                     >
-                        <h2 className="text-4xl font-bold leading-tight mb-4">
-                            Le ménage professionnel<br />à portée de clic
+                        <h2 className="mb-3 text-3xl font-bold leading-tight xl:mb-4 xl:text-4xl">
+                            Le ménage professionnel
+                            <br />
+                            à portée de clic
                         </h2>
-                        <p className="text-lg text-white/80 max-w-md">
-                            Réservez votre agent de ménage en quelques minutes et profitez d'un intérieur impeccable.
+                        <p className="max-w-md text-base text-white/80 xl:text-lg">
+                            Réservez votre agent de ménage en quelques minutes et
+                            profitez d&apos;un intérieur impeccable.
                         </p>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
-                        className="grid grid-cols-2 gap-4"
+                        className="grid grid-cols-2 gap-3 xl:gap-4"
                     >
-                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-                            <Shield className="h-6 w-6 mb-2 text-white/90" />
+                        <div className="rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-md xl:p-4">
+                            <Shield className="mb-2 h-5 w-5 text-white/90 xl:h-6 xl:w-6" />
                             <p className="text-sm font-medium">Agents vérifiés</p>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-                            <Clock className="h-6 w-6 mb-2 text-white/90" />
+                        <div className="rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-md xl:p-4">
+                            <Clock className="mb-2 h-5 w-5 text-white/90 xl:h-6 xl:w-6" />
                             <p className="text-sm font-medium">Réservation rapide</p>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-                            <CheckCircle className="h-6 w-6 mb-2 text-white/90" />
+                        <div className="rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-md xl:p-4">
+                            <CheckCircle className="mb-2 h-5 w-5 text-white/90 xl:h-6 xl:w-6" />
                             <p className="text-sm font-medium">Satisfaction garantie</p>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
-                            <Crown className="h-6 w-6 mb-2 text-white/90" />
+                        <div className="rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-md xl:p-4">
+                            <Crown className="mb-2 h-5 w-5 text-white/90 xl:h-6 xl:w-6" />
                             <p className="text-sm font-medium">Service premium</p>
                         </div>
                     </motion.div>

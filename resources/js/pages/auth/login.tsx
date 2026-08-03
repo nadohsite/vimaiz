@@ -33,11 +33,11 @@ export default function Login({
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-5 sm:gap-6"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-5 sm:gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Adresse email</Label>
                                 <input
