@@ -82,7 +82,7 @@ export default function RcpClauseModal({ show, onAccepted }: RcpClauseModalProps
                             En tant qu'agent de ménage VIMAIZ, vous devez disposer d'une assurance Responsabilité Civile Professionnelle (RCP). Si vous n'en disposez pas lors de votre inscription, vous vous engagez à en souscrire une dans un délai de trois (03) mois. À défaut de régularisation dans ce délai, des pénalités pourront être appliquées conformément aux Conditions Générales d'Utilisation.
                             </p>
                         </div>
-
+                        
                         <div className="space-y-3">
                             <h4 className="font-medium text-slate-900 dark:text-white text-sm">
                                 Ce que couvre la RCP :
