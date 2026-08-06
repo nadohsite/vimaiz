@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AgentAcceptedMissionAdminNotification extends Notification implements ShouldQueue
+class AgentInterventionConfirmedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -24,22 +24,22 @@ class AgentAcceptedMissionAdminNotification extends Notification implements Shou
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('✅ Intervention confirmée par intervenant - ' . $this->mission->mission_number)
-            ->view('emails.agent-accepted-mission-admin', [
-                'notifiable' => $notifiable,
-                'mission' => $this->mission,
-            ]);
+            ->subject('Intervention confirmée — Vimaiz')
+            ->greeting('Bonjour ' . $notifiable->name . ' !')
+            ->line('✅ Votre intervention est confirmée.')
+            ->line('Retrouvez toutes les informations dans votre espace.')
+            ->action('Voir l\'intervention', url('/agent/missions/' . $this->mission->id))
+            ->salutation('L\'équipe Vimaiz');
     }
 
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'agent_accepted_mission',
+            'type' => 'agent_intervention_confirmed',
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
-            'agent_name' => $this->mission->agent->name ?? 'N/A',
-            'message' => 'Intervention confirmée par ' . ($this->mission->agent->name ?? 'intervenant'),
-            'url' => '/admin/missions/' . $this->mission->id,
+            'message' => '✅ Votre intervention est confirmée. Retrouvez toutes les informations dans votre espace.',
+            'url' => '/agent/missions/' . $this->mission->id,
         ];
     }
 }

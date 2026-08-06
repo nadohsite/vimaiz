@@ -101,7 +101,7 @@ export default function Dashboard({
         },
         {
             icon: CheckCircle2,
-            label: 'Missions terminées',
+            label: 'Interventions terminées',
             value: stats?.missions_completed ?? 0,
             iconClass: 'bg-sky-100 text-sky-600 dark:bg-sky-900/50 dark:text-sky-400',
         },
@@ -117,7 +117,7 @@ export default function Dashboard({
         {
             href: route('agent.missions.index'),
             icon: Sparkles,
-            title: 'Mes missions',
+            title: 'Mes interventions',
             description: 'Toutes vos interventions',
         },
         {
@@ -138,7 +138,7 @@ export default function Dashboard({
         <AppSidebarLayout
             breadcrumbs={[{ title: 'Tableau de bord', href: route('agent.dashboard') }]}
         >
-            <Head title="Tableau de bord Agent - VIMAIZ" />
+            <Head title="Tableau de bord Intervenant - VIMAIZ" />
 
             <div className="min-h-screen bg-slate-50 p-4 dark:bg-slate-900 sm:p-6 lg:p-8">
                 <div className="mx-auto max-w-7xl">
@@ -154,7 +154,7 @@ export default function Dashboard({
                                     Bonjour{firstName ? ` ${firstName}` : ''} 👋
                                 </h1>
                                 <p className="mt-1.5 text-slate-600 dark:text-slate-400">
-                                    Gérez vos missions de ménage et suivez vos revenus.
+                                    Gérez vos interventions et suivez vos revenus.
                                 </p>
                                 <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
                                     Vimaiz prélève une commission de 25 % sur chaque intervention
@@ -169,7 +169,7 @@ export default function Dashboard({
                                         <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-sky-500" />
                                     </span>
                                     <span className="text-sm font-semibold text-sky-800 dark:text-sky-300">
-                                        {stats.missions_in_progress} mission
+                                        {stats.missions_in_progress} intervention
                                         {stats.missions_in_progress > 1 ? 's' : ''} en cours
                                     </span>
                                 </div>
@@ -185,7 +185,7 @@ export default function Dashboard({
                             </div>
                             <div className="flex-1">
                                 <p className="font-semibold text-orange-800 dark:text-orange-300">
-                                    Profil incomplet — vous ne recevez pas encore de missions
+                                    Profil incomplet — vous ne recevez pas encore d'interventions
                                 </p>
                                 <p className="text-sm text-orange-700 dark:text-orange-400">
                                     Complétez votre profil et soumettez vos documents pour être
@@ -232,7 +232,7 @@ export default function Dashboard({
                             <div className="mb-4 flex items-center gap-2">
                                 <Bell className="h-5 w-5 animate-pulse text-amber-500" />
                                 <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                                    Missions en attente de votre réponse
+                                    Interventions en attente de votre réponse
                                 </h2>
                             </div>
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -290,7 +290,7 @@ export default function Dashboard({
                             <section>
                                 <div className="mb-4 flex items-center justify-between">
                                     <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                                        Missions à venir
+                                        Interventions à venir
                                     </h2>
                                     <Link
                                         href={route('agent.missions.index')}
@@ -343,10 +343,10 @@ export default function Dashboard({
                                             <Calendar className="h-6 w-6 text-primary" />
                                         </div>
                                         <p className="font-medium text-slate-900 dark:text-white">
-                                            Aucune mission à venir
+                                            Aucune intervention à venir
                                         </p>
                                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                            Les nouvelles missions vous seront proposées ici.
+                                            Les nouvelles interventions vous seront proposées ici.
                                         </p>
                                     </div>
                                 )}
@@ -356,7 +356,7 @@ export default function Dashboard({
                             {recentMissions.length > 0 && (
                                 <section>
                                     <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
-                                        Dernières missions terminées
+                                        Dernières interventions terminées
                                     </h2>
                                     <div className="space-y-3">
                                         {recentMissions.map((mission) => (
@@ -378,7 +378,7 @@ export default function Dashboard({
                                                 </div>
                                                 <div className="flex flex-none flex-col items-end gap-1">
                                                     <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-                                                        Terminée
+                                                        Intervention terminée
                                                     </span>
                                                     <span className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
                                                         {Number(mission.agent_payout).toFixed(0)} €

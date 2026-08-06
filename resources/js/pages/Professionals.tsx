@@ -2,235 +2,267 @@ import PublicLayout from '@/components/public/public-layout';
 import { Link } from '@inertiajs/react';
 import {
     Briefcase,
+    Calendar,
     ChevronDown,
-    Clock,
-    Euro,
-    MapPin,
+    LayoutDashboard,
     Shield,
-    Smartphone,
-    Star,
-    Users,
+    Sparkles,
 } from 'lucide-react';
 import { useState } from 'react';
+
+function CheckIcon() {
+    return (
+        <svg className="dot-check" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" />
+            <path
+                d="M6 10l2.5 2.5L14 7"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    );
+}
+
+type FaqAnswer = string | { paragraphs: string[]; list?: string[]; afterList?: string[] };
+
+const benefits = [
+    {
+        icon: Sparkles,
+        title: 'Développez votre activité.',
+        description: 'Recevez des propositions d’interventions.',
+    },
+    {
+        icon: Calendar,
+        title: 'Choisissez vos disponibilités.',
+        description:
+            'Vous restez libre d’accepter uniquement les interventions qui correspondent à votre planning.',
+    },
+    {
+        icon: LayoutDashboard,
+        title: 'Centralisez votre activité.',
+        description:
+            'Retrouvez vos interventions, vos échanges et le suivi de vos prestations depuis votre espace Vimaiz.',
+    },
+    {
+        icon: Shield,
+        title: 'Travaillez avec des clients vérifiés.',
+        description:
+            'Toutes les demandes passent par la plateforme afin de faciliter votre organisation.',
+    },
+    {
+        icon: Briefcase,
+        title: 'Une plateforme pensée pour les professionnels.',
+        description:
+            'Nous simplifions votre quotidien afin que vous puissiez vous concentrer sur votre savoir-faire.',
+    },
+];
+
+const steps = [
+    {
+        number: '01',
+        title: 'Rejoignez Vimaiz.',
+        description:
+            'Créez votre compte et complétez votre profil professionnel en quelques minutes.',
+    },
+    {
+        number: '02',
+        title: 'Nous vérifions votre profil.',
+        description:
+            'Chaque profil est vérifié afin de garantir un réseau de professionnels fiables et de qualité.',
+    },
+    {
+        number: '03',
+        title: 'Développez votre activité.',
+        description:
+            'Consultez les nouvelles interventions, acceptez celles qui correspondent à vos disponibilités et développez votre activité à votre rythme.',
+    },
+];
+
+const faqs: { question: string; answer: FaqAnswer }[] = [
+    {
+        question: 'Qui peut rejoindre Vimaiz ?',
+        answer: {
+            paragraphs: [
+                'Vimaiz est ouvert aux professionnels du ménage et de la propreté exerçant légalement leur activité.',
+                'Pour rejoindre le réseau Vimaiz, il est obligatoire de disposer d’une entreprise déclarée (micro-entreprise, société ou tout autre statut professionnel autorisé). Cette condition garantit un réseau de professionnels sérieux et conformes aux exigences réglementaires.',
+                'Chaque profil est vérifié avant son intégration afin d’assurer la qualité et la fiabilité du réseau.',
+            ],
+        },
+    },
+    {
+        question:
+            'Dois-je être en auto-entreprise ou en société pour devenir un intervenant Vimaiz ?',
+        answer: {
+            paragraphs: [
+                'Oui. Il est obligatoire d’avoir une entreprise déclarée pour devenir intervenant partenaire de Vimaiz.',
+                'Vous pouvez exercer sous différents statuts professionnels, notamment en micro-entreprise ou en société, à condition que votre activité soit officiellement déclarée.',
+            ],
+        },
+    },
+    {
+        question: 'Quels documents sont demandés pour m’inscrire sur Vimaiz ?',
+        answer: {
+            paragraphs: [
+                'Afin de valider votre inscription sur Vimaiz, plusieurs documents sont nécessaires :',
+            ],
+            list: [
+                'Une pièce d’identité recto-verso en cours de validité ;',
+                'Une facture de moins de 3 mois justifiant votre adresse ;',
+                'Le Kbis de votre société (ou justificatif d’immatriculation selon votre statut) ;',
+                'Une assurance responsabilité professionnelle.',
+            ],
+            afterList: [
+                'L’assurance responsabilité professionnelle est fortement recommandée lors de votre inscription et deviendra obligatoire dans un délai maximum de 3 mois après votre intégration au réseau Vimaiz.',
+            ],
+        },
+    },
+    {
+        question: 'Comment fonctionnent les interventions ?',
+        answer: {
+            paragraphs: [
+                'Lorsqu’une nouvelle intervention est publiée, les intervenants disponibles sont immédiatement notifiés.',
+                'Le premier intervenant à accepter l’intervention en devient responsable et retrouve toutes les informations nécessaires depuis son espace Vimaiz.',
+            ],
+        },
+    },
+    {
+        question: 'Suis-je libre d’accepter ou de refuser une intervention ?',
+        answer: {
+            paragraphs: [
+                'Oui. Vous restez entièrement libre d’accepter ou de refuser chaque intervention selon vos disponibilités, vos secteurs d’intervention et votre organisation.',
+            ],
+        },
+    },
+    {
+        question: 'Comment suis-je rémunéré ?',
+        answer: {
+            paragraphs: [
+                'Avant d’accepter une intervention, le montant de votre rémunération est indiqué en toute transparence.',
+                'Une fois la prestation réalisée et validée, votre paiement est effectué selon les modalités prévues par Vimaiz.',
+            ],
+        },
+    },
+    {
+        question: 'Quelle est la commission de Vimaiz ?',
+        answer: {
+            paragraphs: [
+                'Vimaiz prélève une commission de 20 % sur chaque intervention réalisée.',
+                'Cette commission permet de financer le développement de la plateforme, le support professionnel, la sécurisation des paiements ainsi que les outils mis à votre disposition.',
+                'Le montant affiché avant l’acceptation d’une intervention correspond toujours à la rémunération que vous percevrez.',
+            ],
+        },
+    },
+    {
+        question: 'Dois-je fournir mon propre matériel ?',
+        answer: {
+            paragraphs: [
+                'Oui. Chaque intervenant intervient avec son propre matériel et ses produits d’entretien, sauf indication contraire précisée dans les informations de l’intervention.',
+            ],
+        },
+    },
+    {
+        question: 'Puis-je choisir les zones où j’interviens ?',
+        answer: {
+            paragraphs: [
+                'Oui. Vous définissez les secteurs géographiques dans lesquels vous souhaitez intervenir et restez libre d’accepter uniquement les interventions qui correspondent à vos disponibilités.',
+            ],
+        },
+    },
+    {
+        question: 'Comment suivre mes interventions ?',
+        answer: {
+            paragraphs: [
+                'Depuis votre espace Vimaiz, vous retrouvez l’ensemble de vos interventions, leur statut, vos échanges, votre historique ainsi que toutes les informations utiles à votre activité.',
+            ],
+        },
+    },
+    {
+        question: 'Pourquoi rejoindre Vimaiz ?',
+        answer: {
+            paragraphs: [
+                'Vimaiz vous permet de développer votre activité sans avoir à rechercher constamment de nouveaux clients.',
+                'Vous restez libre d’organiser votre emploi du temps, de choisir vos interventions et de gérer votre activité depuis un seul espace dédié aux intervenants.',
+            ],
+        },
+    },
+];
+
+function FaqBody({ answer }: { answer: FaqAnswer }) {
+    if (typeof answer === 'string') {
+        return <p>{answer}</p>;
+    }
+
+    return (
+        <>
+            {answer.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+            ))}
+            {answer.list && (
+                <ul>
+                    {answer.list.map((item) => (
+                        <li key={item}>{item}</li>
+                    ))}
+                </ul>
+            )}
+            {answer.afterList?.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+            ))}
+        </>
+    );
+}
 
 export default function Professionals() {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-    const benefits = [
-        {
-            icon: Clock,
-            title: 'Flexibilité totale',
-            description: 'Choisissez vos horaires et les missions qui vous conviennent.',
-        },
-        {
-            icon: Euro,
-            title: 'Revenus liés à votre activité',
-            description:
-                'Vos revenus dépendent du nombre et du type de missions que vous réalisez.',
-        },
-        {
-            icon: Shield,
-            title: 'Assurance incluse',
-            description: 'Vous êtes couvert pendant toutes vos missions.',
-        },
-        {
-            icon: Smartphone,
-            title: 'Application simple',
-            description: 'Gérez tout depuis votre smartphone.',
-        },
-        {
-            icon: Users,
-            title: 'Support dédié',
-            description: 'Une équipe à votre écoute au quotidien.',
-        },
-        {
-            icon: Briefcase,
-            title: 'Missions régulières',
-            description: 'Des clients fidèles et des missions récurrentes.',
-        },
-    ];
-
-    const steps = [
-        {
-            number: '01',
-            title: 'Inscrivez-vous',
-            description: 'Créez votre compte et téléchargez vos documents.',
-        },
-        {
-            number: '02',
-            title: 'Validation',
-            description: 'Notre équipe vérifie votre profil sous 48h.',
-        },
-        {
-            number: '03',
-            title: 'Commencez',
-            description: 'Recevez vos premières missions !',
-        },
-    ];
-
-    const testimonials = [
-        {
-            name: 'Marie L.',
-            location: 'Paris',
-            rating: 5,
-            text: "Grâce à VIMAIZ, j'organise mon emploi du temps comme je veux. Les paiements sont toujours à l'heure.",
-            missions: 47,
-        },
-        {
-            name: 'Sophie B.',
-            location: 'Lyon',
-            rating: 5,
-            text: "L'application est super simple. Je reçois des missions près de chez moi.",
-            missions: 32,
-        },
-        {
-            name: 'Thomas M.',
-            location: 'Bordeaux',
-            rating: 5,
-            text: "Excellent complément de revenus. L'équipe support est vraiment à l'écoute.",
-            missions: 58,
-        },
-    ];
-
-    const faqs = [
-        {
-            question: 'Quelles sont les conditions pour devenir agent ?',
-            answer: "Être majeur, disposer d'un numéro SIRET (auto-entrepreneur ou société) et être autonome dans ses déplacements.",
-        },
-        {
-            question: 'Comment suis-je payé ?',
-            answer: "Vos gains sont versés automatiquement sur votre compte bancaire chaque semaine. Vous pouvez suivre vos revenus en temps réel dans l'application.",
-        },
-        {
-            question: 'Dois-je fournir le matériel de ménage ?',
-            answer: "Oui, vous devez disposer de votre propre matériel (aspirateur, produits, etc.). C'est un critère important pour les clients.",
-        },
-        {
-            question: 'Puis-je refuser une mission ?',
-            answer: "Absolument. Vous êtes libre d'accepter ou refuser chaque mission proposée. Aucune obligation.",
-        },
-        {
-            question: 'Quelle est la zone de couverture ?',
-            answer: 'VIMAIZ est disponible dans les principales villes de France : Paris, Lyon, Marseille, Bordeaux, Toulouse, et plus.',
-        },
-    ];
-
     return (
-        <PublicLayout title="Devenir Agent VIMAIZ — Gagnez de l'argent avec le ménage">
-            {/* HERO */}
-            <section className="hero wrap">
-                <div className="hero-grid">
+        <PublicLayout title="Devenir intervenant — Rejoindre le réseau Vimaiz">
+            <section className="hero wrap hero-pros">
+                <div className="hero-grid hero-grid-solo">
                     <div>
-                        <span className="eyebrow rise-1">Recrutement ouvert</span>
+                        <span className="eyebrow rise-1">Réseau professionnel</span>
                         <h1 className="rise-2">
-                            Devenez agent de ménage
-                            <span className="accent"> Vimaiz.</span>
+                            Rejoindre le réseau professionnel
+                            <span className="accent"> Vimaiz</span>
                         </h1>
                         <p className="hero-sub rise-3">
-                            Travaillez régulièrement avec des clients vérifiés, selon vos
-                            disponibilités. Vimaiz vous apporte des missions, vous restez maître
-                            de votre emploi du temps.
+                            Vous vous concentrez sur votre métier, nous simplifions le reste.
                         </p>
                         <div className="hero-ctas rise-4">
                             <Link
                                 className="btn btn-primary"
                                 href={route('register') + '?role=agent'}
                             >
-                                Commencer maintenant →
+                                Devenir intervenant
                             </Link>
                             <a className="btn btn-ghost" href="#comment-ca-marche">
-                                Comment ça marche ?
+                                Comment ça fonctionne
                             </a>
                         </div>
-                        <div className="trust-row">
+                        <div className="trust-row trust-row-centered">
                             <span>
-                                <svg
-                                    className="dot-check"
-                                    viewBox="0 0 20 20"
-                                    fill="none"
-                                    aria-hidden="true"
-                                >
-                                    <circle
-                                        cx="10"
-                                        cy="10"
-                                        r="9"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                    />
-                                    <path
-                                        d="M6 10l2.5 2.5L14 7"
-                                        stroke="currentColor"
-                                        strokeWidth="1.6"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
+                                <CheckIcon />
                                 Inscription gratuite
                             </span>
                             <span>
-                                <svg
-                                    className="dot-check"
-                                    viewBox="0 0 20 20"
-                                    fill="none"
-                                    aria-hidden="true"
-                                >
-                                    <circle
-                                        cx="10"
-                                        cy="10"
-                                        r="9"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                    />
-                                    <path
-                                        d="M6 10l2.5 2.5L14 7"
-                                        stroke="currentColor"
-                                        strokeWidth="1.6"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
-                                Paiement garanti
+                                <CheckIcon />
+                                Paiement sécurisé
                             </span>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="agent-visual" style={{ marginTop: 24 }}>
-                            <div className="badge-num">€ / mission</div>
-                            <div className="badge-cap">
-                                Le montant dépend du type de logement, de la surface et de la
-                                prestation.
-                            </div>
-                            <hr />
-                            <div
-                                style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: '1fr 1fr',
-                                    gap: 14,
-                                }}
-                            >
-                                <div>
-                                    <div className="badge-num">500+</div>
-                                    <div className="badge-cap">Agents actifs</div>
-                                </div>
-                                <div>
-                                    <div className="badge-num">10K+</div>
-                                    <div className="badge-cap">Missions / mois</div>
-                                </div>
-                            </div>
+                            <span>
+                                <CheckIcon />
+                                Gestion simplifiée des interventions
+                            </span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* BENEFITS */}
             <section id="avantages" className="welcome-section">
                 <div className="wrap">
                     <div className="sec-head">
                         <div className="sec-eyebrow">Les avantages</div>
                         <h2>Pourquoi rejoindre Vimaiz ?</h2>
-                        <p className="sec-sub">
-                            Une organisation simple pour vous concentrer sur votre travail.
-                        </p>
                     </div>
                     <div className="grid-3">
                         {benefits.map((benefit) => (
@@ -246,13 +278,11 @@ export default function Professionals() {
                 </div>
             </section>
 
-            {/* STEPS */}
             <section id="comment-ca-marche" className="welcome-section">
                 <div className="wrap">
                     <div className="sec-head">
                         <div className="sec-eyebrow">Le parcours</div>
-                        <h2>Comment ça marche ?</h2>
-                        <p className="sec-sub">3 étapes simples pour commencer.</p>
+                        <h2>Comment ça fonctionne</h2>
                     </div>
                     <div className="grid-3">
                         {steps.map((step) => (
@@ -268,58 +298,18 @@ export default function Professionals() {
                 </div>
             </section>
 
-            {/* TESTIMONIALS */}
-            <section className="welcome-section">
+            <section id="faq" className="welcome-section">
                 <div className="wrap">
                     <div className="sec-head">
-                        <div className="sec-eyebrow">Témoignages</div>
-                        <h2>Ils nous font confiance</h2>
-                        <p className="sec-sub">Découvrez les témoignages de nos agents.</p>
-                    </div>
-                    <div className="grid-3">
-                        {testimonials.map((t) => (
-                            <div className="quote-card" key={t.name}>
-                                <div className="quote-stars">
-                                    {[...Array(t.rating)].map((_, i) => (
-                                        <Star key={i} size={16} fill="currentColor" />
-                                    ))}
-                                </div>
-                                <p className="quote-text">« {t.text} »</p>
-                                <div className="quote-meta">
-                                    <div>
-                                        <div className="quote-name">{t.name}</div>
-                                        <div className="quote-loc">
-                                            <MapPin
-                                                size={11}
-                                                style={{
-                                                    display: 'inline',
-                                                    verticalAlign: '-1px',
-                                                    marginRight: 3,
-                                                }}
-                                            />
-                                            {t.location}
-                                        </div>
-                                    </div>
-                                    <div className="quote-missions">
-                                        {t.missions}
-                                        <small>missions</small>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* FAQ */}
-            <section id="faq" className="welcome-section">
-                <div className="wrap" style={{ maxWidth: 760 }}>
-                    <div className="sec-head">
                         <div className="sec-eyebrow">FAQ</div>
-                        <h2>Questions fréquentes</h2>
+                        <h2>Questions fréquentes – Intervenants Vimaiz</h2>
                     </div>
                     {faqs.map((faq, index) => (
-                        <div className="faq-item" key={faq.question} data-open={openFaq === index}>
+                        <div
+                            className="faq-item"
+                            key={faq.question}
+                            data-open={openFaq === index}
+                        >
                             <button
                                 type="button"
                                 className="faq-q"
@@ -329,25 +319,13 @@ export default function Professionals() {
                                 {faq.question}
                                 <ChevronDown size={18} />
                             </button>
-                            {openFaq === index && <div className="faq-a">{faq.answer}</div>}
+                            {openFaq === index && (
+                                <div className="faq-a">
+                                    <FaqBody answer={faq.answer} />
+                                </div>
+                            )}
                         </div>
                     ))}
-                </div>
-            </section>
-
-            {/* CTA */}
-            <section className="welcome-section">
-                <div className="wrap">
-                    <div className="agent-band" style={{ textAlign: 'center', display: 'block' }}>
-                        <h2>Prêt à rejoindre l&apos;aventure ?</h2>
-                        <p style={{ maxWidth: '52ch', margin: '10px auto 24px' }}>
-                            Rejoignez plus de 500 agents Vimaiz et commencez à gagner de
-                            l&apos;argent dès cette semaine.
-                        </p>
-                        <Link className="btn btn-primary" href={route('register') + '?role=agent'}>
-                            Devenir agent maintenant →
-                        </Link>
-                    </div>
                 </div>
             </section>
         </PublicLayout>

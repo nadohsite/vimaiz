@@ -103,7 +103,7 @@ class ServiceRequest extends Model
             self::STATUS_QUOTE_ACCEPTED => 'Devis accepté',
             self::STATUS_QUOTE_REFUSED => 'Devis refusé',
             self::STATUS_PAID => 'Payé',
-            self::STATUS_ASSIGNED => 'Agent attribué',
+            self::STATUS_ASSIGNED => 'Intervenant assigné',
             self::STATUS_IN_PROGRESS => 'En cours',
             self::STATUS_COMPLETED => 'Terminée',
             self::STATUS_CANCELLED => 'Annulée',

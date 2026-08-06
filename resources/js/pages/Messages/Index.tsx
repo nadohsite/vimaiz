@@ -70,7 +70,7 @@ export default function Index({ conversations }: Props) {
                                 <MessageSquare className="h-12 w-12 text-slate-300 mx-auto mb-4" />
                                 <h3 className="text-lg font-medium text-slate-900 mb-2">Aucune conversation</h3>
                                 <p className="text-slate-500">
-                                    Vos conversations avec les clients et agents apparaîtront ici.
+                                    Vos conversations avec les clients et intervenants apparaîtront ici.
                                 </p>
                             </CardContent>
                         </Card>

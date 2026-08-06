@@ -152,10 +152,10 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
 
     return (
         <AppLayout breadcrumbs={[
-            { title: 'Mes missions', href: route('client.missions.index') },
+            { title: 'Mes interventions', href: route('client.missions.index') },
             { title: mission.mission_number, href: '#' },
         ]}>
-            <Head title={`Mission ${mission.mission_number}`} />
+            <Head title={`Intervention ${mission.mission_number}`} />
 
             <div className="py-8">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -163,7 +163,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                     <div className="mb-8">
                         <Link href={route('client.missions.index')} className="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 mb-4">
                             <ArrowLeft className="h-4 w-4 mr-1" />
-                            Retour aux missions
+                            Retour aux interventions
                         </Link>
                         <div className="flex items-center justify-between">
                             <div>
@@ -198,7 +198,9 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                         <div className="flex items-center gap-3">
                                             <CheckCircle className="h-8 w-8 text-green-500" />
                                             <div>
-                                                <h3 className="font-semibold text-green-800 dark:text-green-300">Mission terminée</h3>
+                                                <h3 className="font-semibold text-green-800 dark:text-green-300">
+                                                    {mission.review ? 'Logement prêt' : 'Intervention terminée'}
+                                                </h3>
                                                 <p className="text-sm text-green-700 dark:text-green-400">
                                                     Terminée le {mission.completed_at && new Date(mission.completed_at).toLocaleDateString('fr-FR', {
                                                         day: 'numeric',
@@ -320,7 +322,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                         {!showReturnForm ? (
                                             <div>
                                                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                                                    Si vous n'êtes pas satisfait de la prestation, vous pouvez demander un retour gratuit de l'agent dans les 7 jours suivant la mission.
+                                                    Si vous n'êtes pas satisfait de la prestation, vous pouvez demander un retour gratuit de l'intervenant dans les 7 jours suivant l'intervention.
                                                 </p>
                                                 <Button
                                                     variant="outline"
@@ -406,13 +408,13 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
 
                                         {mission.return_status === 'pending' && (
                                             <p className="text-sm text-amber-700 dark:text-amber-300">
-                                                ⏳ L'agent a été notifié et va prendre en charge votre demande.
+                                                ⏳ L'intervenant a été notifié et va prendre en charge votre demande.
                                             </p>
                                         )}
 
                                         {mission.return_status === 'in_progress' && (
                                             <p className="text-sm text-blue-700 dark:text-blue-300">
-                                                🔄 L'agent est en train d'effectuer le retour.
+                                                🔄 L'intervenant est en train d'effectuer le retour.
                                             </p>
                                         )}
 
@@ -420,13 +422,13 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                             <div className="space-y-4">
                                                 {mission.return_agent_notes && (
                                                     <div>
-                                                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Notes de l'agent :</p>
+                                                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Notes de l'intervenant :</p>
                                                         <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{mission.return_agent_notes}</p>
                                                     </div>
                                                 )}
                                                 <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
                                                     <p className="text-sm font-medium text-purple-800 dark:text-purple-300 mb-3">
-                                                        L'agent a terminé le retour. Êtes-vous satisfait ?
+                                                        L'intervenant a terminé le retour. Êtes-vous satisfait ?
                                                     </p>
                                                     <Textarea
                                                         placeholder="Commentaire (optionnel)..."
@@ -539,8 +541,8 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                     <CardContent className="p-6 text-center">
                                         <MapPin className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                                         <p className="text-slate-500 dark:text-slate-400">
-                                            L&apos;arrivée de l&apos;agent est vérifiée par géolocalisation à proximité
-                                            du logement, et le début comme la fin de la mission sont horodatés.
+                                            L&apos;arrivée de l&apos;intervenant est vérifiée par géolocalisation à proximité
+                                            du logement, et le début comme la fin de l&apos;intervention sont horodatés.
                                         </p>
                                     </CardContent>
                                 </Card>
@@ -555,7 +557,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2 text-base dark:text-white">
                                             <User className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                            Agent
+                                            Intervenant
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
@@ -565,7 +567,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                             </div>
                                             <div>
                                                 <p className="font-medium dark:text-white">{mission.agent.name}</p>
-                                                <p className="text-sm text-slate-500 dark:text-slate-400">Agent VIMAIZ</p>
+                                                <p className="text-sm text-slate-500 dark:text-slate-400">Intervenant VIMAIZ</p>
                                             </div>
                                         </div>
                                     </CardContent>

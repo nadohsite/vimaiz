@@ -26,18 +26,17 @@ class AgentAcceptedMissionNotification extends Notification implements ShouldQue
         $property = $this->mission->property;
 
         return (new MailMessage)
-            ->subject('Agent confirmé pour votre ménage')
+            ->subject('Intervention confirmée — Vimaiz')
             ->greeting('Bonjour ' . $notifiable->name . ' !')
-            ->line('Un agent professionnel a accepté votre mission de ménage.')
+            ->line('✅ Votre intervention est désormais prise en charge.')
+            ->line('Un intervenant Vimaiz a été assigné à votre logement.')
             ->line('')
             ->line('**Détails :**')
-            ->line('- Mission : ' . $this->mission->mission_number)
+            ->line('- Intervention : ' . $this->mission->mission_number)
             ->line('- Logement : ' . ($property->name ?? $property->type_label))
             ->line('- Date prévue : ' . $this->mission->scheduled_at->format('d/m/Y à H:i'))
-            ->line('')
-            ->line('Votre agent se présentera à l\'adresse indiquée à l\'heure convenue.')
             ->action('Voir les détails', url('/client/missions/' . $this->mission->id))
-            ->salutation('L\'équipe VIMAIZ');
+            ->salutation('L\'équipe Vimaiz');
     }
 
     public function toArray(object $notifiable): array
@@ -47,7 +46,7 @@ class AgentAcceptedMissionNotification extends Notification implements ShouldQue
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'scheduled_at' => $this->mission->scheduled_at->toISOString(),
-            'message' => 'Agent confirmé pour ' . $this->mission->mission_number,
+            'message' => '✅ Votre intervention est désormais prise en charge. Un intervenant Vimaiz a été assigné à votre logement.',
             'url' => '/client/missions/' . $this->mission->id,
         ];
     }

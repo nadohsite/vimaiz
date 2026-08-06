@@ -29,11 +29,12 @@ class MissionCompletedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Ménage terminé - Mission ' . $this->mission->mission_number)
-            ->view('emails.mission-completed', [
-                'notifiable' => $notifiable,
-                'mission' => $this->mission,
-            ]);
+            ->subject('Intervention terminée — Vimaiz')
+            ->greeting('Bonjour ' . $notifiable->name . ' !')
+            ->line('✨ L\'intervention est terminée.')
+            ->line('Il ne vous reste plus qu\'à confirmer que tout est conforme.')
+            ->action('Confirmer l\'intervention', url('/client/missions/' . $this->mission->id))
+            ->salutation('L\'équipe Vimaiz');
     }
 
     public function toArray(object $notifiable): array
@@ -42,8 +43,8 @@ class MissionCompletedNotification extends Notification implements ShouldQueue
             'type' => 'mission_completed',
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
-            'completed_at' => $this->mission->completed_at->toISOString(),
-            'message' => 'Mission ' . $this->mission->mission_number . ' terminée',
+            'completed_at' => $this->mission->completed_at?->toISOString(),
+            'message' => '✨ L\'intervention est terminée. Il ne vous reste plus qu\'à confirmer que tout est conforme.',
             'url' => '/client/missions/' . $this->mission->id,
         ];
     }

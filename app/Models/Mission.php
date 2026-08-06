@@ -223,13 +223,15 @@ class Mission extends Model
     public function getStatusLabelAttribute(): string
     {
         return match($this->status) {
-            self::STATUS_PENDING_AGENT => 'En attente agent',
-            self::STATUS_AGENT_ACCEPTED => 'Agent confirmé',
-            self::STATUS_AGENT_REFUSED => 'Agent refusé',
-            self::STATUS_IN_PROGRESS => 'En cours',
+            self::STATUS_PENDING_AGENT => 'Intervention en attente',
+            self::STATUS_AGENT_ACCEPTED => 'Intervention confirmée',
+            self::STATUS_AGENT_REFUSED => 'Intervention refusée',
+            self::STATUS_IN_PROGRESS => 'Intervention en cours',
             self::STATUS_PHOTOS_BEFORE => 'Photos avant OK',
             self::STATUS_PHOTOS_AFTER => 'Photos après OK',
-            self::STATUS_COMPLETED => 'Terminée',
+            self::STATUS_COMPLETED => $this->relationLoaded('review') && $this->review
+                ? 'Logement prêt'
+                : ($this->review()->exists() ? 'Logement prêt' : 'Intervention terminée'),
             self::STATUS_CANCELLED => 'Annulée',
             default => $this->status,
         };

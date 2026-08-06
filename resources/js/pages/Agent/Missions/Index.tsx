@@ -60,15 +60,15 @@ export default function Index({ missions, currentStatus, statuses }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Mes missions', href: route('agent.missions.index') }]}>
-            <Head title="Mes missions" />
+        <AppLayout breadcrumbs={[{ title: 'Mes interventions', href: route('agent.missions.index') }]}>
+            <Head title="Mes interventions" />
 
             <div className="py-8">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">Mes missions</h1>
-                            <p className="text-slate-500 mt-1">Gérez vos missions de ménage</p>
+                            <h1 className="text-2xl font-bold text-slate-900">Mes interventions</h1>
+                            <p className="text-slate-500 mt-1">Gérez vos interventions</p>
                         </div>
                         <div className="flex items-center gap-2">
                             <Filter className="h-4 w-4 text-slate-500" />
@@ -153,9 +153,9 @@ export default function Index({ missions, currentStatus, statuses }: Props) {
                         <Card className="text-center py-12">
                             <CardContent>
                                 <Calendar className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                                <h3 className="text-lg font-medium text-slate-900 mb-2">Aucune mission</h3>
+                                <h3 className="text-lg font-medium text-slate-900 mb-2">Aucune intervention</h3>
                                 <p className="text-slate-500">
-                                    {currentStatus ? 'Aucune mission avec ce statut.' : 'Vos missions apparaîtront ici.'}
+                                    {currentStatus ? 'Aucune intervention avec ce statut.' : 'Vos interventions apparaîtront ici.'}
                                 </p>
                             </CardContent>
                         </Card>

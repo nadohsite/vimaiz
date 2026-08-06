@@ -113,7 +113,7 @@ export default function AgentReturnsIndex({ missions }: Props) {
                                         <CardHeader className="pb-4">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg flex items-center gap-2">
-                                                    Mission {mission.mission_number}
+                                                    Intervention {mission.mission_number}
                                                     <Badge className={statusInfo.color}>
                                                         <StatusIcon className="h-3 w-3 mr-1" />
                                                         {statusInfo.label}

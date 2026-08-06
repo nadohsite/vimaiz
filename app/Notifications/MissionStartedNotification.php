@@ -24,11 +24,11 @@ class MissionStartedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Votre ménage a commencé !')
-            ->view('emails.mission-started', [
-                'notifiable' => $notifiable,
-                'mission' => $this->mission,
-            ]);
+            ->subject('Intervention en cours — Vimaiz')
+            ->greeting('Bonjour ' . $notifiable->name . ' !')
+            ->line('🏡 Votre intervenant a commencé son intervention.')
+            ->action('Suivre l\'intervention', url('/client/missions/' . $this->mission->id))
+            ->salutation('L\'équipe Vimaiz');
     }
 
     public function toArray(object $notifiable): array
@@ -37,8 +37,8 @@ class MissionStartedNotification extends Notification implements ShouldQueue
             'type' => 'mission_started',
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
-            'started_at' => $this->mission->started_at->toISOString(),
-            'message' => 'Mission ' . $this->mission->mission_number . ' démarrée',
+            'started_at' => $this->mission->started_at?->toISOString(),
+            'message' => '🏡 Votre intervenant a commencé son intervention.',
             'url' => '/client/missions/' . $this->mission->id,
         ];
     }

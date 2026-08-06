@@ -24,7 +24,7 @@ class NewServiceRequestNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('🏠 Nouvelle demande de ménage - ' . $this->serviceRequest->request_number)
+            ->subject('🏠 Nouvelle intervention - ' . $this->serviceRequest->request_number)
             ->view('emails.new-service-request', [
                 'notifiable' => $notifiable,
                 'serviceRequest' => $this->serviceRequest,
@@ -38,7 +38,7 @@ class NewServiceRequestNotification extends Notification implements ShouldQueue
             'service_request_id' => $this->serviceRequest->id,
             'request_number' => $this->serviceRequest->request_number,
             'client_name' => $this->serviceRequest->client->name ?? 'N/A',
-            'message' => 'Nouvelle demande : ' . $this->serviceRequest->request_number,
+            'message' => 'Nouvelle intervention : ' . $this->serviceRequest->request_number,
             'url' => '/admin/service-requests/' . $this->serviceRequest->id,
         ];
     }

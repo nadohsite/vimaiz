@@ -34,8 +34,8 @@ export default function PublicLayout({ title, children }: PublicLayoutProps) {
                         <img src={logoImage} alt="Vimaiz" style={{ filter: LOGO_FILTER }} />
                     </Link>
                     <div className="navlinks">
-                        <Link href="/#service">Faire le ménage</Link>
-                        <Link href={route('professionals.index')}>Devenir agent</Link>
+                        <Link href="/#service">Programmer une intervention</Link>
+                        <Link href={route('professionals.index')}>Devenir intervenant</Link>
                         <Link href="/#about">À propos</Link>
                         <Link href={route('contact.index')}>Contact</Link>
                     </div>
@@ -68,7 +68,7 @@ export default function PublicLayout({ title, children }: PublicLayoutProps) {
                             <div className="logo">
                                 <img src={logoImage} alt="Vimaiz" style={{ filter: LOGO_FILTER }} />
                             </div>
-                            <p>Planifiez votre ménage. Vimaiz s&apos;occupe du reste.</p>
+                            <p>Organisez vos locations. Vimaiz s&apos;occupe du reste.</p>
                         </div>
                         <div className="foot-col">
                             <h4>À propos</h4>
@@ -83,7 +83,7 @@ export default function PublicLayout({ title, children }: PublicLayoutProps) {
                         </div>
                         <div className="foot-col">
                             <h4>Professionnels</h4>
-                            <Link href={route('professionals.index')}>Devenir agent</Link>
+                            <Link href={route('professionals.index')}>Devenir intervenant</Link>
                         </div>
                         <div className="foot-col">
                             <h4>Légal</h4>

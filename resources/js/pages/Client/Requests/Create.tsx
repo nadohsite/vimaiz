@@ -44,9 +44,9 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
     return (
         <AppLayout breadcrumbs={[
             { title: 'Mes demandes', href: route('client.requests.index') },
-            { title: 'Nouvelle demande', href: '#' },
+            { title: 'Nouvelle intervention', href: '#' },
         ]}>
-            <Head title="Nouvelle demande de ménage" />
+            <Head title="Nouvelle intervention" />
 
             <div className="py-8">
                 <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,8 +56,8 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                             <ArrowLeft className="h-4 w-4 mr-1" />
                             Retour aux demandes
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Nouvelle demande de ménage</h1>
-                        <p className="text-slate-500 dark:text-slate-400 mt-1">Planifiez votre prochain ménage</p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Nouvelle intervention</h1>
+                        <p className="text-slate-500 dark:text-slate-400 mt-1">Programmez votre prochaine intervention</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">

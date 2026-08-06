@@ -138,10 +138,10 @@ class Invoice extends Model
             'payment_intent_id' => $mission->payment_intent_id,
             'billing_name' => $user->name,
             'billing_email' => $user->email,
-            'description' => 'Prestation de ménage - ' . ($property->name ?? $property->type_label),
+            'description' => 'Prestation d\'intervention - ' . ($property->name ?? $property->type_label),
             'line_items' => [
                 [
-                    'description' => 'Ménage ' . ($property->name ?? $property->type_label),
+                    'description' => 'Intervention ' . ($property->name ?? $property->type_label),
                     'quantity' => $mission->duration_hours,
                     'unit' => 'heure(s)',
                     'unit_price' => round($subtotal / $mission->duration_hours, 2),

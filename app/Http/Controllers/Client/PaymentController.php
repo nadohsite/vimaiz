@@ -88,14 +88,14 @@ class PaymentController extends Controller
 
             if ($existingMission) {
                 return redirect()->route('client.missions.show', $existingMission)
-                    ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
+                    ->with('success', 'Paiement effectué avec succès ! Un intervenant vous sera assigné rapidement.');
             }
 
             $mission = $this->missionService->createMissionFromQuote($quote);
             $mission = $this->missionService->markAsPaid($mission, $paymentIntent->id);
 
             return redirect()->route('client.missions.show', $mission)
-                ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
+                ->with('success', 'Paiement effectué avec succès ! Un intervenant vous sera assigné rapidement.');
 
         } catch (\Exception $e) {
             return redirect()->route('client.requests.index')
@@ -133,11 +133,11 @@ class PaymentController extends Controller
                     return response()->json([
                         'success' => true,
                         'redirect' => route('client.missions.show', $existingMission),
-                        'message' => 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.'
+                        'message' => 'Paiement effectué avec succès ! Un intervenant vous sera assigné rapidement.'
                     ]);
                 }
                 return redirect()->route('client.missions.show', $existingMission)
-                    ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
+                    ->with('success', 'Paiement effectué avec succès ! Un intervenant vous sera assigné rapidement.');
             }
 
             $mission = $this->missionService->createMissionFromQuote($quote);
@@ -147,12 +147,12 @@ class PaymentController extends Controller
                 return response()->json([
                     'success' => true,
                     'redirect' => route('client.missions.show', $mission),
-                    'message' => 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.'
+                    'message' => 'Paiement effectué avec succès ! Un intervenant vous sera assigné rapidement.'
                 ]);
             }
 
             return redirect()->route('client.missions.show', $mission)
-                ->with('success', 'Paiement effectué avec succès ! Un agent vous sera attribué rapidement.');
+                ->with('success', 'Paiement effectué avec succès ! Un intervenant vous sera assigné rapidement.');
 
         } catch (\Exception $e) {
             if ($request->expectsJson()) {

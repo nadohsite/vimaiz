@@ -118,7 +118,7 @@ export default function Show({
     };
 
     const handleRefuse = () => {
-        if (confirm('Êtes-vous sûr de vouloir refuser cette mission ?')) {
+        if (confirm('Êtes-vous sûr de vouloir refuser cette intervention ?')) {
             postRefuse(route('agent.missions.refuse', mission.id));
         }
     };
@@ -180,7 +180,7 @@ export default function Show({
             );
             return;
         }
-        if (confirm('Confirmer la fin de la mission ?')) {
+        if (confirm('Confirmer la fin de l\'intervention ?')) {
             router.post(route('agent.missions.complete', mission.id));
         }
     };
@@ -206,17 +206,17 @@ export default function Show({
 
     return (
         <AppLayout breadcrumbs={[
-            { title: 'Mes missions', href: route('agent.missions.index') },
+            { title: 'Mes interventions', href: route('agent.missions.index') },
             { title: mission.mission_number, href: '#' },
         ]}>
-            <Head title={`Mission ${mission.mission_number}`} />
+            <Head title={`Intervention ${mission.mission_number}`} />
 
             <div className="py-8">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-8">
                         <Link href={route('agent.missions.index')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 mb-4">
                             <ArrowLeft className="h-4 w-4 mr-1" />
-                            Retour aux missions
+                            Retour aux interventions
                         </Link>
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>
@@ -248,15 +248,15 @@ export default function Show({
                     {canAccept && (
                         <Card className="mb-6 border-orange-300 bg-orange-50">
                             <CardContent className="p-6">
-                                <h3 className="font-semibold text-orange-800 mb-4">Répondez à cette mission</h3>
+                                <h3 className="font-semibold text-orange-800 mb-4">Répondez à cette intervention</h3>
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     <Button onClick={handleAccept} className="bg-green-500 hover:bg-green-600 flex-1">
                                         <CheckCircle className="h-4 w-4 mr-2" />
-                                        Accepter
+                                        Accepter l'intervention
                                     </Button>
                                     <Button variant="outline" onClick={handleRefuse} disabled={refuseProcessing} className="flex-1 text-red-600">
                                         <XCircle className="h-4 w-4 mr-2" />
-                                        Refuser
+                                        Refuser l'intervention
                                     </Button>
                                 </div>
                             </CardContent>
@@ -287,7 +287,7 @@ export default function Show({
                                             : 'Je suis au bon endroit — démarrer'}
                                     </Button>
                                     <p className="text-xs text-sky-600 mt-3">
-                                        En cliquant, vous confirmez être devant le logement de cette mission.
+                                        En cliquant, vous confirmez être devant le logement de cette intervention.
                                     </p>
                                 </div>
                             </CardContent>
@@ -300,9 +300,9 @@ export default function Show({
                                 <Card className="border-green-300 bg-green-50">
                                     <CardContent className="p-6 text-center">
                                         <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
-                                        <h3 className="font-semibold text-green-800 mb-2">Mission en cours</h3>
+                                        <h3 className="font-semibold text-green-800 mb-2">Intervention en cours</h3>
                                         <p className="text-sm text-green-700 mb-4">
-                                            Cochez toute la checklist ci-dessous, puis clôturez la mission.
+                                            Cochez toute la checklist ci-dessous, puis terminez l'intervention.
                                         </p>
                                         <p className="text-sm text-green-800 mb-4 font-medium">
                                             Checklist : {checklistProgress.checked}/{checklistProgress.total}
@@ -312,7 +312,7 @@ export default function Show({
                                             disabled={!checklistProgress.complete}
                                             className="bg-green-500 hover:bg-green-600 disabled:opacity-50"
                                         >
-                                            Terminer la mission
+                                            Terminer l'intervention
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -375,7 +375,7 @@ export default function Show({
                                         ))}
                                         {!canComplete && mission.status !== 'completed' && (
                                             <p className="text-xs text-slate-500">
-                                                La checklist devient cochable une fois la mission démarrée.
+                                                La checklist devient cochable une fois l'intervention démarrée.
                                             </p>
                                         )}
                                     </CardContent>
@@ -388,7 +388,7 @@ export default function Show({
                                         <div className="flex items-center gap-3 mb-4">
                                             <Award className="h-8 w-8 text-green-500" />
                                             <div>
-                                                <h3 className="font-semibold text-green-800">Mission terminée</h3>
+                                                <h3 className="font-semibold text-green-800">Intervention terminée</h3>
                                                 <p className="text-sm text-green-600">
                                                     {mission.completed_at && new Date(mission.completed_at).toLocaleDateString('fr-FR', {
                                                         day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'

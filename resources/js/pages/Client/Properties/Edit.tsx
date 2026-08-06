@@ -328,7 +328,7 @@ export default function Edit({ property, propertyTypes, defaultChecklist }: Prop
                         {/* Informations supplémentaires */}
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="dark:text-white">Informations pour l'agent de ménage</CardTitle>
+                                <CardTitle className="dark:text-white">Informations pour l'intervenant</CardTitle>
                                 <CardDescription className="dark:text-slate-400">Optionnel - Ajoutez des informations utiles si nécessaire</CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -347,10 +347,10 @@ export default function Edit({ property, propertyTypes, defaultChecklist }: Prop
 
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="dark:text-white">Checklist ménage</CardTitle>
+                                <CardTitle className="dark:text-white">Checklist du logement</CardTitle>
                                 <CardDescription className="dark:text-slate-400">
-                                    Modifiez les tâches envoyées automatiquement à l&apos;agent à chaque
-                                    mission.
+                                    Modifiez les tâches envoyées automatiquement à l&apos;intervenant à chaque
+                                    intervention.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>

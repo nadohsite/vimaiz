@@ -223,7 +223,7 @@ export default function InvoiceShow({ invoice }: Props) {
                                         )) || (
                                             <tr className="border-b dark:border-slate-700/50">
                                                 <td className="py-4 text-slate-900 dark:text-white">
-                                                    {invoice.description || 'Prestation de ménage'}
+                                                    {invoice.description || 'Prestation d\'intervention'}
                                                 </td>
                                                 <td className="py-4 text-center text-slate-600 dark:text-slate-400">
                                                     1

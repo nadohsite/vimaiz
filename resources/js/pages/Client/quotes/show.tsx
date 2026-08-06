@@ -403,7 +403,7 @@ export default function QuoteShow({ quote }: Props) {
                                     </div>
                                     <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                                         <CheckCircle className="h-4 w-4 text-emerald-500" />
-                                        <span>Agent certifié VIMAIZ</span>
+                                        <span>Intervenant vérifié VIMAIZ</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                                         <CheckCircle className="h-4 w-4 text-emerald-500" />

@@ -166,7 +166,7 @@ class ServiceRequestController extends Controller
             ServiceRequest::STATUS_QUOTE_ACCEPTED => 'Devis accepté',
             ServiceRequest::STATUS_QUOTE_REFUSED => 'Devis refusé',
             ServiceRequest::STATUS_PAID => 'Payé',
-            ServiceRequest::STATUS_ASSIGNED => 'Agent attribué',
+            ServiceRequest::STATUS_ASSIGNED => 'Intervenant assigné',
             ServiceRequest::STATUS_IN_PROGRESS => 'En cours',
             ServiceRequest::STATUS_COMPLETED => 'Terminée',
             ServiceRequest::STATUS_CANCELLED => 'Annulée',

@@ -65,7 +65,7 @@ export default function Index({ requests, statuses }: Props) {
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Mes demandes', href: route('client.requests.index') }]}>
-            <Head title="Mes demandes de ménage" />
+            <Head title="Mes demandes" />
 
             <div className="py-8">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -73,7 +73,7 @@ export default function Index({ requests, statuses }: Props) {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Mes demandes</h1>
-                            <p className="text-slate-500 dark:text-slate-400 mt-1">Suivez l'état de vos demandes de ménage</p>
+                            <p className="text-slate-500 dark:text-slate-400 mt-1">Suivez l'état de vos demandes d'intervention</p>
                         </div>
                         <Link href={route('client.requests.create')}>
                             <Button className="bg-sky-500 hover:bg-sky-600">
@@ -169,7 +169,7 @@ export default function Index({ requests, statuses }: Props) {
                                     Aucune demande
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400 mb-6">
-                                    Créez votre première demande de ménage pour votre logement.
+                                    Créez votre première demande d'intervention pour votre logement.
                                 </p>
                                 <Link href={route('client.requests.create')}>
                                     <Button className="bg-sky-500 hover:bg-sky-600">

@@ -54,12 +54,12 @@ interface DashboardProps {
 
 const MISSION_STATUS: Record<string, { label: string; className: string }> = {
     pending_agent: {
-        label: 'En attente d’agent',
+        label: 'Intervention en attente',
         className:
             'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
     },
     agent_accepted: {
-        label: 'Agent confirmé',
+        label: 'Intervention confirmée',
         className: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300',
     },
     in_progress: {
@@ -160,7 +160,7 @@ export default function Dashboard({
         },
         {
             icon: CheckCircle,
-            label: 'Ménages effectués',
+            label: 'Interventions effectuées',
             value: stats?.completed_count ?? 0,
             iconClass:
                 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400',
@@ -190,7 +190,7 @@ export default function Dashboard({
             href: route('client.missions.index'),
             icon: FileText,
             title: 'Historique',
-            description: 'Factures et ménages passés',
+            description: 'Factures et interventions passées',
         },
     ];
 
@@ -211,7 +211,7 @@ export default function Dashboard({
                                 Bonjour{firstName ? ` ${firstName}` : ''} 👋
                             </h1>
                             <p className="mt-1.5 text-slate-600 dark:text-slate-400">
-                                Gérez vos logements et demandes de ménage en toute simplicité.
+                                Gérez vos logements et demandes d'intervention en toute simplicité.
                             </p>
                         </div>
                         <Link
@@ -219,7 +219,7 @@ export default function Dashboard({
                             className="group inline-flex flex-none items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:brightness-110"
                         >
                             <Plus className="h-5 w-5" />
-                            Demander un ménage
+                            Programmer une intervention
                             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Link>
                     </div>
@@ -256,7 +256,7 @@ export default function Dashboard({
                         <section>
                             <div className="mb-4 flex items-center justify-between">
                                 <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                                    Prochains ménages
+                                    Prochaines interventions
                                 </h2>
                                 <Link
                                     href={route('client.missions.index')}
@@ -277,17 +277,17 @@ export default function Dashboard({
                                         <Calendar className="h-6 w-6 text-primary" />
                                     </div>
                                     <p className="font-medium text-slate-900 dark:text-white">
-                                        Aucun ménage planifié
+                                        Aucune intervention planifiée
                                     </p>
                                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                        Planifiez votre prochain ménage en quelques clics.
+                                        Programmez votre prochaine intervention en quelques clics.
                                     </p>
                                     <Link
                                         href={route('client.requests.create')}
                                         className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
                                     >
                                         <Plus className="h-4 w-4" />
-                                        Nouvelle demande
+                                        Nouvelle intervention
                                     </Link>
                                 </div>
                             )}
@@ -298,7 +298,7 @@ export default function Dashboard({
                             <section>
                                 <div className="mb-4 flex items-center justify-between">
                                     <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                                        Derniers ménages effectués
+                                        Dernières interventions effectuées
                                     </h2>
                                 </div>
                                 <div className="space-y-3">
@@ -389,7 +389,7 @@ export default function Dashboard({
                                         Aucun logement enregistré
                                     </p>
                                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                        Ajoutez votre premier logement pour demander un ménage.
+                                        Ajoutez votre premier logement pour programmer une intervention.
                                     </p>
                                     <Link
                                         href={route('client.properties.create')}

@@ -65,10 +65,10 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
 
     const getStatusLabel = (status: string) => {
         switch (status) {
-            case 'completed': return 'Terminée';
-            case 'in_progress': return 'En cours';
-            case 'agent_accepted': return 'Acceptée';
-            case 'pending_agent': return 'En attente';
+            case 'completed': return 'Intervention terminée';
+            case 'in_progress': return 'Intervention en cours';
+            case 'agent_accepted': return 'Confirmée';
+            case 'pending_agent': return 'Intervention en attente';
             default: return status;
         }
     };
@@ -85,16 +85,16 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
 
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tableau de bord Agent - VIMAIZ" />
+            <Head title="Tableau de bord Intervenant - VIMAIZ" />
 
             <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 sm:p-6 lg:p-8">
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-                        Espace Agent VIMAIZ
+                        Espace Intervenant VIMAIZ
                     </h1>
                     <p className="mt-2 text-slate-600 dark:text-slate-400">
-                        Gérez vos missions de ménage et suivez vos revenus.
+                        Gérez vos interventions et suivez vos revenus.
                     </p>
                 </div>
 
@@ -151,7 +151,7 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
                     <div className="mb-8">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                                Missions en attente de votre réponse
+                                Interventions en attente de votre réponse
                             </h2>
                         </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -195,9 +195,9 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
                 {/* Active Missions */}
                 <div className="mb-8">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Missions en cours</h2>
+                        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Interventions en cours</h2>
                         <Link href={route('agent.missions.index')} className="text-sm font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300">
-                            Toutes les missions →
+                            Toutes les interventions →
                         </Link>
                     </div>
                     {activeMissions.length > 0 ? (
@@ -236,8 +236,8 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
                             <div className="mx-auto w-fit rounded-full bg-slate-100 dark:bg-slate-700 p-4 mb-4">
                                 <Briefcase className="h-8 w-8 text-slate-400" />
                             </div>
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Aucune mission en cours</h3>
-                            <p className="text-slate-500 dark:text-slate-400">Les nouvelles missions vous seront proposées ici.</p>
+                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Aucune intervention en cours</h3>
+                            <p className="text-slate-500 dark:text-slate-400">Les nouvelles interventions vous seront proposées ici.</p>
                         </div>
                     )}
                 </div>

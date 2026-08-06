@@ -118,18 +118,18 @@ export default function RCPAcceptance({ agentProfile }: Props) {
                         <CardContent className="space-y-6">
                             <div className="prose prose-slate max-w-none dark:prose-invert">
                                 <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                                    Tout agent de ménage ne disposant pas d'une assurance <strong>Responsabilité Civile Professionnelle (RCP) valide</strong> reconnaît 
+                                    Tout intervenant ne disposant pas d'une assurance <strong>Responsabilité Civile Professionnelle (RCP) valide</strong> reconnaît 
                                     et accepte assumer seul l'entière responsabilité de tous les dommages matériels, corporels ou immatériels causés à des tiers 
                                     dans le cadre de ses prestations.
                                 </p>
 
                                 <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                                    En l'absence de RCP, <strong>la plateforme ne pourra en aucun cas être tenue responsable</strong> des dommages causés par l'agent, 
+                                    En l'absence de RCP, <strong>la plateforme ne pourra en aucun cas être tenue responsable</strong> des dommages causés par l'intervenant, 
                                     quels qu'ils soient.
                                 </p>
 
                                 <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                                    L'agent reconnaît avoir été informé de l'obligation de disposer d'une RCP et accepte cette clause en toute connaissance de cause.
+                                    L'intervenant reconnaît avoir été informé de l'obligation de disposer d'une RCP et accepte cette clause en toute connaissance de cause.
                                 </p>
 
                                 <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
@@ -193,7 +193,7 @@ export default function RCPAcceptance({ agentProfile }: Props) {
                                         Pourquoi cette clause ?
                                     </h3>
                                     <p className="text-sm text-sky-700 dark:text-sky-300">
-                                        Cette clause protège à la fois les agents et la plateforme en définissant clairement les responsabilités 
+                                        Cette clause protège à la fois les intervenants et la plateforme en définissant clairement les responsabilités 
                                         en cas de dommages. Il est fortement recommandé de souscrire à une assurance RCP pour exercer votre 
                                         activité en toute sérénité.
                                     </p>

@@ -19,7 +19,7 @@ class ClientProfileIncompleteReminder extends Notification implements ShouldQueu
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Ajoutez votre logement et planifiez votre premier ménage - VIMAIZ')
+            ->subject('Ajoutez votre logement et programmez votre première intervention - Vimaiz')
             ->view('emails.reminder-client-profile', [
                 'notifiable' => $notifiable,
             ]);
@@ -29,7 +29,7 @@ class ClientProfileIncompleteReminder extends Notification implements ShouldQueu
     {
         return [
             'type' => 'client_profile_incomplete',
-            'message' => 'Ajoutez votre premier logement pour pouvoir demander un ménage.',
+            'message' => 'Ajoutez votre premier logement pour pouvoir programmer une intervention.',
             'url' => '/client/properties/create',
         ];
     }

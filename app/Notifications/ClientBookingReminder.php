@@ -23,7 +23,7 @@ class ClientBookingReminder extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Des agents sont disponibles pour votre prochain ménage - VIMAIZ')
+            ->subject('Des intervenants sont disponibles pour votre prochaine intervention - Vimaiz')
             ->view('emails.reminder-client-booking', [
                 'notifiable' => $notifiable,
                 'availableAgentsCount' => $this->availableAgentsCount,
@@ -34,7 +34,7 @@ class ClientBookingReminder extends Notification implements ShouldQueue
     {
         return [
             'type' => 'client_booking_reminder',
-            'message' => 'Des agents sont disponibles : planifiez votre prochain ménage dès maintenant.',
+            'message' => 'Des intervenants sont disponibles : programmez votre prochaine intervention dès maintenant.',
             'url' => '/client/requests/create',
         ];
     }

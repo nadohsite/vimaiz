@@ -31,7 +31,7 @@ class DocumentsVerifiedNotification extends Notification implements ShouldQueue
     {
         return [
             'type' => 'documents_verified',
-            'message' => 'Vos documents ont été validés ! Vous pouvez maintenant recevoir des missions.',
+            'message' => 'Vos documents ont été validés ! Vous pouvez maintenant recevoir des interventions.',
             'url' => '/agent/documents',
         ];
     }

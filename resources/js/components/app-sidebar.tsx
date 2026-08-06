@@ -51,7 +51,7 @@ export function AppSidebar() {
             icon: Home,
         },
         {
-            title: 'Demander un ménage',
+            title: 'Programmer une intervention',
             href: route('client.requests.create'),
             icon: Plus,
         },
@@ -61,7 +61,7 @@ export function AppSidebar() {
             icon: ClipboardList,
         },
         {
-            title: 'Historique & Factures',
+            title: 'Mes interventions',
             href: route('client.missions.index'),
             icon: FileText,
         },
@@ -86,7 +86,7 @@ export function AppSidebar() {
             icon: LayoutGrid,
         },
         {
-            title: 'Mes Missions',
+            title: 'Mes interventions',
             href: route('agent.missions.index'),
             icon: Briefcase,
         },

@@ -194,7 +194,7 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
                         Finaliser votre réservation
                     </h1>
                     <p className="mt-2 text-slate-500 dark:text-slate-400">
-                        Effectuez le paiement pour confirmer votre service de ménage
+                        Effectuez le paiement pour confirmer votre intervention
                     </p>
                 </div>
 
@@ -284,7 +284,7 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
                                             {serviceRequest.requested_hours} heure{serviceRequest.requested_hours > 1 ? 's' : ''}
                                         </p>
                                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                                            de ménage
+                                            d'intervention
                                         </p>
                                     </div>
                                 </div>
@@ -315,7 +315,7 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                         <CheckCircle className="h-4 w-4 text-emerald-500" />
-                                        <span>Agent professionnel vérifié</span>
+                                        <span>Intervenant vérifié</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                         <CheckCircle className="h-4 w-4 text-emerald-500" />

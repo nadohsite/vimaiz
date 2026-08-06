@@ -10,6 +10,8 @@ use App\Models\ServiceRequest;
 use App\Models\User;
 use App\Notifications\AgentAcceptedMissionNotification;
 use App\Notifications\AgentAcceptedMissionAdminNotification;
+use App\Notifications\AgentInterventionCompletedNotification;
+use App\Notifications\AgentInterventionConfirmedNotification;
 use App\Notifications\AgentPayoutNotification;
 use App\Notifications\AgentRefusedMissionNotification;
 use App\Notifications\MissionAssignedNotification;
@@ -114,8 +116,13 @@ class MissionService
             'agent_responded_at' => now(),
         ]);
         
-        // Notify client that agent accepted
+        // Notify client that intervenant accepted
         $mission->client->notify(new AgentAcceptedMissionNotification($mission));
+
+        // Notify intervenant that the intervention is confirmed
+        if ($mission->agent) {
+            $mission->agent->notify(new AgentInterventionConfirmedNotification($mission));
+        }
         
         // Notify admins
         $admins = User::where('role', 'admin')->get();
@@ -235,11 +242,11 @@ class MissionService
     public function completeMission(Mission $mission): Mission
     {
         if (!$mission->canComplete()) {
-            throw new \Exception('La mission ne peut pas être terminée dans son état actuel.');
+            throw new \Exception('L\'intervention ne peut pas être terminée dans son état actuel.');
         }
 
         if (!$mission->isChecklistComplete()) {
-            throw new \Exception('Veuillez cocher toutes les tâches de la checklist avant de terminer la mission.');
+            throw new \Exception('Veuillez cocher toutes les tâches de la checklist avant de terminer l\'intervention.');
         }
         
         $mission->update([
@@ -258,8 +265,13 @@ class MissionService
         // Credit agent wallet
         $this->creditAgentWallet($mission);
         
-        // Notify client that mission is completed
+        // Notify client that intervention is completed
         $mission->client->notify(new MissionCompletedNotification($mission));
+
+        // Notify intervenant awaiting client confirmation
+        if ($mission->agent) {
+            $mission->agent->notify(new AgentInterventionCompletedNotification($mission));
+        }
         
         // Notify admins that mission is completed
         $admins = User::where('role', 'admin')->get();

@@ -282,7 +282,7 @@ export default function Create({ propertyTypes, defaultChecklist }: Props) {
                         {/* Informations supplémentaires */}
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="dark:text-white">Informations pour l'agent de ménage</CardTitle>
+                                <CardTitle className="dark:text-white">Informations pour l'intervenant</CardTitle>
                                 <CardDescription className="dark:text-slate-400">Optionnel - Ajoutez des informations utiles si nécessaire</CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -301,10 +301,10 @@ export default function Create({ propertyTypes, defaultChecklist }: Props) {
 
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="dark:text-white">Checklist ménage</CardTitle>
+                                <CardTitle className="dark:text-white">Checklist du logement</CardTitle>
                                 <CardDescription className="dark:text-slate-400">
                                     Personnalisez les tâches à réaliser. Cette checklist sera envoyée
-                                    automatiquement à l&apos;agent à chaque mission.
+                                    automatiquement à l&apos;intervenant à chaque intervention.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>

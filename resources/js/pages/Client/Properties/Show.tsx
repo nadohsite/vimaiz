@@ -108,7 +108,7 @@ export default function Show({ property }: Props) {
                                 <Link href={route('client.requests.create', { property_id: property.id })}>
                                     <Button className="bg-sky-500 hover:bg-sky-600">
                                         <CalendarPlus className="h-4 w-4 mr-2" />
-                                        Demander un ménage
+                                        Programmer une intervention
                                     </Button>
                                 </Link>
                                 <Link href={route('client.properties.edit', property.id)}>
@@ -176,9 +176,9 @@ export default function Show({ property }: Props) {
                             {property.checklist && property.checklist.length > 0 && (
                                 <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardHeader>
-                                        <CardTitle className="dark:text-white">Checklist ménage</CardTitle>
+                                        <CardTitle className="dark:text-white">Checklist du logement</CardTitle>
                                         <CardDescription className="dark:text-slate-400">
-                                            Remise à l&apos;agent automatiquement à chaque mission
+                                            Remise à l&apos;intervenant automatiquement à chaque intervention
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
@@ -206,7 +206,7 @@ export default function Show({ property }: Props) {
                             <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
                                     <CardTitle className="dark:text-white">Demandes récentes</CardTitle>
-                                    <CardDescription className="dark:text-slate-400">Historique des demandes de ménage</CardDescription>
+                                    <CardDescription className="dark:text-slate-400">Historique des demandes d'intervention</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     {property.service_requests?.length > 0 ? (
@@ -252,7 +252,7 @@ export default function Show({ property }: Props) {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 dark:text-white">
                                         <Key className="h-5 w-5 text-sky-500 dark:text-sky-400" />
-                                        Informations pour l'agent
+                                        Informations pour l'intervenant
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">

@@ -45,14 +45,14 @@ export default function Index({ missions = [] }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Mes missions', href: route('client.missions.index') }]}>
-            <Head title="Mes missions" />
+        <AppLayout breadcrumbs={[{ title: 'Mes interventions', href: route('client.missions.index') }]}>
+            <Head title="Mes interventions" />
 
             <div className="py-8">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-8">
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Mes missions</h1>
-                        <p className="text-slate-500 dark:text-slate-400 mt-1">Suivez vos missions de ménage en cours et passées</p>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Mes interventions</h1>
+                        <p className="text-slate-500 dark:text-slate-400 mt-1">Suivez vos interventions en cours et passées</p>
                     </div>
 
                     {missions.length > 0 ? (
@@ -119,10 +119,10 @@ export default function Index({ missions = [] }: Props) {
                                     <Calendar className="h-8 w-8 text-sky-500 dark:text-sky-400" />
                                 </div>
                                 <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
-                                    Aucune mission
+                                    Aucune intervention
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400">
-                                    Vos missions apparaîtront ici après paiement de vos demandes.
+                                    Vos interventions apparaîtront ici après paiement de vos demandes.
                                 </p>
                             </CardContent>
                         </Card>

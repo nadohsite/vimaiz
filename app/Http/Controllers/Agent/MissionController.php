@@ -68,7 +68,7 @@ class MissionController extends Controller
         try {
             $this->missionService->agentAcceptMission($mission);
 
-            return back()->with('success', 'Mission acceptée. Rendez-vous le ' . 
+            return back()->with('success', 'Intervention confirmée. Rendez-vous le ' . 
                 $mission->scheduled_at->format('d/m/Y à H:i'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -88,7 +88,7 @@ class MissionController extends Controller
 
             return redirect()
                 ->route('agent.missions.index')
-                ->with('info', 'Mission refusée.');
+                ->with('info', 'Intervention refusée.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -112,7 +112,7 @@ class MissionController extends Controller
 
             return back()->with(
                 'success',
-                'Vous êtes au bon endroit : la mission est démarrée. Bonne intervention !'
+                'Vous êtes au bon endroit : l\'intervention est démarrée. Bonne intervention !'
             );
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -182,7 +182,7 @@ class MissionController extends Controller
 
             return redirect()
                 ->route('agent.missions.show', $mission)
-                ->with('success', 'Mission terminée ! Le paiement sera versé après validation.');
+                ->with('success', 'Intervention terminée ! Le paiement sera versé après validation.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -228,10 +228,10 @@ class MissionController extends Controller
     {
         return [
             '' => 'Toutes',
-            Mission::STATUS_PENDING_AGENT => 'En attente',
-            Mission::STATUS_AGENT_ACCEPTED => 'Acceptées',
-            Mission::STATUS_IN_PROGRESS => 'En cours',
-            Mission::STATUS_COMPLETED => 'Terminées',
+            Mission::STATUS_PENDING_AGENT => 'Intervention en attente',
+            Mission::STATUS_AGENT_ACCEPTED => 'Confirmée',
+            Mission::STATUS_IN_PROGRESS => 'Intervention en cours',
+            Mission::STATUS_COMPLETED => 'Intervention terminée',
         ];
     }
 }

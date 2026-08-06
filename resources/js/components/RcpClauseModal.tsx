@@ -69,7 +69,7 @@ export default function RcpClauseModal({ show, onAccepted }: RcpClauseModalProps
                                     Clause de Responsabilité Civile Professionnelle
                                 </h2>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                    Document obligatoire pour exercer en tant qu'agent VIMAIZ
+                                    Document obligatoire pour exercer en tant qu'intervenant VIMAIZ
                                 </p>
                             </div>
                         </div>
@@ -79,7 +79,7 @@ export default function RcpClauseModal({ show, onAccepted }: RcpClauseModalProps
                     <div className="p-6 space-y-5">
                         <div className="bg-sky-50 dark:bg-sky-900/30 rounded-xl p-4 border border-sky-100 dark:border-sky-800">
                             <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                            En tant qu'agent de ménage VIMAIZ, vous devez disposer d'une assurance Responsabilité Civile Professionnelle (RCP). Si vous n'en disposez pas lors de votre inscription, vous vous engagez à en souscrire une dans un délai de trois (03) mois. À défaut de régularisation dans ce délai, des pénalités pourront être appliquées conformément aux Conditions Générales d'Utilisation.
+                            En tant qu'intervenant VIMAIZ, vous devez disposer d'une assurance Responsabilité Civile Professionnelle (RCP). Si vous n'en disposez pas lors de votre inscription, vous vous engagez à en souscrire une dans un délai de trois (03) mois. À défaut de régularisation dans ce délai, des pénalités pourront être appliquées conformément aux Conditions Générales d'Utilisation.
                             </p>
                         </div>
                         
@@ -160,7 +160,7 @@ export default function RcpClauseModal({ show, onAccepted }: RcpClauseModalProps
                             )}
                         </Button>
                         <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-3">
-                            Cette acceptation est requise pour recevoir des missions.
+                            Cette acceptation est requise pour recevoir des interventions.
                         </p>
                     </div>
                 </div>

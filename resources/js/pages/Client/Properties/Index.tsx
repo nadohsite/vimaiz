@@ -43,7 +43,7 @@ export default function Index({ properties, propertyTypes }: Props) {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Mes logements</h1>
-                            <p className="text-slate-500 dark:text-slate-400 mt-1">Gérez vos propriétés pour vos demandes de ménage</p>
+                            <p className="text-slate-500 dark:text-slate-400 mt-1">Gérez vos propriétés pour vos demandes d'intervention</p>
                         </div>
                         <Link href={route('client.properties.create')}>
                             <Button className="bg-sky-500 hover:bg-sky-600">
@@ -139,7 +139,7 @@ export default function Index({ properties, propertyTypes }: Props) {
                                     Aucun logement enregistré
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400 mb-6">
-                                    Ajoutez votre premier logement pour pouvoir demander un ménage.
+                                    Ajoutez votre premier logement pour pouvoir programmer une intervention.
                                 </p>
                                 <Link href={route('client.properties.create')}>
                                     <Button className="bg-sky-500 hover:bg-sky-600">

@@ -181,7 +181,7 @@ export default function Register() {
                       )}
                     >
                       <Briefcase className={cn("h-5 w-5 sm:h-6 sm:w-6", role === 'agent' ? "text-sky-600" : "text-slate-300")} />
-                      <div className="text-[10px] font-bold uppercase tracking-widest sm:text-xs">Agent</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest sm:text-xs">Intervenant</div>
                     </button>
                     <input type="hidden" name="role" value={role} />
                   </div>
@@ -243,7 +243,7 @@ export default function Register() {
                 <div className="grid gap-5 sm:gap-6">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="grid gap-2">
-                      <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Type d'agent</Label>
+                      <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Type d'intervenant</Label>
                       <Select 
                         name="agent_type" 
                         defaultValue={data.agent_type || "individual"}

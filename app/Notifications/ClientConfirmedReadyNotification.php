@@ -8,7 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PaymentReceivedNotification extends Notification implements ShouldQueue
+/** Sent to the client after they confirm/review a completed intervention. */
+class ClientConfirmedReadyNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -18,23 +19,16 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
-    }
-
-    public function toBroadcast(object $notifiable): array
-    {
-        return $this->toArray($notifiable);
+        return ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nouvelle intervention — Vimaiz')
-            ->greeting('Bonjour ' . $notifiable->name . ' !')
-            ->line('🔔 Votre intervention a bien été enregistrée.')
-            ->line('Nous recherchons actuellement un intervenant disponible.')
-            ->line('')
-            ->line('**Référence :** ' . $this->mission->mission_number)
+            ->subject('Logement prêt — Vimaiz')
+            ->greeting('Merci ' . $notifiable->name . ' !')
+            ->line('✅ Merci.')
+            ->line('Votre logement est désormais prêt à accueillir ses prochains voyageurs.')
             ->action('Voir l\'intervention', url('/client/missions/' . $this->mission->id))
             ->salutation('L\'équipe Vimaiz');
     }
@@ -42,11 +36,10 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'payment_received',
+            'type' => 'client_confirmed_ready',
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
-            'amount' => $this->mission->total_price,
-            'message' => '🔔 Votre intervention a bien été enregistrée. Nous recherchons actuellement un intervenant disponible.',
+            'message' => '✅ Merci. Votre logement est désormais prêt à accueillir ses prochains voyageurs.',
             'url' => '/client/missions/' . $this->mission->id,
         ];
     }

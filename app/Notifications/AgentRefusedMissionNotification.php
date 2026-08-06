@@ -25,7 +25,7 @@ class AgentRefusedMissionNotification extends Notification implements ShouldQueu
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('❌ Mission refusée par agent - ' . $this->mission->mission_number)
+            ->subject('❌ Intervention refusée par intervenant - ' . $this->mission->mission_number)
             ->view('emails.agent-refused-mission', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -42,7 +42,7 @@ class AgentRefusedMissionNotification extends Notification implements ShouldQueu
             'mission_number' => $this->mission->mission_number,
             'agent_name' => $this->mission->agent->name ?? 'N/A',
             'reason' => $this->reason,
-            'message' => 'Mission refusée par ' . ($this->mission->agent->name ?? 'agent'),
+            'message' => 'Intervention refusée par ' . ($this->mission->agent->name ?? 'intervenant'),
             'url' => '/admin/missions/' . $this->mission->id,
         ];
     }

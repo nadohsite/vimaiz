@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Mission;
 use App\Models\Review;
+use App\Notifications\ClientConfirmedReadyNotification;
+use App\Notifications\ClientValidatedInterventionNotification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -44,11 +46,11 @@ class MissionController extends Controller
         $this->authorize('view', $mission);
 
         if ($mission->status !== Mission::STATUS_COMPLETED) {
-            return back()->with('error', 'Vous ne pouvez évaluer que les missions terminées.');
+            return back()->with('error', 'Vous ne pouvez évaluer que les interventions terminées.');
         }
 
         if ($mission->review) {
-            return back()->with('error', 'Vous avez déjà évalué cette mission.');
+            return back()->with('error', 'Vous avez déjà évalué cette intervention.');
         }
 
         $validated = $request->validate([
@@ -65,6 +67,12 @@ class MissionController extends Controller
             'status' => 'approved',
         ]);
 
-        return back()->with('success', 'Merci pour votre avis !');
+        $mission->client?->notify(new ClientConfirmedReadyNotification($mission));
+
+        if ($mission->agent) {
+            $mission->agent->notify(new ClientValidatedInterventionNotification($mission));
+        }
+
+        return back()->with('success', 'Merci. Votre logement est désormais prêt à accueillir ses prochains voyageurs.');
     }
 }

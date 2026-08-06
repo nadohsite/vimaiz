@@ -26,7 +26,7 @@ class AgentProfileIncompleteReminder extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Complétez votre profil agent pour recevoir des missions - VIMAIZ')
+            ->subject('Complétez votre profil intervenant pour recevoir des interventions - Vimaiz')
             ->view('emails.reminder-agent-profile', [
                 'notifiable' => $notifiable,
                 'missingItems' => $this->missingItems,
@@ -37,7 +37,7 @@ class AgentProfileIncompleteReminder extends Notification implements ShouldQueue
     {
         return [
             'type' => 'agent_profile_incomplete',
-            'message' => 'Votre profil est incomplet : complétez-le pour commencer à recevoir des missions.',
+            'message' => 'Votre profil est incomplet : complétez-le pour commencer à recevoir des interventions.',
             'url' => '/agent/documents',
         ];
     }

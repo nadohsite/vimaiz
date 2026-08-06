@@ -29,9 +29,9 @@ class NewCleaningRequestNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('🏠 Nouvelle demande de ménage - ' . $this->request->request_number)
+            ->subject('🏠 Nouvelle intervention - ' . $this->request->request_number)
             ->greeting('Bonjour ' . $notifiable->name . ',')
-            ->line('Une nouvelle demande de ménage a été soumise.')
+            ->line('Une nouvelle demande d\'intervention a été soumise.')
             ->line('**Numéro de demande:** ' . $this->request->request_number)
             ->line('**Client:** ' . $this->request->user->name)
             ->line('**Type de logement:** ' . ($this->request->property->property_type ?? 'N/A'))
@@ -47,7 +47,7 @@ class NewCleaningRequestNotification extends Notification implements ShouldQueue
             'request_id' => $this->request->id,
             'request_number' => $this->request->request_number,
             'client_name' => $this->request->user->name,
-            'message' => 'Nouvelle demande de ménage : ' . $this->request->request_number,
+            'message' => 'Nouvelle intervention : ' . $this->request->request_number,
             'url' => '/admin/cleaning-requests/' . $this->request->id,
         ];
     }

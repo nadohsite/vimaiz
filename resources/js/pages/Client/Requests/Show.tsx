@@ -112,7 +112,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
         { key: 'pending', label: 'Demande envoyée', done: true },
         { key: 'quote_sent', label: 'Devis reçu', done: ['quote_sent', 'quote_accepted', 'paid', 'assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
         { key: 'paid', label: 'Paiement', done: ['paid', 'assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
-        { key: 'assigned', label: 'Agent attribué', done: ['assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
+        { key: 'assigned', label: 'Intervenant assigné', done: ['assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
         { key: 'completed', label: 'Terminé', done: serviceRequest.status === 'completed' },
     ];
 
@@ -277,7 +277,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="flex items-center gap-2">
                                                 <User className="h-5 w-5 text-sky-500" />
-                                                Mission {serviceRequest.mission.mission_number}
+                                                Intervention {serviceRequest.mission.mission_number}
                                             </CardTitle>
                                             <Badge className={getStatusColor(serviceRequest.mission.status)}>
                                                 {serviceRequest.mission.status_label}
@@ -292,14 +292,14 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                                 </div>
                                                 <div>
                                                     <p className="font-medium dark:text-white">{serviceRequest.mission.agent.name}</p>
-                                                    <p className="text-sm text-slate-500 dark:text-slate-400">Agent de ménage</p>
+                                                    <p className="text-sm text-slate-500 dark:text-slate-400">Intervenant</p>
                                                 </div>
                                             </div>
                                         )}
                                         
                                         <Link href={route('client.missions.show', serviceRequest.mission.id)}>
                                             <Button variant="outline" className="w-full">
-                                                Voir les détails de la mission
+                                                Voir les détails de l'intervention
                                             </Button>
                                         </Link>
                                     </CardContent>

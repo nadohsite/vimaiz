@@ -92,12 +92,12 @@ export default function AuthSplitLayout({
                         transition={{ delay: 0.2 }}
                     >
                         <h2 className="mb-3 text-3xl font-bold leading-tight xl:mb-4 xl:text-4xl">
-                            Le ménage professionnel
+                            L&apos;intervention professionnelle
                             <br />
                             à portée de clic
                         </h2>
                         <p className="max-w-md text-base text-white/80 xl:text-lg">
-                            Réservez votre agent de ménage en quelques minutes et
+                            Réservez votre intervenant en quelques minutes et
                             profitez d&apos;un intérieur impeccable.
                         </p>
                     </motion.div>
@@ -110,7 +110,7 @@ export default function AuthSplitLayout({
                     >
                         <div className="rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-md xl:p-4">
                             <Shield className="mb-2 h-5 w-5 text-white/90 xl:h-6 xl:w-6" />
-                            <p className="text-sm font-medium">Agents vérifiés</p>
+                            <p className="text-sm font-medium">Intervenants vérifiés</p>
                         </div>
                         <div className="rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-md xl:p-4">
                             <Clock className="mb-2 h-5 w-5 text-white/90 xl:h-6 xl:w-6" />
