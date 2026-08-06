@@ -85,9 +85,9 @@ const CLIENT_FAQS = [
 
 const PARCOURS_STEPS = [
     {
-        title: 'Ajoutez votre logement',
+        title: 'Renseignez vos biens',
         description:
-            'Appartement, maison, villa ou chalet — renseignez ses spécificités une fois pour toutes.',
+            'Centralisez vos logements et leurs spécificités une fois pour toutes — une base claire pour chaque arrivée voyageur.',
     },
     {
         title: 'Planifiez votre créneau',
@@ -602,7 +602,7 @@ export default function Welcome({
             <section className="welcome-section">
                 <div className="wrap">
                     <div className="split-cards">
-                        <article className="split-card split-card-conviction">
+                        <article className="split-card split-card-conviction rise-2">
                             <div className="sec-eyebrow">Notre Conviction</div>
                             <h2>
                                 Une location saisonnière devrait toujours être prête à accueillir
@@ -612,7 +612,7 @@ export default function Welcome({
                                 La décoration attire le regard. La propreté inspire confiance.
                             </p>
                         </article>
-                        <article id="agent" className="split-card split-card-cta">
+                        <article id="agent" className="split-card split-card-cta rise-3">
                             <div className="sec-eyebrow">Réseau Vimaiz</div>
                             <h2>Devenir intervenant ?</h2>
                             <p>
@@ -791,6 +791,7 @@ export default function Welcome({
                             className="faq-item"
                             key={faq.question}
                             data-open={openFaq === index}
+                            style={{ animationDelay: `${Math.min(index, 6) * 40}ms` }}
                         >
                             <button
                                 type="button"
