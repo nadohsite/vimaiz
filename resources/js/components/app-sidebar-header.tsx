@@ -24,14 +24,16 @@ export function AppSidebarHeader({
     const getInitials = useInitials();
 
     return (
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border/50 px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-6">
-            <div className="flex items-center gap-2">
-                <SidebarTrigger className="-ml-1" />
-                <Breadcrumbs breadcrumbs={breadcrumbs} />
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-sidebar-border/60 bg-background/90 px-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 sm:h-16 sm:px-6">
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+                <SidebarTrigger className="size-10 shrink-0 rounded-xl border border-border/70 bg-background shadow-sm hover:bg-accent md:size-9" />
+                <div className="min-w-0 overflow-hidden">
+                    <Breadcrumbs breadcrumbs={breadcrumbs} />
+                </div>
             </div>
 
-            <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 mr-2 border-r border-neutral-200 dark:border-neutral-800 pr-2">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+                <div className="flex items-center gap-0.5 rounded-xl border border-border/60 bg-muted/40 p-0.5 sm:gap-1 sm:px-1">
                     <AppearanceToggleDropdown />
                     <NotificationDropdown />
                 </div>
@@ -40,14 +42,14 @@ export function AppSidebarHeader({
                     <DropdownMenuTrigger asChild>
                         <Button
                             variant="ghost"
-                            className="size-9 rounded-full p-0 overflow-hidden border border-neutral-200 dark:border-neutral-800"
+                            className="size-10 rounded-full p-0 overflow-hidden border border-border/70 shadow-sm sm:size-9"
                         >
                             <Avatar className="size-full rounded-full">
                                 <AvatarImage
                                     src={getAvatarUrl(auth.user.avatar, auth.user.name)}
                                     alt={auth.user.name}
                                 />
-                                <AvatarFallback className="rounded-full bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100 text-xs">
+                                <AvatarFallback className="rounded-full bg-primary/10 text-primary text-xs font-semibold">
                                     {getInitials(auth.user.name)}
                                 </AvatarFallback>
                             </Avatar>

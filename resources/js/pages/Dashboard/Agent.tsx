@@ -89,13 +89,13 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
             <Head title="Tableau de bord Intervenant - VIMAIZ" />
 
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 sm:p-6 lg:p-8">
+            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/80 p-3 dark:from-slate-900 dark:to-slate-950 sm:p-6 lg:p-8">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+                <div className="mb-6 sm:mb-8">
+                    <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
                         Bonjour{firstName ? ` ${firstName}` : ''}
                     </h1>
-                    <p className="mt-2 text-slate-600 dark:text-slate-400">
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 sm:text-base">
                         Gérez vos interventions et suivez vos revenus.
                     </p>
                 </div>

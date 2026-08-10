@@ -26,14 +26,21 @@
         }
         .header {
             background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            padding: 30px;
+            padding: 36px 30px;
             text-align: center;
         }
         .logo {
-            color: #ffffff;
-            font-size: 28px;
-            font-weight: bold;
+            display: inline-block;
             text-decoration: none;
+            line-height: 0;
+        }
+        .logo img {
+            height: 96px;
+            width: 96px;
+            max-width: 96px;
+            border: 0;
+            display: block;
+            margin: 0 auto;
         }
         .content {
             padding: 40px 30px;
@@ -126,7 +133,13 @@
         <div class="container">
             <div class="header">
                 <a href="{{ config('app.url') }}" class="logo">
-                    <img src="{{ config('app.url') }}/vimaiz-logo.png" alt="VIMAIZ" style="height: 40px; filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%);">
+                    <img
+                        src="{{ rtrim(config('app.url'), '/') }}/vimaiz-logo-email-white.png"
+                        alt="Vimaiz"
+                        width="96"
+                        height="96"
+                        style="height: 96px; width: 96px; border: 0; display: block; margin: 0 auto;"
+                    >
                 </a>
             </div>
             <div class="content">

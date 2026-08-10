@@ -147,7 +147,7 @@ export default function Dashboard({
     const statCards = [
         {
             icon: Home,
-            label: 'Biens',
+            label: 'Logements',
             value: stats?.properties_count ?? properties.length,
             iconClass: 'bg-sky-100 text-sky-600 dark:bg-sky-900/50 dark:text-sky-400',
         },
@@ -177,7 +177,7 @@ export default function Dashboard({
         {
             href: route('client.properties.index'),
             icon: Home,
-            title: 'Mes biens',
+            title: 'Mes logements',
             description: 'Gérez vos propriétés',
         },
         {
@@ -198,28 +198,28 @@ export default function Dashboard({
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
             <Head title="Tableau de bord - VIMAIZ" />
 
-            <div className="min-h-screen bg-slate-50 p-4 dark:bg-slate-900 sm:p-6 lg:p-8">
+            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/80 p-3 dark:from-slate-900 dark:to-slate-950 sm:p-6 lg:p-8">
                 {/* Welcome banner */}
-                <div className="relative mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800 sm:p-8">
+                <div className="relative mb-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:mb-8 sm:p-8">
                     <div
                         className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl"
                         aria-hidden="true"
                     />
-                    <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
-                                Bonjour{firstName ? ` ${firstName}` : ''} 👋
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+                        <div className="min-w-0">
+                            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+                                Bonjour{firstName ? ` ${firstName}` : ''}
                             </h1>
-                            <p className="mt-1.5 text-slate-600 dark:text-slate-400">
-                                Gérez vos biens et demandes d'intervention en toute simplicité.
+                            <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400 sm:text-base">
+                                Gérez vos logements et interventions en toute simplicité.
                             </p>
                         </div>
                         <Link
                             href={route('client.requests.create')}
-                            className="group inline-flex flex-none items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:brightness-110"
+                            className="group inline-flex w-full flex-none items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:brightness-110 sm:w-auto sm:px-6 sm:text-base"
                         >
                             <Plus className="h-5 w-5" />
-                            Programmer une intervention
+                            Nouvelle intervention
                             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Link>
                     </div>
@@ -345,7 +345,7 @@ export default function Dashboard({
                         <section>
                             <div className="mb-4 flex items-center justify-between">
                                 <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                                    Mes biens
+                                    Mes logements
                                 </h2>
                                 {properties.length > 0 && (
                                     <Link
@@ -386,17 +386,17 @@ export default function Dashboard({
                                         <Home className="h-6 w-6 text-primary" />
                                     </div>
                                     <p className="font-medium text-slate-900 dark:text-white">
-                                        Aucun bien enregistré
+                                        Aucun logement enregistré
                                     </p>
                                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                        Ajoutez votre premier bien pour programmer une intervention.
+                                        Ajoutez votre premier logement pour programmer une intervention.
                                     </p>
                                     <Link
                                         href={route('client.properties.create')}
                                         className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
                                     >
                                         <Plus className="h-4 w-4" />
-                                        Ajouter un bien
+                                        Ajouter un logement
                                     </Link>
                                 </div>
                             )}

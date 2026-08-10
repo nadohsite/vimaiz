@@ -8,12 +8,13 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarRail,
 } from '@/components/ui/sidebar';
 
 import { type NavItem, type User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { 
-    LayoutGrid, 
+import {
+    LayoutGrid,
     Home,
     Plus,
     ClipboardList,
@@ -25,12 +26,12 @@ import {
     FolderCheck,
     Star,
     Shield,
-    AlertTriangle
+    AlertTriangle,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-    const { auth, unreadMessagesCount } = usePage<{ 
+    const { auth, unreadMessagesCount } = usePage<{
         auth: { user: User & { role: string } };
         unreadMessagesCount?: number;
     }>().props;
@@ -38,7 +39,6 @@ export function AppSidebar() {
     const isAgent = user.role === 'agent';
     const unreadCount = unreadMessagesCount ?? 0;
 
-    // Navigation Client selon CAHIER_DES_CHARGES VIMAIZ
     const clientNavItems: NavItem[] = [
         {
             title: 'Tableau de bord',
@@ -46,12 +46,12 @@ export function AppSidebar() {
             icon: LayoutGrid,
         },
         {
-            title: 'Mes biens',
+            title: 'Mes logements',
             href: route('client.properties.index'),
             icon: Home,
         },
         {
-            title: 'Programmer une intervention',
+            title: 'Nouvelle intervention',
             href: route('client.requests.create'),
             icon: Plus,
         },
@@ -72,13 +72,12 @@ export function AppSidebar() {
             badge: unreadCount,
         },
         {
-            title: 'Mon Profil',
+            title: 'Mon profil',
             href: route('settings.profile.edit'),
             icon: Settings,
         },
     ];
 
-    // Navigation Agent selon CAHIER_DES_CHARGES VIMAIZ
     const agentNavItems: NavItem[] = [
         {
             title: 'Tableau de bord',
@@ -91,7 +90,7 @@ export function AppSidebar() {
             icon: Briefcase,
         },
         {
-            title: 'Mes Documents',
+            title: 'Mes documents',
             href: route('agent.documents.index'),
             icon: FolderCheck,
         },
@@ -101,12 +100,12 @@ export function AppSidebar() {
             icon: Shield,
         },
         {
-            title: 'Mon Portefeuille',
+            title: 'Mon portefeuille',
             href: route('agent.wallet.index'),
             icon: Wallet,
         },
         {
-            title: 'Mes Avis',
+            title: 'Mes avis',
             href: route('agent.reviews.index'),
             icon: Star,
         },
@@ -122,7 +121,7 @@ export function AppSidebar() {
             badge: unreadCount,
         },
         {
-            title: 'Mon Profil',
+            title: 'Mon profil',
             href: route('settings.profile.edit'),
             icon: Settings,
         },
@@ -132,10 +131,10 @@ export function AppSidebar() {
 
     return (
         <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+            <SidebarHeader className="border-b border-sidebar-border/60 px-3 py-3">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size="lg" asChild className="h-14">
                             <Link href={route('dashboard')} prefetch>
                                 <AppLogo />
                             </Link>
@@ -144,13 +143,14 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className="py-3">
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            <SidebarFooter>
+            <SidebarFooter className="border-t border-sidebar-border/60 p-3">
                 <NavUser />
             </SidebarFooter>
+            <SidebarRail />
         </Sidebar>
     );
 }

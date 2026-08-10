@@ -14,10 +14,17 @@
             padding: 20px;
         }
         .header {
-            background-color: #0ea5e9;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             color: white;
-            padding: 20px;
+            padding: 32px 20px;
             text-align: center;
+        }
+        .header img {
+            height: 96px;
+            width: 96px;
+            border: 0;
+            display: block;
+            margin: 0 auto;
         }
         .content {
             background-color: #f8fafc;
@@ -41,7 +48,16 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Nouveau message de contact</h1>
+            <a href="{{ config('app.url') }}" style="display:inline-block;text-decoration:none;">
+                <img
+                    src="{{ rtrim(config('app.url'), '/') }}/vimaiz-logo-email-white.png"
+                    alt="Vimaiz"
+                    width="96"
+                    height="96"
+                    style="height: 96px; width: 96px; border: 0; display: block; margin: 0 auto;"
+                >
+            </a>
+            <h1 style="margin: 16px 0 0; font-size: 20px; color: #ffffff;">Nouveau message de contact</h1>
         </div>
         <div class="content">
             <div class="field">

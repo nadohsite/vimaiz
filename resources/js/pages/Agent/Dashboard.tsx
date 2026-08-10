@@ -140,23 +140,23 @@ export default function Dashboard({
         >
             <Head title="Tableau de bord Intervenant - VIMAIZ" />
 
-            <div className="min-h-screen bg-slate-50 p-4 dark:bg-slate-900 sm:p-6 lg:p-8">
+            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/80 p-3 dark:from-slate-900 dark:to-slate-950 sm:p-6 lg:p-8">
                 <div className="mx-auto max-w-7xl">
                     {/* Welcome banner */}
-                    <div className="relative mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800 sm:p-8">
+                    <div className="relative mb-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:mb-6 sm:p-8">
                         <div
                             className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl"
                             aria-hidden="true"
                         />
-                        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                                <h1 className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
-                                    Bonjour{firstName ? ` ${firstName}` : ''} 👋
+                        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+                            <div className="min-w-0">
+                                <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+                                    Bonjour{firstName ? ` ${firstName}` : ''}
                                 </h1>
-                                <p className="mt-1.5 text-slate-600 dark:text-slate-400">
+                                <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400 sm:text-base">
                                     Gérez vos interventions et suivez vos revenus.
                                 </p>
-                                <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
+                                <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400 sm:text-base">
                                     Vimaiz prélève une commission de 20 % sur chaque intervention
                                     pour couvrir la mise en relation, la gestion de la plateforme
                                     et le support.
