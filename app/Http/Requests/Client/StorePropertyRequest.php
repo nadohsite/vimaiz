@@ -49,8 +49,8 @@ class StorePropertyRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'type.required' => 'Le type de logement est obligatoire.',
-            'type.in' => 'Le type de logement doit être appartement, maison, villa ou chalet.',
+            'type.required' => 'Le type de bien est obligatoire.',
+            'type.in' => 'Le type de bien doit être appartement, maison, villa ou chalet.',
             'address_line1.required' => 'L\'adresse est obligatoire.',
             'city.required' => 'La ville est obligatoire.',
             'postal_code.required' => 'Le code postal est obligatoire.',
@@ -64,7 +64,7 @@ class StorePropertyRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'type' => 'type de logement',
+            'type' => 'type de bien',
             'address_line1' => 'adresse',
             'address_line2' => 'complément d\'adresse',
             'city' => 'ville',

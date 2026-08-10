@@ -42,13 +42,28 @@ class ServiceRequestController extends Controller
             ->properties()
             ->active()
             ->orderBy('name')
-            ->get(['id', 'name', 'type', 'city', 'surface_area']);
+            ->get(['id', 'name', 'type', 'city', 'surface_area', 'checklist']);
 
         if ($properties->isEmpty()) {
             return redirect()
                 ->route('client.properties.create')
                 ->with('info', 'Veuillez d\'abord ajouter un bien.');
         }
+
+        $defaultChecklist = \App\Support\DefaultPropertyChecklist::sections();
+
+        $properties = $properties->map(function (Property $property) use ($defaultChecklist) {
+            return [
+                'id' => $property->id,
+                'name' => $property->name,
+                'type' => $property->type,
+                'city' => $property->city,
+                'surface_area' => $property->surface_area,
+                'checklist' => (!empty($property->checklist))
+                    ? $property->checklist
+                    : $defaultChecklist,
+            ];
+        });
 
         return Inertia::render('Client/Requests/Create', [
             'properties' => $properties,
@@ -62,6 +77,13 @@ class ServiceRequestController extends Controller
     {
         $data = $request->validated();
 
+        $property = Property::findOrFail($data['property_id']);
+        $checklist = \App\Support\DefaultPropertyChecklist::filterForRequest(
+            $property->checklist,
+            $data['checklist_section_ids'],
+            $data['checklist_item_ids']
+        );
+
         $serviceRequest = ServiceRequest::create([
             'client_id' => auth()->id(),
             'property_id' => $data['property_id'],
@@ -69,6 +91,7 @@ class ServiceRequestController extends Controller
             'scheduled_time' => $data['scheduled_time'],
             'requested_hours' => $data['requested_hours'] ?? null,
             'special_instructions' => $data['special_instructions'] ?? null,
+            'checklist' => $checklist,
             'status' => ServiceRequest::STATUS_PENDING,
         ]);
 

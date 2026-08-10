@@ -19,6 +19,7 @@ class ServiceRequest extends Model
         'scheduled_time',
         'requested_hours',
         'special_instructions',
+        'checklist',
         'status',
         'cancellation_reason',
         'cancelled_at',
@@ -28,6 +29,7 @@ class ServiceRequest extends Model
         'scheduled_date' => 'date',
         'scheduled_time' => 'datetime:H:i',
         'cancelled_at' => 'datetime',
+        'checklist' => 'array',
     ];
 
     const STATUS_PENDING = 'pending';

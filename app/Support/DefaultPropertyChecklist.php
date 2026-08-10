@@ -104,6 +104,66 @@ class DefaultPropertyChecklist
     }
 
     /**
+     * Filtre la checklist d'un bien selon les axes / tâches choisis pour une demande.
+     *
+     * @param  list<array<string, mixed>>|null  $checklist
+     * @param  list<string>  $sectionIds
+     * @param  list<string>|null  $itemIds  Si null, toutes les tâches des sections sélectionnées
+     * @return list<array{id: string, title: string, emoji: string, items: list<array{id: string, label: string}>}>
+     */
+    public static function filterForRequest(?array $checklist, array $sectionIds, ?array $itemIds = null): array
+    {
+        $sections = $checklist ?: self::sections();
+        $sectionIdSet = array_fill_keys(array_map('strval', $sectionIds), true);
+        $itemIdSet = $itemIds === null
+            ? null
+            : array_fill_keys(array_map('strval', $itemIds), true);
+
+        $filtered = [];
+
+        foreach ($sections as $section) {
+            $sectionId = (string) ($section['id'] ?? '');
+            if ($sectionId === '' || !isset($sectionIdSet[$sectionId])) {
+                continue;
+            }
+
+            if (empty($section['items']) || !is_array($section['items'])) {
+                continue;
+            }
+
+            $items = [];
+            foreach ($section['items'] as $item) {
+                $itemId = (string) ($item['id'] ?? '');
+                $label = trim((string) ($item['label'] ?? ''));
+                if ($itemId === '' || $label === '') {
+                    continue;
+                }
+                if ($itemIdSet !== null && !isset($itemIdSet[$itemId])) {
+                    continue;
+                }
+
+                $items[] = [
+                    'id' => $itemId,
+                    'label' => $label,
+                ];
+            }
+
+            if ($items === []) {
+                continue;
+            }
+
+            $filtered[] = [
+                'id' => $sectionId,
+                'title' => (string) ($section['title'] ?? 'Section'),
+                'emoji' => (string) ($section['emoji'] ?? ''),
+                'items' => $items,
+            ];
+        }
+
+        return $filtered;
+    }
+
+    /**
      * Snapshot prêt pour une mission (ajoute checked / checked_at).
      *
      * @param  list<array<string, mixed>>|null  $checklist

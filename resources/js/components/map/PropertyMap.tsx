@@ -77,7 +77,7 @@ export default function PropertyMap({ latitude, longitude, address, propertyName
         // Add marker
         window.L.marker([latitude!, longitude!], { icon: customIcon })
             .addTo(map)
-            .bindPopup(`<strong>${propertyName || 'Logement'}</strong><br>${address}`)
+            .bindPopup(`<strong>${propertyName || 'Bien'}</strong><br>${address}`)
             .openPopup();
 
         setMapLoaded(true);

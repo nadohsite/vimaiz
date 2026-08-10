@@ -349,8 +349,8 @@ export default function Edit({ property, propertyTypes, defaultChecklist }: Prop
                             <CardHeader>
                                 <CardTitle className="dark:text-white">Checklist du bien</CardTitle>
                                 <CardDescription className="dark:text-slate-400">
-                                    Modifiez les tâches envoyées automatiquement à l&apos;intervenant à chaque
-                                    intervention.
+                                    Checklist de référence du bien. Les axes concrets se choisissent à chaque
+                                    programmation d&apos;intervention.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>

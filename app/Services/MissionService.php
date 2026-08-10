@@ -61,7 +61,9 @@ class MissionService
             'client_id' => $request->client_id,
             'scheduled_at' => $scheduledAt,
             'duration_hours' => $request->requested_hours,
-            'checklist' => DefaultPropertyChecklist::snapshotForMission($property->checklist),
+            'checklist' => DefaultPropertyChecklist::snapshotForMission(
+                $request->checklist ?: $property->checklist
+            ),
             'total_price' => $effectivePrice,
             'agent_payout' => $agentPayout,
             'platform_fee' => $commissionAmount,

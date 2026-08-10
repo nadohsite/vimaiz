@@ -83,6 +83,26 @@ class ServiceRequestResource extends Resource
                             ->label('Instructions particulières')
                             ->rows(3)
                             ->columnSpanFull(),
+                        Forms\Components\Placeholder::make('checklist_axes')
+                            ->label('Axes d\'intervention')
+                            ->content(function (?ServiceRequest $record): string {
+                                if (!$record || empty($record->checklist)) {
+                                    return 'Aucun axe sélectionné';
+                                }
+
+                                $lines = [];
+                                foreach ($record->checklist as $section) {
+                                    $title = trim(($section['emoji'] ?? '') . ' ' . ($section['title'] ?? 'Section'));
+                                    $itemCount = count($section['items'] ?? []);
+                                    $lines[] = "{$title} ({$itemCount} tâche" . ($itemCount > 1 ? 's' : '') . ')';
+                                    foreach ($section['items'] ?? [] as $item) {
+                                        $lines[] = '  • ' . ($item['label'] ?? '');
+                                    }
+                                }
+
+                                return implode("\n", $lines);
+                            })
+                            ->columnSpanFull(),
                         Forms\Components\Select::make('status')
                             ->label('Statut')
                             ->options([

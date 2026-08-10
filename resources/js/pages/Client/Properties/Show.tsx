@@ -178,7 +178,7 @@ export default function Show({ property }: Props) {
                                     <CardHeader>
                                         <CardTitle className="dark:text-white">Checklist du bien</CardTitle>
                                         <CardDescription className="dark:text-slate-400">
-                                            Remise à l&apos;intervenant automatiquement à chaque intervention
+                                            Checklist de référence — les axes se choisissent à chaque intervention
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">

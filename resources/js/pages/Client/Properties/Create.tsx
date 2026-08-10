@@ -303,8 +303,8 @@ export default function Create({ propertyTypes, defaultChecklist }: Props) {
                             <CardHeader>
                                 <CardTitle className="dark:text-white">Checklist du bien</CardTitle>
                                 <CardDescription className="dark:text-slate-400">
-                                    Personnalisez les tâches à réaliser. Cette checklist sera envoyée
-                                    automatiquement à l&apos;intervenant à chaque intervention.
+                                    Personnalisez les tâches du bien. Vous pourrez choisir les axes
+                                    à réaliser lors de chaque programmation d&apos;intervention.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>

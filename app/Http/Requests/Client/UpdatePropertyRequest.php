@@ -51,8 +51,8 @@ class UpdatePropertyRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'type.required' => 'Le type de logement est obligatoire.',
-            'type.in' => 'Le type de logement doit être appartement, maison, villa ou chalet.',
+            'type.required' => 'Le type de bien est obligatoire.',
+            'type.in' => 'Le type de bien doit être appartement, maison, villa ou chalet.',
             'address_line1.required' => 'L\'adresse est obligatoire.',
             'city.required' => 'La ville est obligatoire.',
             'postal_code.required' => 'Le code postal est obligatoire.',

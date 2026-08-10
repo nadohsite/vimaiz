@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Home, Calendar, Clock, MapPin, FileText, CreditCard, User, XCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Home, Calendar, Clock, MapPin, FileText, CreditCard, User, XCircle, CheckCircle, ClipboardList } from 'lucide-react';
 
 interface Property {
     id: number;
@@ -49,6 +49,13 @@ interface Mission {
     photos: MissionPhoto[];
 }
 
+interface ChecklistSection {
+    id: string;
+    title: string;
+    emoji?: string;
+    items: Array<{ id: string; label: string }>;
+}
+
 interface ServiceRequest {
     id: number;
     request_number: string;
@@ -56,6 +63,7 @@ interface ServiceRequest {
     scheduled_time: string;
     requested_hours: number;
     special_instructions: string | null;
+    checklist: ChecklistSection[] | null;
     status: string;
     status_label: string;
     property: Property;
@@ -383,6 +391,38 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                         <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">
                                             {serviceRequest.special_instructions}
                                         </p>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Selected intervention axes */}
+                            {serviceRequest.checklist && serviceRequest.checklist.length > 0 && (
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                            <ClipboardList className="h-4 w-4 text-sky-500 dark:text-sky-400" />
+                                            Axes d&apos;intervention
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-3">
+                                        {serviceRequest.checklist.map((section) => (
+                                            <div key={section.id}>
+                                                <p className="text-sm font-medium text-slate-900 dark:text-white">
+                                                    {section.emoji ? `${section.emoji} ` : ''}
+                                                    {section.title}
+                                                </p>
+                                                <ul className="mt-1 space-y-0.5">
+                                                    {section.items.map((item) => (
+                                                        <li
+                                                            key={item.id}
+                                                            className="text-xs text-slate-500 dark:text-slate-400 pl-1"
+                                                        >
+                                                            • {item.label}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ))}
                                     </CardContent>
                                 </Card>
                             )}
