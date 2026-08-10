@@ -44,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon.svg'))
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
-                NavigationGroup::make('Demandes & Missions'),
+                NavigationGroup::make('Demandes & Interventions'),
                 NavigationGroup::make('Clients'),
                 NavigationGroup::make('Gestion Utilisateurs'),
                 NavigationGroup::make('Finance'),

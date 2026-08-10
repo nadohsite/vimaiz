@@ -12,3 +12,6 @@ Artisan::command('inspire', function () {
 // La commande garantit max 1 relance par utilisateur toutes les 48h ;
 // on l'exécute chaque jour à 10h pour attraper tous les utilisateurs éligibles.
 Schedule::command('vimaiz:send-reminders')->dailyAt('10:00');
+
+// Récapitulatif hebdomadaire des interventions — chaque lundi matin.
+Schedule::command('vimaiz:send-weekly-recap')->weeklyOn(1, '09:00');

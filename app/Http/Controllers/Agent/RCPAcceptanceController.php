@@ -14,7 +14,7 @@ class RCPAcceptanceController extends Controller
 
         if (!$agentProfile) {
             return redirect()->route('dashboard')
-                ->with('error', 'Profil agent introuvable.');
+                ->with('error', 'Profil intervenant introuvable.');
         }
 
         return Inertia::render('Agent/RCPAcceptance', [
@@ -31,7 +31,7 @@ class RCPAcceptanceController extends Controller
         $agentProfile = $request->user()->agentProfile;
 
         if (!$agentProfile) {
-            return back()->with('error', 'Profil agent introuvable.');
+            return back()->with('error', 'Profil intervenant introuvable.');
         }
 
         // Mettre à jour l'acceptation de la clause RCP

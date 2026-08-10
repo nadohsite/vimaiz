@@ -24,7 +24,7 @@ class ReturnRequestedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('⚠️ Demande de retour - Mission ' . $this->mission->mission_number)
+            ->subject('⚠️ Demande de retour - Intervention ' . $this->mission->mission_number)
             ->view('emails.return-requested', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,

@@ -10,7 +10,7 @@ return [
     | This is deducted from the agent's earnings.
     |
     */
-    'commission_rate' => env('VIMAIZ_COMMISSION_RATE', 25), // 25% default
+    'commission_rate' => env('VIMAIZ_COMMISSION_RATE', 20), // 20% default
 
     /*
     |--------------------------------------------------------------------------

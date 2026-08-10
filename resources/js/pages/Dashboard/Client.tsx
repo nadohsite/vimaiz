@@ -142,12 +142,12 @@ export default function Dashboard({
     stats,
 }: DashboardProps) {
     const { auth } = usePage<SharedData>().props;
-    const firstName = auth.user?.name?.split(' ')[0] ?? '';
+    const firstName = auth.user?.first_name || auth.user?.name?.split(' ')[0] || '';
 
     const statCards = [
         {
             icon: Home,
-            label: 'Logements',
+            label: 'Biens',
             value: stats?.properties_count ?? properties.length,
             iconClass: 'bg-sky-100 text-sky-600 dark:bg-sky-900/50 dark:text-sky-400',
         },
@@ -177,7 +177,7 @@ export default function Dashboard({
         {
             href: route('client.properties.index'),
             icon: Home,
-            title: 'Mes logements',
+            title: 'Mes biens',
             description: 'Gérez vos propriétés',
         },
         {
@@ -211,7 +211,7 @@ export default function Dashboard({
                                 Bonjour{firstName ? ` ${firstName}` : ''} 👋
                             </h1>
                             <p className="mt-1.5 text-slate-600 dark:text-slate-400">
-                                Gérez vos logements et demandes d'intervention en toute simplicité.
+                                Gérez vos biens et demandes d'intervention en toute simplicité.
                             </p>
                         </div>
                         <Link
@@ -345,7 +345,7 @@ export default function Dashboard({
                         <section>
                             <div className="mb-4 flex items-center justify-between">
                                 <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                                    Mes logements
+                                    Mes biens
                                 </h2>
                                 {properties.length > 0 && (
                                     <Link
@@ -386,17 +386,17 @@ export default function Dashboard({
                                         <Home className="h-6 w-6 text-primary" />
                                     </div>
                                     <p className="font-medium text-slate-900 dark:text-white">
-                                        Aucun logement enregistré
+                                        Aucun bien enregistré
                                     </p>
                                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                        Ajoutez votre premier logement pour programmer une intervention.
+                                        Ajoutez votre premier bien pour programmer une intervention.
                                     </p>
                                     <Link
                                         href={route('client.properties.create')}
                                         className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
                                     >
                                         <Plus className="h-4 w-4" />
-                                        Ajouter un logement
+                                        Ajouter un bien
                                     </Link>
                                 </div>
                             )}

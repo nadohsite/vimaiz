@@ -267,12 +267,6 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                             </DialogContent>
                         </Dialog>
 
-                        {wallet.balance < 100 && (
-                            <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center">
-                                <Clock className="mr-1 h-4 w-4" />
-                                Minimum 100 € pour un retrait
-                            </p>
-                        )}
                     </div>
 
                     {/* Transactions */}
@@ -291,7 +285,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                         Aucune transaction
                                     </h3>
                                     <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                                        Vos transactions apparaîtront ici après vos premières missions.
+                                        Vos transactions apparaîtront ici après vos premières interventions.
                                     </p>
                                 </div>
                             ) : (

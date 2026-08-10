@@ -28,27 +28,27 @@ interface Props {
 
 export default function Index({ properties, propertyTypes }: Props) {
     const handleDelete = (id: number) => {
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce logement ?')) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer ce bien ?')) {
             router.delete(route('client.properties.destroy', id));
         }
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Mes logements', href: route('client.properties.index') }]}>
-            <Head title="Mes logements" />
+        <AppLayout breadcrumbs={[{ title: 'Mes biens', href: route('client.properties.index') }]}>
+            <Head title="Mes biens" />
 
             <div className="py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Mes logements</h1>
+                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Mes biens</h1>
                             <p className="text-slate-500 dark:text-slate-400 mt-1">Gérez vos propriétés pour vos demandes d'intervention</p>
                         </div>
                         <Link href={route('client.properties.create')}>
                             <Button className="bg-sky-500 hover:bg-sky-600">
                                 <Plus className="h-4 w-4 mr-2" />
-                                Ajouter un logement
+                                Ajouter un bien
                             </Button>
                         </Link>
                     </div>
@@ -136,15 +136,15 @@ export default function Index({ properties, propertyTypes }: Props) {
                                     <Home className="h-8 w-8 text-sky-500 dark:text-sky-400" />
                                 </div>
                                 <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
-                                    Aucun logement enregistré
+                                    Aucun bien enregistré
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400 mb-6">
-                                    Ajoutez votre premier logement pour pouvoir programmer une intervention.
+                                    Ajoutez votre premier bien pour pouvoir programmer une intervention.
                                 </p>
                                 <Link href={route('client.properties.create')}>
                                     <Button className="bg-sky-500 hover:bg-sky-600">
                                         <Plus className="h-4 w-4 mr-2" />
-                                        Ajouter un logement
+                                        Ajouter un bien
                                     </Button>
                                 </Link>
                             </CardContent>

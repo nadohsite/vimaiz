@@ -5,9 +5,9 @@
 @section('content')
     <h1>Votre compte a été suspendu 🚫</h1>
     
-    <p>Bonjour {{ $notifiable->name }},</p>
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
     
-    <p>Nous vous informons que votre compte agent VIMAIZ a été temporairement suspendu.</p>
+    <p>Nous vous informons que votre compte intervenant VIMAIZ a été temporairement suspendu.</p>
     
     <div class="warning-box" style="background-color: #fef2f2; border-left-color: #ef4444;">
         <p style="color: #991b1b;"><strong>Raison de la suspension :</strong></p>
@@ -28,8 +28,8 @@
     
     <p>Pendant la durée de la suspension :</p>
     <ul style="margin: 20px 0; padding-left: 20px;">
-        <li>❌ Vous ne recevrez plus de nouvelles missions</li>
-        <li>❌ Vous ne pourrez pas accepter de missions</li>
+        <li>❌ Vous ne recevrez plus de nouvelles interventions</li>
+        <li>❌ Vous ne pourrez pas accepter d'interventions</li>
         <li>✅ Vos gains accumulés restent disponibles</li>
         <li>✅ Vous pourrez toujours demander un retrait</li>
     </ul>

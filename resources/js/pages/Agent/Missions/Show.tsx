@@ -126,7 +126,7 @@ export default function Show({
     const handleStart = () => {
         if (!mission.property.latitude || !mission.property.longitude) {
             setLocationError(
-                'Nous ne pouvons pas confirmer automatiquement l\'emplacement de ce logement. '
+                'Nous ne pouvons pas confirmer automatiquement l\'emplacement de ce bien. '
                 + 'Vérifiez bien l\'adresse indiquée ci-dessous avant d\'intervenir, puis contactez le support si besoin.',
             );
             return;
@@ -160,9 +160,9 @@ export default function Show({
             (error) => {
                 setStarting(false);
                 const messages: Record<number, string> = {
-                    1: 'Pour confirmer que vous êtes au bon logement, autorisez l\'accès à votre position dans les paramètres de votre navigateur ou téléphone.',
-                    2: 'Nous n\'avons pas pu localiser votre position. Placez-vous devant le logement, puis réessayez.',
-                    3: 'La vérification de votre position a pris trop de temps. Restez devant le logement et réessayez.',
+                    1: 'Pour confirmer que vous êtes au bon bien, autorisez l\'accès à votre position dans les paramètres de votre navigateur ou téléphone.',
+                    2: 'Nous n\'avons pas pu localiser votre position. Placez-vous devant le bien, puis réessayez.',
+                    3: 'La vérification de votre position a pris trop de temps. Restez devant le bien et réessayez.',
                 };
                 setLocationError(
                     messages[error.code]
@@ -267,11 +267,11 @@ export default function Show({
                         <Card className="mb-6 border-sky-300 bg-sky-50">
                             <CardContent className="p-6">
                                 <h3 className="font-semibold text-sky-800 mb-2 text-center">
-                                    Êtes-vous bien devant le logement ?
+                                    Êtes-vous bien devant le bien ?
                                 </h3>
                                 {!hasPropertyCoordinates && (
                                     <p className="text-sm text-amber-700 mb-4 text-center">
-                                        La position GPS de ce logement n&apos;est pas enregistrée : vérifiez l&apos;adresse
+                                        La position GPS de ce bien n&apos;est pas enregistrée : vérifiez l&apos;adresse
                                         manuellement, puis contactez le support si vous avez un doute.
                                     </p>
                                 )}
@@ -287,7 +287,7 @@ export default function Show({
                                             : 'Je suis au bon endroit — démarrer'}
                                     </Button>
                                     <p className="text-xs text-sky-600 mt-3">
-                                        En cliquant, vous confirmez être devant le logement de cette intervention.
+                                        En cliquant, vous confirmez être devant le bien de cette intervention.
                                     </p>
                                 </div>
                             </CardContent>
@@ -321,7 +321,7 @@ export default function Show({
                             {mission.checklist && mission.checklist.length > 0 && (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Checklist du logement</CardTitle>
+                                        <CardTitle>Checklist du bien</CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-5">
                                         {mission.checklist.map((section) => (
@@ -471,7 +471,7 @@ export default function Show({
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-base dark:text-white">
                                         <Home className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                        Logement
+                                        Bien
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>

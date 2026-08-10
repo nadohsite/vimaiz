@@ -66,21 +66,21 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 dark:text-white">
                                     <Home className="h-5 w-5 text-sky-500 dark:text-sky-400" />
-                                    Logement
+                                    Bien
                                 </CardTitle>
                                 <CardDescription className="dark:text-slate-400">
-                                    Sélectionnez le logement à nettoyer
+                                    Sélectionnez le bien à nettoyer
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-2">
-                                    <Label htmlFor="property_id">Logement *</Label>
+                                    <Label htmlFor="property_id">Bien *</Label>
                                     <Select 
                                         value={data.property_id} 
                                         onValueChange={(value) => setData('property_id', value)}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Sélectionner un logement..." />
+                                            <SelectValue placeholder="Sélectionner un bien..." />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {properties.map((property) => (
@@ -96,9 +96,9 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                                 {properties.length === 0 && (
                                     <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                                         <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                                            Vous n'avez pas encore de logement.{' '}
+                                            Vous n'avez pas encore de bien.{' '}
                                             <Link href={route('client.properties.create')} className="font-medium underline">
-                                                Ajouter un logement
+                                                Ajouter un bien
                                             </Link>
                                         </p>
                                     </div>

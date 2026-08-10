@@ -1,6 +1,6 @@
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Briefcase, Clock, CheckCircle, Euro, ArrowRight, MapPin, Calendar } from 'lucide-react';
 import RcpClauseModal from '@/components/RcpClauseModal';
 import { useState } from 'react';
@@ -48,6 +48,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function AgentDashboard({ pendingMissions = [], activeMissions = [], stats, rcpClauseAccepted = false }: Props) {
     const [showRcpModal, setShowRcpModal] = useState(!rcpClauseAccepted);
+    const { auth } = usePage<SharedData>().props;
+    const firstName = auth.user?.first_name || auth.user?.name?.split(' ')[0] || '';
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'completed':
@@ -91,7 +93,7 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-                        Espace Intervenant VIMAIZ
+                        Bonjour{firstName ? ` ${firstName}` : ''}
                     </h1>
                     <p className="mt-2 text-slate-600 dark:text-slate-400">
                         Gérez vos interventions et suivez vos revenus.

@@ -169,7 +169,7 @@ export default function Index({ requests, statuses }: Props) {
                                     Aucune demande
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400 mb-6">
-                                    Créez votre première demande d'intervention pour votre logement.
+                                    Créez votre première demande d'intervention pour votre bien.
                                 </p>
                                 <Link href={route('client.requests.create')}>
                                     <Button className="bg-sky-500 hover:bg-sky-600">

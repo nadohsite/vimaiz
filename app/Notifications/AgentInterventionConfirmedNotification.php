@@ -25,7 +25,7 @@ class AgentInterventionConfirmedNotification extends Notification implements Sho
     {
         return (new MailMessage)
             ->subject('Intervention confirmée — Vimaiz')
-            ->greeting('Bonjour ' . $notifiable->name . ' !')
+            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
             ->line('✅ Votre intervention est confirmée.')
             ->line('Retrouvez toutes les informations dans votre espace.')
             ->action('Voir l\'intervention', url('/agent/missions/' . $this->mission->id))

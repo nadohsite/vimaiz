@@ -1,17 +1,17 @@
 @extends('emails.layout')
 
-@section('title', 'Complétez votre profil agent')
+@section('title', 'Complétez votre profil intervenant')
 
 @section('content')
     <h1>Votre profil est presque prêt 🚀</h1>
 
-    <p>Bonjour {{ $notifiable->name }},</p>
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
     <p>
-        Vous avez commencé votre inscription comme agent de ménage sur VIMAIZ,
+        Vous avez commencé votre inscription comme intervenant sur VIMAIZ,
         mais votre profil n'est pas encore complet. Tant qu'il ne l'est pas,
-        <strong>vous ne pouvez pas recevoir de missions</strong> — et des clients
-        cherchent des agents en ce moment même.
+        <strong>vous ne pouvez pas recevoir d'interventions</strong> — et des clients
+        cherchent des intervenants en ce moment même.
     </p>
 
     @if (!empty($missingItems))

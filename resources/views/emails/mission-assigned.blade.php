@@ -1,17 +1,17 @@
 @extends('emails.layout')
 
-@section('title', 'Nouvelle mission assignée')
+@section('title', 'Nouvelle intervention assignée')
 
 @section('content')
-    <h1>Nouvelle mission pour vous ! 🏠</h1>
+    <h1>Nouvelle intervention pour vous ! 🏠</h1>
     
-    <p>Bonjour {{ $notifiable->name }},</p>
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
     
-    <p>Une nouvelle mission de ménage vous a été attribuée.</p>
+    <p>Une nouvelle intervention vous a été attribuée.</p>
     
     <div class="info-box">
         <p><strong>Référence :</strong> {{ $mission->mission_number }}</p>
-        <p><strong>Logement :</strong> {{ $mission->property->name ?? $mission->property->type }}</p>
+        <p><strong>Bien :</strong> {{ $mission->property->name ?? $mission->property->type }}</p>
         <p><strong>Surface :</strong> {{ $mission->property->surface_area }} m²</p>
     </div>
     
@@ -34,14 +34,14 @@
     </div>
     
     <div class="warning-box">
-        <p>⚠️ <strong>Important :</strong> Vous avez 30 minutes pour accepter ou refuser cette mission.</p>
+        <p>⚠️ <strong>Important :</strong> Vous avez 30 minutes pour accepter ou refuser cette intervention.</p>
     </div>
     
     <p style="text-align: center;">
         <a href="{{ url('/agent/missions/' . $mission->id) }}" class="button">
-            Voir la mission
+            Voir l'intervention
         </a>
     </p>
     
-    <p>Bonne mission !<br>L'équipe VIMAIZ</p>
+    <p>Bonne intervention !<br>L'équipe VIMAIZ</p>
 @endsection

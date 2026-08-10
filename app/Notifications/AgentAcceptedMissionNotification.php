@@ -27,13 +27,13 @@ class AgentAcceptedMissionNotification extends Notification implements ShouldQue
 
         return (new MailMessage)
             ->subject('Intervention confirmée — Vimaiz')
-            ->greeting('Bonjour ' . $notifiable->name . ' !')
+            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
             ->line('✅ Votre intervention est désormais prise en charge.')
-            ->line('Un intervenant Vimaiz a été assigné à votre logement.')
+            ->line('Un intervenant Vimaiz a été assigné à votre bien.')
             ->line('')
             ->line('**Détails :**')
             ->line('- Intervention : ' . $this->mission->mission_number)
-            ->line('- Logement : ' . ($property->name ?? $property->type_label))
+            ->line('- Bien : ' . ($property->name ?? $property->type_label))
             ->line('- Date prévue : ' . $this->mission->scheduled_at->format('d/m/Y à H:i'))
             ->action('Voir les détails', url('/client/missions/' . $this->mission->id))
             ->salutation('L\'équipe Vimaiz');
@@ -46,7 +46,7 @@ class AgentAcceptedMissionNotification extends Notification implements ShouldQue
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'scheduled_at' => $this->mission->scheduled_at->toISOString(),
-            'message' => '✅ Votre intervention est désormais prise en charge. Un intervenant Vimaiz a été assigné à votre logement.',
+            'message' => '✅ Votre intervention est désormais prise en charge. Un intervenant Vimaiz a été assigné à votre bien.',
             'url' => '/client/missions/' . $this->mission->id,
         ];
     }

@@ -17,14 +17,14 @@ class MissionReturnController extends Controller
      */
     public function requestReturn(Request $request, Mission $mission)
     {
-        // Vérifier que c'est bien le client de cette mission
+        // Vérifier que c'est bien le client de cette intervention
         if ($mission->client_id !== Auth::id()) {
             abort(403, 'Accès non autorisé');
         }
 
         // Vérifier que le retour est possible
         if (!$mission->canRequestReturn()) {
-            return back()->with('error', 'La demande de retour n\'est plus possible pour cette mission.');
+            return back()->with('error', 'La demande de retour n\'est plus possible pour cette intervention.');
         }
 
         $validated = $request->validate([
@@ -44,7 +44,7 @@ class MissionReturnController extends Controller
             $admin->notify(new ReturnRequestedNotification($mission));
         }
 
-        return back()->with('success', 'Votre demande de retour a été envoyée à l\'agent.');
+        return back()->with('success', 'Votre demande de retour a été envoyée à l\'intervenant.');
     }
 
     /**
@@ -52,7 +52,7 @@ class MissionReturnController extends Controller
      */
     public function startReturn(Mission $mission)
     {
-        // Vérifier que c'est bien l'agent de cette mission
+        // Vérifier que c'est bien l'intervenant de cette intervention
         if ($mission->agent_id !== Auth::id()) {
             abort(403, 'Accès non autorisé');
         }
@@ -74,7 +74,7 @@ class MissionReturnController extends Controller
      */
     public function completeReturn(Request $request, Mission $mission)
     {
-        // Vérifier que c'est bien l'agent de cette mission
+        // Vérifier que c'est bien l'intervenant de cette intervention
         if ($mission->agent_id !== Auth::id()) {
             abort(403, 'Accès non autorisé');
         }
@@ -107,7 +107,7 @@ class MissionReturnController extends Controller
      */
     public function validateReturn(Request $request, Mission $mission)
     {
-        // Vérifier que c'est bien le client de cette mission
+        // Vérifier que c'est bien le client de cette intervention
         if ($mission->client_id !== Auth::id()) {
             abort(403, 'Accès non autorisé');
         }
@@ -137,7 +137,7 @@ class MissionReturnController extends Controller
     }
 
     /**
-     * Liste des retours pour l'agent
+     * Liste des retours pour l'intervenant
      */
     public function agentReturns()
     {

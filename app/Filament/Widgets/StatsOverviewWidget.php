@@ -39,12 +39,12 @@ class StatsOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-clipboard-document-list')
                 ->color('warning'),
 
-            Stat::make('Missions en cours', Mission::whereIn('status', ['agent_accepted', 'in_progress'])->count())
-                ->description($pendingMissions . ' en attente d\'agent')
+            Stat::make('Interventions en cours', Mission::whereIn('status', ['agent_accepted', 'in_progress'])->count())
+                ->description($pendingMissions . ' en attente d\'intervenant')
                 ->descriptionIcon('heroicon-m-briefcase')
                 ->color('primary'),
 
-            Stat::make('Agents actifs', User::where('role', 'agent')->where('is_active', true)->count())
+            Stat::make('Intervenants actifs', User::where('role', 'agent')->where('is_active', true)->count())
                 ->description(User::where('role', 'client')->where('is_active', true)->count() . ' clients')
                 ->descriptionIcon('heroicon-m-users')
                 ->color('info'),

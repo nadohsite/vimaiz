@@ -25,7 +25,7 @@ class AgentSuspendedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Suspension de votre compte agent - VIMAIZ')
+            ->subject('Suspension de votre compte intervenant - VIMAIZ')
             ->view('emails.agent-suspended', [
                 'notifiable' => $notifiable,
                 'reason' => $this->reason,

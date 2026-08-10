@@ -45,9 +45,9 @@ class ReviewResource extends Resource
                         TextEntry::make('client.name')
                             ->label('Client'),
                         TextEntry::make('agent.name')
-                            ->label('Agent'),
+                            ->label('Intervenant'),
                         TextEntry::make('mission.mission_number')
-                            ->label('Mission'),
+                            ->label('Intervention'),
                         TextEntry::make('rating')
                             ->label('Note')
                             ->formatStateUsing(fn ($state) => $state . '/5')
@@ -82,7 +82,7 @@ class ReviewResource extends Resource
                             ->label('Commentaire du client')
                             ->columnSpanFull(),
                         TextEntry::make('agent_response')
-                            ->label('Réponse de l\'agent')
+                            ->label('Réponse de l\'intervenant')
                             ->columnSpanFull()
                             ->visible(fn ($record) => !empty($record->agent_response)),
                     ]),
@@ -119,7 +119,7 @@ class ReviewResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('agent.name')
-                    ->label('Agent')
+                    ->label('Intervenant')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rating')

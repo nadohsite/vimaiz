@@ -25,9 +25,9 @@ class ServiceRequestResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
     
-    protected static string|UnitEnum|null $navigationGroup = 'Demandes & Missions';
+    protected static string|UnitEnum|null $navigationGroup = 'Demandes & Interventions';
 
-    protected static ?string $navigationLabel = 'Demandes de ménage';
+    protected static ?string $navigationLabel = "Demandes d'intervention";
 
     protected static ?string $modelLabel = 'Demande';
 
@@ -53,9 +53,9 @@ class ServiceRequestResource extends Resource
                             ->preload()
                             ->required(),
                         Forms\Components\Select::make('property_id')
-                            ->label('Logement')
+                            ->label('Bien')
                             ->relationship('property', 'name')
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? "Logement #{$record->id}")
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? "Bien #{$record->id}")
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -91,7 +91,7 @@ class ServiceRequestResource extends Resource
                                 'quote_accepted' => 'Devis accepté',
                                 'quote_refused' => 'Devis refusé',
                                 'paid' => 'Payé',
-                                'assigned' => 'Agent attribué',
+                                'assigned' => 'Intervenant attribué',
                                 'in_progress' => 'En cours',
                                 'completed' => 'Terminée',
                                 'cancelled' => 'Annulée',
@@ -189,13 +189,13 @@ class ServiceRequestResource extends Resource
                         'quote_accepted' => 'Devis accepté',
                         'quote_refused' => 'Devis refusé',
                         'paid' => 'Payé',
-                        'assigned' => 'Agent attribué',
+                        'assigned' => 'Intervenant attribué',
                         'in_progress' => 'En cours',
                         'completed' => 'Terminée',
                         'cancelled' => 'Annulée',
                     ]),
                 Tables\Filters\SelectFilter::make('property.type')
-                    ->label('Type de logement')
+                    ->label('Type de bien')
                     ->options([
                         'maison' => 'Maison',
                         'villa' => 'Villa',

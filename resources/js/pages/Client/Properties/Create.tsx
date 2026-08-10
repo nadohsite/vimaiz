@@ -49,10 +49,10 @@ export default function Create({ propertyTypes, defaultChecklist }: Props) {
 
     return (
         <AppLayout breadcrumbs={[
-            { title: 'Mes logements', href: route('client.properties.index') },
-            { title: 'Nouveau logement', href: '#' },
+            { title: 'Mes biens', href: route('client.properties.index') },
+            { title: 'Nouveau bien', href: '#' },
         ]}>
-            <Head title="Nouveau logement" />
+            <Head title="Nouveau bien" />
 
             <div className="py-8">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -60,9 +60,9 @@ export default function Create({ propertyTypes, defaultChecklist }: Props) {
                     <div className="mb-8">
                         <Link href={route('client.properties.index')} className="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 mb-4">
                             <ArrowLeft className="h-4 w-4 mr-1" />
-                            Retour aux logements
+                            Retour aux biens
                         </Link>
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Ajouter un logement</h1>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Ajouter un bien</h1>
                         <p className="text-slate-500 dark:text-slate-400 mt-1">Renseignez les informations de votre propriété</p>
                     </div>
 
@@ -90,7 +90,7 @@ export default function Create({ propertyTypes, defaultChecklist }: Props) {
                             <CardContent className="space-y-4">
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label htmlFor="type">Type de logement *</Label>
+                                        <Label htmlFor="type">Type de bien *</Label>
                                         <Select value={data.type} onValueChange={(value) => setData('type', value)}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Sélectionner..." />
@@ -301,7 +301,7 @@ export default function Create({ propertyTypes, defaultChecklist }: Props) {
 
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="dark:text-white">Checklist du logement</CardTitle>
+                                <CardTitle className="dark:text-white">Checklist du bien</CardTitle>
                                 <CardDescription className="dark:text-slate-400">
                                     Personnalisez les tâches à réaliser. Cette checklist sera envoyée
                                     automatiquement à l&apos;intervenant à chaque intervention.

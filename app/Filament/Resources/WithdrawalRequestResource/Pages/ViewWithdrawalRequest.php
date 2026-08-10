@@ -20,7 +20,7 @@ class ViewWithdrawalRequest extends ViewRecord
                 ->color('success')
                 ->requiresConfirmation()
                 ->modalHeading('Valider le retrait')
-                ->modalDescription('Confirmez-vous avoir effectué le virement bancaire à cet agent ?')
+                ->modalDescription('Confirmez-vous avoir effectué le virement bancaire à cet intervenant ?')
                 ->modalSubmitActionLabel('Oui, valider')
                 ->visible(fn () => $this->record->status === 'pending')
                 ->action(function () {
@@ -45,7 +45,7 @@ class ViewWithdrawalRequest extends ViewRecord
                 ->color('danger')
                 ->requiresConfirmation()
                 ->modalHeading('Rejeter le retrait')
-                ->modalDescription('Le montant sera remboursé au portefeuille de l\'agent.')
+                ->modalDescription('Le montant sera remboursé au portefeuille de l\'intervenant.')
                 ->modalSubmitActionLabel('Rejeter et rembourser')
                 ->visible(fn () => $this->record->status === 'pending')
                 ->action(function () {

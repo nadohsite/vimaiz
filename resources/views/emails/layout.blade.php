@@ -133,7 +133,8 @@
                 @yield('content')
             </div>
             <div class="footer">
-                <p>© {{ date('Y') }} VIMAIZ - Tous droits réservés</p>
+                <p>Chaque bien mérite d’être prêt. À chaque arrivée.</p>
+                <p>© {{ date('Y') }} Vimaiz - Tous droits réservés</p>
                 <p>
                     <a href="{{ config('app.url') }}">vimaiz.com</a> |
                     <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>

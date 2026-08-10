@@ -46,7 +46,7 @@ class BookingResource extends Resource
                     ->required()
                     ->searchable(),
                 Forms\Components\Select::make('agent_id')
-                    ->label('Agent')
+                    ->label('Intervenant')
                     ->relationship('agent', 'name')
                     ->required()
                     ->searchable(),
@@ -100,7 +100,7 @@ class BookingResource extends Resource
                     ->label('Client')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('agent.name')
-                    ->label('Agent')
+                    ->label('Intervenant')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('service.name')
                     ->label('Service')

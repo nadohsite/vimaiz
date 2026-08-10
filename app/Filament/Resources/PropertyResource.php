@@ -27,11 +27,11 @@ class PropertyResource extends Resource
     
     protected static string|UnitEnum|null $navigationGroup = 'Clients';
 
-    protected static ?string $navigationLabel = 'Logements';
+    protected static ?string $navigationLabel = 'Biens';
 
-    protected static ?string $modelLabel = 'Logement';
+    protected static ?string $modelLabel = 'Bien';
 
-    protected static ?string $pluralModelLabel = 'Logements';
+    protected static ?string $pluralModelLabel = 'Biens';
 
     protected static ?int $navigationSort = 2;
 
@@ -52,7 +52,7 @@ class PropertyResource extends Resource
                 Section::make('Type & Localisation')
                     ->schema([
                         Forms\Components\Select::make('type')
-                            ->label('Type de logement')
+                            ->label('Type de bien')
                             ->options([
                                 'maison' => 'Maison',
                                 'villa' => 'Villa',
@@ -60,7 +60,7 @@ class PropertyResource extends Resource
                             ])
                             ->required(),
                         Forms\Components\TextInput::make('name')
-                            ->label('Nom du logement')
+                            ->label('Nom du bien')
                             ->placeholder('Ma résidence principale'),
                         Forms\Components\TextInput::make('address_line1')
                             ->label('Adresse')
@@ -193,8 +193,8 @@ class PropertyResource extends Resource
                     ->color('warning')
                     ->visible(fn ($record) => $record->is_active ?? true)
                     ->requiresConfirmation()
-                    ->modalHeading('Suspendre ce logement')
-                    ->modalDescription('Ce logement ne sera plus disponible pour de nouvelles demandes.')
+                    ->modalHeading('Suspendre ce bien')
+                    ->modalDescription('Ce bien ne sera plus disponible pour de nouvelles demandes.')
                     ->action(fn ($record) => $record->update(['is_active' => false])),
                 Action::make('activate')
                     ->label('Réactiver')

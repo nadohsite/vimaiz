@@ -19,7 +19,7 @@ class ClientProfileIncompleteReminder extends Notification implements ShouldQueu
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Ajoutez votre logement et programmez votre première intervention - Vimaiz')
+            ->subject('Ajoutez votre logement et commencez à organiser vos interventions — Vimaiz')
             ->view('emails.reminder-client-profile', [
                 'notifiable' => $notifiable,
             ]);

@@ -109,7 +109,7 @@ class DocumentController extends Controller
         $agentProfile = $user->agentProfile;
 
         if (!$agentProfile) {
-            return back()->with('error', 'Profil agent introuvable.');
+            return back()->with('error', 'Profil intervenant introuvable.');
         }
 
         // Delete old file if exists
@@ -166,7 +166,7 @@ class DocumentController extends Controller
         $agentProfile = $user->agentProfile;
 
         if (!$agentProfile) {
-            return back()->with('error', 'Profil agent introuvable.');
+            return back()->with('error', 'Profil intervenant introuvable.');
         }
 
         // Check all required documents are uploaded

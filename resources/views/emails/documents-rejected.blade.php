@@ -5,7 +5,7 @@
 @section('content')
     <h1>Action requise : Documents rejetés</h1>
     
-    <p>Bonjour {{ $notifiable->name }},</p>
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
     
     <p>Nous avons examiné les documents que vous avez soumis, mais nous ne pouvons malheureusement pas les valider en l'état.</p>
     
@@ -17,7 +17,7 @@
     <h2 style="margin-top: 30px;">Que faire maintenant ?</h2>
     
     <ol style="margin: 20px 0; padding-left: 20px;">
-        <li>Connectez-vous à votre espace agent</li>
+        <li>Connectez-vous à votre espace intervenant</li>
         <li>Accédez à la section "Mes documents"</li>
         <li>Téléchargez les documents corrigés</li>
         <li>Soumettez à nouveau pour vérification</li>

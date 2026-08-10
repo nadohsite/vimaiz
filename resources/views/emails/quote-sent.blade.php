@@ -5,13 +5,13 @@
 @section('content')
     <h1>Votre devis est prêt ! 📋</h1>
     
-    <p>Bonjour {{ $notifiable->name }},</p>
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
     
-    <p>Nous avons préparé votre devis pour la prestation de ménage de votre logement.</p>
+    <p>Nous avons préparé votre devis pour l'intervention sur votre bien.</p>
     
     <div class="info-box">
         <p><strong>Référence :</strong> {{ $quote->quote_number }}</p>
-        <p><strong>Logement :</strong> {{ $quote->serviceRequest->property->name ?? $quote->serviceRequest->property->type }}</p>
+        <p><strong>Bien :</strong> {{ $quote->serviceRequest->property->name ?? $quote->serviceRequest->property->type }}</p>
         <p><strong>Surface :</strong> {{ $quote->serviceRequest->property->surface_area }} m²</p>
         <p><strong>Date prévue :</strong> {{ $quote->serviceRequest->scheduled_date->format('d/m/Y') }} à {{ $quote->serviceRequest->scheduled_time }}</p>
         @if($quote->estimated_hours)
@@ -40,7 +40,7 @@
         <p>⏰ Ce devis est valable jusqu'au <strong>{{ $quote->expires_at?->format('d/m/Y') }}</strong></p>
     </div>
     
-    <p>Une fois le devis accepté, vous pourrez procéder au paiement sécurisé et un agent professionnel vous sera attribué.</p>
+    <p>Une fois le devis accepté, vous pourrez procéder au paiement sécurisé et un intervenant professionnel vous sera attribué.</p>
     
     <p>À bientôt,<br>L'équipe VIMAIZ</p>
 @endsection

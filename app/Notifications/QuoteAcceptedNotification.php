@@ -30,7 +30,7 @@ class QuoteAcceptedNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('✅ Devis accepté - ' . $this->quote->quote_number)
-            ->greeting('Bonjour ' . $notifiable->name . ',')
+            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ',')
             ->line('Le devis ' . $this->quote->quote_number . ' a été accepté par le client.')
             ->line('**Client:** ' . $this->quote->user->name)
             ->line('**Montant:** ' . number_format($this->quote->final_price ?? $this->quote->estimated_price, 2, ',', ' ') . ' €')

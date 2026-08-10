@@ -25,10 +25,10 @@ class ClientConfirmedReadyNotification extends Notification implements ShouldQue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Logement prêt — Vimaiz')
-            ->greeting('Merci ' . $notifiable->name . ' !')
+            ->subject('Bien prêt — Vimaiz')
+            ->greeting('Merci ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
             ->line('✅ Merci.')
-            ->line('Votre logement est désormais prêt à accueillir ses prochains voyageurs.')
+            ->line('Votre bien est désormais prêt à accueillir ses prochains voyageurs.')
             ->action('Voir l\'intervention', url('/client/missions/' . $this->mission->id))
             ->salutation('L\'équipe Vimaiz');
     }
@@ -39,7 +39,7 @@ class ClientConfirmedReadyNotification extends Notification implements ShouldQue
             'type' => 'client_confirmed_ready',
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
-            'message' => '✅ Merci. Votre logement est désormais prêt à accueillir ses prochains voyageurs.',
+            'message' => '✅ Merci. Votre bien est désormais prêt à accueillir ses prochains voyageurs.',
             'url' => '/client/missions/' . $this->mission->id,
         ];
     }

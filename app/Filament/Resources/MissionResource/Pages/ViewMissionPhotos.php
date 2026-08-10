@@ -20,7 +20,7 @@ class ViewMissionPhotos extends ViewRecord
 
     public function getTitle(): string
     {
-        return 'Photos - Mission ' . $this->record->mission_number;
+        return 'Photos - Intervention ' . $this->record->mission_number;
     }
 
     public function getBreadcrumb(): string

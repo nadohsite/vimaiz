@@ -27,13 +27,13 @@ class MissionResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-briefcase';
     
-    protected static string|UnitEnum|null $navigationGroup = 'Demandes & Missions';
+    protected static string|UnitEnum|null $navigationGroup = 'Demandes & Interventions';
 
-    protected static ?string $navigationLabel = 'Missions';
+    protected static ?string $navigationLabel = 'Interventions';
 
-    protected static ?string $modelLabel = 'Mission';
+    protected static ?string $modelLabel = 'Intervention';
 
-    protected static ?string $pluralModelLabel = 'Missions';
+    protected static ?string $pluralModelLabel = 'Interventions';
 
     protected static ?int $navigationSort = 3;
 
@@ -44,7 +44,7 @@ class MissionResource extends Resource
                 Section::make('Informations générales')
                     ->schema([
                         Forms\Components\TextInput::make('mission_number')
-                            ->label('N° Mission')
+                            ->label('N° Intervention')
                             ->disabled(),
                         Forms\Components\Select::make('client_id')
                             ->label('Client')
@@ -52,19 +52,19 @@ class MissionResource extends Resource
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? $record->email ?? "Client #{$record->id}")
                             ->disabled(),
                         Forms\Components\Select::make('agent_id')
-                            ->label('Agent')
+                            ->label('Intervenant')
                             ->relationship('agent', 'name')
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? $record->email ?? "Agent #{$record->id}")
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? $record->email ?? "Intervenant #{$record->id}")
                             ->searchable()
                             ->preload(),
                     ])->columns(3),
 
-                Section::make('Logement')
+                Section::make('Bien')
                     ->schema([
                         Forms\Components\Select::make('property_id')
-                            ->label('Logement')
+                            ->label('Bien')
                             ->relationship('property', 'name')
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? "Logement #{$record->id}")
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? "Bien #{$record->id}")
                             ->disabled(),
                     ]),
 
@@ -89,7 +89,7 @@ class MissionResource extends Resource
                             ->prefix('€')
                             ->disabled(),
                         Forms\Components\TextInput::make('agent_payout')
-                            ->label('Paiement agent')
+                            ->label('Paiement intervenant')
                             ->prefix('€')
                             ->disabled(),
                         Forms\Components\TextInput::make('platform_fee')
@@ -101,11 +101,11 @@ class MissionResource extends Resource
                 Section::make('Statut')
                     ->schema([
                         Forms\Components\Select::make('status')
-                            ->label('Statut mission')
+                            ->label('Statut intervention')
                             ->options([
-                                'pending_agent' => 'En attente agent',
-                                'agent_accepted' => 'Agent confirmé',
-                                'agent_refused' => 'Agent refusé',
+                                'pending_agent' => 'En attente intervenant',
+                                'agent_accepted' => 'Intervenant confirmé',
+                                'agent_refused' => 'Intervenant refusé',
                                 'in_progress' => 'En cours',
                                 'photos_before' => 'Photos avant OK',
                                 'photos_after' => 'Photos après OK',
@@ -154,14 +154,14 @@ class MissionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('mission_number')
-                    ->label('N° Mission')
+                    ->label('N° Intervention')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('client.name')
                     ->label('Client')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('agent.name')
-                    ->label('Agent')
+                    ->label('Intervenant')
                     ->searchable()
                     ->placeholder('Non attribué'),
                 Tables\Columns\TextColumn::make('property.type')
@@ -191,7 +191,7 @@ class MissionResource extends Resource
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending_agent' => 'Attente agent',
+                        'pending_agent' => 'Attente intervenant',
                         'agent_accepted' => 'Confirmé',
                         'agent_refused' => 'Refusé',
                         'in_progress' => 'En cours',
@@ -231,8 +231,8 @@ class MissionResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Statut')
                     ->options([
-                        'pending_agent' => 'En attente agent',
-                        'agent_accepted' => 'Agent confirmé',
+                        'pending_agent' => 'En attente intervenant',
+                        'agent_accepted' => 'Intervenant confirmé',
                         'in_progress' => 'En cours',
                         'completed' => 'Terminée',
                         'cancelled' => 'Annulée',
@@ -247,13 +247,13 @@ class MissionResource extends Resource
             ])
             ->actions([
                 Action::make('assign_agent')
-                    ->label('Attribuer agent')
+                    ->label('Attribuer intervenant')
                     ->icon('heroicon-o-user-plus')
                     ->color('success')
                     ->visible(fn ($record) => $record->status === 'pending_agent' && !$record->agent_id)
                     ->form([
                         Forms\Components\Select::make('agent_id')
-                            ->label('Agent')
+                            ->label('Intervenant')
                             ->options(function () {
                                 return \App\Models\User::where('role', 'agent')
                                     ->where('is_active', true)
@@ -269,7 +269,7 @@ class MissionResource extends Resource
                             'status' => 'pending_agent',
                         ]);
                         Notification::make()
-                            ->title('Agent attribué')
+                            ->title('Intervenant attribué')
                             ->success()
                             ->send();
                     }),

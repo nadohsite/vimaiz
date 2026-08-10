@@ -156,7 +156,7 @@
                     <div class="logo">
                         <img src="{{ public_path('vimaiz-logo.png') }}" alt="VIMAIZ" style="height: 45px; filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(166deg) brightness(98%) contrast(101%);">
                     </div>
-                    <div class="logo-subtitle">Services de ménage professionnels</div>
+                    <div class="logo-subtitle">Services d'intervention professionnels</div>
                     <div style="margin-top: 15px; font-size: 11px; color: #64748b;">
                         <p>VIMAIZ (anciennement Nettolia)</p>
                         <p>12 rue porte de la ville</p>
@@ -230,7 +230,7 @@
                     @endforeach
                 @else
                     <tr>
-                        <td>{{ $invoice->description ?? 'Prestation de ménage' }}</td>
+                        <td>{{ $invoice->description ?? 'Prestation d\'intervention' }}</td>
                         <td>1</td>
                         <td>{{ number_format($invoice->subtotal, 2, ',', ' ') }} €</td>
                         <td>{{ number_format($invoice->subtotal, 2, ',', ' ') }} €</td>

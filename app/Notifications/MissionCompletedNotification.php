@@ -30,7 +30,7 @@ class MissionCompletedNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Intervention terminée — Vimaiz')
-            ->greeting('Bonjour ' . $notifiable->name . ' !')
+            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
             ->line('✨ L\'intervention est terminée.')
             ->line('Il ne vous reste plus qu\'à confirmer que tout est conforme.')
             ->action('Confirmer l\'intervention', url('/client/missions/' . $this->mission->id))

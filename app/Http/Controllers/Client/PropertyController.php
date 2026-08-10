@@ -53,7 +53,7 @@ class PropertyController extends Controller
 
         return redirect()
             ->route('client.properties.index')
-            ->with('success', 'Logement ajouté avec succès.');
+            ->with('success', 'Bien ajouté avec succès.');
     }
 
     public function show(Property $property): Response
@@ -101,7 +101,7 @@ class PropertyController extends Controller
 
         return redirect()
             ->route('client.properties.show', $property)
-            ->with('success', 'Logement mis à jour avec succès.');
+            ->with('success', 'Bien mis à jour avec succès.');
     }
 
     public function destroy(Property $property): RedirectResponse
@@ -109,13 +109,13 @@ class PropertyController extends Controller
         abort_unless($property->user_id === auth()->id(), 403);
 
         if (!$property->canBeDeleted()) {
-            return back()->with('error', 'Ce logement a des demandes en cours et ne peut pas être supprimé.');
+            return back()->with('error', 'Ce bien a des demandes en cours et ne peut pas être supprimé.');
         }
 
         $property->delete();
 
         return redirect()
             ->route('client.properties.index')
-            ->with('success', 'Logement supprimé avec succès.');
+            ->with('success', 'Bien supprimé avec succès.');
     }
 }

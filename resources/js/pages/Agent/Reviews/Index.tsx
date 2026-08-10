@@ -201,7 +201,7 @@ export default function ReviewsIndex({ reviews, stats }: Props) {
                                         Aucun avis pour le moment
                                     </h3>
                                     <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                                        Les avis apparaîtront ici après vos missions terminées.
+                                        Les avis apparaîtront ici après vos interventions terminées.
                                     </p>
                                 </div>
                             ) : (

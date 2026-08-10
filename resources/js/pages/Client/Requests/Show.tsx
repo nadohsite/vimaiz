@@ -329,7 +329,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-base dark:text-white">
                                         <Home className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                        Logement
+                                        Bien
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>

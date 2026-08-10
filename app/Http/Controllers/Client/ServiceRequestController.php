@@ -47,7 +47,7 @@ class ServiceRequestController extends Controller
         if ($properties->isEmpty()) {
             return redirect()
                 ->route('client.properties.create')
-                ->with('info', 'Veuillez d\'abord ajouter un logement.');
+                ->with('info', 'Veuillez d\'abord ajouter un bien.');
         }
 
         return Inertia::render('Client/Requests/Create', [

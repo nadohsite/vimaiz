@@ -5,7 +5,7 @@
 @section('content')
     <h1>❌ Devis refusé par le client</h1>
     
-    <p>Bonjour {{ $notifiable->name }},</p>
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
     
     <p>Un client a refusé le devis qui lui a été envoyé.</p>
 

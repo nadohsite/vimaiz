@@ -5,10 +5,10 @@
 @section('content')
     <h1>🏦 Nouvelle demande de retrait</h1>
     
-    <p>Un agent a soumis une nouvelle demande de retrait qui nécessite votre validation.</p>
+    <p>Un intervenant a soumis une nouvelle demande de retrait qui nécessite votre validation.</p>
 
     <div class="info-box">
-        <p><strong>Agent :</strong> {{ $agent->name }}</p>
+        <p><strong>Intervenant :</strong> {{ $agent->name }}</p>
         <p><strong>Email :</strong> {{ $agent->email }}</p>
         <p><strong>Montant demandé :</strong> {{ number_format($transaction->amount, 2, ',', ' ') }} €</p>
         <p><strong>Compte bancaire :</strong> {{ $bankAccount }}</p>

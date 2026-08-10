@@ -70,7 +70,7 @@ function formatDate(value: string) {
 }
 
 function propertyLabel(property: Property) {
-    return property.name || `${property.type_label ?? property.type ?? 'Logement'} — ${property.city}`;
+    return property.name || `${property.type_label ?? property.type ?? 'Bien'} — ${property.city}`;
 }
 
 export default function Dashboard({
@@ -82,7 +82,7 @@ export default function Dashboard({
 }: Props) {
     const [showRcpModal, setShowRcpModal] = useState(!rcpClauseAccepted);
     const { auth } = usePage<SharedData>().props;
-    const firstName = auth.user?.name?.split(' ')[0] ?? '';
+    const firstName = auth.user?.first_name || auth.user?.name?.split(' ')[0] || '';
 
     const statCards = [
         {
@@ -157,7 +157,7 @@ export default function Dashboard({
                                     Gérez vos interventions et suivez vos revenus.
                                 </p>
                                 <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
-                                    Vimaiz prélève une commission de 25 % sur chaque intervention
+                                    Vimaiz prélève une commission de 20 % sur chaque intervention
                                     pour couvrir la mise en relation, la gestion de la plateforme
                                     et le support.
                                 </p>

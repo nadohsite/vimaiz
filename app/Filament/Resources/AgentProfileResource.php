@@ -30,11 +30,11 @@ class AgentProfileResource extends Resource
     
     protected static string|UnitEnum|null $navigationGroup = 'Gestion Utilisateurs';
 
-    protected static ?string $navigationLabel = 'Profils Agents';
+    protected static ?string $navigationLabel = 'Profils Intervenants';
 
-    protected static ?string $modelLabel = 'Profil Agent';
+    protected static ?string $modelLabel = 'Profil Intervenant';
 
-    protected static ?string $pluralModelLabel = 'Profils Agents';
+    protected static ?string $pluralModelLabel = 'Profils Intervenants';
 
     protected static ?int $navigationSort = 2;
 
@@ -42,7 +42,7 @@ class AgentProfileResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make('Informations Agent')
+                Section::make('Informations Intervenant')
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->label('Utilisateur')
@@ -81,7 +81,7 @@ class AgentProfileResource extends Resource
                 Section::make('Statistiques')
                     ->schema([
                         Forms\Components\TextInput::make('missions_completed')
-                            ->label('Missions terminées')
+                            ->label('Interventions terminées')
                             ->disabled(),
                         Forms\Components\TextInput::make('average_rating')
                             ->label('Note moyenne')
@@ -100,7 +100,7 @@ class AgentProfileResource extends Resource
                 Tables\Columns\ImageColumn::make('profile_photo')
                     ->label('Photo')
                     ->circular()
-                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user?->name ?? 'Agent') . '&background=0ea5e9&color=fff')
+                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user?->name ?? 'Intervenant') . '&background=0ea5e9&color=fff')
                     ->disk('public'),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Nom')
@@ -140,7 +140,7 @@ class AgentProfileResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('missions_completed')
-                    ->label('Missions')
+                    ->label('Interventions')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('average_rating')
                     ->label('Note')
@@ -186,7 +186,7 @@ class AgentProfileResource extends Resource
                     ->visible(fn ($record) => in_array($record->verification_status, ['pending', 'submitted']))
                     ->requiresConfirmation()
                     ->modalHeading('Valider les documents')
-                    ->modalDescription('Confirmez que tous les documents de cet agent sont valides.')
+                    ->modalDescription('Confirmez que tous les documents de cet intervenant sont valides.')
                     ->action(function ($record) {
                         $record->update([
                             'verification_status' => 'verified',
@@ -200,7 +200,7 @@ class AgentProfileResource extends Resource
                         
                         Notification::make()
                             ->title('Documents validés')
-                            ->body('L\'agent a été notifié par email.')
+                            ->body('L\'intervenant a été notifié par email.')
                             ->success()
                             ->send();
                     }),
@@ -228,7 +228,7 @@ class AgentProfileResource extends Resource
                         
                         Notification::make()
                             ->title('Documents rejetés')
-                            ->body('L\'agent a été notifié par email.')
+                            ->body('L\'intervenant a été notifié par email.')
                             ->warning()
                             ->send();
                     }),
@@ -265,7 +265,7 @@ class AgentProfileResource extends Resource
                         
                         Notification::make()
                             ->title('Avertissement envoyé')
-                            ->body('L\'agent a maintenant ' . $record->warnings_count . ' avertissement(s).')
+                            ->body('L\'intervenant a maintenant ' . $record->warnings_count . ' avertissement(s).')
                             ->warning()
                             ->send();
                     }),
@@ -308,7 +308,7 @@ class AgentProfileResource extends Resource
                         }
                         
                         Notification::make()
-                            ->title('Agent suspendu')
+                            ->title('Intervenant suspendu')
                             ->body('Suspension jusqu\'au ' . $suspendedUntil->format('d/m/Y'))
                             ->danger()
                             ->send();
@@ -320,7 +320,7 @@ class AgentProfileResource extends Resource
                     ->visible(fn ($record) => $record->suspended_until && $record->suspended_until->isFuture())
                     ->requiresConfirmation()
                     ->modalHeading('Lever la suspension')
-                    ->modalDescription('L\'agent pourra à nouveau recevoir des missions.')
+                    ->modalDescription('L\'intervenant pourra à nouveau recevoir des interventions.')
                     ->action(function ($record) {
                         $record->update(['suspended_until' => null]);
                         
@@ -348,8 +348,8 @@ class AgentProfileResource extends Resource
                             ->placeholder('Décrivez la raison de cette exclusion définitive...'),
                     ])
                     ->requiresConfirmation()
-                    ->modalHeading('Exclure définitivement cet agent')
-                    ->modalDescription('⚠️ Cette action est irréversible. L\'agent ne pourra plus jamais utiliser la plateforme.')
+                    ->modalHeading('Exclure définitivement cet intervenant')
+                    ->modalDescription('⚠️ Cette action est irréversible. L\'intervenant ne pourra plus jamais utiliser la plateforme.')
                     ->action(function ($record, array $data) {
                         $record->update([
                             'is_banned' => true,
@@ -371,8 +371,8 @@ class AgentProfileResource extends Resource
                         }
                         
                         Notification::make()
-                            ->title('Agent exclu définitivement')
-                            ->body('L\'agent a été notifié par email.')
+                            ->title('Intervenant exclu définitivement')
+                            ->body('L\'intervenant a été notifié par email.')
                             ->danger()
                             ->send();
                     }),

@@ -24,7 +24,7 @@ class ReturnCompletedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('✅ Retour effectué - Mission ' . $this->mission->mission_number)
+            ->subject('✅ Retour effectué - Intervention ' . $this->mission->mission_number)
             ->view('emails.return-completed', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,

@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 
 class MissionsChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Missions des 30 derniers jours';
+    protected ?string $heading = 'Interventions des 30 derniers jours';
 
     protected static ?int $sort = 3;
 
@@ -27,7 +27,7 @@ class MissionsChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Missions',
+                    'label' => 'Interventions',
                     'data' => $data,
                     'fill' => true,
                     'backgroundColor' => 'rgba(14, 165, 233, 0.1)',

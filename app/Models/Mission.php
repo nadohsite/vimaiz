@@ -230,8 +230,8 @@ class Mission extends Model
             self::STATUS_PHOTOS_BEFORE => 'Photos avant OK',
             self::STATUS_PHOTOS_AFTER => 'Photos après OK',
             self::STATUS_COMPLETED => $this->relationLoaded('review') && $this->review
-                ? 'Logement prêt'
-                : ($this->review()->exists() ? 'Logement prêt' : 'Intervention terminée'),
+                ? 'Bien prêt'
+                : ($this->review()->exists() ? 'Bien prêt' : 'Intervention terminée'),
             self::STATUS_CANCELLED => 'Annulée',
             default => $this->status,
         };

@@ -15,7 +15,7 @@ class LatestRequestsWidget extends BaseWidget
 
     protected int | string | array $columnSpan = 'full';
 
-    protected static ?string $heading = 'Dernières demandes de ménage';
+    protected static ?string $heading = "Dernières demandes d'intervention";
 
     public function table(Table $table): Table
     {

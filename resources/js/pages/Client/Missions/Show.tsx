@@ -199,7 +199,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                             <CheckCircle className="h-8 w-8 text-green-500" />
                                             <div>
                                                 <h3 className="font-semibold text-green-800 dark:text-green-300">
-                                                    {mission.review ? 'Logement prêt' : 'Intervention terminée'}
+                                                    {mission.review ? 'Bien prêt' : 'Intervention terminée'}
                                                 </h3>
                                                 <p className="text-sm text-green-700 dark:text-green-400">
                                                     Terminée le {mission.completed_at && new Date(mission.completed_at).toLocaleDateString('fr-FR', {
@@ -542,7 +542,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                         <MapPin className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                                         <p className="text-slate-500 dark:text-slate-400">
                                             L&apos;arrivée de l&apos;intervenant est vérifiée par géolocalisation à proximité
-                                            du logement, et le début comme la fin de l&apos;intervention sont horodatés.
+                                            du bien, et le début comme la fin de l&apos;intervention sont horodatés.
                                         </p>
                                     </CardContent>
                                 </Card>
@@ -579,7 +579,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-base dark:text-white">
                                         <Home className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                        Logement
+                                        Bien
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>

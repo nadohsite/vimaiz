@@ -46,7 +46,7 @@ export function AppSidebar() {
             icon: LayoutGrid,
         },
         {
-            title: 'Mes logements',
+            title: 'Mes biens',
             href: route('client.properties.index'),
             icon: Home,
         },

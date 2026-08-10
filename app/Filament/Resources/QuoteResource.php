@@ -30,7 +30,7 @@ class QuoteResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-currency-euro';
     
-    protected static string|UnitEnum|null $navigationGroup = 'Demandes & Missions';
+    protected static string|UnitEnum|null $navigationGroup = 'Demandes & Interventions';
 
     protected static ?string $navigationLabel = 'Devis';
 
@@ -70,11 +70,11 @@ class QuoteResource extends Resource
                             ->dehydrated(false),
                     ])->columns(2),
 
-                Section::make('Informations du logement')
+                Section::make('Informations du bien')
                     ->description('Données pour aider au calcul du prix')
                     ->schema([
                         Forms\Components\TextInput::make('property_type')
-                            ->label('Type de logement')
+                            ->label('Type de bien')
                             ->disabled()
                             ->dehydrated(false)
                             ->formatStateUsing(fn ($state, Get $get): string => 
@@ -126,9 +126,9 @@ class QuoteResource extends Resource
                             ->suffix('€')
                             ->required()
                             ->live()
-                            ->helperText('Définissez le prix final pour cette mission')
+                            ->helperText('Définissez le prix final pour cette intervention')
                             ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                $rate = (float) ($get('commission_rate') ?? 25);
+                                $rate = (float) ($get('commission_rate') ?? 20);
                                 $final = (float) ($state ?? 0);
                                 $commission = round($final * ($rate / 100), 2);
                                 $agent = round($final - $commission, 2);
@@ -162,7 +162,7 @@ class QuoteResource extends Resource
                             ->disabled()
                             ->dehydrated(true),
                         Forms\Components\TextInput::make('agent_amount')
-                            ->label('Montant agent')
+                            ->label('Montant intervenant')
                             ->numeric()
                             ->suffix('€')
                             ->disabled()

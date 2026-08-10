@@ -34,9 +34,11 @@ class ConversationResource extends Resource
         return $schema
             ->schema([
                 Forms\Components\Select::make('client_id')
+                    ->label('Client')
                     ->relationship('client', 'name')
                     ->required(),
                 Forms\Components\Select::make('agent_id')
+                    ->label('Intervenant')
                     ->relationship('agent', 'name')
                     ->required(),
                 Forms\Components\Select::make('booking_id')
@@ -52,13 +54,15 @@ class ConversationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('client.name')
+                    ->label('Client')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('agent.name')
+                    ->label('Intervenant')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('booking.id')
-                    ->label('Booking ID')
+                    ->label('Réservation')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('last_message')
                     ->limit(50)

@@ -25,7 +25,7 @@ class ClientValidatedInterventionNotification extends Notification implements Sh
     {
         return (new MailMessage)
             ->subject('Intervention validée — Vimaiz')
-            ->greeting('Bonjour ' . $notifiable->name . ' !')
+            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
             ->line('✅ Votre intervention a été validée.')
             ->line('Merci pour votre professionnalisme.')
             ->action('Voir l\'intervention', url('/agent/missions/' . $this->mission->id))

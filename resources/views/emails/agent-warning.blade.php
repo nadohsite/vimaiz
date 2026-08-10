@@ -5,7 +5,7 @@
 @section('content')
     <h1>Avertissement reçu ⚠️</h1>
     
-    <p>Bonjour {{ $notifiable->name }},</p>
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
     
     <p>Nous vous informons que vous avez reçu un avertissement concernant votre activité sur VIMAIZ.</p>
     

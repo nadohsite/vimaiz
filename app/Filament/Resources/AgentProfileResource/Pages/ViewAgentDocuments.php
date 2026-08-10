@@ -44,7 +44,7 @@ class ViewAgentDocuments extends Page
                 ->visible(fn () => in_array($this->record->verification_status, ['pending', 'submitted']))
                 ->requiresConfirmation()
                 ->modalHeading('Valider les documents')
-                ->modalDescription('Confirmez que tous les documents de cet agent sont valides.')
+                ->modalDescription('Confirmez que tous les documents de cet intervenant sont valides.')
                 ->action(function () {
                     $this->record->update([
                         'verification_status' => 'verified',
@@ -57,7 +57,7 @@ class ViewAgentDocuments extends Page
                     
                     Notification::make()
                         ->title('Documents validés')
-                        ->body('L\'agent a été notifié par email.')
+                        ->body('L\'intervenant a été notifié par email.')
                         ->success()
                         ->send();
                 }),
@@ -84,7 +84,7 @@ class ViewAgentDocuments extends Page
                     
                     Notification::make()
                         ->title('Documents rejetés')
-                        ->body('L\'agent a été notifié par email.')
+                        ->body('L\'intervenant a été notifié par email.')
                         ->warning()
                         ->send();
                 }),

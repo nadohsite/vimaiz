@@ -76,7 +76,7 @@ export default function Show({ property }: Props) {
 
     return (
         <AppLayout breadcrumbs={[
-            { title: 'Mes logements', href: route('client.properties.index') },
+            { title: 'Mes biens', href: route('client.properties.index') },
             { title: property.name || property.type_label, href: '#' },
         ]}>
             <Head title={property.name || property.type_label} />
@@ -87,7 +87,7 @@ export default function Show({ property }: Props) {
                     <div className="mb-8">
                         <Link href={route('client.properties.index')} className="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 mb-4">
                             <ArrowLeft className="h-4 w-4 mr-1" />
-                            Retour aux logements
+                            Retour aux biens
                         </Link>
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div className="flex items-center gap-4">
@@ -176,7 +176,7 @@ export default function Show({ property }: Props) {
                             {property.checklist && property.checklist.length > 0 && (
                                 <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardHeader>
-                                        <CardTitle className="dark:text-white">Checklist du logement</CardTitle>
+                                        <CardTitle className="dark:text-white">Checklist du bien</CardTitle>
                                         <CardDescription className="dark:text-slate-400">
                                             Remise à l&apos;intervenant automatiquement à chaque intervention
                                         </CardDescription>
@@ -239,14 +239,14 @@ export default function Show({ property }: Props) {
                                         </div>
                                     ) : (
                                         <p className="text-center text-slate-500 dark:text-slate-400 py-4">
-                                            Aucune demande pour ce logement
+                                            Aucune demande pour ce bien
                                         </p>
                                     )}
                                 </CardContent>
                             </Card>
                         </div>
 
-                        {/* Sidebar - Informations pour l'agent */}
+                        {/* Sidebar - Informations pour l'intervenant */}
                         <div className="space-y-6">
                             <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>

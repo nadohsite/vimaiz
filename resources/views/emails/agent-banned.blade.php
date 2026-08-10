@@ -5,9 +5,9 @@
 @section('content')
     <h1>Votre compte a été définitivement exclu</h1>
     
-    <p>Bonjour {{ $notifiable->name }},</p>
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
     
-    <p>Nous avons le regret de vous informer que votre compte agent VIMAIZ a été définitivement exclu de notre plateforme.</p>
+    <p>Nous avons le regret de vous informer que votre compte intervenant VIMAIZ a été définitivement exclu de notre plateforme.</p>
     
     <div class="warning-box" style="background-color: #fef2f2; border-left-color: #dc2626;">
         <p style="color: #991b1b;"><strong>Raison de l'exclusion :</strong></p>
@@ -18,8 +18,8 @@
     
     <p>Cette décision est définitive et signifie que :</p>
     <ul style="margin: 20px 0; padding-left: 20px;">
-        <li>❌ Vous ne pouvez plus vous connecter à votre espace agent</li>
-        <li>❌ Vous ne recevrez plus de missions</li>
+        <li>❌ Vous ne pouvez plus vous connecter à votre espace intervenant</li>
+        <li>❌ Vous ne recevrez plus d'interventions</li>
         <li>❌ Vous ne pourrez plus créer de nouveau compte</li>
     </ul>
     

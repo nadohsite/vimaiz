@@ -44,7 +44,7 @@ class WalletResource extends Resource
                             ->badge()
                             ->formatStateUsing(fn ($state) => match ($state) {
                                 'client' => 'Client',
-                                'agent' => 'Agent',
+                                'agent' => 'Intervenant',
                                 'admin' => 'Admin',
                                 default => $state,
                             })
@@ -99,7 +99,7 @@ class WalletResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'client' => 'Client',
-                        'agent' => 'Agent',
+                        'agent' => 'Intervenant',
                         'admin' => 'Admin',
                         default => $state ?? '-',
                     })

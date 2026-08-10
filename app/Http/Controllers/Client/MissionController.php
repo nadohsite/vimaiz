@@ -73,6 +73,6 @@ class MissionController extends Controller
             $mission->agent->notify(new ClientValidatedInterventionNotification($mission));
         }
 
-        return back()->with('success', 'Merci. Votre logement est désormais prêt à accueillir ses prochains voyageurs.');
+        return back()->with('success', 'Merci. Votre bien est désormais prêt à accueillir ses prochains voyageurs.');
     }
 }

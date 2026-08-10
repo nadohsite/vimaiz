@@ -46,7 +46,7 @@ class WithdrawalRequestResource extends Resource
                 Section::make('Informations de la demande')
                     ->schema([
                         TextEntry::make('wallet.user.name')
-                            ->label('Agent'),
+                            ->label('Intervenant'),
                         TextEntry::make('wallet.user.email')
                             ->label('Email'),
                         TextEntry::make('amount')
@@ -98,7 +98,7 @@ class WithdrawalRequestResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('wallet.user.name')
-                    ->label('Agent')
+                    ->label('Intervenant')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
@@ -149,7 +149,7 @@ class WithdrawalRequestResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalHeading('Valider le retrait')
-                    ->modalDescription('Confirmez-vous avoir effectué le virement bancaire à cet agent ?')
+                    ->modalDescription('Confirmez-vous avoir effectué le virement bancaire à cet intervenant ?')
                     ->modalSubmitActionLabel('Oui, valider')
                     ->visible(fn ($record) => $record->status === 'pending')
                     ->action(function ($record) {
@@ -172,7 +172,7 @@ class WithdrawalRequestResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalHeading('Rejeter le retrait')
-                    ->modalDescription('Le montant sera remboursé au portefeuille de l\'agent.')
+                    ->modalDescription('Le montant sera remboursé au portefeuille de l\'intervenant.')
                     ->modalSubmitActionLabel('Rejeter et rembourser')
                     ->visible(fn ($record) => $record->status === 'pending')
                     ->action(function ($record) {

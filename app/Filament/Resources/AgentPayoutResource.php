@@ -23,11 +23,11 @@ class AgentPayoutResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Finances';
 
-    protected static ?string $navigationLabel = 'Paiements agents';
+    protected static ?string $navigationLabel = 'Paiements intervenants';
 
-    protected static ?string $modelLabel = 'Paiement agent';
+    protected static ?string $modelLabel = 'Paiement intervenant';
 
-    protected static ?string $pluralModelLabel = 'Paiements agents';
+    protected static ?string $pluralModelLabel = 'Paiements intervenants';
 
     public static function infolist(Schema $schema): Schema
     {
@@ -38,7 +38,7 @@ class AgentPayoutResource extends Resource
                         TextEntry::make('payout_number')
                             ->label('N° Paiement'),
                         TextEntry::make('agent.name')
-                            ->label('Agent'),
+                            ->label('Intervenant'),
                         TextEntry::make('status')
                             ->label('Statut')
                             ->badge()
@@ -104,7 +104,7 @@ class AgentPayoutResource extends Resource
                     ->label('N° Paiement')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('agent.name')
-                    ->label('Agent')
+                    ->label('Intervenant')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('period_start')

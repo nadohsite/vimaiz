@@ -55,7 +55,7 @@ class UserResource extends Resource
                 Forms\Components\Select::make('role')
                     ->options([
                         'client' => 'Client',
-                        'agent' => 'Agent',
+                        'agent' => 'Intervenant',
                         'admin' => 'Admin',
                     ])
                     ->required(),
@@ -66,7 +66,7 @@ class UserResource extends Resource
                     ->required(),
                 Forms\Components\DateTimePicker::make('email_verified_at'),
 
-                Section::make('Agent Profile')
+                Section::make('Profil Intervenant')
                     ->relationship('agentProfile')
                     ->schema([
                         Forms\Components\Textarea::make('description')
@@ -104,7 +104,7 @@ class UserResource extends Resource
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'admin' => 'Admin',
-                        'agent' => 'Agent',
+                        'agent' => 'Intervenant',
                         'client' => 'Client',
                         default => $state,
                     }),
@@ -120,7 +120,7 @@ class UserResource extends Resource
                     ->label('Rôle')
                     ->options([
                         'client' => 'Client',
-                        'agent' => 'Agent',
+                        'agent' => 'Intervenant',
                         'admin' => 'Admin',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')

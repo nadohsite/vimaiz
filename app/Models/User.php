@@ -169,6 +169,22 @@ class User extends Authenticatable implements FilamentUser
         return $this->name ?? '';
     }
 
+    /**
+     * Prénom pour les salutations (emails, dashboard).
+     */
+    public function preferredFirstName(): string
+    {
+        if (! empty($this->first_name)) {
+            return $this->first_name;
+        }
+
+        if (! empty($this->name)) {
+            return explode(' ', trim($this->name))[0];
+        }
+
+        return '';
+    }
+
     // Scopes
     public function scopeClients($query)
     {
