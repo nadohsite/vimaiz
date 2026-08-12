@@ -24,7 +24,7 @@
 
     <p>Vous recevrez une notification dès qu'un intervenant aura confirmé l'intervention. Votre facture est disponible dans votre espace client.</p>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">
             Suivre l'intervention
         </a>

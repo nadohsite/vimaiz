@@ -3,7 +3,7 @@
 @section('title', 'Intervention validée')
 
 @section('content')
-    <h1>Intervention validée ✅</h1>
+    <h1>Intervention validée ! ✅</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
@@ -19,11 +19,11 @@
         <p><strong>Adresse :</strong> {{ $mission->property->address_line1 }}, {{ $mission->property->postal_code }} {{ $mission->property->city }}</p>
     </div>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/agent/missions/' . $mission->id) }}" class="button">
             Voir l'intervention
         </a>
     </p>
 
-    <p>Merci pour votre travail !<br>L'équipe VIMAIZ</p>
+    <p>À bientôt,<br>L'équipe VIMAIZ</p>
 @endsection

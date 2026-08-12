@@ -58,7 +58,7 @@
         </div>
     @endif
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ $role === 'agent' ? url('/agent/dashboard') : url('/dashboard') }}" class="button">
             Voir mon espace
         </a>

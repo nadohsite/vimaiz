@@ -23,7 +23,7 @@
 
     <p>Une organisation simple, pensée pour que votre bien soit prêt à accueillir ses prochains voyageurs.</p>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/properties/create') }}" class="button">
             Ajouter mon bien
         </a>

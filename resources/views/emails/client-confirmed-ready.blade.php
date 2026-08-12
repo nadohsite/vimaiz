@@ -3,9 +3,9 @@
 @section('title', 'Bien prêt')
 
 @section('content')
-    <h1>Votre bien est prêt ✅</h1>
+    <h1>Votre bien est prêt ! ✅</h1>
 
-    <p>Merci {{ $notifiable->preferredFirstName() ?: $notifiable->name }} !</p>
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
     <p>Votre bien est désormais prêt à accueillir ses prochains voyageurs.</p>
 
@@ -14,7 +14,7 @@
         <p><strong>Bien :</strong> {{ $mission->property->name ?? $mission->property->type }}</p>
     </div>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">
             Voir l'intervention
         </a>

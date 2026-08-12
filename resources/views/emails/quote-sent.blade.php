@@ -40,7 +40,7 @@
 
     <p>Une fois le devis accepté, vous pourrez procéder au paiement sécurisé et un intervenant vous sera attribué.</p>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/quotes/' . $quote->id) }}" class="button">
             Voir le devis
         </a>

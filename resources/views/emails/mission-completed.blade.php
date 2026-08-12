@@ -28,7 +28,7 @@
 
     <p>L'intervention a été <strong>géolocalisée</strong> et <strong>horodatée</strong>. Retrouvez tous les détails dans votre espace client.</p>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">
             Confirmer l'intervention
         </a>

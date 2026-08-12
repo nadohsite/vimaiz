@@ -32,7 +32,7 @@
 
     <p>Quelques minutes suffisent pour finaliser et commencer à recevoir des missions.</p>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/agent/documents') }}" class="button">
             Compléter mon profil
         </a>

@@ -3,7 +3,7 @@
 @section('title', 'Intervention confirmée')
 
 @section('content')
-    <h1>Intervention prise en charge ✅</h1>
+    <h1>Intervention prise en charge ! ✅</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
@@ -22,7 +22,7 @@
         @endif
     </div>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">
             Voir les détails
         </a>

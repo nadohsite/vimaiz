@@ -39,11 +39,17 @@ class ContactReplyMail extends Mailable
             with: [
                 'contactMessage' => $this->contactMessage,
                 'replyMessage' => $this->replyMessage,
-                'notifiable' => (object) [
-                    'name' => $this->contactMessage->name,
-                    'email' => $this->contactMessage->email,
-                ],
+                'notifiable' => new class($this->contactMessage->name, $this->contactMessage->email)
+                {
+                    public function __construct(public string $name, public string $email) {}
+
+                    public function preferredFirstName(): string
+                    {
+                        return explode(' ', trim($this->name))[0] ?: $this->name;
+                    }
+                },
             ],
+
         );
     }
 

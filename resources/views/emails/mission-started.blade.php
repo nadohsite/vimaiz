@@ -21,7 +21,7 @@
 
     <p>La présence de l'intervenant sur place a été <strong>vérifiée par géolocalisation</strong> et le début de l'intervention est <strong>horodaté</strong>. Vous pouvez suivre l'avancement depuis votre espace client.</p>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">
             Suivre l'intervention
         </a>

@@ -28,7 +28,7 @@
 
     <p>Programmez votre intervention en quelques clics depuis votre espace client.</p>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/requests/create') }}" class="button">
             Planifier une intervention
         </a>

@@ -26,7 +26,7 @@
         <p>⚠️ <strong>Important :</strong> Vous avez 30 minutes pour accepter ou refuser cette intervention.</p>
     </div>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/agent/missions/' . $mission->id) }}" class="button">
             Voir l'intervention
         </a>

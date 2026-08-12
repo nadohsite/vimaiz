@@ -29,7 +29,7 @@
 
     <p>Assurez-vous que les photos sont nettes, complètes et que les documents sont encore valides.</p>
 
-    <p style="text-align: center;">
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/agent/documents') }}" class="button">
             Corriger mes documents
         </a>

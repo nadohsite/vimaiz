@@ -3,25 +3,29 @@
 @section('title', 'Nouvelle demande de retrait')
 
 @section('content')
-    <h1>🏦 Nouvelle demande de retrait</h1>
-    
+    <h1>Nouvelle demande de retrait ! 🏦</h1>
+
+    <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
+
     <p>Un intervenant a soumis une nouvelle demande de retrait qui nécessite votre validation.</p>
 
-    <div class="info-box">
+    <div class="success-box">
         <p><strong>Intervenant :</strong> {{ $agent->name }}</p>
-        <p><strong>Email :</strong> {{ $agent->email }}</p>
         <p><strong>Montant demandé :</strong> {{ number_format($transaction->amount, 2, ',', ' ') }} €</p>
-        <p><strong>Compte bancaire :</strong> {{ $bankAccount }}</p>
-        <p><strong>Date de demande :</strong> {{ $transaction->created_at->format('d/m/Y à H:i') }}</p>
+        <p><strong>Date de demande :</strong> {{ ($transaction->created_at ?? now())->format('d/m/Y à H:i') }}</p>
     </div>
 
-    <p style="text-align: center;">
+    <div class="info-box">
+        <p><strong>Email :</strong> {{ $agent->email }}</p>
+        <p><strong>Compte bancaire :</strong> {{ $bankAccount }}</p>
+        <p>Vous pouvez valider ou rejeter cette demande depuis le panneau d'administration.</p>
+    </div>
+
+    <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ config('app.url') }}/admin/withdrawal-requests/{{ $transaction->id }}" class="button">
             Traiter la demande
         </a>
     </p>
 
-    <p style="font-size: 13px; color: #64748b; margin-top: 30px;">
-        Vous pouvez valider ou rejeter cette demande depuis le panneau d'administration.
-    </p>
+    <p>À bientôt,<br>L'équipe VIMAIZ</p>
 @endsection

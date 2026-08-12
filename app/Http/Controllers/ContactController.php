@@ -34,10 +34,23 @@ class ContactController extends Controller
                 'email' => $validated['email'],
                 'subject' => $validated['subject'],
                 'content' => $validated['message'],
-                'notifiable' => (object) [
-                    'email' => config('mail.contact_email', 'contact@vimaiz.com'),
-                    'name' => 'Vimaiz',
-                ],
+                'notifiable' => new class
+                {
+                    public string $name = 'Vimaiz';
+
+                    public string $email;
+
+                    public function __construct()
+                    {
+                        $this->email = config('mail.contact_email', 'contact@vimaiz.com');
+                    }
+
+                    public function preferredFirstName(): string
+                    {
+                        return $this->name;
+                    }
+                },
+
             ];
 
             // Tenter d'envoyer un email (optionnel - ne bloque pas si ça échoue)
