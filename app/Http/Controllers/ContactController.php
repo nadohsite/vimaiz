@@ -34,6 +34,10 @@ class ContactController extends Controller
                 'email' => $validated['email'],
                 'subject' => $validated['subject'],
                 'content' => $validated['message'],
+                'notifiable' => (object) [
+                    'email' => config('mail.contact_email', 'contact@vimaiz.com'),
+                    'name' => 'Vimaiz',
+                ],
             ];
 
             // Tenter d'envoyer un email (optionnel - ne bloque pas si ça échoue)

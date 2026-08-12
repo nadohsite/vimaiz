@@ -139,25 +139,7 @@
 <body>
     <div class="wrapper">
         <div class="container">
-            <div class="header">
-                @php
-                    $logoSrc = \App\Support\EmailBranding::logoSrc($message ?? null);
-                @endphp
-                @if($logoSrc)
-                <a href="{{ config('app.url') }}" class="logo">
-                    <img
-                        src="{{ $logoSrc }}"
-                        alt="Vimaiz"
-                        width="140"
-                        height="37"
-                        style="width: 140px; height: auto; max-height: 40px; border: 0; display: block; margin: 0 auto;"
-                    >
-                </a>
-                @endif
-                <p class="header-slogan">
-                    La décoration attire le regard. La propreté inspire confiance.
-                </p>
-            </div>
+            @include('emails.partials.brand-header')
             <div class="content">
                 @yield('content')
             </div>
@@ -168,7 +150,7 @@
                     <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>
                 </p>
                 <p style="margin-top: 16px; font-size: 11px;">
-                    Cet email a été envoyé à {{ $notifiable->email ?? '' }}.<br>
+                    Cet email a été envoyé à {{ $notifiable->email ?? $email ?? '' }}.<br>
                     Si vous n'avez pas demandé cet email, veuillez nous contacter.
                 </p>
             </div>
