@@ -25,27 +25,20 @@ width: 100% !important;
 </style>
 {!! $head ?? '' !!}
 </head>
-<body>
+<body style="margin:0;padding:0;background-color:#f8fafc;">
 
-<table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+<table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#f8fafc;">
 <tr>
-<td align="center">
-<table class="content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+<td align="center" style="padding: 32px 16px;">
+<table class="inner-body" align="center" width="600" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;">
 {!! $header ?? '' !!}
 
 <!-- Email Body -->
 <tr>
-<td class="body" width="100%" cellpadding="0" cellspacing="0" style="border: hidden !important;">
-<table class="inner-body" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
-<!-- Body content -->
-<tr>
-<td class="content-cell">
+<td class="content-cell" align="left" style="padding:32px 28px 28px;text-align:left;color:#475569;">
 {!! Illuminate\Mail\Markdown::parse($slot) !!}
 
 {!! $subcopy ?? '' !!}
-</td>
-</tr>
-</table>
 </td>
 </tr>
 

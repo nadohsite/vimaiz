@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+    body { margin: 0; padding: 20px; background: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    .row { display: flex; gap: 24px; align-items: flex-start; }
+    .col { width: 340px; }
+    .tag { font-size: 13px; font-weight: 700; margin: 0 0 8px; padding: 4px 8px; border-radius: 4px; display: inline-block; }
+    .tag.old { background: #fee2e2; color: #991b1b; }
+    .tag.new { background: #dcfce7; color: #166534; }
+    .card { background: #fff; border-radius: 12px; overflow: hidden; }
+    .header { background-color: #0284c7; background-image: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding: 20px 24px 18px; text-align: center; }
+    .header img { width: 140px; height: auto; max-height: 40px; border: 0; display: block; margin: 0 auto; }
+    .slogan-old { margin: 10px 0 0; padding: 0 8px; color: #e0f2fe; font-size: 14px; line-height: 1.4; text-align: center; }
+    .slogan-new td { padding: 0; color: #e0f2fe; font-size: 13px; line-height: 1.45; text-align: center; white-space: nowrap; }
+    .body { padding: 20px 24px; }
+    .body h1 { margin: 0; color: #0f172a; font-size: 22px; line-height: 1.3; }
+</style>
+</head>
+<body>
+<div class="row">
+    <div class="col">
+        <p class="tag old">AVANT &mdash; avant 21h03</p>
+        <div class="card">
+            <div class="header">
+                <img src="../../../public/vimaiz-logo-email-white.png" alt="Vimaiz">
+                <p class="slogan-old">La décoration attire le regard. La propreté inspire confiance.</p>
+            </div>
+            <div class="body"><h1>Votre intervention est confirmée&nbsp;!</h1></div>
+        </div>
+    </div>
+    <div class="col">
+        <p class="tag new">APRÈS &mdash; ce qui part maintenant</p>
+        <div class="card">
+            <div class="header">
+                <img src="../../../public/vimaiz-logo-email-white.png" alt="Vimaiz">
+                <table class="slogan-new" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:10px;">
+                    <tr><td>La décoration attire le regard.</td></tr>
+                    <tr><td>La propreté inspire confiance.</td></tr>
+                </table>
+            </div>
+            <div class="body"><h1>Votre intervention est confirmée&nbsp;!</h1></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

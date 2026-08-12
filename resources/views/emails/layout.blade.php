@@ -34,11 +34,12 @@
         }
         .header-slogan {
             margin: 10px 0 0;
-            padding: 0;
+            padding: 0 8px;
             color: #e0f2fe !important;
-            font-size: 13px;
-            line-height: 1.45;
+            font-size: 14px;
+            line-height: 1.4;
             font-weight: 400;
+            text-align: center !important;
         }
         .content {
             padding: 32px 28px 28px;
