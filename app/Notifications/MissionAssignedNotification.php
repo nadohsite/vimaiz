@@ -29,7 +29,7 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nouvelle intervention disponible — Vimaiz')
+            ->subject('Nouvelle intervention à accepter — ' . $this->mission->mission_number)
             ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
             ->line('🔔 Une nouvelle intervention est disponible près de chez vous.')
             ->line('**Référence :** ' . $this->mission->mission_number)

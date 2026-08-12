@@ -99,7 +99,7 @@ img {
 
 .header {
     background-color: #0284c7;
-    padding: 36px 0;
+    padding: 18px 20px 16px;
     text-align: center;
 }
 
@@ -113,11 +113,12 @@ img {
 /* Logo */
 
 .logo {
-    height: 96px;
+    height: auto;
     margin-top: 0;
     margin-bottom: 0;
-    max-height: 96px;
-    width: 96px;
+    max-height: 40px;
+    max-width: 140px;
+    width: 140px;
 }
 
 /* Body */

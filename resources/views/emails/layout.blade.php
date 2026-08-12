@@ -26,7 +26,7 @@
         }
         .header {
             background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            padding: 36px 30px;
+            padding: 18px 24px 16px;
             text-align: center;
         }
         .logo {
@@ -35,12 +35,20 @@
             line-height: 0;
         }
         .logo img {
-            height: 96px;
-            width: 96px;
-            max-width: 96px;
+            width: 140px;
+            height: auto;
+            max-height: 40px;
             border: 0;
             display: block;
             margin: 0 auto;
+        }
+        .header-slogan {
+            margin: 10px 0 0;
+            padding: 0 8px;
+            color: #e0f2fe;
+            font-size: 14px;
+            line-height: 1.4;
+            font-weight: 400;
         }
         .content {
             padding: 40px 30px;
@@ -132,21 +140,28 @@
     <div class="wrapper">
         <div class="container">
             <div class="header">
+                @php
+                    $logoSrc = \App\Support\EmailBranding::logoSrc($message ?? null);
+                @endphp
+                @if($logoSrc)
                 <a href="{{ config('app.url') }}" class="logo">
                     <img
-                        src="{{ rtrim(config('app.url'), '/') }}/vimaiz-logo-email-white.png"
+                        src="{{ $logoSrc }}"
                         alt="Vimaiz"
-                        width="96"
-                        height="96"
-                        style="height: 96px; width: 96px; border: 0; display: block; margin: 0 auto;"
+                        width="140"
+                        height="37"
+                        style="width: 140px; height: auto; max-height: 40px; border: 0; display: block; margin: 0 auto;"
                     >
                 </a>
+                @endif
+                <p class="header-slogan">
+                    La décoration attire le regard. La propreté inspire confiance.
+                </p>
             </div>
             <div class="content">
                 @yield('content')
             </div>
             <div class="footer">
-                <p>Chaque bien mérite d’être prêt. À chaque arrivée.</p>
                 <p>© {{ date('Y') }} Vimaiz - Tous droits réservés</p>
                 <p>
                     <a href="{{ config('app.url') }}">vimaiz.com</a> |

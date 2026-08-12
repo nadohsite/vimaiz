@@ -16,15 +16,23 @@
         .header {
             background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             color: white;
-            padding: 32px 20px;
+            padding: 18px 20px 16px;
             text-align: center;
         }
         .header img {
-            height: 96px;
-            width: 96px;
+            width: 140px;
+            height: auto;
+            max-height: 40px;
             border: 0;
             display: block;
             margin: 0 auto;
+        }
+        .header-slogan {
+            margin: 10px 0 0;
+            color: #e0f2fe;
+            font-size: 14px;
+            line-height: 1.4;
+            font-weight: 400;
         }
         .content {
             background-color: #f8fafc;
@@ -47,17 +55,25 @@
 </head>
 <body>
     <div class="container">
+        @php
+            $logoSrc = \App\Support\EmailBranding::logoSrc($message ?? null);
+        @endphp
         <div class="header">
-            <a href="{{ config('app.url') }}" style="display:inline-block;text-decoration:none;">
+            @if($logoSrc)
+            <a href="{{ config('app.url') }}" style="display:inline-block;text-decoration:none;line-height:0;">
                 <img
-                    src="{{ rtrim(config('app.url'), '/') }}/vimaiz-logo-email-white.png"
+                    src="{{ $logoSrc }}"
                     alt="Vimaiz"
-                    width="96"
-                    height="96"
-                    style="height: 96px; width: 96px; border: 0; display: block; margin: 0 auto;"
+                    width="140"
+                    height="37"
+                    style="width: 140px; height: auto; max-height: 40px; border: 0; display: block; margin: 0 auto;"
                 >
             </a>
-            <h1 style="margin: 16px 0 0; font-size: 20px; color: #ffffff;">Nouveau message de contact</h1>
+            @endif
+            <p class="header-slogan">
+                La décoration attire le regard. La propreté inspire confiance.
+            </p>
+            <h1 style="margin: 12px 0 0; font-size: 18px; color: #ffffff;">Nouveau message de contact</h1>
         </div>
         <div class="content">
             <div class="field">

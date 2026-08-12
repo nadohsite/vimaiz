@@ -29,7 +29,7 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nouvelle intervention — Vimaiz')
+            ->subject('Votre intervention est confirmée — ' . $this->mission->mission_number)
             ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
             ->line('🔔 Votre intervention a bien été enregistrée.')
             ->line('Nous recherchons actuellement un intervenant disponible.')

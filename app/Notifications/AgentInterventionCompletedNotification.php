@@ -24,7 +24,7 @@ class AgentInterventionCompletedNotification extends Notification implements Sho
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Intervention terminée — Vimaiz')
+            ->subject('Intervention terminée — en attente du client — ' . $this->mission->mission_number)
             ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
             ->line('🎉 Merci.')
             ->line('Votre intervention est terminée.')
