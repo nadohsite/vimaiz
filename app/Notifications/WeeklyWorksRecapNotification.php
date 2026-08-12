@@ -31,7 +31,7 @@ class WeeklyWorksRecapNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Votre récap de la semaine — Vimaiz')
+            ->subject('Votre récap de la semaine')
             ->view('emails.weekly-works-recap', [
                 'notifiable' => $notifiable,
                 'completedMissions' => $this->completedMissions,

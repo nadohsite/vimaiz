@@ -29,7 +29,7 @@ class NewQuoteNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Votre devis VIMAIZ est prêt')
+            ->subject('Votre devis est prêt — ' . $this->quote->quote_number)
             ->view('emails.quote-sent', [
                 'notifiable' => $notifiable,
                 'quote' => $this->quote,

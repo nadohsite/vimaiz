@@ -3,23 +3,20 @@
 @section('title', 'Votre récap de la semaine')
 
 @section('content')
-    <h1>Voici le récap de vos interventions.</h1>
+    <h1>Votre récap de la semaine ! 📊</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>
-        Voici un aperçu de votre activité Vimaiz pour la semaine du
-        <strong>{{ $weekLabel }}</strong>.
-    </p>
+    <p>Voici un aperçu de votre activité Vimaiz pour la semaine du <strong>{{ $weekLabel }}</strong>.</p>
 
-    <div class="info-box">
+    <div class="success-box">
         <p><strong>Interventions terminées :</strong> {{ $completedMissions->count() }}</p>
         <p><strong>Interventions à venir :</strong> {{ $upcomingMissions->count() }}</p>
     </div>
 
     @if ($completedMissions->isNotEmpty())
-        <p><strong>Terminées la semaine dernière</strong></p>
         <div class="info-box">
+            <p><strong>Terminées la semaine dernière</strong></p>
             @foreach ($completedMissions as $mission)
                 <p>
                     • {{ $mission->mission_number }}
@@ -27,9 +24,7 @@
                     @if (!empty($mission->completed_at_label))
                         ({{ $mission->completed_at_label }})
                     @endif
-                    @if ($role === 'agent' && isset($mission->amount_label))
-                        — {{ $mission->amount_label }}
-                    @elseif ($role === 'client' && isset($mission->amount_label))
+                    @if (isset($mission->amount_label))
                         — {{ $mission->amount_label }}
                     @endif
                 </p>
@@ -38,8 +33,8 @@
     @endif
 
     @if ($upcomingMissions->isNotEmpty())
-        <p><strong>À venir cette semaine</strong></p>
-        <div class="success-box">
+        <div class="info-box">
+            <p><strong>À venir cette semaine</strong></p>
             @foreach ($upcomingMissions as $mission)
                 <p>
                     • {{ $mission->mission_number }}
@@ -53,24 +48,21 @@
     @endif
 
     @if ($completedMissions->isEmpty() && $upcomingMissions->isEmpty())
-        <p>
-            Aucune intervention à signaler pour cette période.
+        <div class="info-box">
+            <p>Aucune intervention à signaler pour cette période.</p>
             @if ($role === 'client')
-                C’est le bon moment pour organiser la prochaine.
+                <p>C’est le bon moment pour organiser la prochaine.</p>
             @else
-                De nouvelles interventions arriveront bientôt dans votre espace.
+                <p>De nouvelles interventions arriveront bientôt dans votre espace.</p>
             @endif
-        </p>
+        </div>
     @endif
 
     <p style="text-align: center;">
         <a href="{{ $role === 'agent' ? url('/agent/dashboard') : url('/dashboard') }}" class="button">
-            Voir mon espace →
+            Voir mon espace
         </a>
     </p>
 
-    <p>
-        À bientôt,<br>
-        L’équipe Vimaiz
-    </p>
+    <p>À bientôt,<br>L'équipe VIMAIZ</p>
 @endsection

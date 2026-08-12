@@ -23,7 +23,7 @@ class DocumentsRejectedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Documents rejetés - Action requise - VIMAIZ')
+            ->subject('Documents rejetés — action requise')
             ->view('emails.documents-rejected', [
                 'notifiable' => $notifiable,
                 'reason' => $this->reason,

@@ -3,16 +3,16 @@
 @section('title', 'Complétez votre profil intervenant')
 
 @section('content')
-    <h1>Votre profil est presque prêt 🚀</h1>
+    <h1>Votre profil est presque prêt ! 🚀</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>
-        Vous avez commencé votre inscription comme intervenant sur VIMAIZ,
-        mais votre profil n'est pas encore complet. Tant qu'il ne l'est pas,
-        <strong>vous ne pouvez pas recevoir d'interventions</strong> — et des clients
-        cherchent des intervenants en ce moment même.
-    </p>
+    <p>Votre inscription intervenant a bien démarré, mais votre profil n'est pas encore complet. Tant qu'il ne l'est pas, vous ne pouvez pas recevoir d'interventions.</p>
+
+    <div class="success-box">
+        <p><strong>Statut :</strong> Profil incomplet</p>
+        <p><strong>Objectif :</strong> Finaliser pour recevoir des interventions</p>
+    </div>
 
     @if (!empty($missingItems))
         <div class="warning-box">
@@ -23,7 +23,14 @@
         </div>
     @endif
 
-    <p>Quelques minutes suffisent pour finaliser votre profil et commencer à gagner de l'argent.</p>
+    <div class="info-box">
+        <p><strong>En quelques minutes :</strong></p>
+        <p>1. Complétez les informations manquantes</p>
+        <p>2. Déposez vos documents</p>
+        <p>3. Attendez la validation de notre équipe</p>
+    </div>
+
+    <p>Quelques minutes suffisent pour finaliser et commencer à recevoir des missions.</p>
 
     <p style="text-align: center;">
         <a href="{{ url('/agent/documents') }}" class="button">
@@ -31,10 +38,5 @@
         </a>
     </p>
 
-    <p>
-        Besoin d'aide ? Répondez simplement à cet email ou écrivez-nous à
-        <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>.
-    </p>
-
-    <p>L'équipe VIMAIZ</p>
+    <p>À bientôt,<br>L'équipe VIMAIZ</p>
 @endsection

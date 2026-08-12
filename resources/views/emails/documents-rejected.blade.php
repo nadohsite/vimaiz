@@ -3,40 +3,37 @@
 @section('title', 'Documents rejetés')
 
 @section('content')
-    <h1>Action requise : Documents rejetés</h1>
-    
+    <h1>Documents rejetés — action requise ⚠️</h1>
+
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
-    
-    <p>Nous avons examiné les documents que vous avez soumis, mais nous ne pouvons malheureusement pas les valider en l'état.</p>
-    
-    <div class="warning-box">
-        <p><strong>⚠️ Raison du rejet :</strong></p>
-        <p style="margin-top: 10px;">{{ $reason }}</p>
+
+    <p>Nous avons examiné vos documents, mais nous ne pouvons pas les valider en l'état.</p>
+
+    <div class="success-box">
+        <p><strong>Statut :</strong> Rejetés</p>
+        <p><strong>Action :</strong> Merci de renvoyer des documents conformes</p>
     </div>
-    
-    <h2 style="margin-top: 30px;">Que faire maintenant ?</h2>
-    
-    <ol style="margin: 20px 0; padding-left: 20px;">
-        <li>Connectez-vous à votre espace intervenant</li>
-        <li>Accédez à la section "Mes documents"</li>
-        <li>Téléchargez les documents corrigés</li>
-        <li>Soumettez à nouveau pour vérification</li>
-    </ol>
-    
+
+    <div class="warning-box">
+        <p><strong>Raison du rejet :</strong></p>
+        <p>{{ $reason }}</p>
+    </div>
+
+    <div class="info-box">
+        <p><strong>Que faire maintenant ?</strong></p>
+        <p>1. Connectez-vous à votre espace intervenant</p>
+        <p>2. Accédez à « Mes documents »</p>
+        <p>3. Téléversez des documents lisibles et à jour</p>
+        <p>4. Soumettez à nouveau pour vérification</p>
+    </div>
+
+    <p>Assurez-vous que les photos sont nettes, complètes et que les documents sont encore valides.</p>
+
     <p style="text-align: center;">
         <a href="{{ url('/agent/documents') }}" class="button">
             Corriger mes documents
         </a>
     </p>
-    
-    <div class="info-box">
-        <p><strong>💡 Conseils :</strong></p>
-        <p>- Assurez-vous que les documents sont lisibles et non flous</p>
-        <p>- Vérifiez que toutes les informations sont visibles</p>
-        <p>- Les documents doivent être en cours de validité</p>
-    </div>
-    
-    <p>Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>.</p>
-    
-    <p>L'équipe VIMAIZ</p>
+
+    <p>À bientôt,<br>L'équipe VIMAIZ</p>
 @endsection
