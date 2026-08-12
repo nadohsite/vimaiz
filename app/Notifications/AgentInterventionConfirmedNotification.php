@@ -24,12 +24,11 @@ class AgentInterventionConfirmedNotification extends Notification implements Sho
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Intervention confirmée — Vimaiz')
-            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
-            ->line('✅ Votre intervention est confirmée.')
-            ->line('Retrouvez toutes les informations dans votre espace.')
-            ->action('Voir l\'intervention', url('/agent/missions/' . $this->mission->id))
-            ->salutation('L\'équipe Vimaiz');
+            ->subject('Intervention confirmée — ' . $this->mission->mission_number)
+            ->view('emails.agent-intervention-confirmed', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+            ]);
     }
 
     public function toArray(object $notifiable): array

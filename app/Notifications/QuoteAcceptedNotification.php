@@ -29,13 +29,11 @@ class QuoteAcceptedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('✅ Devis accepté - ' . $this->quote->quote_number)
-            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ',')
-            ->line('Le devis ' . $this->quote->quote_number . ' a été accepté par le client.')
-            ->line('**Client:** ' . $this->quote->user->name)
-            ->line('**Montant:** ' . number_format($this->quote->final_price ?? $this->quote->estimated_price, 2, ',', ' ') . ' €')
-            ->action('Voir le devis', url('/admin/quotes/' . $this->quote->id))
-            ->line('Le client peut maintenant procéder au paiement.');
+            ->subject('Devis accepté — ' . $this->quote->quote_number)
+            ->view('emails.quote-accepted', [
+                'notifiable' => $notifiable,
+                'quote' => $this->quote,
+            ]);
     }
 
     public function toArray(object $notifiable): array
@@ -44,7 +42,7 @@ class QuoteAcceptedNotification extends Notification implements ShouldQueue
             'type' => 'quote_accepted',
             'quote_id' => $this->quote->id,
             'quote_number' => $this->quote->quote_number,
-            'client_name' => $this->quote->user->name,
+            'client_name' => $this->quote->serviceRequest?->client?->name,
             'amount' => $this->quote->final_price ?? $this->quote->estimated_price,
             'message' => 'Devis accepté : ' . $this->quote->quote_number,
             'url' => '/admin/quotes/' . $this->quote->id,

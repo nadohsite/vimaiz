@@ -11,7 +11,7 @@
     
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
-        <p><strong>Début :</strong> {{ $mission->started_at->format('d/m/Y à H:i') }}</p>
+        <p><strong>Début :</strong> {{ ($mission->started_at ?? now())->format('d/m/Y à H:i') }}</p>
     </div>
     
     <div class="info-box">

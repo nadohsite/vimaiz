@@ -24,12 +24,11 @@ class ClientValidatedInterventionNotification extends Notification implements Sh
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Intervention validée — Vimaiz')
-            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
-            ->line('✅ Votre intervention a été validée.')
-            ->line('Merci pour votre professionnalisme.')
-            ->action('Voir l\'intervention', url('/agent/missions/' . $this->mission->id))
-            ->salutation('L\'équipe Vimaiz');
+            ->subject('Intervention validée — ' . $this->mission->mission_number)
+            ->view('emails.client-validated-intervention', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+            ]);
     }
 
     public function toArray(object $notifiable): array

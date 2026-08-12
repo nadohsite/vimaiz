@@ -25,12 +25,11 @@ class ClientConfirmedReadyNotification extends Notification implements ShouldQue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Bien prêt — Vimaiz')
-            ->greeting('Merci ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
-            ->line('✅ Merci.')
-            ->line('Votre bien est désormais prêt à accueillir ses prochains voyageurs.')
-            ->action('Voir l\'intervention', url('/client/missions/' . $this->mission->id))
-            ->salutation('L\'équipe Vimaiz');
+            ->subject('Bien prêt — ' . $this->mission->mission_number)
+            ->view('emails.client-confirmed-ready', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+            ]);
     }
 
     public function toArray(object $notifiable): array

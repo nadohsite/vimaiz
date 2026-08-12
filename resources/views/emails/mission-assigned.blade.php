@@ -25,7 +25,7 @@
     </div>
     
     <div class="info-box">
-        <p><strong>Date et heure :</strong> {{ $mission->scheduled_at->format('d/m/Y à H:i') }}</p>
+        <p><strong>Date et heure :</strong> {{ ($mission->scheduled_at ?? now())->format('d/m/Y à H:i') }}</p>
         <p><strong>Durée estimée :</strong> {{ $mission->duration_hours }} heure(s)</p>
     </div>
     

@@ -30,12 +30,10 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Nouvelle intervention à accepter — ' . $this->mission->mission_number)
-            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
-            ->line('🔔 Une nouvelle intervention est disponible près de chez vous.')
-            ->line('**Référence :** ' . $this->mission->mission_number)
-            ->line('**Date prévue :** ' . $this->mission->scheduled_at->format('d/m/Y à H:i'))
-            ->action('Voir l\'intervention', url('/agent/missions/' . $this->mission->id))
-            ->salutation('L\'équipe Vimaiz');
+            ->view('emails.mission-assigned', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+            ]);
     }
 
     public function toArray(object $notifiable): array

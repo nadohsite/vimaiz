@@ -23,20 +23,12 @@ class AgentAcceptedMissionNotification extends Notification implements ShouldQue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $property = $this->mission->property;
-
         return (new MailMessage)
-            ->subject('Intervention confirmée — Vimaiz')
-            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
-            ->line('✅ Votre intervention est désormais prise en charge.')
-            ->line('Un intervenant Vimaiz a été assigné à votre bien.')
-            ->line('')
-            ->line('**Détails :**')
-            ->line('- Intervention : ' . $this->mission->mission_number)
-            ->line('- Bien : ' . ($property->name ?? $property->type_label))
-            ->line('- Date prévue : ' . $this->mission->scheduled_at->format('d/m/Y à H:i'))
-            ->action('Voir les détails', url('/client/missions/' . $this->mission->id))
-            ->salutation('L\'équipe Vimaiz');
+            ->subject('Intervention confirmée — ' . $this->mission->mission_number)
+            ->view('emails.agent-accepted-mission', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+            ]);
     }
 
     public function toArray(object $notifiable): array

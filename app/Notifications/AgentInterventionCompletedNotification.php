@@ -25,12 +25,10 @@ class AgentInterventionCompletedNotification extends Notification implements Sho
     {
         return (new MailMessage)
             ->subject('Intervention terminée — en attente du client — ' . $this->mission->mission_number)
-            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
-            ->line('🎉 Merci.')
-            ->line('Votre intervention est terminée.')
-            ->line('Le client va maintenant la confirmer.')
-            ->action('Voir l\'intervention', url('/agent/missions/' . $this->mission->id))
-            ->salutation('L\'équipe Vimaiz');
+            ->view('emails.agent-intervention-completed', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+            ]);
     }
 
     public function toArray(object $notifiable): array

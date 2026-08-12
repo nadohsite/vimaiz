@@ -25,10 +25,10 @@ class MissionStartedNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Votre intervention a commencé — ' . $this->mission->mission_number)
-            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ' !')
-            ->line('🏡 Votre intervenant a commencé son intervention.')
-            ->action('Suivre l\'intervention', url('/client/missions/' . $this->mission->id))
-            ->salutation('L\'équipe Vimaiz');
+            ->view('emails.mission-started', [
+                'notifiable' => $notifiable,
+                'mission' => $this->mission,
+            ]);
     }
 
     public function toArray(object $notifiable): array

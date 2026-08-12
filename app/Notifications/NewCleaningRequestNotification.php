@@ -29,15 +29,11 @@ class NewCleaningRequestNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('🏠 Nouvelle intervention - ' . $this->request->request_number)
-            ->greeting('Bonjour ' . ($notifiable->preferredFirstName() ?: $notifiable->name) . ',')
-            ->line('Une nouvelle demande d\'intervention a été soumise.')
-            ->line('**Numéro de demande:** ' . $this->request->request_number)
-            ->line('**Client:** ' . $this->request->user->name)
-            ->line('**Type de bien:** ' . ($this->request->property->property_type ?? 'N/A'))
-            ->line('**Date souhaitée:** ' . ($this->request->preferred_date ? $this->request->preferred_date->format('d/m/Y') : 'Flexible'))
-            ->action('Voir la demande', url('/admin/cleaning-requests/' . $this->request->id))
-            ->line('Merci de traiter cette demande rapidement.');
+            ->subject('Nouvelle demande d\'intervention — ' . $this->request->request_number)
+            ->view('emails.new-cleaning-request', [
+                'notifiable' => $notifiable,
+                'request' => $this->request,
+            ]);
     }
 
     public function toArray(object $notifiable): array

@@ -1,24 +1,29 @@
-<x-mail::message>
-# Bonjour {{ $contactMessage->name }},
+@extends('emails.layout')
 
-Merci de nous avoir contacté. Voici notre réponse à votre message :
+@section('title', 'Réponse à votre message')
 
----
+@section('content')
+    <h1>Réponse à votre message</h1>
 
-{!! nl2br(e($replyMessage)) !!}
+    <p>Bonjour {{ $contactMessage->name }},</p>
 
----
+    <p>Merci de nous avoir contacté. Voici notre réponse à votre message :</p>
 
-**Votre message original :**
-> **Sujet :** {{ $contactMessage->subject }}
-> 
-> {{ $contactMessage->message }}
+    <div class="info-box">
+        <p>{!! nl2br(e($replyMessage)) !!}</p>
+    </div>
 
-Cordialement,<br>
-L'équipe {{ config('app.name') }}
+    <p><strong>Votre message original :</strong></p>
+    <div class="info-box">
+        <p><strong>Sujet :</strong> {{ $contactMessage->subject }}</p>
+        <p>{{ $contactMessage->message }}</p>
+    </div>
 
-<x-mail::button :url="config('app.url')">
-Visiter notre site
-</x-mail::button>
+    <p style="text-align: center;">
+        <a href="{{ config('app.url') }}" class="button">
+            Visiter notre site
+        </a>
+    </p>
 
-</x-mail::message>
+    <p>Cordialement,<br>L'équipe VIMAIZ</p>
+@endsection

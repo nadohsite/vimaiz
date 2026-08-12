@@ -35,10 +35,14 @@ class ContactReplyMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.contact-reply',
+            html: 'emails.contact-reply',
             with: [
                 'contactMessage' => $this->contactMessage,
                 'replyMessage' => $this->replyMessage,
+                'notifiable' => (object) [
+                    'name' => $this->contactMessage->name,
+                    'email' => $this->contactMessage->email,
+                ],
             ],
         );
     }

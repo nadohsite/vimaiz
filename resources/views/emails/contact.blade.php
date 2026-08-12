@@ -16,7 +16,7 @@
         .header {
             background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             color: white;
-            padding: 18px 20px 16px;
+            padding: 18px 24px 16px;
             text-align: center;
         }
         .header img {

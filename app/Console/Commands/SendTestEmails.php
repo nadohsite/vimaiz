@@ -292,6 +292,17 @@ class SendTestEmails extends Command
                 $mission->setRelation('property', $this->sampleProperty());
             }
 
+            // Dates manquantes : évite les erreurs de rendu sur les mails de test
+            if (! $mission->scheduled_at) {
+                $mission->scheduled_at = now()->addDays(2)->setTime(10, 0);
+            }
+            if (! $mission->started_at) {
+                $mission->started_at = now()->subHours(2);
+            }
+            if (! $mission->completed_at) {
+                $mission->completed_at = now()->subHour();
+            }
+
             return $mission;
         }
 

@@ -7,11 +7,11 @@
     
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
     
-    <p>L'intervention sur votre bien est terminée avec succès !</p>
-    
+    <p>L'intervention sur votre bien est terminée. Il ne vous reste plus qu'à confirmer que tout est conforme.</p>
+
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
-        <p><strong>Statut :</strong> ✅ Terminée</p>
+        <p><strong>Statut :</strong> ✅ Terminée — à confirmer</p>
     </div>
     
     <div class="info-box">
@@ -30,7 +30,7 @@
     
     <p style="text-align: center;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">
-            Voir l'intervention
+            Confirmer l'intervention
         </a>
     </p>
     
