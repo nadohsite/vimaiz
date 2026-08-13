@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 const TYPE_OPTIONS = ['Appartement', 'Maison', 'Villa', 'Chalet'] as const;
 
 /** Tarif ménage interne — non affiché au public */
-const PRICE_PER_M2 = 1.5;
+const PRICE_PER_M2 = 1.7;
 const DEFAULT_SURFACE = 50;
 
 const CLIENT_FAQS = [
