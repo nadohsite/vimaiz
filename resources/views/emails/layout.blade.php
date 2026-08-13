@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
     <title>@yield('title') - VIMAIZ</title>
     <!--[if mso]>
     <style type="text/css">
@@ -11,6 +14,10 @@
     </style>
     <![endif]-->
     <style>
+        :root {
+            color-scheme: light;
+            supported-color-schemes: light;
+        }
         body {
             margin: 0 !important;
             padding: 0 !important;
@@ -126,13 +133,36 @@
             margin-top: 14px !important;
             font-size: 11px !important;
         }
+        @media only screen and (max-width: 600px) {
+            .outer-gutter { padding: 16px 10px !important; }
+            .container { width: 100% !important; }
+            .header { padding: 18px 12px 16px !important; }
+            .header-slogan { padding: 0 !important; }
+            .content { padding: 24px 18px 22px !important; }
+            .content h1 { font-size: 20px !important; }
+            .info-box,
+            .success-box,
+            .warning-box { padding: 12px 14px !important; }
+            .button {
+                display: block !important;
+                padding: 14px 16px !important;
+                text-align: center !important;
+            }
+            .footer { padding: 20px 18px !important; }
+            .footer p { font-size: 12px !important; }
+        }
+        @media only screen and (max-width: 360px) {
+            /* La limite du slogan étant en em, réduire la police garde la coupure au même mot. */
+            .header-slogan { font-size: 13px !important; }
+            .content { padding: 22px 14px 20px !important; }
+        }
     </style>
 </head>
 <body style="margin:0;padding:0;background-color:#f8fafc;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
     {{-- Gmail supprime la balise body : le verrou anti-agrandissement doit être en ligne sur les tableaux, sinon chaque mail est mis à l'échelle différemment. --}}
     <table role="presentation" class="wrapper" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
         <tr>
-            <td align="center" style="padding: 32px 16px;">
+            <td align="center" class="outer-gutter" style="padding: 32px 16px;">
                 <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
                     <tr>
                         <td align="center" class="header" style="background-color:#0284c7;background-image:linear-gradient(135deg,#0284c7 0%,#0369a1 100%);padding:20px 24px 18px;text-align:center;">
