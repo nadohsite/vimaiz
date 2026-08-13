@@ -9,7 +9,8 @@ body *:not(html):not(style):not(br):not(tr):not(code) {
 }
 
 body {
-    -webkit-text-size-adjust: none;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
     background-color: #f8fafc;
     color: #334155;
     height: 100%;

@@ -127,11 +127,12 @@
         }
     </style>
 </head>
-<body style="margin:0;padding:0;background-color:#f8fafc;">
-    <table role="presentation" class="wrapper" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;">
+<body style="margin:0;padding:0;background-color:#f8fafc;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+    {{-- Gmail supprime la balise body : le verrou anti-agrandissement doit être en ligne sur les tableaux, sinon chaque mail est mis à l'échelle différemment. --}}
+    <table role="presentation" class="wrapper" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
         <tr>
             <td align="center" style="padding: 32px 16px;">
-                <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;">
+                <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
                     <tr>
                         <td align="center" class="header" style="background-color:#0284c7;background-image:linear-gradient(135deg,#0284c7 0%,#0369a1 100%);padding:20px 24px 18px;text-align:center;">
                             @include('emails.partials.brand-header')

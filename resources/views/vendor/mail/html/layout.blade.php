@@ -25,12 +25,12 @@ width: 100% !important;
 </style>
 {!! $head ?? '' !!}
 </head>
-<body style="margin:0;padding:0;background-color:#f8fafc;">
+<body style="margin:0;padding:0;background-color:#f8fafc;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
 
-<table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#f8fafc;">
+<table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#f8fafc;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
 <tr>
 <td align="center" style="padding: 32px 16px;">
-<table class="inner-body" align="center" width="600" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;">
+<table class="inner-body" align="center" width="600" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
 {!! $header ?? '' !!}
 
 <!-- Email Body -->
