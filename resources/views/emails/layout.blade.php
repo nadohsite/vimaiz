@@ -33,8 +33,9 @@
             padding: 20px 24px 18px;
         }
         .header-slogan {
-            margin: 10px 0 0;
+            margin: 10px auto 0;
             padding: 0 8px;
+            max-width: 20em;
             color: #e0f2fe !important;
             font-size: 14px;
             line-height: 1.4;

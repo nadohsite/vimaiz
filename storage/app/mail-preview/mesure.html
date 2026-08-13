@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+    span { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; white-space: nowrap; }
+</style>
+</head>
+<body>
+<span id="a">La décoration attire le regard. La propreté</span><br>
+<span id="b">La décoration attire le regard. La propreté inspire</span><br>
+<span id="c">La décoration attire le regard. La propreté inspire confiance.</span>
+<pre id="out"></pre>
+<script>
+    const f = (id) => {
+        const w = document.getElementById(id).getBoundingClientRect().width;
+        return id + ' = ' + w.toFixed(1) + 'px = ' + (w / 14).toFixed(2) + 'em';
+    };
+    document.getElementById('out').textContent = ['a', 'b', 'c'].map(f).join(' | ');
+</script>
+</body>
+</html>
