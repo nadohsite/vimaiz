@@ -216,7 +216,10 @@ export default function Welcome({
     }, [total]);
 
     return (
-        <PublicLayout title="VIMAIZ — Dormez l'esprit Tranquille">
+        <PublicLayout
+            title="VIMAIZ — Dormez l'esprit Tranquille"
+            description="Dormez l'esprit Tranquille. Vimaiz veille à ce que chacun de vos logements soit toujours prêt à accueillir les prochains voyageurs."
+        >
             <section className="hero wrap">
                 <div className="hero-grid">
                     <div>

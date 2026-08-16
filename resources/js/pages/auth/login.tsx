@@ -25,10 +25,15 @@ export default function Login({
 }: LoginProps) {
     return (
         <AuthLayout
-            title="Bienvenue chez VIMAIZ"
+            title="Connexion"
             description="Connectez-vous pour accéder à votre espace personnalisé"
         >
-            <Head title="Connexion" />
+            <Head title="Connexion">
+                <meta
+                    name="description"
+                    content="Connectez-vous à votre espace VIMAIZ pour gérer vos logements, interventions et paiements."
+                />
+            </Head>
 
             <Form
                 {...store.form()}

@@ -3,9 +3,15 @@ import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, Home, MapPin, User, CheckCircle, XCircle, Play, Star, Award, AlertCircle, Maximize, BedDouble, Bath, Layers, DoorOpen, Wifi, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Home, MapPin, User, CheckCircle, XCircle, Play, Star, Award, AlertCircle, Maximize, BedDouble, Bath, Layers, DoorOpen, Wifi, Trash2, Clock } from 'lucide-react';
 import PropertyMap from '@/components/map/PropertyMap';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import InterventionReportWizard, {
+    type DraftAnomaly,
+    type ReportCategory,
+} from '@/components/missions/InterventionReportWizard';
+import InterventionReportCard, { type ReportAnomaly, type ReportSummary } from '@/components/missions/InterventionReportCard';
+import { elapsedMinutesBetween, formatDurationMinutes } from '@/lib/duration';
 
 interface Property {
     id: number;
@@ -44,6 +50,9 @@ interface Mission {
     started_at: string | null;
     completed_at: string | null;
     duration_hours: number;
+    actual_duration_minutes: number | null;
+    actual_duration_label: string | null;
+    estimated_duration_label: string | null;
     agent_payout: number;
     status: string;
     status_label: string;
@@ -67,6 +76,8 @@ interface Mission {
         comment: string | null;
         created_at: string;
     } | null;
+    anomalies?: ReportAnomaly[];
+    report_nothing_to_report?: boolean | null;
 }
 
 interface Props {
@@ -79,6 +90,8 @@ interface Props {
         checked: number;
         complete: boolean;
     };
+    reportCatalog?: ReportCategory[];
+    reportSummary?: ReportSummary;
 }
 
 const charTileClass = 'flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-700 rounded-lg border border-slate-100 dark:border-slate-600';
@@ -91,12 +104,34 @@ export default function Show({
     canStart,
     canComplete,
     checklistProgress = { total: 0, checked: 0, complete: true },
+    reportCatalog = [],
+    reportSummary,
 }: Props) {
     const { props } = usePage<{ flash?: { success?: string; error?: string } }>();
     const flash = props.flash;
     const [starting, setStarting] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
     const [togglingItem, setTogglingItem] = useState<string | null>(null);
+    const [reportOpen, setReportOpen] = useState(false);
+    const [completing, setCompleting] = useState(false);
+    const [elapsedMinutes, setElapsedMinutes] = useState(() =>
+        elapsedMinutesBetween(mission.started_at, mission.completed_at),
+    );
+
+    useEffect(() => {
+        setElapsedMinutes(elapsedMinutesBetween(mission.started_at, mission.completed_at));
+        if (!mission.started_at || mission.completed_at) {
+            return;
+        }
+        const timer = window.setInterval(() => {
+            setElapsedMinutes(elapsedMinutesBetween(mission.started_at, null));
+        }, 1000);
+        return () => window.clearInterval(timer);
+    }, [mission.started_at, mission.completed_at]);
+
+    const durationLabel = mission.completed_at
+        ? (mission.actual_duration_label || (elapsedMinutes != null ? formatDurationMinutes(elapsedMinutes) : null))
+        : (elapsedMinutes != null ? formatDurationMinutes(elapsedMinutes) : null);
 
     const { post: postRefuse, processing: refuseProcessing } = useForm({
         reason: '',
@@ -174,15 +209,23 @@ export default function Show({
     };
 
     const handleComplete = () => {
-        if (!checklistProgress.complete) {
-            alert(
-                `Checklist incomplète (${checklistProgress.checked}/${checklistProgress.total}). Cochez toutes les tâches avant de terminer.`,
-            );
-            return;
-        }
-        if (confirm('Confirmer la fin de l\'intervention ?')) {
-            router.post(route('agent.missions.complete', mission.id));
-        }
+        setReportOpen(true);
+    };
+
+    const handleSubmitReport = (payload: { nothing_to_report: boolean; anomalies: DraftAnomaly[] }) => {
+        setCompleting(true);
+        router.post(
+            route('agent.missions.complete', mission.id),
+            {
+                nothing_to_report: payload.nothing_to_report ? 1 : 0,
+                anomalies: payload.anomalies,
+            },
+            {
+                preserveScroll: true,
+                onFinish: () => setCompleting(false),
+                onSuccess: () => setReportOpen(false),
+            },
+        );
     };
 
     const handleToggleChecklistItem = (sectionId: string, itemId: string, checked: boolean) => {
@@ -302,15 +345,21 @@ export default function Show({
                                         <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
                                         <h3 className="font-semibold text-green-800 mb-2">Intervention en cours</h3>
                                         <p className="text-sm text-green-700 mb-4">
-                                            Cochez toute la checklist ci-dessous, puis terminez l'intervention.
+                                            Cochez les tâches réalisées, puis terminez avec le rapport d&apos;intervention.
                                         </p>
-                                        <p className="text-sm text-green-800 mb-4 font-medium">
+                                        <p className="text-sm text-green-800 mb-1 font-medium">
                                             Checklist : {checklistProgress.checked}/{checklistProgress.total}
                                         </p>
+                                        {durationLabel && (
+                                            <p className="text-sm text-green-700 mb-4 flex items-center justify-center gap-1">
+                                                <Clock className="h-3.5 w-3.5" />
+                                                Temps passé : {durationLabel}
+                                            </p>
+                                        )}
+                                        {!durationLabel && <div className="mb-4" />}
                                         <Button
                                             onClick={handleComplete}
-                                            disabled={!checklistProgress.complete}
-                                            className="bg-green-500 hover:bg-green-600 disabled:opacity-50"
+                                            className="bg-green-500 hover:bg-green-600"
                                         >
                                             Terminer l'intervention
                                         </Button>
@@ -380,6 +429,15 @@ export default function Show({
                                         )}
                                     </CardContent>
                                 </Card>
+                            )}
+
+                            {mission.status === 'completed' && reportSummary && (
+                                <InterventionReportCard
+                                    propertyName={mission.property.name || mission.property.type_label}
+                                    completedAt={mission.completed_at}
+                                    summary={reportSummary}
+                                    anomalies={mission.anomalies ?? []}
+                                />
                             )}
 
                             {mission.status === 'completed' && (
@@ -625,9 +683,17 @@ export default function Show({
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500">Durée</span>
-                                        <span className="font-medium">{mission.duration_hours}h</span>
+                                        <span className="text-slate-500">Durée estimée</span>
+                                        <span className="font-medium">
+                                            {mission.estimated_duration_label || `${mission.duration_hours}h`}
+                                        </span>
                                     </div>
+                                    {durationLabel && (
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Temps passé</span>
+                                            <span className="font-medium">{durationLabel}</span>
+                                        </div>
+                                    )}
                                     {mission.started_at && (
                                         <div className="flex justify-between">
                                             <span className="text-slate-500">Démarrée</span>
@@ -659,6 +725,16 @@ export default function Show({
                     </div>
                 </div>
             </div>
+
+            <InterventionReportWizard
+                open={reportOpen}
+                onOpenChange={setReportOpen}
+                catalog={reportCatalog}
+                checklistProgress={checklistProgress}
+                durationLabel={durationLabel || ''}
+                processing={completing}
+                onSubmit={handleSubmitReport}
+            />
         </AppLayout>
     );
 }

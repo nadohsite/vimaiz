@@ -15,8 +15,34 @@
         <p><strong>Date de fin :</strong> {{ ($mission->completed_at ?? now())->format('d/m/Y à H:i') }}</p>
     </div>
 
+    @php
+        $durationLabel = $mission->actual_duration_label
+            ?? \App\Support\DurationFormatter::minutes(
+                $mission->started_at && $mission->completed_at
+                    ? (int) $mission->started_at->diffInMinutes($mission->completed_at)
+                    : null
+            );
+        $progress = $mission->checklistProgress();
+        $anomalies = $mission->relationLoaded('anomalies') ? $mission->anomalies : collect();
+    @endphp
+
     <div class="info-box">
         <p><strong>Client :</strong> {{ $mission->client->name ?? 'N/A' }}</p>
+        <p><strong>Durée de l'intervention :</strong> {{ $durationLabel }}</p>
+        @if($mission->estimated_duration_label)
+            <p><strong>Durée estimée :</strong> {{ $mission->estimated_duration_label }}</p>
+        @endif
+        @if($progress['total'] > 0)
+            <p><strong>Checklist :</strong> {{ $progress['checked'] }}/{{ $progress['total'] }}</p>
+        @endif
+        @if($mission->report_nothing_to_report || $anomalies->isEmpty())
+            <p><strong>Rapport :</strong> Aucune anomalie signalée</p>
+        @else
+            <p><strong>Rapport :</strong> {{ $anomalies->count() }} anomalie{{ $anomalies->count() > 1 ? 's' : '' }}</p>
+            @foreach($anomalies as $anomaly)
+                <p>— {{ $anomaly->category_label }} : {{ $anomaly->label }}</p>
+            @endforeach
+        @endif
         <p><strong>Montant total :</strong> {{ number_format($mission->total_price, 2, ',', ' ') }} €</p>
         <p><strong>Commission VIMAIZ :</strong> {{ number_format($mission->platform_fee, 2, ',', ' ') }} €</p>
         <p><strong>Paiement intervenant :</strong> {{ number_format($mission->agent_payout, 2, ',', ' ') }} €</p>

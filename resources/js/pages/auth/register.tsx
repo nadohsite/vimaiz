@@ -68,7 +68,12 @@ export default function Register() {
       title={step === 1 ? "Créer un compte" : "Dites-en plus sur vous"}
       description={step === 1 ? "Entrez vos coordonnées pour commencer" : "Ces informations nous aideront à vous mettre en avant auprès des clients"}
     >
-      <Head title="Inscription" />
+      <Head title="Inscription">
+        <meta
+          name="description"
+          content="Créez votre compte VIMAIZ : inscrivez-vous comme propriétaire ou comme intervenant."
+        />
+      </Head>
       
       {role === 'agent' && (
         <div className="mb-5 flex items-center justify-center gap-3 sm:mb-6 sm:gap-4">

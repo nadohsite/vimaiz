@@ -10,16 +10,18 @@ export const LOGO_FILTER =
 
 interface PublicLayoutProps {
     title: string;
+    description?: string;
     children: ReactNode;
 }
 
-export default function PublicLayout({ title, children }: PublicLayoutProps) {
+export default function PublicLayout({ title, description, children }: PublicLayoutProps) {
     const { auth } = usePage<SharedData>().props;
     const isLoggedIn = Boolean(auth.user);
 
     return (
         <div className="welcome-page">
             <Head title={title}>
+                {description && <meta name="description" content={description} />}
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
                 <link
@@ -36,7 +38,7 @@ export default function PublicLayout({ title, children }: PublicLayoutProps) {
                     <div className="navlinks">
                         <Link href="/#service">Programmer une intervention</Link>
                         <Link href={route('professionals.index')}>Devenir intervenant</Link>
-                        <Link href="/#about">À propos</Link>
+                        <Link href={route('about')}>À propos</Link>
                         <Link href={route('contact.index')}>Contact</Link>
                     </div>
                     <div className="navcta">
@@ -51,7 +53,7 @@ export default function PublicLayout({ title, children }: PublicLayoutProps) {
                                     Connexion
                                 </Link>
                                 <Link href={route('register')} className="btn btn-primary">
-                                    Inscription
+                                    S&apos;inscrire
                                 </Link>
                             </>
                         )}
@@ -72,13 +74,13 @@ export default function PublicLayout({ title, children }: PublicLayoutProps) {
                         </div>
                         <div className="foot-col">
                             <h4>À propos</h4>
-                            <Link href="/#about">À propos de Vimaiz</Link>
+                            <Link href={route('about')}>À propos de Vimaiz</Link>
                             <Link href="/#service">Service</Link>
                             <Link href="/#steps">Fonctionnement</Link>
                         </div>
                         <div className="foot-col">
                             <h4>Clients</h4>
-                            <Link href={route('register')}>Inscription</Link>
+                            <Link href={route('register')}>S&apos;inscrire</Link>
                             <Link href={route('login')}>Connexion</Link>
                         </div>
                         <div className="foot-col">

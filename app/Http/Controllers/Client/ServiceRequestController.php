@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\StoreServiceRequestRequest;
+use App\Models\MissionAnomaly;
 use App\Models\Property;
 use App\Models\ServiceRequest;
 use App\Models\User;
 use App\Notifications\NewServiceRequestNotification;
 use App\Services\QuoteCalculationService;
+use App\Support\DefaultPropertyChecklist;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -50,7 +52,7 @@ class ServiceRequestController extends Controller
                 ->with('info', 'Veuillez d\'abord ajouter un bien.');
         }
 
-        $defaultChecklist = \App\Support\DefaultPropertyChecklist::sections();
+        $defaultChecklist = DefaultPropertyChecklist::sections();
 
         $properties = $properties->map(function (Property $property) use ($defaultChecklist) {
             return [
@@ -59,17 +61,43 @@ class ServiceRequestController extends Controller
                 'type' => $property->type,
                 'city' => $property->city,
                 'surface_area' => $property->surface_area,
-                'checklist' => (!empty($property->checklist))
+                'checklist' => (! empty($property->checklist))
                     ? $property->checklist
                     : $defaultChecklist,
             ];
         });
 
+        $fromAnomaly = null;
+        $anomalyId = request()->query('anomaly_id');
+        if ($anomalyId) {
+            $anomaly = MissionAnomaly::query()
+                ->with('mission')
+                ->find($anomalyId);
+
+            if (
+                $anomaly
+                && $anomaly->mission
+                && $anomaly->mission->client_id === auth()->id()
+                && ! $anomaly->hasFollowUp()
+            ) {
+                $fromAnomaly = [
+                    'id' => $anomaly->id,
+                    'property_id' => $anomaly->property_id,
+                    'category_label' => $anomaly->category_label,
+                    'label' => $anomaly->label,
+                    'notes' => $anomaly->notes,
+                    'mission_date' => $anomaly->mission->completed_at?->format('d/m/Y')
+                        ?? $anomaly->mission->scheduled_at?->format('d/m/Y'),
+                ];
+            }
+        }
+
         return Inertia::render('Client/Requests/Create', [
             'properties' => $properties,
             'minDate' => now()->addDay()->format('Y-m-d'),
             'maxDate' => now()->addMonths(3)->format('Y-m-d'),
-            'selectedPropertyId' => request()->query('property_id'),
+            'selectedPropertyId' => request()->query('property_id') ?: $fromAnomaly['property_id'] ?? null,
+            'fromAnomaly' => $fromAnomaly,
         ]);
     }
 
@@ -78,7 +106,7 @@ class ServiceRequestController extends Controller
         $data = $request->validated();
 
         $property = Property::findOrFail($data['property_id']);
-        $checklist = \App\Support\DefaultPropertyChecklist::filterForRequest(
+        $checklist = DefaultPropertyChecklist::filterForRequest(
             $property->checklist,
             $data['checklist_section_ids'],
             $data['checklist_item_ids']
@@ -94,6 +122,17 @@ class ServiceRequestController extends Controller
             'checklist' => $checklist,
             'status' => ServiceRequest::STATUS_PENDING,
         ]);
+
+        if (! empty($data['anomaly_id'])) {
+            $anomaly = MissionAnomaly::with('mission')->find($data['anomaly_id']);
+            if (
+                $anomaly
+                && $anomaly->mission?->client_id === auth()->id()
+                && ! $anomaly->hasFollowUp()
+            ) {
+                $anomaly->update(['follow_up_service_request_id' => $serviceRequest->id]);
+            }
+        }
 
         // Notify admins of new service request
         $admins = User::where('role', 'admin')->get();
@@ -128,7 +167,7 @@ class ServiceRequestController extends Controller
     {
         abort_unless($serviceRequest->client_id === auth()->id(), 403);
 
-        if (!$serviceRequest->canBeCancelled()) {
+        if (! $serviceRequest->canBeCancelled()) {
             return back()->with('error', 'Cette demande ne peut plus être annulée.');
         }
 
@@ -153,13 +192,13 @@ class ServiceRequestController extends Controller
         ]);
 
         $property = Property::findOrFail($validated['property_id']);
-        
+
         if ($property->user_id !== auth()->id()) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
 
         $scheduledAt = Carbon::parse(
-            $validated['scheduled_date'] . ' ' . $validated['scheduled_time']
+            $validated['scheduled_date'].' '.$validated['scheduled_time']
         );
 
         try {

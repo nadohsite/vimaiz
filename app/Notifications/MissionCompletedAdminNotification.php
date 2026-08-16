@@ -23,8 +23,10 @@ class MissionCompletedAdminNotification extends Notification implements ShouldQu
 
     public function toMail(object $notifiable): MailMessage
     {
+        $this->mission->loadMissing(['property', 'anomalies', 'agent', 'client']);
+
         return (new MailMessage)
-            ->subject('🎉 Intervention terminée - ' . $this->mission->mission_number)
+            ->subject('🎉 Intervention terminée - '.$this->mission->mission_number)
             ->view('emails.mission-completed-admin', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -39,8 +41,8 @@ class MissionCompletedAdminNotification extends Notification implements ShouldQu
             'mission_number' => $this->mission->mission_number,
             'agent_name' => $this->mission->agent->name ?? 'N/A',
             'total_price' => $this->mission->total_price,
-            'message' => 'Intervention terminée : ' . $this->mission->mission_number,
-            'url' => '/admin/missions/' . $this->mission->id,
+            'message' => 'Intervention terminée : '.$this->mission->mission_number,
+            'url' => '/admin/missions/'.$this->mission->id,
         ];
     }
 }

@@ -4,29 +4,29 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MissionResource\Pages;
 use App\Models\Mission;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
-use Filament\Notifications\Notification;
+use App\Models\User;
+use App\Support\DurationFormatter;
+use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 use UnitEnum;
-use BackedEnum;
 
 class MissionResource extends Resource
 {
     protected static ?string $model = Mission::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-briefcase';
-    
+
     protected static string|UnitEnum|null $navigationGroup = 'Demandes & Interventions';
 
     protected static ?string $navigationLabel = 'Interventions';
@@ -73,9 +73,12 @@ class MissionResource extends Resource
                         Forms\Components\DateTimePicker::make('scheduled_at')
                             ->label('Date et heure prévues'),
                         Forms\Components\TextInput::make('duration_hours')
-                            ->label('Durée')
+                            ->label('Durée estimée')
                             ->suffix('heures')
                             ->disabled(),
+                        Forms\Components\Placeholder::make('actual_duration_label')
+                            ->label('Durée réelle')
+                            ->content(fn (?Mission $record): string => $record?->actual_duration_label ?? '—'),
                         Forms\Components\DateTimePicker::make('started_at')
                             ->label('Démarrée le'),
                         Forms\Components\DateTimePicker::make('completed_at')
@@ -120,6 +123,54 @@ class MissionResource extends Resource
                                 'refunded' => 'Remboursé',
                             ]),
                     ])->columns(2),
+
+                Section::make('Rapport d\'intervention')
+                    ->schema([
+                        Forms\Components\Placeholder::make('report_status')
+                            ->label('Rapport')
+                            ->content(function (?Mission $record): string {
+                                if (! $record?->hasReport()) {
+                                    return 'Pas encore soumis';
+                                }
+                                if ($record->report_nothing_to_report) {
+                                    return 'Aucune anomalie signalée';
+                                }
+                                $count = $record->anomalies()->count();
+
+                                return $count.' anomalie'.($count > 1 ? 's' : '').' signalée'.($count > 1 ? 's' : '');
+                            }),
+                        Forms\Components\Placeholder::make('checklist_progress')
+                            ->label('Checklist')
+                            ->content(function (?Mission $record): string {
+                                if (! $record) {
+                                    return '—';
+                                }
+                                $progress = $record->checklistProgress();
+                                if ($progress['total'] === 0) {
+                                    return 'Aucune tâche';
+                                }
+
+                                return $progress['checked'].'/'.$progress['total'].' tâches complétées';
+                            }),
+                        Forms\Components\Placeholder::make('anomalies_list')
+                            ->label('Anomalies')
+                            ->content(function (?Mission $record): string {
+                                if (! $record) {
+                                    return '—';
+                                }
+                                $anomalies = $record->anomalies()->get();
+                                if ($anomalies->isEmpty()) {
+                                    return $record->hasReport() ? 'Rien à signaler' : '—';
+                                }
+
+                                return $anomalies
+                                    ->map(fn ($anomaly) => '• '.$anomaly->category_label.' — '.$anomaly->label.($anomaly->notes ? ' ('.$anomaly->notes.')' : ''))
+                                    ->implode("\n");
+                            })
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->collapsed(fn (?Mission $record) => ! $record?->hasReport()),
 
                 Section::make('Contrôle qualité (Admin)')
                     ->schema([
@@ -216,6 +267,16 @@ class MissionResource extends Resource
                         'refunded' => 'Remboursé',
                         default => $state,
                     }),
+                Tables\Columns\TextColumn::make('actual_duration_minutes')
+                    ->label('Durée réelle')
+                    ->formatStateUsing(fn (?int $state): string => DurationFormatter::minutes($state))
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('anomalies_count')
+                    ->counts('anomalies')
+                    ->label('Anomalies')
+                    ->badge()
+                    ->color(fn ($state): string => $state > 0 ? 'warning' : 'success')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('internal_quality_score')
                     ->label('Qualité')
                     ->badge()
@@ -250,14 +311,14 @@ class MissionResource extends Resource
                     ->label('Attribuer intervenant')
                     ->icon('heroicon-o-user-plus')
                     ->color('success')
-                    ->visible(fn ($record) => $record->status === 'pending_agent' && !$record->agent_id)
+                    ->visible(fn ($record) => $record->status === 'pending_agent' && ! $record->agent_id)
                     ->form([
                         Forms\Components\Select::make('agent_id')
                             ->label('Intervenant')
                             ->options(function () {
-                                return \App\Models\User::where('role', 'agent')
+                                return User::where('role', 'agent')
                                     ->where('is_active', true)
-                                    ->whereHas('agentProfile', fn($q) => $q->where('is_available', true))
+                                    ->whereHas('agentProfile', fn ($q) => $q->where('is_available', true))
                                     ->pluck('name', 'id');
                             })
                             ->searchable()
@@ -282,7 +343,7 @@ class MissionResource extends Resource
                     ->label('Contrôle qualité')
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn ($record) => $record->status === 'completed' && !$record->internal_quality_score)
+                    ->visible(fn ($record) => $record->status === 'completed' && ! $record->internal_quality_score)
                     ->form([
                         Forms\Components\Select::make('internal_quality_score')
                             ->label('Note qualité')

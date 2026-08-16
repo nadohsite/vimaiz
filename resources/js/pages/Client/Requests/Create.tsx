@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Home, Calendar, ClipboardList, FileText, Send } from 'lucide-react';
+import { ArrowLeft, Home, Calendar, ClipboardList, FileText, Send, Wrench } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import type { ChecklistSection } from '@/components/property/PropertyChecklistEditor';
 
@@ -24,7 +24,15 @@ interface Props {
     properties: Property[];
     minDate: string;
     maxDate: string;
-    selectedPropertyId?: string | null;
+    selectedPropertyId?: string | number | null;
+    fromAnomaly?: {
+        id: number;
+        property_id: number;
+        category_label: string;
+        label: string;
+        notes: string | null;
+        mission_date: string | null;
+    } | null;
 }
 
 function collectIds(checklist: ChecklistSection[]) {
@@ -34,18 +42,30 @@ function collectIds(checklist: ChecklistSection[]) {
     };
 }
 
-export default function Create({ properties, minDate, maxDate, selectedPropertyId }: Props) {
+export default function Create({ properties, minDate, maxDate, selectedPropertyId, fromAnomaly = null }: Props) {
     const initialPropertyId = selectedPropertyId ? String(selectedPropertyId) : '';
     const initialProperty = properties.find((p) => p.id === Number(initialPropertyId));
     const initialIds = collectIds(initialProperty?.checklist ?? []);
+    const anomalyInstructions = fromAnomaly
+        ? [
+              fromAnomaly.mission_date
+                  ? `Suite à l'intervention du ${fromAnomaly.mission_date} :`
+                  : 'Suite à une intervention précédente :',
+              `${fromAnomaly.category_label} — ${fromAnomaly.label}`,
+              fromAnomaly.notes ? fromAnomaly.notes : null,
+          ]
+              .filter(Boolean)
+              .join('\n')
+        : '';
 
     const { data, setData, post, processing, errors } = useForm({
         property_id: initialPropertyId,
         scheduled_date: '',
         scheduled_time: '09:00',
-        special_instructions: '',
+        special_instructions: anomalyInstructions,
         checklist_section_ids: initialIds.sectionIds,
         checklist_item_ids: initialIds.itemIds,
+        anomaly_id: fromAnomaly?.id ?? null,
     });
 
     const selectedProperty = useMemo(
@@ -157,7 +177,7 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                 { title: 'Nouvelle intervention', href: '#' },
             ]}
         >
-            <Head title="Nouvelle intervention" />
+                            <Head title={fromAnomaly ? 'Intervention de suivi' : 'Nouvelle intervention'} />
 
             <div className="py-8">
                 <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -170,12 +190,26 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                             Retour aux demandes
                         </Link>
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                            Nouvelle intervention
+                            {fromAnomaly ? 'Intervention de suivi' : 'Nouvelle intervention'}
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 mt-1">
-                            Programmez votre prochaine intervention
+                            {fromAnomaly
+                                ? 'Programmez une intervention suite à un signalement'
+                                : 'Programmez votre prochaine intervention'}
                         </p>
                     </div>
+
+                    {fromAnomaly && (
+                        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
+                            <p className="flex items-center gap-2 text-sm font-medium text-amber-900 dark:text-amber-200">
+                                <Wrench className="h-4 w-4" />
+                                Signalement à traiter
+                            </p>
+                            <p className="mt-1 text-sm text-amber-800 dark:text-amber-300">
+                                {fromAnomaly.category_label} — {fromAnomaly.label}
+                            </p>
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <Card className="dark:bg-slate-800 dark:border-slate-700">

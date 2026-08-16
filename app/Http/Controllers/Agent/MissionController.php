@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Mission;
 use App\Models\MissionPhoto;
 use App\Services\MissionService;
+use App\Support\InterventionReportCatalog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,8 +50,11 @@ class MissionController extends Controller
             'client',
             'quote',
             'serviceRequest',
+            'anomalies',
             'photos' => fn ($q) => $q->orderBy('type')->orderByDesc('created_at'),
         ]);
+
+        $mission->append(['status_label', 'actual_duration_label', 'estimated_duration_label']);
 
         return Inertia::render('Agent/Missions/Show', [
             'mission' => $mission,
@@ -58,6 +62,8 @@ class MissionController extends Controller
             'canStart' => $mission->canStart(),
             'canComplete' => $mission->canComplete(),
             'checklistProgress' => $mission->checklistProgress(),
+            'reportCatalog' => InterventionReportCatalog::categories(),
+            'reportSummary' => $mission->reportSummary(),
         ]);
     }
 
@@ -68,7 +74,7 @@ class MissionController extends Controller
         try {
             $this->missionService->agentAcceptMission($mission);
 
-            return back()->with('success', 'Intervention confirmée. Rendez-vous le ' . 
+            return back()->with('success', 'Intervention confirmée. Rendez-vous le '.
                 $mission->scheduled_at->format('d/m/Y à H:i'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -173,16 +179,29 @@ class MissionController extends Controller
         ]);
     }
 
-    public function complete(Mission $mission): RedirectResponse
+    public function complete(Request $request, Mission $mission): RedirectResponse
     {
         $this->authorize('complete', $mission);
 
+        $validated = $request->validate([
+            'nothing_to_report' => ['present', 'boolean'],
+            'anomalies' => ['nullable', 'array', 'max:20'],
+            'anomalies.*.category' => ['required_with:anomalies', 'string', 'max:50'],
+            'anomalies.*.type' => ['required_with:anomalies', 'string', 'max:80'],
+            'anomalies.*.notes' => ['nullable', 'string', 'max:500'],
+        ]);
+
         try {
-            $this->missionService->completeMission($mission);
+            $this->missionService->completeMission($mission, [
+                'nothing_to_report' => $request->boolean('nothing_to_report'),
+                'anomalies' => $validated['anomalies'] ?? [],
+            ]);
 
             return redirect()
                 ->route('agent.missions.show', $mission)
-                ->with('success', 'Intervention terminée ! Le paiement sera versé après validation.');
+                ->with('success', 'Intervention terminée. Le rapport a été transmis au propriétaire.');
+        } catch (\InvalidArgumentException $e) {
+            return back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

@@ -28,7 +28,10 @@ export default function Contact({ success }: Props) {
     };
 
     return (
-        <PublicLayout title="Nous contacter — VIMAIZ">
+        <PublicLayout
+            title="Nous contacter — VIMAIZ"
+            description="Une question ? Une suggestion ? Notre équipe est là pour vous répondre."
+        >
             <section className="welcome-section">
                 <div className="wrap">
                     <div className="page-hero">

@@ -217,7 +217,10 @@ export default function Professionals() {
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
     return (
-        <PublicLayout title="Devenir intervenant — Rejoindre le réseau Vimaiz">
+        <PublicLayout
+            title="Devenir intervenant — Rejoindre le réseau Vimaiz"
+            description="Rejoignez le réseau d'intervenants VIMAIZ et recevez des propositions d'interventions selon vos disponibilités."
+        >
             <section className="hero wrap hero-pros">
                 <div className="hero-grid hero-grid-solo">
                     <div>

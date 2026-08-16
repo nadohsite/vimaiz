@@ -31,7 +31,16 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        @php
+            $seo = \App\Support\PublicSeo::forComponent($page['component'] ?? null);
+        @endphp
+        <title inertia>{{ $seo['title'] }}</title>
+        @if ($seo['description'])
+            <meta name="description" content="{{ $seo['description'] }}" inertia>
+            <meta property="og:title" content="{{ $seo['title'] }}" inertia>
+            <meta property="og:description" content="{{ $seo['description'] }}" inertia>
+            <meta property="og:locale" content="fr_FR">
+        @endif
 
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="icon" href="/favicon.png" type="image/png">

@@ -1,24 +1,34 @@
 <?php
 
-use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
+use App\Http\Controllers\Agent\DocumentController;
+use App\Http\Controllers\Agent\MissionController as AgentMissionController;
+use App\Http\Controllers\Agent\RCPAcceptanceController;
+use App\Http\Controllers\Agent\ReviewController;
+use App\Http\Controllers\Agent\WalletController;
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\Client\InvoiceController;
+use App\Http\Controllers\Client\MissionController as ClientMissionController;
+use App\Http\Controllers\Client\PaymentController as ClientPaymentController;
+use App\Http\Controllers\Client\PropertyController as ClientPropertyController;
+use App\Http\Controllers\Client\QuoteController as ClientQuoteController;
+use App\Http\Controllers\Client\ServiceRequestController as ClientServiceRequestController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MissionReturnController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\PasswordController;
+use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
-use App\Http\Controllers\Client\PropertyController as ClientPropertyController;
-use App\Http\Controllers\Client\ServiceRequestController as ClientServiceRequestController;
-use App\Http\Controllers\Client\QuoteController as ClientQuoteController;
-use App\Http\Controllers\Client\PaymentController as ClientPaymentController;
-use App\Http\Controllers\Client\MissionController as ClientMissionController;
-use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
-use App\Http\Controllers\Agent\MissionController as AgentMissionController;
-use App\Http\Controllers\MissionReturnController;
+use App\Models\AgentProfile;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -30,7 +40,7 @@ use Inertia\Inertia;
 
 // Public routes
 Route::get('/', function () {
-    $availableAgentsCount = \App\Models\AgentProfile::query()
+    $availableAgentsCount = AgentProfile::query()
         ->verified()
         ->available()
         ->where(function ($query) {
@@ -56,8 +66,8 @@ Route::get('/services', [ServiceController::class, 'index'])->name('services.ind
 Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
 
 // Professionals landing page (public)
-Route::get('/professionnels', [\App\Http\Controllers\ProfessionalController::class, 'index'])->name('professionals.index');
-Route::post('/professionnels/inscription', [\App\Http\Controllers\ProfessionalController::class, 'register'])->name('professionals.register');
+Route::get('/professionnels', [ProfessionalController::class, 'index'])->name('professionals.index');
+Route::post('/professionnels/inscription', [ProfessionalController::class, 'register'])->name('professionals.register');
 
 // Legal pages (public)
 Route::get('/mentions-legales', function () {
@@ -68,11 +78,32 @@ Route::get('/confidentialite', function () {
     return inertia('Privacy');
 })->name('privacy');
 
+Route::get('/a-propos', function () {
+    return inertia('About');
+})->name('about');
+
 Route::get('/contact', function () {
     return inertia('Contact');
 })->name('contact.index');
 
-Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
+Route::get('/sitemap.xml', function () {
+    $urls = [
+        ['loc' => route('home'), 'changefreq' => 'weekly', 'priority' => '1.0'],
+        ['loc' => route('about'), 'changefreq' => 'monthly', 'priority' => '0.8'],
+        ['loc' => route('contact.index'), 'changefreq' => 'monthly', 'priority' => '0.8'],
+        ['loc' => route('register'), 'changefreq' => 'monthly', 'priority' => '0.8'],
+        ['loc' => route('login'), 'changefreq' => 'monthly', 'priority' => '0.6'],
+        ['loc' => route('professionals.index'), 'changefreq' => 'monthly', 'priority' => '0.7'],
+        ['loc' => route('legal.notice'), 'changefreq' => 'yearly', 'priority' => '0.3'],
+        ['loc' => route('privacy'), 'changefreq' => 'yearly', 'priority' => '0.3'],
+    ];
+
+    return response()
+        ->view('sitemap', ['urls' => $urls])
+        ->header('Content-Type', 'application/xml');
+})->name('sitemap');
+
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 
 // Google OAuth routes
 Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
@@ -99,16 +130,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])->name('settings.two-factor.show');
 
     // Notifications (shared by all authenticated users)
-    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
-    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
-    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
     // Messages (shared by clients and agents)
-    Route::get('/messages', [\App\Http\Controllers\ConversationController::class, 'index'])->name('messages.index');
-    Route::get('/messages/{conversation}', [\App\Http\Controllers\ConversationController::class, 'show'])->name('messages.show');
-    Route::post('/messages', [\App\Http\Controllers\ConversationController::class, 'store'])->name('messages.store');
-    Route::post('/messages/{conversation}/send', [\App\Http\Controllers\ConversationController::class, 'sendMessage'])->name('messages.send');
+    Route::get('/messages', [ConversationController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{conversation}', [ConversationController::class, 'show'])->name('messages.show');
+    Route::post('/messages', [ConversationController::class, 'store'])->name('messages.store');
+    Route::post('/messages/{conversation}/send', [ConversationController::class, 'sendMessage'])->name('messages.send');
 
     // Client routes
     Route::middleware(['role:client'])->prefix('client')->name('client.')->group(function () {
@@ -152,20 +183,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/missions', [ClientMissionController::class, 'index'])->name('missions.index');
         Route::get('/missions/{mission}', [ClientMissionController::class, 'show'])->name('missions.show');
         Route::post('/missions/{mission}/review', [ClientMissionController::class, 'storeReview'])->name('missions.review');
-        
+
         // VIMAIZ - Retours mécontentement (Client)
         Route::post('/missions/{mission}/return-request', [MissionReturnController::class, 'requestReturn'])->name('missions.return-request');
         Route::post('/missions/{mission}/return-validate', [MissionReturnController::class, 'validateReturn'])->name('missions.return-validate');
 
         // VIMAIZ - Factures (Invoices)
-        Route::get('/invoices', [\App\Http\Controllers\Client\InvoiceController::class, 'index'])->name('invoices.index');
-        Route::get('/invoices/{invoice}', [\App\Http\Controllers\Client\InvoiceController::class, 'show'])->name('invoices.show');
-        Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Client\InvoiceController::class, 'download'])->name('invoices.download');
+        Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
+        Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
 
         // Addresses
         Route::get('/addresses', function () {
             return Inertia::render('client/addresses/index', [
-                'addresses' => request()->user()->addresses()->orderBy('is_default', 'desc')->get()
+                'addresses' => request()->user()->addresses()->orderBy('is_default', 'desc')->get(),
             ]);
         })->name('addresses.index');
 
@@ -191,21 +222,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/missions/{mission}/checklist', [AgentMissionController::class, 'updateChecklist'])->name('missions.checklist');
 
         // VIMAIZ - Wallet Agent
-        Route::get('/wallet', [\App\Http\Controllers\Agent\WalletController::class, 'index'])->name('wallet.index');
-        Route::post('/wallet/withdraw', [\App\Http\Controllers\Agent\WalletController::class, 'withdraw'])->name('wallet.withdraw');
+        Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+        Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 
         // VIMAIZ - Documents Agent
-        Route::get('/documents', [\App\Http\Controllers\Agent\DocumentController::class, 'index'])->name('documents.index');
-        Route::post('/documents/{type}/upload', [\App\Http\Controllers\Agent\DocumentController::class, 'upload'])->name('documents.upload');
-        Route::delete('/documents/{type}', [\App\Http\Controllers\Agent\DocumentController::class, 'destroy'])->name('documents.destroy');
-        Route::post('/documents/submit', [\App\Http\Controllers\Agent\DocumentController::class, 'submitForVerification'])->name('documents.submit');
+        Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
+        Route::post('/documents/{type}/upload', [DocumentController::class, 'upload'])->name('documents.upload');
+        Route::delete('/documents/{type}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+        Route::post('/documents/submit', [DocumentController::class, 'submitForVerification'])->name('documents.submit');
 
         // VIMAIZ - Avis/Notes Agent
-        Route::get('/reviews', [\App\Http\Controllers\Agent\ReviewController::class, 'index'])->name('reviews.index');
+        Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 
         // VIMAIZ - Clause RCP
-        Route::get('/rcp-acceptance', [\App\Http\Controllers\Agent\RCPAcceptanceController::class, 'index'])->name('rcp-acceptance');
-        Route::post('/rcp-acceptance', [\App\Http\Controllers\Agent\RCPAcceptanceController::class, 'store'])->name('rcp-acceptance.store');
+        Route::get('/rcp-acceptance', [RCPAcceptanceController::class, 'index'])->name('rcp-acceptance');
+        Route::post('/rcp-acceptance', [RCPAcceptanceController::class, 'store'])->name('rcp-acceptance.store');
 
         // VIMAIZ - Retours mécontentement (Agent)
         Route::get('/returns', [MissionReturnController::class, 'agentReturns'])->name('returns.index');

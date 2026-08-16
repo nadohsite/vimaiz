@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\DefaultPropertyChecklist;
+use App\Support\DurationFormatter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,6 +25,7 @@ class Mission extends Model
         'duration_hours',
         'started_at',
         'completed_at',
+        'actual_duration_minutes',
         'total_price',
         'agent_payout',
         'platform_fee',
@@ -40,6 +43,8 @@ class Mission extends Model
         'agent_responded_at',
         'assignment_attempts',
         'checklist',
+        'report_nothing_to_report',
+        'report_submitted_at',
         // Retour mécontentement
         'return_requested',
         'return_status',
@@ -56,6 +61,9 @@ class Mission extends Model
         'scheduled_at' => 'datetime',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
+        'actual_duration_minutes' => 'integer',
+        'report_nothing_to_report' => 'boolean',
+        'report_submitted_at' => 'datetime',
         'paid_at' => 'datetime',
         'quality_reviewed_at' => 'datetime',
         'cancelled_at' => 'datetime',
@@ -73,23 +81,36 @@ class Mission extends Model
     ];
 
     const STATUS_PENDING_AGENT = 'pending_agent';
+
     const STATUS_AGENT_ACCEPTED = 'agent_accepted';
+
     const STATUS_AGENT_REFUSED = 'agent_refused';
+
     const STATUS_IN_PROGRESS = 'in_progress';
+
     const STATUS_PHOTOS_BEFORE = 'photos_before';
+
     const STATUS_PHOTOS_AFTER = 'photos_after';
+
     const STATUS_COMPLETED = 'completed';
+
     const STATUS_CANCELLED = 'cancelled';
 
     const PAYMENT_PENDING = 'pending';
+
     const PAYMENT_PAID = 'paid';
+
     const PAYMENT_REFUNDED = 'refunded';
 
     // Statuts de retour mécontentement
     const RETURN_PENDING = 'pending';
+
     const RETURN_IN_PROGRESS = 'in_progress';
+
     const RETURN_COMPLETED = 'completed';
+
     const RETURN_VALIDATED = 'validated';
+
     const RETURN_REJECTED = 'rejected';
 
     protected static function boot()
@@ -98,7 +119,7 @@ class Mission extends Model
 
         static::creating(function ($model) {
             if (empty($model->mission_number)) {
-                $model->mission_number = 'MIS-' . strtoupper(uniqid());
+                $model->mission_number = 'MIS-'.strtoupper(uniqid());
             }
         });
     }
@@ -138,6 +159,11 @@ class Mission extends Model
         return $this->hasMany(MissionPhoto::class);
     }
 
+    public function anomalies(): HasMany
+    {
+        return $this->hasMany(MissionAnomaly::class);
+    }
+
     public function beforePhotos(): HasMany
     {
         return $this->hasMany(MissionPhoto::class)->where('type', 'before');
@@ -165,13 +191,13 @@ class Mission extends Model
 
     public function needsAgent(): bool
     {
-        return $this->status === self::STATUS_AGENT_REFUSED || 
-               ($this->status === self::STATUS_PENDING_AGENT && !$this->agent_id);
+        return $this->status === self::STATUS_AGENT_REFUSED ||
+               ($this->status === self::STATUS_PENDING_AGENT && ! $this->agent_id);
     }
 
     public function canStart(): bool
     {
-        return $this->status === self::STATUS_AGENT_ACCEPTED && 
+        return $this->status === self::STATUS_AGENT_ACCEPTED &&
                $this->payment_status === self::PAYMENT_PAID;
     }
 
@@ -196,7 +222,7 @@ class Mission extends Model
 
     public function isChecklistComplete(): bool
     {
-        return \App\Support\DefaultPropertyChecklist::isComplete($this->checklist);
+        return DefaultPropertyChecklist::isComplete($this->checklist);
     }
 
     public function checklistProgress(): array
@@ -207,7 +233,7 @@ class Mission extends Model
         foreach ($this->checklist ?? [] as $section) {
             foreach ($section['items'] ?? [] as $item) {
                 $total++;
-                if (!empty($item['checked'])) {
+                if (! empty($item['checked'])) {
                     $checked++;
                 }
             }
@@ -220,9 +246,73 @@ class Mission extends Model
         ];
     }
 
+    public function hasReport(): bool
+    {
+        return $this->report_submitted_at !== null;
+    }
+
+    public function actualDurationMinutes(): ?int
+    {
+        if ($this->actual_duration_minutes !== null) {
+            return (int) $this->actual_duration_minutes;
+        }
+
+        if ($this->started_at && $this->completed_at) {
+            return max(0, (int) $this->started_at->diffInMinutes($this->completed_at));
+        }
+
+        if ($this->started_at && $this->canComplete()) {
+            return max(0, (int) $this->started_at->diffInMinutes(now()));
+        }
+
+        return null;
+    }
+
+    public function estimatedDurationMinutes(): ?int
+    {
+        if ($this->duration_hours === null) {
+            return null;
+        }
+
+        return (int) round((float) $this->duration_hours * 60);
+    }
+
+    public function getActualDurationLabelAttribute(): ?string
+    {
+        $minutes = $this->actualDurationMinutes();
+
+        return $minutes === null ? null : DurationFormatter::minutes($minutes);
+    }
+
+    public function getEstimatedDurationLabelAttribute(): ?string
+    {
+        $minutes = $this->estimatedDurationMinutes();
+
+        return $minutes === null ? null : DurationFormatter::minutes($minutes);
+    }
+
+    public function reportSummary(): array
+    {
+        $progress = $this->checklistProgress();
+
+        return [
+            'submitted' => $this->hasReport(),
+            'nothing_to_report' => (bool) $this->report_nothing_to_report,
+            'submitted_at' => $this->report_submitted_at?->toIso8601String(),
+            'checklist' => $progress,
+            'anomalies_count' => $this->relationLoaded('anomalies')
+                ? $this->anomalies->count()
+                : $this->anomalies()->count(),
+            'actual_duration_minutes' => $this->actualDurationMinutes(),
+            'actual_duration_label' => $this->actual_duration_label,
+            'estimated_duration_minutes' => $this->estimatedDurationMinutes(),
+            'estimated_duration_label' => $this->estimated_duration_label,
+        ];
+    }
+
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_PENDING_AGENT => 'Intervention en attente',
             self::STATUS_AGENT_ACCEPTED => 'Intervention confirmée',
             self::STATUS_AGENT_REFUSED => 'Intervention refusée',
@@ -239,7 +329,7 @@ class Mission extends Model
 
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_PENDING_AGENT => 'warning',
             self::STATUS_AGENT_ACCEPTED => 'info',
             self::STATUS_AGENT_REFUSED => 'danger',
@@ -254,7 +344,7 @@ class Mission extends Model
 
     public function getPaymentStatusLabelAttribute(): string
     {
-        return match($this->payment_status) {
+        return match ($this->payment_status) {
             self::PAYMENT_PENDING => 'En attente',
             self::PAYMENT_PAID => 'Payé',
             self::PAYMENT_REFUNDED => 'Remboursé',
@@ -270,19 +360,19 @@ class Mission extends Model
 
     public function canRequestReturn(): bool
     {
-        return $this->status === self::STATUS_COMPLETED 
-            && !$this->return_requested
-            && $this->completed_at 
+        return $this->status === self::STATUS_COMPLETED
+            && ! $this->return_requested
+            && $this->completed_at
             && $this->completed_at->diffInDays(now()) <= 7; // 7 jours pour demander un retour
     }
 
     public function getReturnStatusLabelAttribute(): ?string
     {
-        if (!$this->return_status) {
+        if (! $this->return_status) {
             return null;
         }
 
-        return match($this->return_status) {
+        return match ($this->return_status) {
             self::RETURN_PENDING => 'Retour demandé',
             self::RETURN_IN_PROGRESS => 'Retour en cours',
             self::RETURN_COMPLETED => 'Retour effectué',
@@ -294,11 +384,11 @@ class Mission extends Model
 
     public function getReturnStatusColorAttribute(): ?string
     {
-        if (!$this->return_status) {
+        if (! $this->return_status) {
             return null;
         }
 
-        return match($this->return_status) {
+        return match ($this->return_status) {
             self::RETURN_PENDING => 'warning',
             self::RETURN_IN_PROGRESS => 'info',
             self::RETURN_COMPLETED => 'primary',

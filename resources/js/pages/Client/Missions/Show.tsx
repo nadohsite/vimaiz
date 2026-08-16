@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Download, FileText, Star, Send, AlertTriangle, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useState } from 'react';
+import InterventionReportCard, { type ReportAnomaly, type ReportSummary } from '@/components/missions/InterventionReportCard';
 
 interface Property {
     id: number;
@@ -50,6 +51,9 @@ interface Mission {
     started_at: string | null;
     completed_at: string | null;
     duration_hours: number;
+    actual_duration_minutes: number | null;
+    actual_duration_label: string | null;
+    estimated_duration_label: string | null;
     total_price: number;
     status: string;
     status_label: string;
@@ -66,6 +70,7 @@ interface Mission {
     return_requested_at: string | null;
     return_completed_at: string | null;
     return_agent_notes: string | null;
+    anomalies?: ReportAnomaly[];
 }
 
 interface Props {
@@ -73,9 +78,10 @@ interface Props {
     canDownloadInvoice: boolean;
     canReview?: boolean;
     canRequestReturn?: boolean;
+    reportSummary?: ReportSummary;
 }
 
-export default function Show({ mission, canDownloadInvoice, canReview = false, canRequestReturn = false }: Props) {
+export default function Show({ mission, canDownloadInvoice, canReview = false, canRequestReturn = false, reportSummary }: Props) {
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
@@ -210,10 +216,27 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                                         minute: '2-digit'
                                                     })}
                                                 </p>
+                                                {mission.actual_duration_label && (
+                                                    <p className="text-sm text-green-700 dark:text-green-400 mt-1 flex items-center gap-1">
+                                                        <Clock className="h-3.5 w-3.5" />
+                                                        Durée de l&apos;intervention : {mission.actual_duration_label}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                     </CardContent>
                                 </Card>
+                            )}
+
+                            {mission.status === 'completed' && reportSummary && (
+                                <InterventionReportCard
+                                    propertyName={mission.property.name || mission.property.type_label}
+                                    completedAt={mission.completed_at}
+                                    summary={reportSummary}
+                                    anomalies={mission.anomalies ?? []}
+                                    propertyId={mission.property.id}
+                                    showFollowUp
+                                />
                             )}
 
                             {/* Review Form */}
@@ -623,9 +646,30 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500 dark:text-slate-400">Durée</span>
-                                        <span className="font-medium dark:text-white">{mission.duration_hours}h</span>
+                                        <span className="text-slate-500 dark:text-slate-400">Durée estimée</span>
+                                        <span className="font-medium dark:text-white">
+                                            {mission.estimated_duration_label || `${mission.duration_hours}h`}
+                                        </span>
                                     </div>
+                                    {mission.started_at && !mission.completed_at && (
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500 dark:text-slate-400">Démarrée</span>
+                                            <span className="font-medium dark:text-white">
+                                                {new Date(mission.started_at).toLocaleTimeString('fr-FR', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {mission.actual_duration_label && (
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500 dark:text-slate-400">Durée réelle</span>
+                                            <span className="font-medium dark:text-white">
+                                                {mission.actual_duration_label}
+                                            </span>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
 

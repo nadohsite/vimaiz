@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Client;
 
+use App\Models\MissionAnomaly;
 use App\Models\Property;
 use App\Support\DefaultPropertyChecklist;
 use Illuminate\Foundation\Http\FormRequest;
@@ -35,6 +36,7 @@ class StoreServiceRequestRequest extends FormRequest
             'checklist_section_ids.*' => ['required', 'string', 'max:100'],
             'checklist_item_ids' => ['required', 'array', 'min:1'],
             'checklist_item_ids.*' => ['required', 'string', 'max:100'],
+            'anomaly_id' => ['nullable', 'integer', 'exists:mission_anomalies,id'],
         ];
     }
 
@@ -46,7 +48,7 @@ class StoreServiceRequestRequest extends FormRequest
             }
 
             $property = Property::find($this->input('property_id'));
-            if (!$property || $property->user_id !== $this->user()->id) {
+            if (! $property || $property->user_id !== $this->user()->id) {
                 return;
             }
 
@@ -69,7 +71,7 @@ class StoreServiceRequestRequest extends FormRequest
             }
 
             foreach ($this->input('checklist_section_ids', []) as $sectionId) {
-                if (!isset($validSectionIds[(string) $sectionId])) {
+                if (! isset($validSectionIds[(string) $sectionId])) {
                     $validator->errors()->add(
                         'checklist_section_ids',
                         'Un axe d\'intervention sélectionné est invalide pour ce bien.'
@@ -85,19 +87,32 @@ class StoreServiceRequestRequest extends FormRequest
 
             foreach ($this->input('checklist_item_ids', []) as $itemId) {
                 $itemId = (string) $itemId;
-                if (!isset($validItemIds[$itemId])) {
+                if (! isset($validItemIds[$itemId])) {
                     $validator->errors()->add(
                         'checklist_item_ids',
                         'Une tâche sélectionnée est invalide pour ce bien.'
                     );
                     break;
                 }
-                if (!isset($selectedSectionIds[$validItemIds[$itemId]])) {
+                if (! isset($selectedSectionIds[$validItemIds[$itemId]])) {
                     $validator->errors()->add(
                         'checklist_item_ids',
                         'Une tâche sélectionnée n\'appartient pas à un axe choisi.'
                     );
                     break;
+                }
+            }
+
+            $anomalyId = $this->input('anomaly_id');
+            if ($anomalyId) {
+                $anomaly = MissionAnomaly::with('mission')->find($anomalyId);
+                if (
+                    ! $anomaly
+                    || ! $anomaly->mission
+                    || $anomaly->mission->client_id !== $this->user()->id
+                    || (int) $anomaly->property_id !== (int) $this->input('property_id')
+                ) {
+                    $validator->errors()->add('anomaly_id', 'Cette anomalie ne peut pas être liée à la demande.');
                 }
             }
         });

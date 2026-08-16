@@ -3,31 +3,35 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AgentProfileResource\Pages;
+use App\Filament\Resources\AgentProfileResource\RelationManagers\SanctionsRelationManager;
 use App\Models\AgentProfile;
-use App\Notifications\DocumentsVerifiedNotification;
+use App\Notifications\AgentBannedNotification;
+use App\Notifications\AgentSuspendedNotification;
+use App\Notifications\AgentWarningNotification;
 use App\Notifications\DocumentsRejectedNotification;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+use App\Notifications\DocumentsVerifiedNotification;
+use App\Support\AgentQualityMetrics;
+use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Storage;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 use UnitEnum;
-use BackedEnum;
 
 class AgentProfileResource extends Resource
 {
     protected static ?string $model = AgentProfile::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-identification';
-    
+
     protected static string|UnitEnum|null $navigationGroup = 'Gestion Utilisateurs';
 
     protected static ?string $navigationLabel = 'Profils Intervenants';
@@ -90,6 +94,51 @@ class AgentProfileResource extends Resource
                             ->label('Avertissements')
                             ->disabled(),
                     ])->columns(3),
+
+                Section::make('Qualité marketplace')
+                    ->schema([
+                        Forms\Components\Placeholder::make('reliability_label')
+                            ->label('Fiabilité')
+                            ->content(fn (?AgentProfile $record): string => $record
+                                ? (AgentQualityMetrics::for($record)['reliability_label'] ?? '—')
+                                : '—'),
+                        Forms\Components\Placeholder::make('checklist_rate')
+                            ->label('Checklists complétées')
+                            ->content(function (?AgentProfile $record): string {
+                                if (! $record) {
+                                    return '—';
+                                }
+                                $rate = AgentQualityMetrics::for($record)['checklist_completion_rate'];
+
+                                return $rate === null ? '—' : $rate.' %';
+                            }),
+                        Forms\Components\Placeholder::make('anomaly_rate')
+                            ->label('Interventions avec anomalie')
+                            ->content(function (?AgentProfile $record): string {
+                                if (! $record) {
+                                    return '—';
+                                }
+                                $metrics = AgentQualityMetrics::for($record);
+                                $rate = $metrics['anomaly_rate'];
+
+                                return $rate === null
+                                    ? '—'
+                                    : $rate.' % ('.$metrics['anomalies_count'].' signalement'.($metrics['anomalies_count'] > 1 ? 's' : '').')';
+                            }),
+                        Forms\Components\Placeholder::make('avg_duration')
+                            ->label('Durée moyenne réelle')
+                            ->content(function (?AgentProfile $record): string {
+                                if (! $record) {
+                                    return '—';
+                                }
+                                $metrics = AgentQualityMetrics::for($record);
+
+                                return $metrics['average_actual_duration_label']
+                                    .' (estimé '.$metrics['average_estimated_duration_label'].')';
+                            }),
+                    ])
+                    ->columns(2)
+                    ->collapsed(),
             ]);
     }
 
@@ -100,7 +149,7 @@ class AgentProfileResource extends Resource
                 Tables\Columns\ImageColumn::make('profile_photo')
                     ->label('Photo')
                     ->circular()
-                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user?->name ?? 'Intervenant') . '&background=0ea5e9&color=fff')
+                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name='.urlencode($record->user?->name ?? 'Intervenant').'&background=0ea5e9&color=fff')
                     ->disk('public'),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Nom')
@@ -144,7 +193,7 @@ class AgentProfileResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('average_rating')
                     ->label('Note')
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1) . '/5' : '-')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1).'/5' : '-')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('documents_complete')
                     ->label('Documents')
@@ -192,12 +241,12 @@ class AgentProfileResource extends Resource
                             'verification_status' => 'verified',
                             'rejection_reason' => null,
                         ]);
-                        
+
                         // Notify agent
                         if ($record->user) {
-                            $record->user->notify(new DocumentsVerifiedNotification());
+                            $record->user->notify(new DocumentsVerifiedNotification);
                         }
-                        
+
                         Notification::make()
                             ->title('Documents validés')
                             ->body('L\'intervenant a été notifié par email.')
@@ -220,12 +269,12 @@ class AgentProfileResource extends Resource
                             'verification_status' => 'rejected',
                             'rejection_reason' => $data['rejection_reason'],
                         ]);
-                        
+
                         // Notify agent
                         if ($record->user) {
                             $record->user->notify(new DocumentsRejectedNotification($data['rejection_reason']));
                         }
-                        
+
                         Notification::make()
                             ->title('Documents rejetés')
                             ->body('L\'intervenant a été notifié par email.')
@@ -250,22 +299,22 @@ class AgentProfileResource extends Resource
                     ])
                     ->action(function ($record, array $data) {
                         $record->increment('warnings_count');
-                        
+
                         // Log sanction history
                         $record->sanctions()->create([
                             'admin_id' => auth()->id(),
                             'type' => 'warning',
                             'reason' => $data['reason'],
                         ]);
-                        
+
                         // Notify agent
                         if ($record->user) {
-                            $record->user->notify(new \App\Notifications\AgentWarningNotification($data['reason'], $record->warnings_count));
+                            $record->user->notify(new AgentWarningNotification($data['reason'], $record->warnings_count));
                         }
-                        
+
                         Notification::make()
                             ->title('Avertissement envoyé')
-                            ->body('L\'intervenant a maintenant ' . $record->warnings_count . ' avertissement(s).')
+                            ->body('L\'intervenant a maintenant '.$record->warnings_count.' avertissement(s).')
                             ->warning()
                             ->send();
                     }),
@@ -273,7 +322,7 @@ class AgentProfileResource extends Resource
                     ->label('Suspendre')
                     ->icon('heroicon-o-pause-circle')
                     ->color('danger')
-                    ->visible(fn ($record) => !$record->suspended_until || $record->suspended_until->isPast())
+                    ->visible(fn ($record) => ! $record->suspended_until || $record->suspended_until->isPast())
                     ->form([
                         Forms\Components\Select::make('duration')
                             ->label('Durée de suspension')
@@ -292,7 +341,7 @@ class AgentProfileResource extends Resource
                     ->action(function ($record, array $data) {
                         $suspendedUntil = now()->addDays((int) $data['duration']);
                         $record->update(['suspended_until' => $suspendedUntil]);
-                        
+
                         // Log sanction history
                         $record->sanctions()->create([
                             'admin_id' => auth()->id(),
@@ -301,15 +350,15 @@ class AgentProfileResource extends Resource
                             'suspension_days' => (int) $data['duration'],
                             'expires_at' => $suspendedUntil,
                         ]);
-                        
+
                         // Notify agent
                         if ($record->user) {
-                            $record->user->notify(new \App\Notifications\AgentSuspendedNotification($data['reason'], $suspendedUntil));
+                            $record->user->notify(new AgentSuspendedNotification($data['reason'], $suspendedUntil));
                         }
-                        
+
                         Notification::make()
                             ->title('Intervenant suspendu')
-                            ->body('Suspension jusqu\'au ' . $suspendedUntil->format('d/m/Y'))
+                            ->body('Suspension jusqu\'au '.$suspendedUntil->format('d/m/Y'))
                             ->danger()
                             ->send();
                     }),
@@ -323,14 +372,14 @@ class AgentProfileResource extends Resource
                     ->modalDescription('L\'intervenant pourra à nouveau recevoir des interventions.')
                     ->action(function ($record) {
                         $record->update(['suspended_until' => null]);
-                        
+
                         // Log sanction history
                         $record->sanctions()->create([
                             'admin_id' => auth()->id(),
                             'type' => 'unsuspend',
                             'reason' => 'Suspension levée par l\'administrateur',
                         ]);
-                        
+
                         Notification::make()
                             ->title('Suspension levée')
                             ->success()
@@ -340,7 +389,7 @@ class AgentProfileResource extends Resource
                     ->label('Exclure définitivement')
                     ->icon('heroicon-o-no-symbol')
                     ->color('danger')
-                    ->visible(fn ($record) => !$record->is_banned)
+                    ->visible(fn ($record) => ! $record->is_banned)
                     ->form([
                         Forms\Components\Textarea::make('reason')
                             ->label('Raison de l\'exclusion')
@@ -357,19 +406,19 @@ class AgentProfileResource extends Resource
                             'ban_reason' => $data['reason'],
                             'is_available' => false,
                         ]);
-                        
+
                         // Log sanction history
                         $record->sanctions()->create([
                             'admin_id' => auth()->id(),
                             'type' => 'ban',
                             'reason' => $data['reason'],
                         ]);
-                        
+
                         // Notify agent
                         if ($record->user) {
-                            $record->user->notify(new \App\Notifications\AgentBannedNotification($data['reason']));
+                            $record->user->notify(new AgentBannedNotification($data['reason']));
                         }
-                        
+
                         Notification::make()
                             ->title('Intervenant exclu définitivement')
                             ->body('L\'intervenant a été notifié par email.')
@@ -390,10 +439,10 @@ class AgentProfileResource extends Resource
                             $records->each(function ($record) {
                                 $record->update(['verification_status' => 'verified', 'rejection_reason' => null]);
                                 if ($record->user) {
-                                    $record->user->notify(new DocumentsVerifiedNotification());
+                                    $record->user->notify(new DocumentsVerifiedNotification);
                                 }
                             });
-                            
+
                             Notification::make()
                                 ->title('Documents validés')
                                 ->success()
@@ -406,7 +455,7 @@ class AgentProfileResource extends Resource
     public static function getRelations(): array
     {
         return [
-            \App\Filament\Resources\AgentProfileResource\RelationManagers\SanctionsRelationManager::class,
+            SanctionsRelationManager::class,
         ];
     }
 

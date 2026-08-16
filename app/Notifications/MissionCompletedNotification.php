@@ -28,8 +28,10 @@ class MissionCompletedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
+        $this->mission->loadMissing(['property', 'anomalies']);
+
         return (new MailMessage)
-            ->subject('Intervention terminée — à confirmer — ' . $this->mission->mission_number)
+            ->subject('Intervention terminée — à confirmer — '.$this->mission->mission_number)
             ->view('emails.mission-completed', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -44,7 +46,7 @@ class MissionCompletedNotification extends Notification implements ShouldQueue
             'mission_number' => $this->mission->mission_number,
             'completed_at' => $this->mission->completed_at?->toISOString(),
             'message' => '✨ L\'intervention est terminée. Il ne vous reste plus qu\'à confirmer que tout est conforme.',
-            'url' => '/client/missions/' . $this->mission->id,
+            'url' => '/client/missions/'.$this->mission->id,
         ];
     }
 }
