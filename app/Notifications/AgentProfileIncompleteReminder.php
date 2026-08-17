@@ -3,11 +3,10 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AgentProfileIncompleteReminder extends Notification implements ShouldQueue
+class AgentProfileIncompleteReminder extends Notification
 {
     use Queueable;
 
@@ -20,7 +19,7 @@ class AgentProfileIncompleteReminder extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage

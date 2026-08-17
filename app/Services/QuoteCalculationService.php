@@ -24,19 +24,19 @@ class QuoteCalculationService
     public function calculateForServiceRequest(ServiceRequest $request): array
     {
         $property = $request->property;
-        
-        if (!$property) {
+
+        if (! $property) {
             throw new \Exception('Property not found for service request');
         }
-        
-        if (!$this->pricingRule) {
+
+        if (! $this->pricingRule) {
             throw new \Exception('No active pricing rule found');
         }
-        
+
         $scheduledAt = Carbon::parse(
-            $request->scheduled_date->format('Y-m-d') . ' ' . $request->scheduled_time
+            $request->scheduled_date->format('Y-m-d').' '.$request->scheduled_time
         );
-        
+
         return $this->pricingRule->calculatePrice(
             $property->type,
             $property->surface_area,
@@ -49,7 +49,7 @@ class QuoteCalculationService
     public function createQuoteForRequest(ServiceRequest $request): Quote
     {
         $calculation = $this->calculateForServiceRequest($request);
-        
+
         $quote = Quote::create([
             'service_request_id' => $request->id,
             'estimated_price' => $calculation['estimated_price'],
@@ -59,7 +59,7 @@ class QuoteCalculationService
             'status' => Quote::STATUS_DRAFT,
             'expires_at' => now()->addDays(7),
         ]);
-        
+
         return $quote;
     }
 
@@ -67,13 +67,13 @@ class QuoteCalculationService
     {
         $request = $quote->serviceRequest;
         $calculation = $this->calculateForServiceRequest($request);
-        
+
         $quote->update([
             'estimated_price' => $calculation['estimated_price'],
             'commission_amount' => $calculation['commission_amount'],
             'agent_amount' => $calculation['agent_amount'],
         ]);
-        
+
         if ($quote->final_price) {
             $finalPrice = $quote->final_price;
             $commissionAmount = round($finalPrice * ($quote->commission_rate / 100), 2);
@@ -82,7 +82,7 @@ class QuoteCalculationService
                 'agent_amount' => round($finalPrice - $commissionAmount, 2),
             ]);
         }
-        
+
         return $quote->fresh();
     }
 
@@ -94,17 +94,17 @@ class QuoteCalculationService
             'validated_by' => $validatedBy,
             'expires_at' => now()->addDays(7),
         ]);
-        
+
         $quote->serviceRequest->update([
             'status' => ServiceRequest::STATUS_QUOTE_SENT,
         ]);
-        
+
         // Notify client of new quote
         $client = $quote->serviceRequest->client;
         if ($client) {
             $client->notify(new NewQuoteNotification($quote));
         }
-        
+
         return $quote->fresh();
     }
 
@@ -114,17 +114,17 @@ class QuoteCalculationService
             'status' => Quote::STATUS_ACCEPTED,
             'responded_at' => now(),
         ]);
-        
+
         $quote->serviceRequest->update([
             'status' => ServiceRequest::STATUS_QUOTE_ACCEPTED,
         ]);
-        
+
         // Notify admins of accepted quote
-        $admins = User::role('admin')->get();
+        $admins = User::admins()->get();
         foreach ($admins as $admin) {
             $admin->notify(new QuoteAcceptedNotification($quote));
         }
-        
+
         return $quote->fresh();
     }
 
@@ -134,17 +134,17 @@ class QuoteCalculationService
             'status' => Quote::STATUS_REFUSED,
             'responded_at' => now(),
         ]);
-        
+
         $quote->serviceRequest->update([
             'status' => ServiceRequest::STATUS_QUOTE_REFUSED,
         ]);
-        
+
         // Notify admins of refused quote
-        $admins = User::where('role', 'admin')->get();
+        $admins = User::admins()->get();
         foreach ($admins as $admin) {
             $admin->notify(new QuoteRefusedNotification($quote));
         }
-        
+
         return $quote->fresh();
     }
 
@@ -153,10 +153,10 @@ class QuoteCalculationService
         float $requestedHours,
         Carbon $scheduledAt
     ): array {
-        if (!$this->pricingRule) {
+        if (! $this->pricingRule) {
             throw new \Exception('No active pricing rule found');
         }
-        
+
         $calculation = $this->pricingRule->calculatePrice(
             $property->type,
             $property->surface_area,
@@ -164,11 +164,11 @@ class QuoteCalculationService
             $scheduledAt,
             $property->postal_code
         );
-        
+
         // Retourner une fourchette de prix (±10%)
         $price = $calculation['estimated_price'];
         $margin = round($price * 0.10, 2);
-        
+
         return [
             'min' => round($price - $margin, 2),
             'max' => round($price + $margin, 2),

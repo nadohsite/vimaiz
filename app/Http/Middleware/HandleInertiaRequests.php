@@ -2,7 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Conversation;
+use App\Models\Message;
+use App\Support\NotificationPayload;
 use Closure;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -58,17 +59,24 @@ class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         $user = $request->user();
-        
+
         // Count unread messages for sidebar badge
         $unreadMessagesCount = 0;
         if ($user) {
-            $unreadMessagesCount = \App\Models\Message::whereHas('conversation', function ($query) use ($user) {
+            $unreadMessagesCount = Message::whereHas('conversation', function ($query) use ($user) {
                 $query->where('client_id', $user->id)
                     ->orWhere('agent_id', $user->id);
             })
-            ->where('sender_id', '!=', $user->id)
-            ->where('is_read', false)
-            ->count();
+                ->where('sender_id', '!=', $user->id)
+                ->where('is_read', false)
+                ->count();
+        }
+
+        $recentNotifications = [];
+        if ($user) {
+            $recentNotifications = NotificationPayload::collection(
+                $user->notifications()->latest()->take(10)->get()
+            );
         }
 
         return [
@@ -84,7 +92,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'notifications' => $user ? $user->notifications()->latest()->take(10)->get() : [],
+            'notifications' => $recentNotifications,
+            'recentNotifications' => $recentNotifications,
             'unreadNotificationsCount' => $user ? $user->unreadNotifications()->count() : 0,
             'unreadMessagesCount' => $unreadMessagesCount,
         ];

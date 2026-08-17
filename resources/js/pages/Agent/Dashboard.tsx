@@ -185,11 +185,11 @@ export default function Dashboard({
                             </div>
                             <div className="flex-1">
                                 <p className="font-semibold text-orange-800 dark:text-orange-300">
-                                    Profil incomplet — vous ne recevez pas encore d'interventions
+                                    Profil incomplet — finalisez vos documents
                                 </p>
                                 <p className="text-sm text-orange-700 dark:text-orange-400">
-                                    Complétez votre profil et soumettez vos documents pour être
-                                    éligible.
+                                    Vous pouvez déjà recevoir des interventions. Complétez votre profil
+                                    pour accélérer la validation.
                                 </p>
                             </div>
                             <Link

@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\AgentProfileResource\Pages;
 
 use App\Filament\Resources\AgentProfileResource;
-use App\Notifications\DocumentsVerifiedNotification;
+use App\Models\AgentProfile;
 use App\Notifications\DocumentsRejectedNotification;
-use Filament\Actions;
+use App\Notifications\DocumentsVerifiedNotification;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Notifications\Notification;
@@ -22,12 +22,12 @@ class ViewAgentDocuments extends Page
 
     public function mount($record): void
     {
-        $this->record = \App\Models\AgentProfile::findOrFail($record);
+        $this->record = AgentProfile::findOrFail($record);
     }
 
     public function getTitle(): string
     {
-        return 'Documents de ' . $this->record->user->name;
+        return 'Documents de '.$this->record->user->name;
     }
 
     protected function getHeaderActions(): array
@@ -49,12 +49,13 @@ class ViewAgentDocuments extends Page
                     $this->record->update([
                         'verification_status' => 'verified',
                         'rejection_reason' => null,
+                        'verified_at' => now(),
                     ]);
-                    
+
                     if ($this->record->user) {
-                        $this->record->user->notify(new DocumentsVerifiedNotification());
+                        $this->record->user->notifyNow(new DocumentsVerifiedNotification);
                     }
-                    
+
                     Notification::make()
                         ->title('Documents validés')
                         ->body('L\'intervenant a été notifié par email.')
@@ -77,11 +78,11 @@ class ViewAgentDocuments extends Page
                         'verification_status' => 'rejected',
                         'rejection_reason' => $data['rejection_reason'],
                     ]);
-                    
+
                     if ($this->record->user) {
-                        $this->record->user->notify(new DocumentsRejectedNotification($data['rejection_reason']));
+                        $this->record->user->notifyNow(new DocumentsRejectedNotification($data['rejection_reason']));
                     }
-                    
+
                     Notification::make()
                         ->title('Documents rejetés')
                         ->body('L\'intervenant a été notifié par email.')
@@ -94,7 +95,7 @@ class ViewAgentDocuments extends Page
     public function getDocuments(): array
     {
         $documents = [];
-        
+
         $documentTypes = [
             'id_document' => [
                 'label' => 'Pièce d\'identité',
@@ -130,7 +131,7 @@ class ViewAgentDocuments extends Page
                 'label' => $config['label'],
                 'icon' => $config['icon'],
                 'required' => $config['required'],
-                'uploaded' => !empty($path),
+                'uploaded' => ! empty($path),
                 'path' => $path,
                 'url' => $path ? Storage::disk('public')->url($path) : null,
                 'is_image' => $path ? $this->isImage($path) : false,
@@ -143,6 +144,7 @@ class ViewAgentDocuments extends Page
     private function isImage(string $path): bool
     {
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
         return in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
     }
 }

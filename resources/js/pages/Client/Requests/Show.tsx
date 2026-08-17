@@ -44,6 +44,7 @@ interface Mission {
     mission_number: string;
     status: string;
     status_label: string;
+    payment_status?: string;
     scheduled_at: string;
     agent: Agent | null;
     photos: MissionPhoto[];
@@ -75,10 +76,11 @@ interface ServiceRequest {
 interface Props {
     serviceRequest: ServiceRequest;
     canCancel: boolean;
-    canPay: boolean;
+    canAcceptQuote: boolean;
+    canProceedToPayment: boolean;
 }
 
-export default function Show({ serviceRequest, canCancel, canPay }: Props) {
+export default function Show({ serviceRequest, canCancel, canAcceptQuote, canProceedToPayment }: Props) {
     const getStatusColor = (status: string) => {
         const colors: Record<string, string> = {
             pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
@@ -120,7 +122,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
         { key: 'pending', label: 'Demande envoyée', done: true },
         { key: 'quote_sent', label: 'Devis reçu', done: ['quote_sent', 'quote_accepted', 'paid', 'assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
         { key: 'paid', label: 'Paiement', done: ['paid', 'assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
-        { key: 'assigned', label: 'Intervenant assigné', done: ['assigned', 'in_progress', 'completed'].includes(serviceRequest.status) },
+        { key: 'assigned', label: 'Intervenant assigné', done: ['in_progress', 'completed'].includes(serviceRequest.status) || (serviceRequest.status === 'assigned' && Boolean(serviceRequest.mission?.agent)) },
         { key: 'completed', label: 'Terminé', done: serviceRequest.status === 'completed' },
     ];
 
@@ -230,7 +232,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                         <div className="flex items-center justify-between mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                                             <span className="text-slate-600 dark:text-slate-400 font-medium">Montant total</span>
                                             <span className="text-2xl font-bold text-green-700 dark:text-green-400">
-                                                {serviceRequest.quote.final_price} €
+                                                {Number(serviceRequest.quote.final_price ?? serviceRequest.quote.estimated_price).toFixed(2)} €
                                             </span>
                                         </div>
                                         
@@ -240,7 +242,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                             </p>
                                         )}
 
-                                        {serviceRequest.quote.status === 'sent' && (
+                                        {serviceRequest.quote.status === 'sent' && canAcceptQuote && (
                                             <div className="flex gap-3">
                                                 <Button 
                                                     onClick={handleAcceptQuote}
@@ -259,7 +261,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                             </div>
                                         )}
 
-                                        {serviceRequest.quote.status === 'accepted' && !serviceRequest.mission && (
+                                        {canProceedToPayment && (
                                             <Link href={route('client.payment.show', serviceRequest.quote.id)}>
                                                 <Button className="w-full bg-green-500 hover:bg-green-600">
                                                     <CreditCard className="h-4 w-4 mr-2" />
@@ -268,7 +270,7 @@ export default function Show({ serviceRequest, canCancel, canPay }: Props) {
                                             </Link>
                                         )}
 
-                                        {(serviceRequest.quote.status === 'paid' || serviceRequest.mission) && (
+                                        {(serviceRequest.quote.status === 'paid' || serviceRequest.mission?.payment_status === 'paid') && (
                                             <div className="flex items-center justify-center gap-2 py-3 px-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                                                 <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                                                 <span className="font-medium text-green-700 dark:text-green-300">Paiement effectué</span>

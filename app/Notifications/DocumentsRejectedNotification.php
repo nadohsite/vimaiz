@@ -20,6 +20,11 @@ class DocumentsRejectedNotification extends Notification implements ShouldQueue
         return ['mail', 'database'];
     }
 
+    public function toBroadcast(object $notifiable): array
+    {
+        return $this->toArray($notifiable);
+    }
+
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
@@ -34,7 +39,7 @@ class DocumentsRejectedNotification extends Notification implements ShouldQueue
     {
         return [
             'type' => 'documents_rejected',
-            'message' => 'Vos documents ont été rejetés. Raison : ' . $this->reason,
+            'message' => 'Vos documents ont été rejetés. Raison : '.$this->reason,
             'reason' => $this->reason,
             'url' => '/agent/documents',
         ];

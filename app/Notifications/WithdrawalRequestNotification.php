@@ -2,14 +2,13 @@
 
 namespace App\Notifications;
 
-use App\Models\WalletTransaction;
 use App\Models\User;
+use App\Models\WalletTransaction;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WithdrawalRequestNotification extends Notification implements ShouldQueue
+class WithdrawalRequestNotification extends Notification
 {
     use Queueable;
 
@@ -20,15 +19,15 @@ class WithdrawalRequestNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         $bankAccount = $this->transaction->metadata['bank_account'] ?? 'Non renseigné';
-        
+
         return (new MailMessage)
-            ->subject('Nouvelle demande de retrait - ' . number_format($this->transaction->amount, 2, ',', ' ') . ' €')
+            ->subject('Nouvelle demande de retrait - '.number_format($this->transaction->amount, 2, ',', ' ').' €')
             ->view('emails.withdrawal-request', [
                 'notifiable' => $notifiable,
                 'transaction' => $this->transaction,
@@ -45,8 +44,8 @@ class WithdrawalRequestNotification extends Notification implements ShouldQueue
             'agent_id' => $this->agent->id,
             'agent_name' => $this->agent->name,
             'amount' => $this->transaction->amount,
-            'message' => $this->agent->name . ' demande un retrait de ' . number_format($this->transaction->amount, 2, ',', ' ') . ' €',
-            'url' => '/admin/withdrawal-requests/' . $this->transaction->id,
+            'message' => $this->agent->name.' demande un retrait de '.number_format($this->transaction->amount, 2, ',', ' ').' €',
+            'url' => '/admin/withdrawal-requests/'.$this->transaction->id,
         ];
     }
 }

@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\StoreServiceRequestRequest;
 use App\Models\MissionAnomaly;
 use App\Models\Property;
+use App\Models\Quote;
 use App\Models\ServiceRequest;
 use App\Models\User;
 use App\Notifications\NewServiceRequestNotification;
+use App\Notifications\ServiceRequestReceivedNotification;
 use App\Services\QuoteCalculationService;
 use App\Support\DefaultPropertyChecklist;
 use Carbon\Carbon;
@@ -134,8 +136,11 @@ class ServiceRequestController extends Controller
             }
         }
 
-        // Notify admins of new service request
-        $admins = User::where('role', 'admin')->get();
+        $serviceRequest->load(['property', 'client']);
+
+        $serviceRequest->client?->notify(new ServiceRequestReceivedNotification($serviceRequest));
+
+        $admins = User::admins()->get();
         foreach ($admins as $admin) {
             $admin->notify(new NewServiceRequestNotification($serviceRequest));
         }
@@ -159,7 +164,9 @@ class ServiceRequestController extends Controller
         return Inertia::render('Client/Requests/Show', [
             'serviceRequest' => $serviceRequest,
             'canCancel' => $serviceRequest->canBeCancelled(),
-            'canPay' => $serviceRequest->quote?->canBeAccepted() ?? false,
+            'canAcceptQuote' => $serviceRequest->quote?->canBeAccepted() ?? false,
+            'canProceedToPayment' => $serviceRequest->quote?->status === Quote::STATUS_ACCEPTED
+                && ! $serviceRequest->mission?->isPaid(),
         ]);
     }
 

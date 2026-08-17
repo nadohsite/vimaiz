@@ -25,7 +25,8 @@ class MissionController extends Controller
         $user = $request->user();
         $status = $request->query('status');
 
-        $query = Mission::where('agent_id', $user->id)
+        $query = Mission::query()
+            ->visibleToAgent($user)
             ->with(['property', 'client']);
 
         if ($status) {
@@ -41,7 +42,7 @@ class MissionController extends Controller
         ]);
     }
 
-    public function show(Mission $mission): Response
+    public function show(Request $request, Mission $mission): Response
     {
         $this->authorize('view', $mission);
 
@@ -58,7 +59,8 @@ class MissionController extends Controller
 
         return Inertia::render('Agent/Missions/Show', [
             'mission' => $mission,
-            'canAccept' => $mission->status === Mission::STATUS_PENDING_AGENT,
+            'canAccept' => $request->user()->can('accept', $mission),
+            'canRefuse' => $request->user()->can('refuse', $mission),
             'canStart' => $mission->canStart(),
             'canComplete' => $mission->canComplete(),
             'checklistProgress' => $mission->checklistProgress(),
@@ -67,12 +69,12 @@ class MissionController extends Controller
         ]);
     }
 
-    public function accept(Mission $mission): RedirectResponse
+    public function accept(Request $request, Mission $mission): RedirectResponse
     {
         $this->authorize('accept', $mission);
 
         try {
-            $this->missionService->agentAcceptMission($mission);
+            $this->missionService->agentAcceptMission($mission, $request->user());
 
             return back()->with('success', 'Intervention confirmée. Rendez-vous le '.
                 $mission->scheduled_at->format('d/m/Y à H:i'));

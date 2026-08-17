@@ -28,7 +28,8 @@ class DashboardController extends Controller
             'pending_earnings' => $wallet->pending_balance,
             'available_balance' => $wallet->balance,
             'missions_completed' => $agentProfile->missions_completed ?? 0,
-            'missions_pending' => Mission::where('agent_id', $user->id)
+            'missions_pending' => Mission::query()
+                ->visibleToAgent($user)
                 ->whereIn('status', [Mission::STATUS_PENDING_AGENT, Mission::STATUS_AGENT_ACCEPTED])
                 ->count(),
             'missions_in_progress' => Mission::where('agent_id', $user->id)
@@ -39,7 +40,8 @@ class DashboardController extends Controller
         ];
 
         // Missions en attente de réponse
-        $pendingMissions = Mission::where('agent_id', $user->id)
+        $pendingMissions = Mission::query()
+            ->visibleToAgent($user)
             ->where('status', Mission::STATUS_PENDING_AGENT)
             ->with(['property', 'client'])
             ->orderBy('scheduled_at')

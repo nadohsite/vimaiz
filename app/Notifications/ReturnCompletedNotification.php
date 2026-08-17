@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ReturnCompletedNotification extends Notification implements ShouldQueue
+class ReturnCompletedNotification extends Notification
 {
     use Queueable;
 
@@ -18,13 +17,13 @@ class ReturnCompletedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('✅ Retour effectué - Intervention ' . $this->mission->mission_number)
+            ->subject('✅ Retour effectué - Intervention '.$this->mission->mission_number)
             ->view('emails.return-completed', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -38,8 +37,8 @@ class ReturnCompletedNotification extends Notification implements ShouldQueue
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'agent_name' => $this->mission->agent->name ?? 'N/A',
-            'message' => 'Retour effectué : ' . $this->mission->mission_number,
-            'url' => '/admin/missions/' . $this->mission->id,
+            'message' => 'Retour effectué : '.$this->mission->mission_number,
+            'url' => '/admin/missions/'.$this->mission->id,
         ];
     }
 }

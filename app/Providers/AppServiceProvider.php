@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Listeners\BroadcastDatabaseNotification;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->brandAuthenticationMails();
+
+        Event::listen(NotificationSent::class, BroadcastDatabaseNotification::class);
     }
 
     /**

@@ -175,8 +175,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/quotes/{quote}/refuse', [ClientQuoteController::class, 'refuse'])->name('quotes.refuse');
 
         // VIMAIZ - Paiement (Payment)
-        Route::get('/payment/{quote}', [ClientPaymentController::class, 'show'])->name('payment.show');
         Route::get('/payment/return', [ClientPaymentController::class, 'return'])->name('payment.return');
+        Route::get('/payment/{quote}', [ClientPaymentController::class, 'show'])->name('payment.show');
         Route::post('/payment/{quote}/process', [ClientPaymentController::class, 'process'])->name('payment.process');
 
         // VIMAIZ - Missions

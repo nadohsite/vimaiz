@@ -4,23 +4,14 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
-use App\Services\MissionService;
 use App\Services\QuoteCalculationService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class QuoteController extends Controller
 {
-    protected QuoteCalculationService $quoteService;
-    protected MissionService $missionService;
-
     public function __construct(
-        QuoteCalculationService $quoteService,
-        MissionService $missionService
-    ) {
-        $this->quoteService = $quoteService;
-        $this->missionService = $missionService;
-    }
+        protected QuoteCalculationService $quoteService
+    ) {}
 
     public function show(Quote $quote)
     {
@@ -28,7 +19,7 @@ class QuoteController extends Controller
 
         $quote->load(['serviceRequest.property']);
 
-        return Inertia::render('client/quotes/show', [
+        return Inertia::render('Client/quotes/show', [
             'quote' => $quote,
         ]);
     }
@@ -37,7 +28,7 @@ class QuoteController extends Controller
     {
         $this->authorize('update', $quote);
 
-        if (!$quote->canBeAccepted()) {
+        if (! $quote->canBeAccepted()) {
             return back()->with('error', 'Ce devis ne peut plus être accepté.');
         }
 

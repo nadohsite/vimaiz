@@ -6,7 +6,6 @@ use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class NewMessageNotification extends Notification implements ShouldQueue
@@ -20,7 +19,7 @@ class NewMessageNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['database'];
     }
 
     public function toBroadcast(object $notifiable): array
@@ -32,12 +31,12 @@ class NewMessageNotification extends Notification implements ShouldQueue
     {
         return [
             'type' => 'new_message',
-            'message' => 'Nouveau message de ' . $this->message->sender->name,
+            'message' => 'Nouveau message de '.$this->message->sender->name,
             'preview' => \Str::limit($this->message->message, 50),
             'conversation_id' => $this->conversation->id,
             'sender_id' => $this->message->sender_id,
             'sender_name' => $this->message->sender->name,
-            'url' => '/messages/' . $this->conversation->id,
+            'url' => '/messages/'.$this->conversation->id,
         ];
     }
 }

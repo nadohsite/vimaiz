@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Mission;
 use App\Models\User;
-use App\Notifications\ReturnRequestedNotification;
 use App\Notifications\ReturnCompletedNotification;
+use App\Notifications\ReturnRequestedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -23,7 +23,7 @@ class MissionReturnController extends Controller
         }
 
         // Vérifier que le retour est possible
-        if (!$mission->canRequestReturn()) {
+        if (! $mission->canRequestReturn()) {
             return back()->with('error', 'La demande de retour n\'est plus possible pour cette intervention.');
         }
 
@@ -39,10 +39,7 @@ class MissionReturnController extends Controller
         ]);
 
         // Notify admins of return request
-        $admins = User::where('role', 'admin')->get();
-        foreach ($admins as $admin) {
-            $admin->notify(new ReturnRequestedNotification($mission));
-        }
+        User::notifyAdmins(new ReturnRequestedNotification($mission));
 
         return back()->with('success', 'Votre demande de retour a été envoyée à l\'intervenant.');
     }
@@ -94,10 +91,7 @@ class MissionReturnController extends Controller
         ]);
 
         // Notify admins that return is completed
-        $admins = User::where('role', 'admin')->get();
-        foreach ($admins as $admin) {
-            $admin->notify(new ReturnCompletedNotification($mission));
-        }
+        User::notifyAdmins(new ReturnCompletedNotification($mission));
 
         return back()->with('success', 'Le retour a été marqué comme terminé. En attente de validation client.');
     }
@@ -129,8 +123,8 @@ class MissionReturnController extends Controller
             'return_client_feedback' => $validated['feedback'] ?? null,
         ]);
 
-        $message = $validated['approved'] 
-            ? 'Merci ! Le retour a été validé.' 
+        $message = $validated['approved']
+            ? 'Merci ! Le retour a été validé.'
             : 'Le retour a été refusé. Notre équipe va examiner votre dossier.';
 
         return back()->with('success', $message);

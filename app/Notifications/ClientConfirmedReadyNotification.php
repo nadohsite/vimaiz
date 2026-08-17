@@ -4,12 +4,11 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /** Sent to the client after they confirm/review a completed intervention. */
-class ClientConfirmedReadyNotification extends Notification implements ShouldQueue
+class ClientConfirmedReadyNotification extends Notification
 {
     use Queueable;
 
@@ -25,7 +24,7 @@ class ClientConfirmedReadyNotification extends Notification implements ShouldQue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Bien prêt — ' . $this->mission->mission_number)
+            ->subject('Bien prêt — '.$this->mission->mission_number)
             ->view('emails.client-confirmed-ready', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -39,7 +38,7 @@ class ClientConfirmedReadyNotification extends Notification implements ShouldQue
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'message' => '✅ Merci. Votre bien est désormais prêt à accueillir ses prochains voyageurs.',
-            'url' => '/client/missions/' . $this->mission->id,
+            'url' => '/client/missions/'.$this->mission->id,
         ];
     }
 }

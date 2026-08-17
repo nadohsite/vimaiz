@@ -90,7 +90,7 @@ class AgentProfileResource extends Resource
                         Forms\Components\TextInput::make('average_rating')
                             ->label('Note moyenne')
                             ->disabled(),
-                        Forms\Components\TextInput::make('warnings_count')
+                        Forms\Components\TextInput::make('warning_count')
                             ->label('Avertissements')
                             ->disabled(),
                     ])->columns(3),
@@ -240,11 +240,11 @@ class AgentProfileResource extends Resource
                         $record->update([
                             'verification_status' => 'verified',
                             'rejection_reason' => null,
+                            'verified_at' => now(),
                         ]);
 
-                        // Notify agent
                         if ($record->user) {
-                            $record->user->notify(new DocumentsVerifiedNotification);
+                            $record->user->notifyNow(new DocumentsVerifiedNotification);
                         }
 
                         Notification::make()
@@ -272,7 +272,7 @@ class AgentProfileResource extends Resource
 
                         // Notify agent
                         if ($record->user) {
-                            $record->user->notify(new DocumentsRejectedNotification($data['rejection_reason']));
+                            $record->user->notifyNow(new DocumentsRejectedNotification($data['rejection_reason']));
                         }
 
                         Notification::make()
@@ -298,7 +298,7 @@ class AgentProfileResource extends Resource
                             ->placeholder('Décrivez la raison de cet avertissement...'),
                     ])
                     ->action(function ($record, array $data) {
-                        $record->increment('warnings_count');
+                        $record->increment('warning_count');
 
                         // Log sanction history
                         $record->sanctions()->create([
@@ -309,12 +309,12 @@ class AgentProfileResource extends Resource
 
                         // Notify agent
                         if ($record->user) {
-                            $record->user->notify(new AgentWarningNotification($data['reason'], $record->warnings_count));
+                            $record->user->notify(new AgentWarningNotification($data['reason'], $record->warning_count));
                         }
 
                         Notification::make()
                             ->title('Avertissement envoyé')
-                            ->body('L\'intervenant a maintenant '.$record->warnings_count.' avertissement(s).')
+                            ->body('L\'intervenant a maintenant '.$record->warning_count.' avertissement(s).')
                             ->warning()
                             ->send();
                     }),
@@ -437,9 +437,13 @@ class AgentProfileResource extends Resource
                         ->requiresConfirmation()
                         ->action(function ($records) {
                             $records->each(function ($record) {
-                                $record->update(['verification_status' => 'verified', 'rejection_reason' => null]);
+                                $record->update([
+                                    'verification_status' => 'verified',
+                                    'rejection_reason' => null,
+                                    'verified_at' => now(),
+                                ]);
                                 if ($record->user) {
-                                    $record->user->notify(new DocumentsVerifiedNotification);
+                                    $record->user->notifyNow(new DocumentsVerifiedNotification);
                                 }
                             });
 

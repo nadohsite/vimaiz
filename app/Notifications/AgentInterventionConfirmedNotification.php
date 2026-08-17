@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AgentInterventionConfirmedNotification extends Notification implements ShouldQueue
+class AgentInterventionConfirmedNotification extends Notification
 {
     use Queueable;
 
@@ -18,13 +17,13 @@ class AgentInterventionConfirmedNotification extends Notification implements Sho
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Intervention confirmée — ' . $this->mission->mission_number)
+            ->subject('Intervention confirmée — '.$this->mission->mission_number)
             ->view('emails.agent-intervention-confirmed', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -38,7 +37,7 @@ class AgentInterventionConfirmedNotification extends Notification implements Sho
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'message' => '✅ Votre intervention est confirmée. Retrouvez toutes les informations dans votre espace.',
-            'url' => '/agent/missions/' . $this->mission->id,
+            'url' => '/agent/missions/'.$this->mission->id,
         ];
     }
 }

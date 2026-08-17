@@ -18,7 +18,7 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
+        return ['mail', 'database'];
     }
 
     public function toBroadcast(object $notifiable): array
@@ -29,7 +29,7 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Votre intervention est confirmée — ' . $this->mission->mission_number)
+            ->subject('Votre intervention est confirmée — '.$this->mission->mission_number)
             ->view('emails.payment-received', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -44,7 +44,7 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
             'mission_number' => $this->mission->mission_number,
             'amount' => $this->mission->total_price,
             'message' => '🔔 Votre intervention a bien été enregistrée. Nous recherchons actuellement un intervenant disponible.',
-            'url' => '/client/missions/' . $this->mission->id,
+            'url' => '/client/missions/'.$this->mission->id,
         ];
     }
 }

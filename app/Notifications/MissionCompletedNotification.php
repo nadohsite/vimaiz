@@ -18,7 +18,7 @@ class MissionCompletedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
+        return ['mail', 'database'];
     }
 
     public function toBroadcast(object $notifiable): array

@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AgentSuspendedNotification extends Notification implements ShouldQueue
+class AgentSuspendedNotification extends Notification
 {
     use Queueable;
 
@@ -19,7 +18,7 @@ class AgentSuspendedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -37,7 +36,7 @@ class AgentSuspendedNotification extends Notification implements ShouldQueue
     {
         return [
             'type' => 'agent_suspended',
-            'message' => 'Votre compte est suspendu jusqu\'au ' . $this->suspendedUntil->format('d/m/Y'),
+            'message' => 'Votre compte est suspendu jusqu\'au '.$this->suspendedUntil->format('d/m/Y'),
             'reason' => $this->reason,
             'suspended_until' => $this->suspendedUntil->toISOString(),
             'url' => '/agent/dashboard',

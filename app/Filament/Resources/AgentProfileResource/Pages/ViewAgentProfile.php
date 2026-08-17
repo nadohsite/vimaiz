@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\AgentProfileResource\Pages;
 
 use App\Filament\Resources\AgentProfileResource;
-use App\Notifications\DocumentsVerifiedNotification;
 use App\Notifications\DocumentsRejectedNotification;
+use App\Notifications\DocumentsVerifiedNotification;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -35,12 +35,13 @@ class ViewAgentProfile extends ViewRecord
                     $this->record->update([
                         'verification_status' => 'verified',
                         'rejection_reason' => null,
+                        'verified_at' => now(),
                     ]);
-                    
+
                     if ($this->record->user) {
-                        $this->record->user->notify(new DocumentsVerifiedNotification());
+                        $this->record->user->notifyNow(new DocumentsVerifiedNotification);
                     }
-                    
+
                     Notification::make()
                         ->title('Documents validés')
                         ->body('L\'intervenant a été notifié par email.')
@@ -63,11 +64,11 @@ class ViewAgentProfile extends ViewRecord
                         'verification_status' => 'rejected',
                         'rejection_reason' => $data['rejection_reason'],
                     ]);
-                    
+
                     if ($this->record->user) {
-                        $this->record->user->notify(new DocumentsRejectedNotification($data['rejection_reason']));
+                        $this->record->user->notifyNow(new DocumentsRejectedNotification($data['rejection_reason']));
                     }
-                    
+
                     Notification::make()
                         ->title('Documents rejetés')
                         ->body('L\'intervenant a été notifié par email.')

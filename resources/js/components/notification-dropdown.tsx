@@ -7,7 +7,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { usePage, router, Link } from '@inertiajs/react';
+import { usePage, router } from '@inertiajs/react';
 import { Bell, FileText, CreditCard, User, CheckCircle, Play, Wallet, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -26,6 +26,7 @@ interface Notification {
 }
 
 interface PageProps {
+    recentNotifications?: Notification[];
     notifications?: Notification[];
     unreadNotificationsCount?: number;
     [key: string]: any;
@@ -34,6 +35,7 @@ interface PageProps {
 const getNotificationIcon = (type: string) => {
     const icons: Record<string, { icon: typeof Bell; color: string }> = {
         new_quote: { icon: FileText, color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400' },
+        service_request_received: { icon: FileText, color: 'text-sky-600 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-400' },
         payment_received: { icon: CreditCard, color: 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400' },
         mission_assigned: { icon: User, color: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400' },
         agent_accepted: { icon: CheckCircle, color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400' },
@@ -41,6 +43,11 @@ const getNotificationIcon = (type: string) => {
         mission_completed: { icon: CheckCircle, color: 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400' },
         agent_payout: { icon: Wallet, color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400' },
         quote_refused: { icon: AlertCircle, color: 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400' },
+        documents_verified: { icon: CheckCircle, color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400' },
+        documents_rejected: { icon: AlertCircle, color: 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400' },
+        agent_refused_client: { icon: AlertCircle, color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400' },
+        mission_needs_agent: { icon: User, color: 'text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400' },
+        service_request_received: { icon: FileText, color: 'text-sky-600 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-400' },
     };
     return icons[type] || { icon: Bell, color: 'text-neutral-600 bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-400' };
 };
@@ -53,18 +60,32 @@ const formatTime = (dateString: string) => {
     }
 };
 
+function toNotificationList(value: unknown): Notification[] {
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (value && typeof value === 'object') {
+        return Object.values(value as Record<string, Notification>);
+    }
+
+    return [];
+}
+
 export function NotificationDropdown() {
-    const { notifications = [], unreadNotificationsCount = 0 } = usePage<PageProps>().props;
+    const {
+        recentNotifications,
+        notifications: sharedNotifications,
+        unreadNotificationsCount = 0,
+    } = usePage<PageProps>().props;
+    const notifications = toNotificationList(recentNotifications ?? sharedNotifications);
 
     const handleNotificationClick = (notification: Notification) => {
-        // Mark as read
         router.post(route('notifications.mark-read', notification.id), {}, {
             preserveScroll: true,
-            preserveState: true,
         });
 
-        // Navigate to URL if provided
-        if (notification.data.url) {
+        if (notification.data?.url) {
             router.visit(notification.data.url);
         }
     };
@@ -72,8 +93,11 @@ export function NotificationDropdown() {
     const handleMarkAllRead = () => {
         router.post(route('notifications.mark-all-read'), {}, {
             preserveScroll: true,
-            preserveState: true,
         });
+    };
+
+    const handleViewAll = () => {
+        router.visit(route('notifications.index'));
     };
 
     return (
@@ -111,7 +135,7 @@ export function NotificationDropdown() {
                         </div>
                     ) : (
                         notifications.slice(0, 10).map((notification) => {
-                            const { icon: Icon, color } = getNotificationIcon(notification.data.type);
+                            const { icon: Icon, color } = getNotificationIcon(notification.data?.type);
                             const isUnread = !notification.read_at;
 
                             return (
@@ -127,7 +151,7 @@ export function NotificationDropdown() {
                                     </div>
                                     <div className="flex-1 space-y-1 overflow-hidden">
                                         <p className={`text-sm leading-tight ${isUnread ? 'font-semibold' : 'font-medium'}`}>
-                                            {notification.data.message}
+                                            {notification.data?.message}
                                         </p>
                                         <p className="text-[10px] text-neutral-400">
                                             {formatTime(notification.created_at)}
@@ -141,19 +165,13 @@ export function NotificationDropdown() {
                         })
                     )}
                 </div>
-                {notifications.length > 0 && (
-                    <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild className="flex justify-center p-2">
-                            <Link
-                                href={route('notifications.index')}
-                                className="w-full text-center text-xs font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400"
-                            >
-                                Voir toutes les notifications
-                            </Link>
-                        </DropdownMenuItem>
-                    </>
-                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    className="flex justify-center p-2 text-xs font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400"
+                    onSelect={handleViewAll}
+                >
+                    Voir toutes les notifications
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

@@ -18,7 +18,7 @@ class NewQuoteNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
+        return ['mail', 'database'];
     }
 
     public function toBroadcast(object $notifiable): array
@@ -29,7 +29,7 @@ class NewQuoteNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Votre devis est prêt — ' . $this->quote->quote_number)
+            ->subject('Votre devis est prêt — '.$this->quote->quote_number)
             ->view('emails.quote-sent', [
                 'notifiable' => $notifiable,
                 'quote' => $this->quote,
@@ -43,8 +43,8 @@ class NewQuoteNotification extends Notification implements ShouldQueue
             'quote_id' => $this->quote->id,
             'quote_number' => $this->quote->quote_number,
             'amount' => $this->quote->final_price ?? $this->quote->estimated_price,
-            'message' => 'Nouveau devis disponible : ' . $this->quote->quote_number,
-            'url' => '/client/quotes/' . $this->quote->id,
+            'message' => 'Nouveau devis disponible : '.$this->quote->quote_number,
+            'url' => '/client/quotes/'.$this->quote->id,
         ];
     }
 }

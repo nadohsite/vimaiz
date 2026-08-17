@@ -14,11 +14,13 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
 
     public function __construct(
         public Mission $mission
-    ) {}
+    ) {
+        $this->afterCommit();
+    }
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
+        return ['mail', 'database'];
     }
 
     public function toBroadcast(object $notifiable): array
@@ -29,7 +31,7 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nouvelle intervention à accepter — ' . $this->mission->mission_number)
+            ->subject('Nouvelle intervention à accepter — '.$this->mission->mission_number)
             ->view('emails.mission-assigned', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -45,7 +47,7 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
             'scheduled_at' => $this->mission->scheduled_at->toISOString(),
             'payout' => $this->mission->agent_payout,
             'message' => '🔔 Une nouvelle intervention est disponible près de chez vous.',
-            'url' => '/agent/missions/' . $this->mission->id,
+            'url' => '/agent/missions/'.$this->mission->id,
         ];
     }
 }

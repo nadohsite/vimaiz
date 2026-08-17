@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AgentAcceptedMissionAdminNotification extends Notification implements ShouldQueue
+class AgentAcceptedMissionAdminNotification extends Notification
 {
     use Queueable;
 
@@ -18,13 +17,13 @@ class AgentAcceptedMissionAdminNotification extends Notification implements Shou
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('✅ Intervention confirmée par intervenant - ' . $this->mission->mission_number)
+            ->subject('✅ Intervention confirmée par intervenant - '.$this->mission->mission_number)
             ->view('emails.agent-accepted-mission-admin', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -38,8 +37,8 @@ class AgentAcceptedMissionAdminNotification extends Notification implements Shou
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'agent_name' => $this->mission->agent->name ?? 'N/A',
-            'message' => 'Intervention confirmée par ' . ($this->mission->agent->name ?? 'intervenant'),
-            'url' => '/admin/missions/' . $this->mission->id,
+            'message' => 'Intervention confirmée par '.($this->mission->agent->name ?? 'intervenant'),
+            'url' => '/admin/missions/'.$this->mission->id,
         ];
     }
 }

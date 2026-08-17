@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { router } from '@inertiajs/react';
 
 interface Message {
@@ -10,12 +10,25 @@ interface Message {
     created_at: string;
 }
 
-interface Notification {
+interface RealtimeNotification {
     id: string;
     type: string;
-    message: string;
+    message?: string;
     url?: string;
-    data: Record<string, unknown>;
+    data?: Record<string, unknown>;
+}
+
+function notifyBrowser(title: string, body?: string) {
+    if (typeof window === 'undefined' || !('Notification' in window) || !body) {
+        return;
+    }
+
+    if (window.Notification.permission === 'granted') {
+        new window.Notification(title, {
+            body: body.substring(0, 100),
+            icon: '/favicon.ico',
+        });
+    }
 }
 
 export function useRealtime(userId: number | null) {
@@ -29,28 +42,19 @@ export function useRealtime(userId: number | null) {
             // Refresh the current page to get new messages
             router.reload({ only: ['messages', 'conversations', 'unreadCount'] });
             
-            // Show browser notification if permitted
-            if (Notification.permission === 'granted') {
-                new Notification(`Nouveau message de ${data.sender_name}`, {
-                    body: data.message.substring(0, 100),
-                    icon: '/favicon.ico',
-                });
-            }
+            notifyBrowser(`Nouveau message de ${data.sender_name}`, data.message);
         });
 
-        // Listen for new notifications
-        channel.listen('.new-notification', (data: Notification) => {
-            // Refresh notifications
-            router.reload({ only: ['notifications', 'unreadNotificationsCount'] });
-            
-            // Show browser notification if permitted
-            if (Notification.permission === 'granted') {
-                new Notification('VIMAIZ', {
-                    body: data.message,
-                    icon: '/favicon.ico',
-                });
-            }
-        });
+        const handleNotification = (data: RealtimeNotification) => {
+            router.reload({ only: ['recentNotifications', 'notifications', 'unreadNotificationsCount'] });
+
+            const message = data.message
+                ?? (typeof data.data?.message === 'string' ? data.data.message : undefined);
+            notifyBrowser('VIMAIZ', message);
+        };
+
+        channel.listen('.new-notification', handleNotification);
+        channel.notification(handleNotification);
 
         return () => {
             channel.stopListening('.new-message');
@@ -78,7 +82,7 @@ export function useConversationRealtime(conversationId: number | null, onNewMess
 }
 
 export function requestNotificationPermission() {
-    if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
+    if (typeof window !== 'undefined' && 'Notification' in window && window.Notification.permission === 'default') {
+        window.Notification.requestPermission();
     }
 }

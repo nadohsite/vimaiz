@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ClientValidatedInterventionNotification extends Notification implements ShouldQueue
+class ClientValidatedInterventionNotification extends Notification
 {
     use Queueable;
 
@@ -18,13 +17,13 @@ class ClientValidatedInterventionNotification extends Notification implements Sh
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Intervention validée — ' . $this->mission->mission_number)
+            ->subject('Intervention validée — '.$this->mission->mission_number)
             ->view('emails.client-validated-intervention', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -38,7 +37,7 @@ class ClientValidatedInterventionNotification extends Notification implements Sh
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'message' => '✅ Votre intervention a été validée. Merci pour votre professionnalisme.',
-            'url' => '/agent/missions/' . $this->mission->id,
+            'url' => '/agent/missions/'.$this->mission->id,
         ];
     }
 }

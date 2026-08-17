@@ -18,6 +18,11 @@ class DocumentsVerifiedNotification extends Notification implements ShouldQueue
         return ['mail', 'database'];
     }
 
+    public function toBroadcast(object $notifiable): array
+    {
+        return $this->toArray($notifiable);
+    }
+
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)

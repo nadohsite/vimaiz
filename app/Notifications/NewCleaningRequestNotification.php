@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\CleaningRequest;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewCleaningRequestNotification extends Notification implements ShouldQueue
+class NewCleaningRequestNotification extends Notification
 {
     use Queueable;
 
@@ -18,7 +17,7 @@ class NewCleaningRequestNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
+        return ['database', 'mail'];
     }
 
     public function toBroadcast(object $notifiable): array
@@ -29,7 +28,7 @@ class NewCleaningRequestNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nouvelle demande d\'intervention — ' . $this->request->request_number)
+            ->subject('Nouvelle demande d\'intervention — '.$this->request->request_number)
             ->view('emails.new-cleaning-request', [
                 'notifiable' => $notifiable,
                 'request' => $this->request,
@@ -43,8 +42,8 @@ class NewCleaningRequestNotification extends Notification implements ShouldQueue
             'request_id' => $this->request->id,
             'request_number' => $this->request->request_number,
             'client_name' => $this->request->user->name,
-            'message' => 'Nouvelle intervention : ' . $this->request->request_number,
-            'url' => '/admin/cleaning-requests/' . $this->request->id,
+            'message' => 'Nouvelle intervention : '.$this->request->request_number,
+            'url' => '/admin/cleaning-requests/'.$this->request->id,
         ];
     }
 }

@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MissionCompletedAdminNotification extends Notification implements ShouldQueue
+class MissionCompletedAdminNotification extends Notification
 {
     use Queueable;
 
@@ -18,7 +17,7 @@ class MissionCompletedAdminNotification extends Notification implements ShouldQu
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage

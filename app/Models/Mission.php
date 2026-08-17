@@ -189,6 +189,31 @@ class Mission extends Model
         return $this->payment_status === self::PAYMENT_PAID;
     }
 
+    public function isOpenForAgents(): bool
+    {
+        return $this->agent_id === null
+            && $this->status === self::STATUS_PENDING_AGENT
+            && $this->isPaid();
+    }
+
+    public function scopeVisibleToAgent($query, User $agent)
+    {
+        return $query->where(function ($q) use ($agent) {
+            $q->where('agent_id', $agent->id)
+                ->orWhere(function ($open) use ($agent) {
+                    $open->whereNull('agent_id')
+                        ->where('status', self::STATUS_PENDING_AGENT)
+                        ->where('payment_status', self::PAYMENT_PAID)
+                        ->whereNotExists(function ($pending) use ($agent) {
+                            $pending->selectRaw('1')
+                                ->from('missions as agent_pending_missions')
+                                ->where('agent_pending_missions.agent_id', $agent->id)
+                                ->where('agent_pending_missions.status', self::STATUS_PENDING_AGENT);
+                        });
+                });
+        });
+    }
+
     public function needsAgent(): bool
     {
         return $this->status === self::STATUS_AGENT_REFUSED ||

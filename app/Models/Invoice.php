@@ -43,8 +43,11 @@ class Invoice extends Model
     ];
 
     const STATUS_DRAFT = 'draft';
+
     const STATUS_PENDING = 'pending';
+
     const STATUS_PAID = 'paid';
+
     const STATUS_REFUNDED = 'refunded';
 
     protected static function boot()
@@ -63,7 +66,7 @@ class Invoice extends Model
         $prefix = 'VIM';
         $year = date('Y');
         $month = date('m');
-        
+
         $lastInvoice = static::whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->orderBy('id', 'desc')
@@ -114,16 +117,23 @@ class Invoice extends Model
 
     public function getFormattedTotalAttribute(): string
     {
-        return number_format($this->total, 2, ',', ' ') . ' €';
+        return number_format($this->total, 2, ',', ' ').' €';
     }
 
     public static function createFromMission(Mission $mission): self
     {
+        $existing = static::query()->where('mission_id', $mission->id)->first();
+        if ($existing) {
+            return $existing;
+        }
+
         $subtotal = round($mission->total_price / 1.20, 2); // Remove TVA
         $taxAmount = round($mission->total_price - $subtotal, 2);
 
         $property = $mission->property;
         $user = $mission->client;
+
+        $hours = max(1, (float) $mission->duration_hours);
 
         return static::create([
             'user_id' => $mission->client_id,
@@ -138,13 +148,13 @@ class Invoice extends Model
             'payment_intent_id' => $mission->payment_intent_id,
             'billing_name' => $user->name,
             'billing_email' => $user->email,
-            'description' => 'Prestation d\'intervention - ' . ($property->name ?? $property->type_label),
+            'description' => 'Prestation d\'intervention - '.($property->name ?? $property->type_label),
             'line_items' => [
                 [
-                    'description' => 'Intervention ' . ($property->name ?? $property->type_label),
-                    'quantity' => $mission->duration_hours,
+                    'description' => 'Intervention '.($property->name ?? $property->type_label),
+                    'quantity' => $hours,
                     'unit' => 'heure(s)',
-                    'unit_price' => round($subtotal / $mission->duration_hours, 2),
+                    'unit_price' => round($subtotal / $hours, 2),
                     'total' => $subtotal,
                 ],
             ],

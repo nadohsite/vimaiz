@@ -17,9 +17,43 @@ class MissionPolicy
 
     public function view(User $user, Mission $mission): bool
     {
-        return $user->id === $mission->client_id 
-            || $user->id === $mission->agent_id 
-            || $user->isAdmin();
+        if ($user->id === $mission->client_id
+            || $user->id === $mission->agent_id
+            || $user->isAdmin()) {
+            return true;
+        }
+
+        return $user->isAgent() && $mission->isOpenForAgents();
+    }
+
+    public function accept(User $user, Mission $mission): bool
+    {
+        if (! $user->isAgent() || ! $user->is_active || $mission->status !== Mission::STATUS_PENDING_AGENT) {
+            return false;
+        }
+
+        $profile = $user->agentProfile;
+        if ($profile && ($profile->is_banned || $profile->isSuspended())) {
+            return false;
+        }
+
+        if ($mission->agent_id === $user->id) {
+            return true;
+        }
+
+        if (! $mission->isOpenForAgents()) {
+            return false;
+        }
+
+        return ! Mission::where('agent_id', $user->id)
+            ->where('status', Mission::STATUS_PENDING_AGENT)
+            ->exists();
+    }
+
+    public function refuse(User $user, Mission $mission): bool
+    {
+        return $user->id === $mission->agent_id
+            && $mission->status === Mission::STATUS_PENDING_AGENT;
     }
 
     public function create(User $user): bool
@@ -35,18 +69,6 @@ class MissionPolicy
     public function delete(User $user, Mission $mission): bool
     {
         return $user->isAdmin();
-    }
-
-    public function accept(User $user, Mission $mission): bool
-    {
-        return $user->id === $mission->agent_id 
-            && $mission->status === Mission::STATUS_PENDING_AGENT;
-    }
-
-    public function refuse(User $user, Mission $mission): bool
-    {
-        return $user->id === $mission->agent_id 
-            && $mission->status === Mission::STATUS_PENDING_AGENT;
     }
 
     public function start(User $user, Mission $mission): bool

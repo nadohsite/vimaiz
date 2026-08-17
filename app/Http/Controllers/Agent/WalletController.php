@@ -14,17 +14,17 @@ class WalletController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        
+
         $wallet = Wallet::firstOrCreate(
             ['user_id' => $user->id],
             ['balance' => 0, 'pending_balance' => 0, 'total_earned' => 0, 'total_withdrawn' => 0]
         );
-        
+
         $transactions = $wallet->transactions()
             ->with(['mission.property', 'booking'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
-        
+
         // Calculate real stats
         $stats = [
             'total_missions' => $user->agentMissions()->count(),
@@ -37,36 +37,33 @@ class WalletController extends Controller
                 ->whereYear('created_at', now()->year)
                 ->sum('amount'),
         ];
-        
+
         return Inertia::render('Agent/Wallet/Index', [
             'wallet' => $wallet,
             'transactions' => $transactions,
             'stats' => $stats,
         ]);
     }
-    
+
     public function withdraw(Request $request)
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:1',
             'bank_account' => 'required|string',
         ]);
-        
+
         $wallet = $request->user()->wallet;
-        
-        if (!$wallet || $wallet->balance < $validated['amount']) {
+
+        if (! $wallet || $wallet->balance < $validated['amount']) {
             return redirect()->back()->withErrors(['amount' => 'Insufficient balance']);
         }
-        
+
         try {
             $transaction = $wallet->withdraw($validated['amount'], $validated['bank_account']);
-            
+
             // Notify all admins about the withdrawal request
-            $admins = User::where('role', 'admin')->get();
-            foreach ($admins as $admin) {
-                $admin->notify(new WithdrawalRequestNotification($transaction, $request->user()));
-            }
-            
+            User::notifyAdmins(new WithdrawalRequestNotification($transaction, $request->user()));
+
             return redirect()->back()->with('success', 'Demande de retrait soumise avec succès !');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['amount' => $e->getMessage()]);

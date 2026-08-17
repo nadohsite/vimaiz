@@ -14,17 +14,24 @@ use App\Notifications\AgentAcceptedMissionNotification;
 use App\Notifications\AgentInterventionCompletedNotification;
 use App\Notifications\AgentInterventionConfirmedNotification;
 use App\Notifications\AgentPayoutNotification;
+use App\Notifications\AgentRefusedMissionClientNotification;
 use App\Notifications\AgentRefusedMissionNotification;
 use App\Notifications\MissionAssignedNotification;
 use App\Notifications\MissionCompletedAdminNotification;
 use App\Notifications\MissionCompletedNotification;
+use App\Notifications\MissionNeedsAgentNotification;
 use App\Notifications\MissionStartedNotification;
 use App\Notifications\PaymentReceivedNotification;
 use App\Support\DefaultPropertyChecklist;
 use App\Support\InterventionReportCatalog;
 use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Refund;
+use Stripe\Stripe;
 
 class MissionService
 {
@@ -56,6 +63,7 @@ class MissionService
         $effectivePrice = $quote->final_price ?? $quote->estimated_price;
         $commissionAmount = $quote->commission_amount ?? round($effectivePrice * ($quote->commission_rate / 100), 2);
         $agentPayout = $quote->agent_amount ?? round($effectivePrice - $commissionAmount, 2);
+        $durationHours = (int) max(1, round((float) ($request->requested_hours ?: $quote->estimated_hours ?: 1)));
 
         $mission = Mission::create([
             'service_request_id' => $request->id,
@@ -63,7 +71,7 @@ class MissionService
             'property_id' => $property->id,
             'client_id' => $request->client_id,
             'scheduled_at' => $scheduledAt,
-            'duration_hours' => $request->requested_hours,
+            'duration_hours' => $durationHours,
             'checklist' => DefaultPropertyChecklist::snapshotForMission(
                 $request->checklist ?: $property->checklist
             ),
@@ -77,70 +85,157 @@ class MissionService
         return $mission;
     }
 
+    public function fulfillPaidQuote(Quote $quote, string $paymentIntentId): Mission
+    {
+        return DB::transaction(function () use ($quote, $paymentIntentId) {
+            $quote = Quote::query()->whereKey($quote->id)->lockForUpdate()->firstOrFail();
+
+            $mission = Mission::query()
+                ->where('quote_id', $quote->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $mission) {
+                try {
+                    $mission = $this->createMissionFromQuote($quote);
+                } catch (UniqueConstraintViolationException) {
+                    $mission = Mission::query()
+                        ->where('quote_id', $quote->id)
+                        ->lockForUpdate()
+                        ->firstOrFail();
+                }
+            }
+
+            return $this->markAsPaid($mission, $paymentIntentId);
+        });
+    }
+
     public function markAsPaid(Mission $mission, string $paymentIntentId): Mission
     {
+        if ($mission->isPaid()) {
+            return $mission->fresh();
+        }
+
+        $hadAgent = (bool) $mission->agent_id;
+        $hadInvoice = Invoice::query()->where('mission_id', $mission->id)->exists();
+
         $mission->update([
             'payment_status' => Mission::PAYMENT_PAID,
             'payment_intent_id' => $paymentIntentId,
             'paid_at' => now(),
         ]);
 
-        // Update quote status to paid
         $mission->quote->update([
-            'status' => 'paid',
+            'status' => Quote::STATUS_PAID,
+            'payment_intent_id' => $paymentIntentId,
         ]);
 
         $mission->serviceRequest->update([
             'status' => ServiceRequest::STATUS_PAID,
         ]);
 
-        $agent = $this->assignmentService->assignAgentToMission($mission);
+        $notifiedAgents = collect();
+
+        if ($hadAgent && $mission->agent) {
+            $notifiedAgents = collect([$mission->agent]);
+        } else {
+            $notifiedAgents = $this->assignmentService->proposeToAvailableAgents($mission);
+        }
+
+        $mission->refresh();
+
+        $mission->serviceRequest->update([
+            'status' => $mission->agent_id
+                ? ServiceRequest::STATUS_ASSIGNED
+                : ServiceRequest::STATUS_PAID,
+        ]);
+
+        if (! $hadInvoice) {
+            Invoice::createFromMission($mission->fresh());
+        }
+
+        $mission->client->notify(new PaymentReceivedNotification($mission->fresh()));
+
+        $freshMission = $mission->fresh(['property']);
+        foreach ($notifiedAgents as $agent) {
+            $agent->notify(new MissionAssignedNotification($freshMission));
+        }
+
+        if ($notifiedAgents->isEmpty() && ! $mission->agent_id) {
+            User::notifyAdmins(new MissionNeedsAgentNotification($freshMission));
+        }
+
+        return $mission->fresh();
+    }
+
+    public function assignSpecificAgent(Mission $mission, User $agent): Mission
+    {
+        $mission->update([
+            'agent_id' => $agent->id,
+            'status' => Mission::STATUS_PENDING_AGENT,
+            'agent_notified_at' => now(),
+            'assignment_attempts' => $mission->assignment_attempts + 1,
+        ]);
 
         $mission->serviceRequest->update([
             'status' => ServiceRequest::STATUS_ASSIGNED,
         ]);
 
-        // Create invoice for the mission
-        Invoice::createFromMission($mission);
-
-        // Notify client that payment was received
-        $mission->client->notify(new PaymentReceivedNotification($mission));
-
-        // Notify agent of new mission
-        if ($agent) {
-            $agent->notify(new MissionAssignedNotification($mission->fresh()));
-        }
+        $agent->notify(new MissionAssignedNotification($mission->fresh()));
 
         return $mission->fresh();
     }
 
-    public function agentAcceptMission(Mission $mission): Mission
+    public function agentAcceptMission(Mission $mission, User $agent): Mission
     {
-        $mission->update([
-            'status' => Mission::STATUS_AGENT_ACCEPTED,
-            'agent_responded_at' => now(),
-        ]);
+        return DB::transaction(function () use ($mission, $agent) {
+            $mission = Mission::query()->whereKey($mission->id)->lockForUpdate()->firstOrFail();
 
-        // Notify client that intervenant accepted
-        $mission->client->notify(new AgentAcceptedMissionNotification($mission));
+            if ($mission->status !== Mission::STATUS_PENDING_AGENT) {
+                throw new \Exception('Cette intervention n\'est plus disponible.');
+            }
 
-        // Notify intervenant that the intervention is confirmed
-        if ($mission->agent) {
-            $mission->agent->notify(new AgentInterventionConfirmedNotification($mission));
-        }
+            if ($mission->agent_id && $mission->agent_id !== $agent->id) {
+                throw new \Exception('Cette intervention a déjà été prise par un autre intervenant.');
+            }
 
-        // Notify admins
-        $admins = User::where('role', 'admin')->get();
-        foreach ($admins as $admin) {
-            $admin->notify(new AgentAcceptedMissionAdminNotification($mission));
-        }
+            $alreadyPending = Mission::query()
+                ->where('agent_id', $agent->id)
+                ->where('status', Mission::STATUS_PENDING_AGENT)
+                ->whereKeyNot($mission->id)
+                ->exists();
 
-        return $mission->fresh();
+            if ($alreadyPending) {
+                throw new \Exception('Vous avez déjà une intervention en attente de réponse.');
+            }
+
+            $mission->update([
+                'agent_id' => $agent->id,
+                'status' => Mission::STATUS_AGENT_ACCEPTED,
+                'agent_responded_at' => now(),
+            ]);
+
+            $mission->serviceRequest->update([
+                'status' => ServiceRequest::STATUS_ASSIGNED,
+            ]);
+
+            $mission = $mission->fresh(['client', 'agent', 'property']);
+
+            $mission->client->notify(new AgentAcceptedMissionNotification($mission));
+
+            if ($mission->agent) {
+                $mission->agent->notify(new AgentInterventionConfirmedNotification($mission));
+            }
+
+            User::notifyAdmins(new AgentAcceptedMissionAdminNotification($mission));
+
+            return $mission;
+        });
     }
 
     public function agentRefuseMission(Mission $mission, ?string $reason = null): Mission
     {
-        $agentName = $mission->agent?->name;
+        $client = $mission->client;
 
         $mission->update([
             'status' => Mission::STATUS_AGENT_REFUSED,
@@ -152,13 +247,26 @@ class MissionService
             $mission->agent->agentProfile->incrementMissionsRefused();
         }
 
-        // Notify admins that agent refused
-        $admins = User::where('role', 'admin')->get();
-        foreach ($admins as $admin) {
-            $admin->notify(new AgentRefusedMissionNotification($mission, $reason));
+        User::notifyAdmins(new AgentRefusedMissionNotification($mission, $reason));
+
+        if ($client) {
+            $client->notify(new AgentRefusedMissionClientNotification($mission));
         }
 
-        $newAgent = $this->assignmentService->reassignMission($mission);
+        $newAgents = $this->assignmentService->reassignMission($mission);
+
+        $freshMission = $mission->fresh();
+
+        if ($newAgents->isNotEmpty()) {
+            foreach ($newAgents as $newAgent) {
+                $newAgent->notify(new MissionAssignedNotification($freshMission));
+            }
+        } else {
+            $mission->serviceRequest->update([
+                'status' => ServiceRequest::STATUS_PAID,
+            ]);
+            User::notifyAdmins(new MissionNeedsAgentNotification($freshMission));
+        }
 
         return $mission->fresh();
     }
@@ -246,10 +354,6 @@ class MissionService
 
     public function completeMission(Mission $mission, array $report = []): Mission
     {
-        if (! $mission->canComplete()) {
-            throw new \Exception('L\'intervention ne peut pas être terminée dans son état actuel.');
-        }
-
         $nothingToReport = (bool) ($report['nothing_to_report'] ?? false);
         $rawAnomalies = $report['anomalies'] ?? [];
 
@@ -269,11 +373,18 @@ class MissionService
         }
 
         $completedAt = now();
-        $actualMinutes = $mission->started_at
-            ? max(1, (int) $mission->started_at->diffInMinutes($completedAt))
-            : null;
 
-        DB::transaction(function () use ($mission, $nothingToReport, $resolvedAnomalies, $completedAt, $actualMinutes) {
+        $mission = DB::transaction(function () use ($mission, $nothingToReport, $resolvedAnomalies, $completedAt) {
+            $mission = Mission::query()->whereKey($mission->id)->lockForUpdate()->firstOrFail();
+
+            if (! $mission->canComplete()) {
+                throw new \Exception('L\'intervention ne peut pas être terminée dans son état actuel.');
+            }
+
+            $actualMinutes = $mission->started_at
+                ? max(1, (int) $mission->started_at->diffInMinutes($completedAt))
+                : null;
+
             $mission->update([
                 'status' => Mission::STATUS_COMPLETED,
                 'completed_at' => $completedAt,
@@ -307,9 +418,9 @@ class MissionService
             }
 
             $this->creditAgentWallet($mission);
-        });
 
-        $mission = $mission->fresh(['property', 'anomalies', 'agent', 'client']);
+            return $mission->fresh(['property', 'anomalies', 'agent', 'client']);
+        });
 
         // Notify client that intervention is completed
         $mission->client->notify(new MissionCompletedNotification($mission));
@@ -319,11 +430,7 @@ class MissionService
             $mission->agent->notify(new AgentInterventionCompletedNotification($mission));
         }
 
-        // Notify admins that mission is completed
-        $admins = User::where('role', 'admin')->get();
-        foreach ($admins as $admin) {
-            $admin->notify(new MissionCompletedAdminNotification($mission));
-        }
+        User::notifyAdmins(new MissionCompletedAdminNotification($mission));
 
         return $mission;
     }
@@ -380,6 +487,15 @@ class MissionService
             ]);
         }
 
+        $alreadyCredited = $wallet->transactions()
+            ->where('mission_id', $mission->id)
+            ->where('type', 'credit')
+            ->exists();
+
+        if ($alreadyCredited) {
+            return;
+        }
+
         $wallet->credit(
             $mission->agent_payout,
             'Mission '.$mission->mission_number,
@@ -408,9 +524,38 @@ class MissionService
             $mission->agent->agentProfile->incrementMissionsCancelled();
         }
 
-        // TODO: Process refund if paid
+        if ($mission->isPaid() && $mission->payment_intent_id) {
+            $this->refundStripePayment($mission);
+        }
 
         return $mission->fresh();
+    }
+
+    protected function refundStripePayment(Mission $mission): void
+    {
+        Stripe::setApiKey(config('services.stripe.secret') ?: config('cashier.secret'));
+
+        try {
+            Refund::create([
+                'payment_intent' => $mission->payment_intent_id,
+            ]);
+        } catch (ApiErrorException $e) {
+            if (! str_contains(strtolower($e->getMessage()), 'already been refunded')) {
+                throw $e;
+            }
+        }
+
+        $mission->update([
+            'payment_status' => Mission::PAYMENT_REFUNDED,
+        ]);
+
+        if ($mission->invoice) {
+            $mission->invoice->update([
+                'status' => Invoice::STATUS_REFUNDED,
+            ]);
+        }
+
+        Log::info('Stripe refund processed for mission '.$mission->mission_number);
     }
 
     public function setQualityScore(

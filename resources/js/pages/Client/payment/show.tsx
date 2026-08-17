@@ -1,7 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,47 +71,37 @@ function CheckoutForm({ quote }: { quote: Quote }) {
             redirect: 'if_required',
         });
 
-        console.log('Payment confirmation result:', { submitError, paymentIntent });
-
         if (submitError) {
-            console.error('Payment error:', submitError);
             setError(submitError.message || 'Une erreur est survenue lors du paiement.');
             setIsProcessing(false);
             return;
         }
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
-            console.log('Payment succeeded, calling process route with ID:', paymentIntent.id);
-            
-            // Use axios instead of router.post to get the redirect URL
             const axios = (await import('axios')).default;
-            
+
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                 const response = await axios.post(route('client.payment.process', quote.id), {
                     payment_intent_id: paymentIntent.id,
                 }, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
+                        ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}),
                     }
                 });
-                
-                console.log('Process route response:', response);
-                
-                // Redirect to the URL returned by the backend
+
                 if (response.data.redirect) {
                     window.location.href = response.data.redirect;
                 } else {
-                    // Fallback: redirect to missions index
                     router.visit(route('client.missions.index'));
                 }
             } catch (error: any) {
-                console.error('Process route error:', error);
                 setError(error.response?.data?.message || 'Une erreur est survenue lors du traitement du paiement.');
                 setIsProcessing(false);
             }
         } else {
-            console.warn('Payment not succeeded:', paymentIntent);
             setError('Le paiement n\'a pas pu être confirmé.');
             setIsProcessing(false);
         }
@@ -162,7 +152,7 @@ function CheckoutForm({ quote }: { quote: Quote }) {
 }
 
 export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
-    const stripePromise = loadStripe(stripeKey);
+    const stripePromise = useMemo(() => stripeKey ? loadStripe(stripeKey) : null, [stripeKey]);
     const price = Number(quote.final_price ?? quote.estimated_price);
     const serviceRequest = quote.service_request;
     const property = serviceRequest.property;
@@ -212,6 +202,11 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
+                                {!stripeKey || !stripePromise ? (
+                                    <p className="text-sm text-red-600 dark:text-red-400">
+                                        Le paiement est temporairement indisponible. Réessayez dans un instant.
+                                    </p>
+                                ) : (
                                 <Elements
                                     stripe={stripePromise}
                                     options={{
@@ -228,6 +223,7 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
                                 >
                                     <CheckoutForm quote={quote} />
                                 </Elements>
+                                )}
                             </CardContent>
                         </Card>
                     </div>

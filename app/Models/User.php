@@ -3,18 +3,20 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -83,89 +85,90 @@ class User extends Authenticatable implements FilamentUser
     // Relationships
     public function agentProfile()
     {
-        return $this->hasOne(\App\Models\AgentProfile::class, 'user_id');
+        return $this->hasOne(AgentProfile::class, 'user_id');
     }
 
     public function addresses()
     {
-        return $this->hasMany(\App\Models\Address::class);
+        return $this->hasMany(Address::class);
     }
 
     public function clientBookings()
     {
-        return $this->hasMany(\App\Models\Booking::class, 'client_id');
+        return $this->hasMany(Booking::class, 'client_id');
     }
 
     public function agentBookings()
     {
-        return $this->hasMany(\App\Models\Booking::class, 'agent_id');
+        return $this->hasMany(Booking::class, 'agent_id');
     }
 
     public function reviews()
     {
-        return $this->hasMany(\App\Models\Review::class, 'client_id');
+        return $this->hasMany(Review::class, 'client_id');
     }
 
     public function receivedReviews()
     {
-        return $this->hasMany(\App\Models\Review::class, 'agent_id');
+        return $this->hasMany(Review::class, 'agent_id');
     }
 
     public function transactions()
     {
-        return $this->hasMany(\App\Models\Transaction::class);
+        return $this->hasMany(Transaction::class);
     }
 
     public function payouts()
     {
-        return $this->hasMany(\App\Models\AgentPayout::class, 'agent_id');
+        return $this->hasMany(AgentPayout::class, 'agent_id');
     }
 
     public function clientConversations()
     {
-        return $this->hasMany(\App\Models\Conversation::class, 'client_id');
+        return $this->hasMany(Conversation::class, 'client_id');
     }
 
     public function agentConversations()
     {
-        return $this->hasMany(\App\Models\Conversation::class, 'agent_id');
+        return $this->hasMany(Conversation::class, 'agent_id');
     }
 
     public function messages()
     {
-        return $this->hasMany(\App\Models\Message::class, 'sender_id');
+        return $this->hasMany(Message::class, 'sender_id');
     }
 
     public function properties()
     {
-        return $this->hasMany(\App\Models\Property::class);
+        return $this->hasMany(Property::class);
     }
 
     public function serviceRequests()
     {
-        return $this->hasMany(\App\Models\ServiceRequest::class, 'client_id');
+        return $this->hasMany(ServiceRequest::class, 'client_id');
     }
 
     public function clientMissions()
     {
-        return $this->hasMany(\App\Models\Mission::class, 'client_id');
+        return $this->hasMany(Mission::class, 'client_id');
     }
 
     public function agentMissions()
     {
-        return $this->hasMany(\App\Models\Mission::class, 'agent_id');
+        return $this->hasMany(Mission::class, 'agent_id');
     }
 
     public function wallet()
     {
-        return $this->hasOne(\App\Models\Wallet::class);
+        return $this->hasOne(Wallet::class);
     }
 
     public function getFullNameAttribute(): string
     {
         if ($this->first_name && $this->last_name) {
-            return $this->first_name . ' ' . $this->last_name;
+            return $this->first_name.' '.$this->last_name;
         }
+
         return $this->name ?? '';
     }
 
@@ -201,6 +204,13 @@ class User extends Authenticatable implements FilamentUser
         return $query->where('role', 'admin');
     }
 
+    public static function notifyAdmins(Notification $notification): void
+    {
+        static::admins()->get()->each(
+            fn (self $admin) => $admin->notify($notification)
+        );
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
@@ -213,5 +223,10 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->isAdmin();
+    }
+
+    public function receivesBroadcastNotificationsOn(): string
+    {
+        return 'user.'.$this->id;
     }
 }

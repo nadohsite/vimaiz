@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AgentPayoutNotification extends Notification implements ShouldQueue
+class AgentPayoutNotification extends Notification
 {
     use Queueable;
 
@@ -19,13 +18,13 @@ class AgentPayoutNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Paiement crédité - ' . number_format($this->amount, 2, ',', ' ') . ' €')
+            ->subject('Paiement crédité - '.number_format($this->amount, 2, ',', ' ').' €')
             ->view('emails.agent-payout', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -40,7 +39,7 @@ class AgentPayoutNotification extends Notification implements ShouldQueue
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'amount' => $this->amount,
-            'message' => number_format($this->amount, 2, ',', ' ') . ' € crédités sur votre portefeuille',
+            'message' => number_format($this->amount, 2, ',', ' ').' € crédités sur votre portefeuille',
             'url' => '/agent/wallet',
         ];
     }

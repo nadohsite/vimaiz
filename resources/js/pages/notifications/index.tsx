@@ -1,6 +1,6 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bell, FileText, CreditCard, User, CheckCircle, Play, Wallet, AlertCircle, Trash2, Check } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -30,7 +30,7 @@ interface PaginatedNotifications {
 }
 
 interface Props {
-    notifications: PaginatedNotifications;
+    paginatedNotifications?: PaginatedNotifications;
 }
 
 const breadcrumbs = [
@@ -40,6 +40,7 @@ const breadcrumbs = [
 const getNotificationIcon = (type: string) => {
     const icons: Record<string, { icon: typeof Bell; color: string }> = {
         new_quote: { icon: FileText, color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400' },
+        service_request_received: { icon: FileText, color: 'text-sky-600 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-400' },
         payment_received: { icon: CreditCard, color: 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400' },
         mission_assigned: { icon: User, color: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400' },
         agent_accepted: { icon: CheckCircle, color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400' },
@@ -47,6 +48,11 @@ const getNotificationIcon = (type: string) => {
         mission_completed: { icon: CheckCircle, color: 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400' },
         agent_payout: { icon: Wallet, color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400' },
         quote_refused: { icon: AlertCircle, color: 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400' },
+        documents_verified: { icon: CheckCircle, color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400' },
+        documents_rejected: { icon: AlertCircle, color: 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400' },
+        agent_refused_client: { icon: AlertCircle, color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400' },
+        mission_needs_agent: { icon: User, color: 'text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400' },
+        service_request_received: { icon: FileText, color: 'text-sky-600 bg-sky-100 dark:bg-sky-900/30 dark:text-sky-400' },
     };
     return icons[type] || { icon: Bell, color: 'text-neutral-600 bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-400' };
 };
@@ -59,7 +65,44 @@ const formatTime = (dateString: string) => {
     }
 };
 
-export default function NotificationsIndex({ notifications }: Props) {
+function toNotificationList(value: unknown): Notification[] {
+    if (Array.isArray(value)) {
+        return value as Notification[];
+    }
+
+    if (value && typeof value === 'object') {
+        const maybeData = (value as PaginatedNotifications).data;
+        if (Array.isArray(maybeData)) {
+            return maybeData;
+        }
+        if (maybeData && typeof maybeData === 'object') {
+            return Object.values(maybeData);
+        }
+
+        return Object.values(value as Record<string, Notification>).filter(
+            (item) => item && typeof item === 'object' && 'id' in item,
+        );
+    }
+
+    return [];
+}
+
+export default function NotificationsIndex({ paginatedNotifications }: Props) {
+    const { recentNotifications, notifications: sharedNotifications } = usePage<{
+        recentNotifications?: Notification[];
+        notifications?: Notification[] | PaginatedNotifications;
+        [key: string]: unknown;
+    }>().props;
+
+    const items = toNotificationList(
+        paginatedNotifications?.data
+            ?? paginatedNotifications
+            ?? recentNotifications
+            ?? sharedNotifications,
+    );
+
+    const total = paginatedNotifications?.total ?? items.length;
+
     const handleMarkAsRead = (id: string) => {
         router.post(route('notifications.mark-read', id), {}, {
             preserveScroll: true,
@@ -84,12 +127,12 @@ export default function NotificationsIndex({ notifications }: Props) {
         if (!notification.read_at) {
             handleMarkAsRead(notification.id);
         }
-        if (notification.data.url) {
+        if (notification.data?.url) {
             router.visit(notification.data.url);
         }
     };
 
-    const unreadCount = notifications.data.filter(n => !n.read_at).length;
+    const unreadCount = items.filter(n => !n.read_at).length;
 
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
@@ -102,7 +145,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                             Notifications
                         </h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                            {notifications.total} notification{notifications.total > 1 ? 's' : ''}
+                            {total} notification{total > 1 ? 's' : ''}
                             {unreadCount > 0 && ` (${unreadCount} non lue${unreadCount > 1 ? 's' : ''})`}
                         </p>
                     </div>
@@ -114,7 +157,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                     )}
                 </div>
 
-                {notifications.data.length === 0 ? (
+                {items.length === 0 ? (
                     <Card className="dark:bg-slate-800 dark:border-slate-700">
                         <CardContent className="p-12 text-center">
                             <Bell className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600" />
@@ -128,8 +171,8 @@ export default function NotificationsIndex({ notifications }: Props) {
                     </Card>
                 ) : (
                     <div className="space-y-3">
-                        {notifications.data.map((notification) => {
-                            const { icon: Icon, color } = getNotificationIcon(notification.data.type);
+                        {items.map((notification) => {
+                            const { icon: Icon, color } = getNotificationIcon(notification.data?.type);
                             const isUnread = !notification.read_at;
 
                             return (
@@ -148,7 +191,7 @@ export default function NotificationsIndex({ notifications }: Props) {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className={`text-sm leading-relaxed ${isUnread ? 'font-semibold text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>
-                                                {notification.data.message}
+                                                {notification.data?.message}
                                             </p>
                                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                                 {formatTime(notification.created_at)}
@@ -178,24 +221,24 @@ export default function NotificationsIndex({ notifications }: Props) {
                 )}
 
                 {/* Pagination */}
-                {notifications.last_page > 1 && (
+                {(paginatedNotifications?.last_page ?? 1) > 1 && (
                     <div className="mt-6 flex items-center justify-center gap-2">
                         <Button
                             variant="outline"
                             size="sm"
-                            disabled={!notifications.prev_page_url}
-                            onClick={() => notifications.prev_page_url && router.visit(notifications.prev_page_url)}
+                            disabled={!paginatedNotifications?.prev_page_url}
+                            onClick={() => paginatedNotifications?.prev_page_url && router.visit(paginatedNotifications.prev_page_url)}
                         >
                             Précédent
                         </Button>
                         <span className="text-sm text-slate-500 dark:text-slate-400">
-                            Page {notifications.current_page} sur {notifications.last_page}
+                            Page {paginatedNotifications?.current_page} sur {paginatedNotifications?.last_page}
                         </span>
                         <Button
                             variant="outline"
                             size="sm"
-                            disabled={!notifications.next_page_url}
-                            onClick={() => notifications.next_page_url && router.visit(notifications.next_page_url)}
+                            disabled={!paginatedNotifications?.next_page_url}
+                            onClick={() => paginatedNotifications?.next_page_url && router.visit(paginatedNotifications.next_page_url)}
                         >
                             Suivant
                         </Button>

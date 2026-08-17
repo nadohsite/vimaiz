@@ -27,6 +27,7 @@ class Quote extends Model
         'sent_at',
         'responded_at',
         'expires_at',
+        'payment_intent_id',
     ];
 
     protected $casts = [
@@ -42,10 +43,15 @@ class Quote extends Model
     ];
 
     const STATUS_DRAFT = 'draft';
+
     const STATUS_SENT = 'sent';
+
     const STATUS_ACCEPTED = 'accepted';
+
     const STATUS_REFUSED = 'refused';
+
     const STATUS_EXPIRED = 'expired';
+
     const STATUS_PAID = 'paid';
 
     protected static function boot()
@@ -54,7 +60,7 @@ class Quote extends Model
 
         static::creating(function ($model) {
             if (empty($model->quote_number)) {
-                $model->quote_number = 'DEV-' . strtoupper(uniqid());
+                $model->quote_number = 'DEV-'.strtoupper(uniqid());
             }
         });
     }
@@ -106,39 +112,41 @@ class Quote extends Model
         if ($this->status === self::STATUS_EXPIRED) {
             return true;
         }
-        
+
         if ($this->expires_at && $this->expires_at->isPast() && $this->status === self::STATUS_SENT) {
             return true;
         }
-        
+
         return false;
     }
 
     public function canBeAccepted(): bool
     {
-        return $this->status === self::STATUS_SENT && !$this->isExpired();
+        return $this->status === self::STATUS_SENT && ! $this->isExpired();
     }
 
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_DRAFT => 'Brouillon',
             self::STATUS_SENT => 'Envoyé',
             self::STATUS_ACCEPTED => 'Accepté',
             self::STATUS_REFUSED => 'Refusé',
             self::STATUS_EXPIRED => 'Expiré',
+            self::STATUS_PAID => 'Payé',
             default => $this->status,
         };
     }
 
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_DRAFT => 'secondary',
             self::STATUS_SENT => 'info',
             self::STATUS_ACCEPTED => 'success',
             self::STATUS_REFUSED => 'danger',
             self::STATUS_EXPIRED => 'warning',
+            self::STATUS_PAID => 'success',
             default => 'secondary',
         };
     }

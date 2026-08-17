@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MissionResource\Pages;
 use App\Models\Mission;
 use App\Models\User;
+use App\Services\MissionService;
 use App\Support\DurationFormatter;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -311,24 +312,31 @@ class MissionResource extends Resource
                     ->label('Attribuer intervenant')
                     ->icon('heroicon-o-user-plus')
                     ->color('success')
-                    ->visible(fn ($record) => $record->status === 'pending_agent' && ! $record->agent_id)
+                    ->visible(fn ($record) => $record->needsAgent())
                     ->form([
                         Forms\Components\Select::make('agent_id')
                             ->label('Intervenant')
                             ->options(function () {
                                 return User::where('role', 'agent')
                                     ->where('is_active', true)
-                                    ->whereHas('agentProfile', fn ($q) => $q->where('is_available', true))
+                                    ->whereHas('agentProfile', function ($q) {
+                                        $q->where('verification_status', 'verified')
+                                            ->where('is_available', true)
+                                            ->where('is_banned', false)
+                                            ->where(function ($query) {
+                                                $query->whereNull('suspended_until')
+                                                    ->orWhere('suspended_until', '<', now());
+                                            });
+                                    })
                                     ->pluck('name', 'id');
                             })
                             ->searchable()
                             ->required(),
                     ])
                     ->action(function ($record, array $data) {
-                        $record->update([
-                            'agent_id' => $data['agent_id'],
-                            'status' => 'pending_agent',
-                        ]);
+                        $agent = User::findOrFail($data['agent_id']);
+                        app(MissionService::class)
+                            ->assignSpecificAgent($record, $agent);
                         Notification::make()
                             ->title('Intervenant attribué')
                             ->success()

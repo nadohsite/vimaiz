@@ -83,6 +83,7 @@ interface Mission {
 interface Props {
     mission: Mission;
     canAccept: boolean;
+    canRefuse: boolean;
     canStart: boolean;
     canComplete: boolean;
     checklistProgress: {
@@ -101,6 +102,7 @@ const charValueClass = 'text-sm font-medium text-slate-900 dark:text-white';
 export default function Show({
     mission,
     canAccept,
+    canRefuse = false,
     canStart,
     canComplete,
     checklistProgress = { total: 0, checked: 0, complete: true },
@@ -297,10 +299,12 @@ export default function Show({
                                         <CheckCircle className="h-4 w-4 mr-2" />
                                         Accepter l'intervention
                                     </Button>
-                                    <Button variant="outline" onClick={handleRefuse} disabled={refuseProcessing} className="flex-1 text-red-600">
-                                        <XCircle className="h-4 w-4 mr-2" />
-                                        Refuser l'intervention
-                                    </Button>
+                                    {canRefuse && (
+                                        <Button variant="outline" onClick={handleRefuse} disabled={refuseProcessing} className="flex-1 text-red-600">
+                                            <XCircle className="h-4 w-4 mr-2" />
+                                            Refuser l'intervention
+                                        </Button>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
@@ -551,42 +555,34 @@ export default function Show({
                                             Caractéristiques
                                         </p>
                                         <div className="grid grid-cols-2 gap-2">
-                                            {mission.property.surface_area > 0 && (
-                                                <div className={charTileClass}>
-                                                    <Maximize className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
-                                                    <div>
-                                                        <p className={charLabelClass}>Surface</p>
-                                                        <p className={charValueClass}>{mission.property.surface_area} m²</p>
-                                                    </div>
+                                            <div className={charTileClass}>
+                                                <Maximize className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                <div>
+                                                    <p className={charLabelClass}>Surface</p>
+                                                    <p className={charValueClass}>{mission.property.surface_area} m²</p>
                                                 </div>
-                                            )}
-                                            {mission.property.bedrooms > 0 && (
-                                                <div className={charTileClass}>
-                                                    <BedDouble className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
-                                                    <div>
-                                                        <p className={charLabelClass}>Chambres</p>
-                                                        <p className={charValueClass}>{mission.property.bedrooms}</p>
-                                                    </div>
+                                            </div>
+                                            <div className={charTileClass}>
+                                                <BedDouble className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                <div>
+                                                    <p className={charLabelClass}>Chambres</p>
+                                                    <p className={charValueClass}>{mission.property.bedrooms}</p>
                                                 </div>
-                                            )}
-                                            {mission.property.bathrooms > 0 && (
-                                                <div className={charTileClass}>
-                                                    <Bath className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
-                                                    <div>
-                                                        <p className={charLabelClass}>Salles de bain</p>
-                                                        <p className={charValueClass}>{mission.property.bathrooms}</p>
-                                                    </div>
+                                            </div>
+                                            <div className={charTileClass}>
+                                                <Bath className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                <div>
+                                                    <p className={charLabelClass}>Salles de bain</p>
+                                                    <p className={charValueClass}>{mission.property.bathrooms}</p>
                                                 </div>
-                                            )}
-                                            {mission.property.toilets > 0 && (
-                                                <div className={charTileClass}>
-                                                    <Bath className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
-                                                    <div>
-                                                        <p className={charLabelClass}>Toilettes</p>
-                                                        <p className={charValueClass}>{mission.property.toilets}</p>
-                                                    </div>
+                                            </div>
+                                            <div className={charTileClass}>
+                                                <Bath className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />
+                                                <div>
+                                                    <p className={charLabelClass}>Toilettes</p>
+                                                    <p className={charValueClass}>{mission.property.toilets}</p>
                                                 </div>
-                                            )}
+                                            </div>
                                             {mission.property.other_rooms > 0 && (
                                                 <div className={charTileClass}>
                                                     <DoorOpen className="h-4 w-4 text-sky-500 dark:text-sky-400 shrink-0" />

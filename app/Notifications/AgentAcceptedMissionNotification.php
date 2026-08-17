@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AgentAcceptedMissionNotification extends Notification implements ShouldQueue
+class AgentAcceptedMissionNotification extends Notification
 {
     use Queueable;
 
@@ -18,13 +17,13 @@ class AgentAcceptedMissionNotification extends Notification implements ShouldQue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Intervention confirmée — ' . $this->mission->mission_number)
+            ->subject('Intervention confirmée — '.$this->mission->mission_number)
             ->view('emails.agent-accepted-mission', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -39,7 +38,7 @@ class AgentAcceptedMissionNotification extends Notification implements ShouldQue
             'mission_number' => $this->mission->mission_number,
             'scheduled_at' => $this->mission->scheduled_at->toISOString(),
             'message' => '✅ Votre intervention est désormais prise en charge. Un intervenant Vimaiz a été assigné à votre bien.',
-            'url' => '/client/missions/' . $this->mission->id,
+            'url' => '/client/missions/'.$this->mission->id,
         ];
     }
 }

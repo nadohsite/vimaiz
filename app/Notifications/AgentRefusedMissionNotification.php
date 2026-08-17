@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AgentRefusedMissionNotification extends Notification implements ShouldQueue
+class AgentRefusedMissionNotification extends Notification
 {
     use Queueable;
 
@@ -19,13 +18,13 @@ class AgentRefusedMissionNotification extends Notification implements ShouldQueu
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('❌ Intervention refusée par intervenant - ' . $this->mission->mission_number)
+            ->subject('❌ Intervention refusée par intervenant - '.$this->mission->mission_number)
             ->view('emails.agent-refused-mission', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -42,8 +41,8 @@ class AgentRefusedMissionNotification extends Notification implements ShouldQueu
             'mission_number' => $this->mission->mission_number,
             'agent_name' => $this->mission->agent->name ?? 'N/A',
             'reason' => $this->reason,
-            'message' => 'Intervention refusée par ' . ($this->mission->agent->name ?? 'intervenant'),
-            'url' => '/admin/missions/' . $this->mission->id,
+            'message' => 'Intervention refusée par '.($this->mission->agent->name ?? 'intervenant'),
+            'url' => '/admin/missions/'.$this->mission->id,
         ];
     }
 }
