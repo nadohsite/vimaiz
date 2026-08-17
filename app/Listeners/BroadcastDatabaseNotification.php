@@ -5,7 +5,6 @@ namespace App\Listeners;
 use App\Events\NotificationEvent;
 use App\Models\User;
 use App\Support\NotificationPayload;
-use Filament\Notifications\Events\DatabaseNotificationsSent;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Events\NotificationSent;
 use Throwable;
@@ -34,12 +33,10 @@ class BroadcastDatabaseNotification
             event(new NotificationEvent($event->notifiable->id, [
                 'id' => $payload['id'],
                 'type' => $data['type'] ?? $payload['type'],
-                'message' => $data['message'] ?? '',
+                'message' => $data['message'] ?? $data['body'] ?? '',
                 'url' => $data['url'] ?? null,
                 'data' => $data,
             ]));
-
-            DatabaseNotificationsSent::dispatch($event->notifiable);
         } catch (Throwable $e) {
             report($e);
         }

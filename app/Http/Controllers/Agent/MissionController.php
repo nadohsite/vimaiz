@@ -61,7 +61,7 @@ class MissionController extends Controller
             'mission' => $mission,
             'canAccept' => $request->user()->can('accept', $mission),
             'canRefuse' => $request->user()->can('refuse', $mission),
-            'canStart' => $mission->canStart(),
+            'canStart' => $request->user()->can('start', $mission),
             'canComplete' => $mission->canComplete(),
             'checklistProgress' => $mission->checklistProgress(),
             'reportCatalog' => InterventionReportCatalog::categories(),
@@ -96,7 +96,7 @@ class MissionController extends Controller
 
             return redirect()
                 ->route('agent.missions.index')
-                ->with('info', 'Intervention refusée.');
+                ->with('info', 'Intervention déclinée. Elle a été proposée à d\'autres intervenants.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

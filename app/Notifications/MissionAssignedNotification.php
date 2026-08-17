@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Mission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MissionAssignedNotification extends Notification implements ShouldQueue
+class MissionAssignedNotification extends Notification
 {
     use Queueable;
 
@@ -20,7 +19,7 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toBroadcast(object $notifiable): array
@@ -31,7 +30,7 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nouvelle intervention à accepter — '.$this->mission->mission_number)
+            ->subject('Une intervention vous est proposée — '.$this->mission->mission_number)
             ->view('emails.mission-assigned', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -46,7 +45,7 @@ class MissionAssignedNotification extends Notification implements ShouldQueue
             'mission_number' => $this->mission->mission_number,
             'scheduled_at' => $this->mission->scheduled_at->toISOString(),
             'payout' => $this->mission->agent_payout,
-            'message' => '🔔 Une nouvelle intervention est disponible près de chez vous.',
+            'message' => 'Une intervention vous est proposée. Acceptez-la pour la réserver.',
             'url' => '/agent/missions/'.$this->mission->id,
         ];
     }

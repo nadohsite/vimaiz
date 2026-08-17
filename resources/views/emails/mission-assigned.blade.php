@@ -1,13 +1,13 @@
 @extends('emails.layout')
 
-@section('title', 'Nouvelle intervention assignée')
+@section('title', 'Nouvelle intervention proposée')
 
 @section('content')
-    <h1>Nouvelle intervention pour vous ! 🏠</h1>
+    <h1>Une intervention vous est proposée 🏠</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Une nouvelle intervention est disponible près de chez vous.</p>
+    <p>Une nouvelle intervention est disponible. Acceptez-la pour la réserver — le premier intervenant qui confirme l’obtient.</p>
 
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
@@ -23,7 +23,7 @@
     </div>
 
     <div class="warning-box">
-        <p>⚠️ <strong>Important :</strong> Vous avez 30 minutes pour accepter ou refuser cette intervention.</p>
+        <p>⚠️ <strong>Important :</strong> Plusieurs intervenants reçoivent cette proposition. Acceptez rapidement pour la réserver.</p>
     </div>
 
     <p class="cta" style="text-align:center !important; margin:24px 0;">

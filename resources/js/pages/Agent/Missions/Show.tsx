@@ -155,7 +155,7 @@ export default function Show({
     };
 
     const handleRefuse = () => {
-        if (confirm('Êtes-vous sûr de vouloir refuser cette intervention ?')) {
+        if (confirm('Décliner cette intervention ? Elle sera proposée à d\'autres intervenants.')) {
             postRefuse(route('agent.missions.refuse', mission.id));
         }
     };
@@ -314,8 +314,11 @@ export default function Show({
                         <Card className="mb-6 border-sky-300 bg-sky-50">
                             <CardContent className="p-6">
                                 <h3 className="font-semibold text-sky-800 mb-2 text-center">
-                                    Êtes-vous bien devant le bien ?
+                                    Démarrer l&apos;intervention
                                 </h3>
+                                <p className="text-sm text-sky-700 mb-4 text-center">
+                                    Placez-vous devant le bien, puis démarrez pour confirmer que vous êtes sur place.
+                                </p>
                                 {!hasPropertyCoordinates && (
                                     <p className="text-sm text-amber-700 mb-4 text-center">
                                         La position GPS de ce bien n&apos;est pas enregistrée : vérifiez l&apos;adresse
@@ -325,14 +328,22 @@ export default function Show({
                                 <div className="text-center">
                                     <Button
                                         onClick={handleStart}
-                                        disabled={starting || !hasPropertyCoordinates}
+                                        disabled={starting}
                                         className="bg-sky-500 hover:bg-sky-600"
                                     >
                                         <Play className="h-4 w-4 mr-2" />
                                         {starting
                                             ? 'Vérification que vous êtes sur place...'
-                                            : 'Je suis au bon endroit — démarrer'}
+                                            : 'Démarrer l\'intervention'}
                                     </Button>
+                                    {canRefuse && (
+                                        <div className="mt-4">
+                                            <Button variant="outline" onClick={handleRefuse} disabled={refuseProcessing} className="text-red-600">
+                                                <XCircle className="h-4 w-4 mr-2" />
+                                                Décliner l'intervention
+                                            </Button>
+                                        </div>
+                                    )}
                                     <p className="text-xs text-sky-600 mt-3">
                                         En cliquant, vous confirmez être devant le bien de cette intervention.
                                     </p>

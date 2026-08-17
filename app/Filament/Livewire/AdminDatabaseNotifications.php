@@ -9,6 +9,8 @@ use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Carbon;
+use Livewire\Attributes\On;
 
 class AdminDatabaseNotifications extends BaseDatabaseNotifications
 {
@@ -36,6 +38,7 @@ class AdminDatabaseNotifications extends BaseDatabaseNotifications
         $url = $data['url'] ?? null;
         $color = $this->colorForType($type);
 
+        $createdAt = $notification->created_at;
         $filamentNotification = Notification::make((string) $notification->getKey())
             ->title($this->titleForType($type))
             ->body($message)
@@ -43,7 +46,8 @@ class AdminDatabaseNotifications extends BaseDatabaseNotifications
             ->iconColor($color)
             ->color($color)
             ->status($color)
-            ->date($this->formatNotificationDate($notification->created_at));
+            ->persistent()
+            ->date($createdAt ? $this->formatNotificationDate(Carbon::parse($createdAt)) : '');
 
         if (filled($url)) {
             $filamentNotification->actions([
@@ -57,6 +61,7 @@ class AdminDatabaseNotifications extends BaseDatabaseNotifications
         return $filamentNotification;
     }
 
+    #[On('notificationClosed')]
     public function removeNotification(string $id): void
     {
         $this->getNotificationsQuery()
@@ -64,6 +69,7 @@ class AdminDatabaseNotifications extends BaseDatabaseNotifications
             ->delete();
     }
 
+    #[On('markedNotificationAsRead')]
     public function markNotificationAsRead(string $id): void
     {
         $this->getNotificationsQuery()
@@ -71,6 +77,7 @@ class AdminDatabaseNotifications extends BaseDatabaseNotifications
             ->update(['read_at' => now()]);
     }
 
+    #[On('markedNotificationAsUnread')]
     public function markNotificationAsUnread(string $id): void
     {
         $this->getNotificationsQuery()

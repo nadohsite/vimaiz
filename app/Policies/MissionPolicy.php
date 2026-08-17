@@ -53,7 +53,10 @@ class MissionPolicy
     public function refuse(User $user, Mission $mission): bool
     {
         return $user->id === $mission->agent_id
-            && $mission->status === Mission::STATUS_PENDING_AGENT;
+            && in_array($mission->status, [
+                Mission::STATUS_PENDING_AGENT,
+                Mission::STATUS_AGENT_ACCEPTED,
+            ], true);
     }
 
     public function create(User $user): bool
