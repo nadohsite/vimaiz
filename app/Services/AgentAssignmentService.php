@@ -9,6 +9,10 @@ use Illuminate\Support\Collection;
 
 class AgentAssignmentService
 {
+    public function __construct(
+        protected GeographicMatchingService $geoMatching
+    ) {}
+
     const WEIGHT_PROXIMITY = 0.40;
 
     const WEIGHT_INTERNAL_RATING = 0.30;
@@ -44,18 +48,27 @@ class AgentAssignmentService
 
     public function findEligibleAgents(Mission $mission): Collection
     {
+        $mission->loadMissing('property');
+
         return User::agents()
             ->where('is_active', true)
-            ->whereDoesntHave('agentProfile', function ($query) {
-                $query->where('is_banned', true)
-                    ->orWhere(function ($suspended) {
-                        $suspended->whereNotNull('suspended_until')
-                            ->where('suspended_until', '>=', now());
+            ->whereHas('agentProfile', function ($query) {
+                $query->where('is_available', true)
+                    ->where(function ($status) {
+                        $status->where('is_banned', false)
+                            ->orWhereNull('is_banned');
+                    })
+                    ->where(function ($suspended) {
+                        $suspended->whereNull('suspended_until')
+                            ->orWhere('suspended_until', '<', now());
                     });
             })
-            ->with('agentProfile')
+            ->with(['agentProfile', 'addresses'])
             ->get()
-            ->reject(fn (User $agent) => $this->hasPendingMission($agent));
+            ->reject(fn (User $agent) => $this->hasPendingMission($agent))
+            ->reject(fn (User $agent) => $mission->scheduled_at && $this->hasConflictingMission($agent, $mission))
+            ->filter(fn (User $agent) => $this->geoMatching->isGeographicallyEligible($agent, $mission))
+            ->values();
     }
 
     protected function hasPendingMission(User $agent): bool

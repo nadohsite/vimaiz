@@ -93,6 +93,38 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Address::class);
     }
 
+    /**
+     * Adresse de référence géocodée (défaut, sinon première avec coordonnées).
+     */
+    public function referenceAddress(): ?Address
+    {
+        $addresses = $this->relationLoaded('addresses')
+            ? $this->addresses
+            : $this->addresses()->get();
+
+        return $addresses
+            ->filter(fn (Address $address) => $address->latitude && $address->longitude)
+            ->sortByDesc(fn (Address $address) => $address->is_default)
+            ->first();
+    }
+
+    /**
+     * @return array{latitude: float, longitude: float}|null
+     */
+    public function referenceCoordinates(): ?array
+    {
+        $address = $this->referenceAddress();
+
+        if (! $address) {
+            return null;
+        }
+
+        return [
+            'latitude' => (float) $address->latitude,
+            'longitude' => (float) $address->longitude,
+        ];
+    }
+
     public function clientBookings()
     {
         return $this->hasMany(Booking::class, 'client_id');

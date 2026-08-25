@@ -3,8 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\WithdrawalRequestResource\Pages;
+use App\Models\AgentProfile;
 use App\Models\WalletTransaction;
-use App\Models\Wallet;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -52,8 +52,15 @@ class WithdrawalRequestResource extends Resource
                         TextEntry::make('amount')
                             ->label('Montant')
                             ->money('EUR'),
+                        TextEntry::make('metadata.bank_account_holder')
+                            ->label('Titulaire')
+                            ->placeholder('Non renseigné'),
                         TextEntry::make('reference')
-                            ->label('Compte bancaire'),
+                            ->label('IBAN')
+                            ->formatStateUsing(fn (?string $state): string => AgentProfile::formatIban($state) ?? ($state ?: 'Non renseigné')),
+                        TextEntry::make('metadata.bic')
+                            ->label('BIC')
+                            ->placeholder('Non renseigné'),
                         TextEntry::make('status')
                             ->label('Statut')
                             ->badge()
@@ -105,9 +112,14 @@ class WithdrawalRequestResource extends Resource
                     ->label('Montant')
                     ->money('EUR')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('metadata.bank_account_holder')
+                    ->label('Titulaire')
+                    ->placeholder('—')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('reference')
-                    ->label('Compte bancaire')
-                    ->limit(20),
+                    ->label('IBAN')
+                    ->formatStateUsing(fn (?string $state): ?string => AgentProfile::formatIban($state) ?? $state)
+                    ->limit(27),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Statut')
                     ->badge()

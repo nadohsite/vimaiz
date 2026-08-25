@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\Address;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,9 +20,16 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+        $address = $user->isAgent()
+            ? ($user->referenceAddress() ?? $user->addresses()->orderByDesc('is_default')->first())
+            : null;
+
         return Inertia::render('settings/profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'referenceAddress' => $address,
+            'extendedRadiusKm' => (float) config('vimaiz.matching.extended_radius_km', 150),
         ]);
     }
 
@@ -43,8 +51,14 @@ class ProfileController extends Controller
             $user->avatar = $path;
         }
         
-        // Fill other fields (excluding avatar which is handled above)
-        $user->fill($request->safe()->except('avatar'));
+        $user->fill($request->safe()->except([
+            'avatar',
+            'street_address',
+            'city',
+            'postal_code',
+            'latitude',
+            'longitude',
+        ]));
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -52,7 +66,45 @@ class ProfileController extends Controller
 
         $user->save();
 
+        if ($user->isAgent()) {
+            $this->updateAgentReferenceLocation($request);
+        }
+
         return to_route('settings.profile.edit')->with('success', 'Profil mis a jour.');
+    }
+
+    protected function updateAgentReferenceLocation(ProfileUpdateRequest $request): void
+    {
+        $latitude = $request->validated('latitude');
+        $longitude = $request->validated('longitude');
+        $street = $request->validated('street_address');
+
+        if ($latitude === null || $longitude === null || empty($street)) {
+            return;
+        }
+
+        $user = $request->user();
+        $address = $user->referenceAddress()
+            ?? $user->addresses()->orderByDesc('is_default')->first();
+
+        $user->addresses()->update(['is_default' => false]);
+
+        $payload = [
+            'label' => 'Localisation de référence',
+            'street_address' => $street,
+            'city' => $request->validated('city') ?: 'Non précisée',
+            'postal_code' => $request->validated('postal_code'),
+            'country' => 'France',
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'is_default' => true,
+        ];
+
+        if ($address) {
+            $address->update($payload);
+        } else {
+            Address::create(['user_id' => $user->id, ...$payload]);
+        }
     }
 
     /**

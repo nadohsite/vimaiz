@@ -3,15 +3,20 @@
 namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Agent\UpdateBankDetailsRequest;
+use App\Http\Requests\Agent\WithdrawRequest;
+use App\Models\AgentProfile;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Notifications\WithdrawalRequestNotification;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class WalletController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $user = $request->user();
 
@@ -20,12 +25,13 @@ class WalletController extends Controller
             ['balance' => 0, 'pending_balance' => 0, 'total_earned' => 0, 'total_withdrawn' => 0]
         );
 
+        $agentProfile = $user->agentProfile;
+
         $transactions = $wallet->transactions()
             ->with(['mission.property', 'booking'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        // Calculate real stats
         $stats = [
             'total_missions' => $user->agentMissions()->count(),
             'completed_missions' => $user->agentMissions()->where('status', 'completed')->count(),
@@ -42,27 +48,52 @@ class WalletController extends Controller
             'wallet' => $wallet,
             'transactions' => $transactions,
             'stats' => $stats,
+            'bankDetails' => $agentProfile
+                ? $agentProfile->bankDetailsForWallet()
+                : [
+                    'iban' => null,
+                    'bic' => null,
+                    'bank_account_holder' => null,
+                    'is_complete' => false,
+                ],
         ]);
     }
 
-    public function withdraw(Request $request)
+    public function updateBankDetails(UpdateBankDetailsRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'bank_account' => 'required|string',
+        $user = $request->user();
+
+        $agentProfile = $user->agentProfile ?? AgentProfile::create([
+            'user_id' => $user->id,
+            'verification_status' => 'pending',
         ]);
 
-        $wallet = $request->user()->wallet;
+        $agentProfile->update($request->validated());
 
-        if (! $wallet || $wallet->balance < $validated['amount']) {
-            return redirect()->back()->withErrors(['amount' => 'Insufficient balance']);
+        return redirect()->back()->with('success', 'Coordonnées bancaires enregistrées.');
+    }
+
+    public function withdraw(WithdrawRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $agentProfile = $user->agentProfile;
+
+        if (! $agentProfile || ! $agentProfile->hasBankDetails()) {
+            return redirect()->back()->withErrors([
+                'amount' => 'Renseignez votre IBAN avant de demander un retrait.',
+            ]);
+        }
+
+        $wallet = $user->wallet;
+
+        if (! $wallet || $wallet->balance < $request->validated('amount')) {
+            return redirect()->back()->withErrors(['amount' => 'Solde insuffisant.']);
         }
 
         try {
-            $transaction = $wallet->withdraw($validated['amount'], $validated['bank_account']);
+            $transaction = $wallet->withdraw($request->validated('amount'), $agentProfile);
 
-            // Notify all admins about the withdrawal request
-            User::notifyAdmins(new WithdrawalRequestNotification($transaction, $request->user()));
+            User::notifyAdmins(new WithdrawalRequestNotification($transaction, $user));
 
             return redirect()->back()->with('success', 'Demande de retrait soumise avec succès !');
         } catch (\Exception $e) {

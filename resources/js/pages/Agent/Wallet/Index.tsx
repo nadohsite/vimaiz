@@ -1,20 +1,20 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { 
-    Wallet, 
-    TrendingUp, 
-    ArrowDownCircle, 
-    ArrowUpCircle, 
+import {
+    Wallet,
+    TrendingUp,
+    ArrowDownCircle,
+    ArrowUpCircle,
     Clock,
     CheckCircle,
-    XCircle,
+    Banknote,
     CreditCard,
-    Banknote
+    AlertTriangle,
 } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -56,9 +56,17 @@ interface PaginatedTransactions {
     total: number;
 }
 
+interface BankDetails {
+    iban: string | null;
+    bic: string | null;
+    bank_account_holder: string | null;
+    is_complete: boolean;
+}
+
 interface Props {
     wallet: WalletData;
     transactions: PaginatedTransactions;
+    bankDetails: BankDetails;
 }
 
 const breadcrumbs = [
@@ -66,20 +74,42 @@ const breadcrumbs = [
     { title: 'Mon portefeuille', href: route('agent.wallet.index') },
 ];
 
-export default function WalletIndex({ wallet, transactions }: Props) {
-    const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
+function formatIbanInput(value: string): string {
+    const clean = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 34);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        amount: '',
-        bank_account: '',
+    return clean.replace(/(.{4})/g, '$1 ').trim();
+}
+
+export default function WalletIndex({ wallet, transactions, bankDetails }: Props) {
+    const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
+    const { props } = usePage<{ flash?: { success?: string; error?: string } }>();
+    const flash = props.flash;
+
+    const bankForm = useForm({
+        bank_account_holder: bankDetails.bank_account_holder ?? '',
+        iban: bankDetails.iban ?? '',
+        bic: bankDetails.bic ?? '',
     });
+
+    const withdrawForm = useForm({
+        amount: '',
+    });
+
+    const canWithdraw = bankDetails.is_complete && Number(wallet.balance) >= 1;
+
+    const handleSaveBankDetails = (e: React.FormEvent) => {
+        e.preventDefault();
+        bankForm.put(route('agent.wallet.bank-details'), {
+            preserveScroll: true,
+        });
+    };
 
     const handleWithdraw = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('agent.wallet.withdraw'), {
+        withdrawForm.post(route('agent.wallet.withdraw'), {
             onSuccess: () => {
                 setWithdrawDialogOpen(false);
-                reset();
+                withdrawForm.reset();
             },
         });
     };
@@ -102,6 +132,7 @@ export default function WalletIndex({ wallet, transactions }: Props) {
             completed: { label: 'Complété', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
             pending: { label: 'En attente', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
             failed: { label: 'Échoué', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
+            rejected: { label: 'Rejeté', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
         };
         const { label, color } = config[status] || config.pending;
         return <Badge className={color}>{label}</Badge>;
@@ -123,7 +154,6 @@ export default function WalletIndex({ wallet, transactions }: Props) {
 
             <div className="py-8">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Header */}
                     <div className="mb-8">
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
                             Mon portefeuille
@@ -133,9 +163,20 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                         </p>
                     </div>
 
-                    {/* Stats Cards */}
+                    {flash?.success && (
+                        <div className="mb-6 flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+                            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                            <p className="text-green-800 dark:text-green-300">{flash.success}</p>
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="mb-6 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+                            <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                            <p className="text-red-800 dark:text-red-300">{flash.error}</p>
+                        </div>
+                    )}
+
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-                        {/* Balance */}
                         <Card className="bg-gradient-to-br from-sky-500 to-blue-600 text-white border-0">
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
@@ -152,7 +193,6 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                             </CardContent>
                         </Card>
 
-                        {/* Pending */}
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
@@ -169,7 +209,6 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                             </CardContent>
                         </Card>
 
-                        {/* Total Earned */}
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
@@ -186,7 +225,6 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                             </CardContent>
                         </Card>
 
-                        {/* Total Withdrawn */}
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
@@ -204,13 +242,85 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                         </Card>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex gap-4 mb-8">
+                    <Card className="mb-8 dark:bg-slate-800 dark:border-slate-700">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 dark:text-white">
+                                <CreditCard className="h-5 w-5" />
+                                Coordonnées bancaires
+                            </CardTitle>
+                            <CardDescription className="dark:text-slate-400">
+                                Renseignez votre IBAN avant de demander un retrait. Le virement sera effectué sur ce compte.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {!bankDetails.is_complete && (
+                                <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
+                                    <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+                                    <p className="text-sm text-amber-800 dark:text-amber-300">
+                                        Vous devez enregistrer vos coordonnées bancaires avant de pouvoir demander un retrait.
+                                    </p>
+                                </div>
+                            )}
+                            <form onSubmit={handleSaveBankDetails} className="space-y-4">
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2 sm:col-span-2">
+                                        <Label htmlFor="bank_account_holder">Titulaire du compte</Label>
+                                        <Input
+                                            id="bank_account_holder"
+                                            type="text"
+                                            autoComplete="name"
+                                            placeholder="Nom du titulaire"
+                                            value={bankForm.data.bank_account_holder}
+                                            onChange={(e) => bankForm.setData('bank_account_holder', e.target.value)}
+                                        />
+                                        {bankForm.errors.bank_account_holder && (
+                                            <p className="text-sm text-red-500">{bankForm.errors.bank_account_holder}</p>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="iban">IBAN</Label>
+                                        <Input
+                                            id="iban"
+                                            type="text"
+                                            autoComplete="off"
+                                            placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX"
+                                            value={bankForm.data.iban}
+                                            onChange={(e) => bankForm.setData('iban', formatIbanInput(e.target.value))}
+                                        />
+                                        {bankForm.errors.iban && (
+                                            <p className="text-sm text-red-500">{bankForm.errors.iban}</p>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="bic">BIC <span className="font-normal text-slate-400">(optionnel)</span></Label>
+                                        <Input
+                                            id="bic"
+                                            type="text"
+                                            autoComplete="off"
+                                            placeholder="BNPAFRPP"
+                                            value={bankForm.data.bic}
+                                            onChange={(e) => bankForm.setData('bic', e.target.value.toUpperCase().replace(/\s+/g, '').slice(0, 11))}
+                                        />
+                                        {bankForm.errors.bic && (
+                                            <p className="text-sm text-red-500">{bankForm.errors.bic}</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex justify-end">
+                                    <Button type="submit" disabled={bankForm.processing}>
+                                        {bankForm.processing ? 'Enregistrement...' : 'Enregistrer les coordonnées'}
+                                    </Button>
+                                </div>
+                            </form>
+                        </CardContent>
+                    </Card>
+
+                    <div className="flex flex-col gap-3 mb-8 sm:flex-row sm:items-center">
                         <Dialog open={withdrawDialogOpen} onOpenChange={setWithdrawDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button 
+                                <Button
                                     className="bg-sky-600 hover:bg-sky-700"
-                                    disabled={wallet.balance < 1}
+                                    disabled={!canWithdraw}
                                 >
                                     <Banknote className="mr-2 h-4 w-4" />
                                     Demander un retrait
@@ -225,6 +335,18 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                 </DialogHeader>
                                 <form onSubmit={handleWithdraw}>
                                     <div className="space-y-4 py-4">
+                                        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-900/50">
+                                            <p className="text-slate-500 dark:text-slate-400">Virement vers</p>
+                                            <p className="mt-1 font-medium text-slate-900 dark:text-white">
+                                                {bankDetails.bank_account_holder}
+                                            </p>
+                                            <p className="font-mono text-slate-700 dark:text-slate-300">
+                                                {bankDetails.iban}
+                                            </p>
+                                            {bankDetails.bic && (
+                                                <p className="text-slate-500 dark:text-slate-400">BIC {bankDetails.bic}</p>
+                                            )}
+                                        </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="amount">Montant (€)</Label>
                                             <Input
@@ -234,24 +356,11 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                                 max={wallet.balance}
                                                 step="0.01"
                                                 placeholder="1.00"
-                                                value={data.amount}
-                                                onChange={(e) => setData('amount', e.target.value)}
+                                                value={withdrawForm.data.amount}
+                                                onChange={(e) => withdrawForm.setData('amount', e.target.value)}
                                             />
-                                            {errors.amount && (
-                                                <p className="text-sm text-red-500">{errors.amount}</p>
-                                            )}
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="bank_account">IBAN</Label>
-                                            <Input
-                                                id="bank_account"
-                                                type="text"
-                                                placeholder="FR76 1234 5678 9012 3456 7890 123"
-                                                value={data.bank_account}
-                                                onChange={(e) => setData('bank_account', e.target.value)}
-                                            />
-                                            {errors.bank_account && (
-                                                <p className="text-sm text-red-500">{errors.bank_account}</p>
+                                            {withdrawForm.errors.amount && (
+                                                <p className="text-sm text-red-500">{withdrawForm.errors.amount}</p>
                                             )}
                                         </div>
                                     </div>
@@ -259,17 +368,25 @@ export default function WalletIndex({ wallet, transactions }: Props) {
                                         <Button type="button" variant="outline" onClick={() => setWithdrawDialogOpen(false)}>
                                             Annuler
                                         </Button>
-                                        <Button type="submit" disabled={processing}>
-                                            {processing ? 'Envoi...' : 'Confirmer le retrait'}
+                                        <Button type="submit" disabled={withdrawForm.processing}>
+                                            {withdrawForm.processing ? 'Envoi...' : 'Confirmer le retrait'}
                                         </Button>
                                     </DialogFooter>
                                 </form>
                             </DialogContent>
                         </Dialog>
-
+                        {!bankDetails.is_complete && (
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                                Enregistrez votre IBAN pour activer les retraits.
+                            </p>
+                        )}
+                        {bankDetails.is_complete && Number(wallet.balance) < 1 && (
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                                Solde insuffisant pour un retrait (minimum 1 €).
+                            </p>
+                        )}
                     </div>
 
-                    {/* Transactions */}
                     <Card className="dark:bg-slate-800 dark:border-slate-700">
                         <CardHeader>
                             <CardTitle className="dark:text-white">Historique des transactions</CardTitle>

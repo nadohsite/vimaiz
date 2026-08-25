@@ -80,6 +80,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Matching géographique des interventions
+    |--------------------------------------------------------------------------
+    |
+    | 0–standard_radius_km : zone standard, mission proposable.
+    | standard–extended : zone étendue, uniquement si le payout au km
+    |   (agent_payout / distance) atteint extended_min_payout_per_km.
+    | Au-delà : jamais proposé (ex. Paris vs Chambéry).
+    |
+    */
+    'matching' => [
+        'standard_radius_km' => (float) env('VIMAIZ_MATCHING_STANDARD_RADIUS_KM', 30),
+        'extended_radius_km' => (float) env('VIMAIZ_MATCHING_EXTENDED_RADIUS_KM', 150),
+        'extended_min_payout_per_km' => (float) env('VIMAIZ_MATCHING_EXTENDED_MIN_PAYOUT_PER_KM', 2.5),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Notification Settings
     |--------------------------------------------------------------------------
     */

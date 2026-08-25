@@ -14,6 +14,9 @@ class AgentProfile extends Model
         'siret',
         'company_type',
         'company_name',
+        'bank_account_holder',
+        'iban',
+        'bic',
         'tva_number',
         'website',
         'description',
@@ -54,6 +57,12 @@ class AgentProfile extends Model
         'ban_reason',
         'rcp_clause_accepted',
         'rcp_clause_accepted_at',
+    ];
+
+    protected $hidden = [
+        'iban',
+        'bic',
+        'bank_account_holder',
     ];
 
     protected $casts = [
@@ -146,6 +155,50 @@ class AgentProfile extends Model
     public function isVerified(): bool
     {
         return $this->verification_status === 'verified';
+    }
+
+    public function needsDocuments(): bool
+    {
+        if (in_array($this->verification_status, ['submitted', 'verified'], true)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function hasBankDetails(): bool
+    {
+        return filled($this->iban) && filled($this->bank_account_holder);
+    }
+
+    public static function normalizeIban(?string $iban): ?string
+    {
+        if ($iban === null || trim($iban) === '') {
+            return null;
+        }
+
+        return strtoupper((string) preg_replace('/\s+/', '', $iban));
+    }
+
+    public static function formatIban(?string $iban): ?string
+    {
+        $normalized = self::normalizeIban($iban);
+
+        if (! $normalized) {
+            return null;
+        }
+
+        return trim(chunk_split($normalized, 4, ' '));
+    }
+
+    public function bankDetailsForWallet(): array
+    {
+        return [
+            'iban' => self::formatIban($this->iban),
+            'bic' => $this->bic,
+            'bank_account_holder' => $this->bank_account_holder,
+            'is_complete' => $this->hasBankDetails(),
+        ];
     }
 
     public function updateRating()

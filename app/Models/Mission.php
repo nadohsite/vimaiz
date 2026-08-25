@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\GeographicMatchingService;
 use App\Support\DefaultPropertyChecklist;
 use App\Support\DurationFormatter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -196,21 +197,36 @@ class Mission extends Model
             && $this->isPaid();
     }
 
+    public function isVisibleToAgent(User $agent): bool
+    {
+        if ($this->agent_id === $agent->id) {
+            return true;
+        }
+
+        if (! $this->isOpenForAgents()) {
+            return false;
+        }
+
+        $geo = app(GeographicMatchingService::class);
+
+        if ($geo->hasPendingMission($agent)) {
+            return false;
+        }
+
+        return $geo->isGeographicallyEligible($agent, $this);
+    }
+
     public function scopeVisibleToAgent($query, User $agent)
     {
-        return $query->where(function ($q) use ($agent) {
-            $q->where('agent_id', $agent->id)
-                ->orWhere(function ($open) use ($agent) {
-                    $open->whereNull('agent_id')
-                        ->where('status', self::STATUS_PENDING_AGENT)
-                        ->where('payment_status', self::PAYMENT_PAID)
-                        ->whereNotExists(function ($pending) use ($agent) {
-                            $pending->selectRaw('1')
-                                ->from('missions as agent_pending_missions')
-                                ->where('agent_pending_missions.agent_id', $agent->id)
-                                ->where('agent_pending_missions.status', self::STATUS_PENDING_AGENT);
-                        });
-                });
+        $openIds = app(GeographicMatchingService::class)
+            ->visibleOpenMissionIdsFor($agent);
+
+        return $query->where(function ($q) use ($agent, $openIds) {
+            $q->where('agent_id', $agent->id);
+
+            if ($openIds !== []) {
+                $q->orWhereIn('id', $openIds);
+            }
         });
     }
 

@@ -17,7 +17,11 @@
 
     <div class="info-box">
         <p><strong>Email :</strong> {{ $agent->email }}</p>
-        <p><strong>Compte bancaire :</strong> {{ $bankAccount }}</p>
+        <p><strong>Titulaire :</strong> {{ $transaction->metadata['bank_account_holder'] ?? 'Non renseigné' }}</p>
+        <p><strong>IBAN :</strong> {{ \App\Models\AgentProfile::formatIban($bankAccount) ?? $bankAccount }}</p>
+        @if (!empty($transaction->metadata['bic']))
+            <p><strong>BIC :</strong> {{ $transaction->metadata['bic'] }}</p>
+        @endif
         <p>Vous pouvez valider ou rejeter cette demande depuis le panneau d'administration.</p>
     </div>
 

@@ -15,6 +15,15 @@ class ViewAgentProfile extends ViewRecord
 {
     protected static string $resource = AgentProfileResource::class;
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['iban'] = $this->record->iban;
+        $data['bic'] = $this->record->bic;
+        $data['bank_account_holder'] = $this->record->bank_account_holder;
+
+        return $data;
+    }
+
     protected function getHeaderActions(): array
     {
         return [

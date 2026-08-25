@@ -37,6 +37,9 @@ class DashboardController extends Controller
                 ->count(),
             'internal_rating' => $agentProfile->internal_rating ?? 5.0,
             'is_eligible' => $agentProfile?->isEligibleForMissions() ?? false,
+            'has_reference_location' => $user->referenceCoordinates() !== null,
+            'needs_documents' => $agentProfile?->needsDocuments() ?? true,
+            'matching_radius_km' => (float) config('vimaiz.matching.extended_radius_km', 150),
         ];
 
         // Missions en attente de réponse

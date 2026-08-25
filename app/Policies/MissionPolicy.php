@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Mission;
 use App\Models\User;
+use App\Services\GeographicMatchingService;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MissionPolicy
@@ -23,7 +24,7 @@ class MissionPolicy
             return true;
         }
 
-        return $user->isAgent() && $mission->isOpenForAgents();
+        return $user->isAgent() && $mission->isVisibleToAgent($user);
     }
 
     public function accept(User $user, Mission $mission): bool
@@ -45,9 +46,10 @@ class MissionPolicy
             return false;
         }
 
-        return ! Mission::where('agent_id', $user->id)
-            ->where('status', Mission::STATUS_PENDING_AGENT)
-            ->exists();
+        return app(GeographicMatchingService::class)->isGeographicallyEligible($user, $mission)
+            && ! Mission::where('agent_id', $user->id)
+                ->where('status', Mission::STATUS_PENDING_AGENT)
+                ->exists();
     }
 
     public function refuse(User $user, Mission $mission): bool

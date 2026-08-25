@@ -49,6 +49,9 @@ interface Stats {
     missions_in_progress: number;
     internal_rating: number;
     is_eligible: boolean;
+    has_reference_location?: boolean;
+    needs_documents?: boolean;
+    matching_radius_km?: number;
 }
 
 interface Props {
@@ -177,26 +180,51 @@ export default function Dashboard({
                         </div>
                     </div>
 
-                    {/* Eligibility warning */}
-                    {!stats?.is_eligible && (
+                    {/* Localisation — profil */}
+                    {stats && stats.has_reference_location === false && (
+                        <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-sky-200 bg-sky-50 p-5 dark:border-sky-800 dark:bg-sky-900/20 sm:flex-row sm:items-center">
+                            <div className="flex flex-none items-center justify-center rounded-xl bg-sky-100 p-3 dark:bg-sky-900/50">
+                                <MapPin className="h-6 w-6 text-sky-600" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="font-semibold text-sky-900 dark:text-sky-300">
+                                    Indiquez votre localisation pour recevoir des interventions
+                                </p>
+                                <p className="text-sm text-sky-800 dark:text-sky-400">
+                                    Les missions vous sont proposées autour de votre adresse, dans un
+                                    rayon d’environ {stats.matching_radius_km ?? 150} km.
+                                    Renseignez-la depuis votre profil.
+                                </p>
+                            </div>
+                            <Link
+                                href={route('settings.profile.edit')}
+                                className="inline-flex flex-none items-center gap-2 rounded-full bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700"
+                            >
+                                Compléter mon profil
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </div>
+                    )}
+
+                    {stats?.needs_documents && (
                         <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-orange-200 bg-orange-50 p-5 dark:border-orange-800 dark:bg-orange-900/20 sm:flex-row sm:items-center">
                             <div className="flex flex-none items-center justify-center rounded-xl bg-orange-100 p-3 dark:bg-orange-900/50">
                                 <AlertCircle className="h-6 w-6 text-orange-500" />
                             </div>
                             <div className="flex-1">
                                 <p className="font-semibold text-orange-800 dark:text-orange-300">
-                                    Profil incomplet — finalisez vos documents
+                                    Finalisez vos documents
                                 </p>
                                 <p className="text-sm text-orange-700 dark:text-orange-400">
-                                    Vous pouvez déjà recevoir des interventions. Complétez votre profil
-                                    pour accélérer la validation.
+                                    Déposez vos justificatifs (pièce d’identité, domicile, SIRET) pour
+                                    valider votre compte.
                                 </p>
                             </div>
                             <Link
                                 href={route('agent.documents.index')}
                                 className="inline-flex flex-none items-center gap-2 rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
                             >
-                                Compléter mon profil
+                                Finaliser mes documents
                                 <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>

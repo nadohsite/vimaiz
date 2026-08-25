@@ -223,6 +223,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // VIMAIZ - Wallet Agent
         Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+        Route::put('/wallet/bank-details', [WalletController::class, 'updateBankDetails'])->name('wallet.bank-details');
         Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 
         // VIMAIZ - Documents Agent

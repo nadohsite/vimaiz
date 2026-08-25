@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\WalletResource\Pages;
+use App\Models\AgentProfile;
 use App\Models\Wallet;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -78,7 +79,28 @@ class WalletResource extends Resource
                             ->label('Dernière mise à jour')
                             ->dateTime('d/m/Y H:i'),
                     ])->columns(3),
+                Section::make('Coordonnées bancaires')
+                    ->schema([
+                        TextEntry::make('bank_account_holder')
+                            ->label('Titulaire')
+                            ->state(fn (Wallet $record): ?string => $record->user?->agentProfile?->bank_account_holder)
+                            ->placeholder('Non renseigné'),
+                        TextEntry::make('iban')
+                            ->label('IBAN')
+                            ->state(fn (Wallet $record): string => AgentProfile::formatIban($record->user?->agentProfile?->iban) ?? 'Non renseigné'),
+                        TextEntry::make('bic')
+                            ->label('BIC')
+                            ->state(fn (Wallet $record): ?string => $record->user?->agentProfile?->bic)
+                            ->placeholder('Non renseigné'),
+                    ])
+                    ->columns(3)
+                    ->visible(fn (?Wallet $record): bool => $record?->user?->isAgent() ?? false),
             ]);
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->with(['user.agentProfile']);
     }
 
     public static function form(Schema $schema): Schema

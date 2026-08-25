@@ -75,11 +75,17 @@ class Wallet extends Model
         ]);
     }
 
-    public function withdraw(float $amount, string $bankAccount = null): WalletTransaction
+    public function withdraw(float $amount, AgentProfile $profile): WalletTransaction
     {
         if ($this->balance < $amount) {
-            throw new \Exception('Insufficient balance');
+            throw new \Exception('Solde insuffisant');
         }
+
+        if (! $profile->hasBankDetails()) {
+            throw new \Exception('Coordonnées bancaires manquantes');
+        }
+
+        $iban = AgentProfile::normalizeIban($profile->iban);
 
         $this->balance -= $amount;
         $this->total_withdrawn += $amount;
@@ -89,11 +95,14 @@ class Wallet extends Model
             'type' => 'withdrawal',
             'amount' => $amount,
             'balance_after' => $this->balance,
-            'reference' => $bankAccount,
-            'description' => 'Withdrawal to bank account',
+            'reference' => $iban,
+            'description' => 'Retrait vers '.$profile->bank_account_holder,
             'status' => 'pending',
             'metadata' => [
-                'bank_account' => $bankAccount,
+                'bank_account' => $iban,
+                'iban' => $iban,
+                'bic' => $profile->bic,
+                'bank_account_holder' => $profile->bank_account_holder,
             ],
         ]);
     }

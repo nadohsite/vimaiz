@@ -67,6 +67,18 @@ class AgentProfileResource extends Resource
                             ->disabled(),
                     ])->columns(2),
 
+                Section::make('Coordonnées bancaires')
+                    ->schema([
+                        Forms\Components\TextInput::make('bank_account_holder')
+                            ->label('Titulaire du compte'),
+                        Forms\Components\TextInput::make('iban')
+                            ->label('IBAN')
+                            ->placeholder('FR76 XXXX XXXX XXXX XXXX XXXX XXX'),
+                        Forms\Components\TextInput::make('bic')
+                            ->label('BIC')
+                            ->placeholder('BNPAFRPP'),
+                    ])->columns(3),
+
                 Section::make('Statut de vérification')
                     ->schema([
                         Forms\Components\Select::make('verification_status')
