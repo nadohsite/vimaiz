@@ -131,6 +131,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Notifications (shared by all authenticated users)
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{id}/open', [NotificationController::class, 'open'])->name('notifications.open');
     Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
@@ -170,9 +171,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/requests/estimate', [ClientServiceRequestController::class, 'estimate'])->name('requests.estimate');
 
         // VIMAIZ - Devis (Quotes)
-        Route::get('/quotes/{quote}', [ClientQuoteController::class, 'show'])->name('quotes.show');
-        Route::post('/quotes/{quote}/accept', [ClientQuoteController::class, 'accept'])->name('quotes.accept');
-        Route::post('/quotes/{quote}/refuse', [ClientQuoteController::class, 'refuse'])->name('quotes.refuse');
+        Route::get('/quotes/{quote}', [ClientQuoteController::class, 'show'])
+            ->name('quotes.show')
+            ->missing(fn () => redirect()->route('notifications.index')->with('info', 'Ce devis n\'est plus disponible.'));
+        Route::post('/quotes/{quote}/accept', [ClientQuoteController::class, 'accept'])
+            ->name('quotes.accept')
+            ->missing(fn () => redirect()->route('notifications.index')->with('info', 'Ce devis n\'est plus disponible.'));
+        Route::post('/quotes/{quote}/refuse', [ClientQuoteController::class, 'refuse'])
+            ->name('quotes.refuse')
+            ->missing(fn () => redirect()->route('notifications.index')->with('info', 'Ce devis n\'est plus disponible.'));
 
         // VIMAIZ - Paiement (Payment)
         Route::get('/payment/return', [ClientPaymentController::class, 'return'])->name('payment.return');

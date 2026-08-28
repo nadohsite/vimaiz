@@ -12,6 +12,9 @@ use App\Notifications\QuoteAcceptedNotification;
 use App\Notifications\QuoteRefusedNotification;
 use App\Support\ScheduledTime;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class QuoteCalculationService
 {
@@ -101,11 +104,12 @@ class QuoteCalculationService
             'status' => ServiceRequest::STATUS_QUOTE_SENT,
         ]);
 
-        // Notify client of new quote
-        $client = $quote->serviceRequest->client;
-        if ($client) {
-            $client->notify(new NewQuoteNotification($quote));
-        }
+        $this->notifyAfterCommit($quote, function (Quote $fresh) {
+            $client = $fresh->serviceRequest?->client;
+            if ($client) {
+                $client->notify(new NewQuoteNotification($fresh));
+            }
+        }, 'new_quote');
 
         return $quote->fresh();
     }
@@ -121,11 +125,11 @@ class QuoteCalculationService
             'status' => ServiceRequest::STATUS_QUOTE_ACCEPTED,
         ]);
 
-        // Notify admins of accepted quote
-        $admins = User::admins()->get();
-        foreach ($admins as $admin) {
-            $admin->notify(new QuoteAcceptedNotification($quote));
-        }
+        $this->notifyAfterCommit($quote, function (Quote $fresh) {
+            foreach (User::admins()->get() as $admin) {
+                $admin->notify(new QuoteAcceptedNotification($fresh));
+            }
+        }, 'quote_accepted');
 
         return $quote->fresh();
     }
@@ -141,13 +145,42 @@ class QuoteCalculationService
             'status' => ServiceRequest::STATUS_QUOTE_REFUSED,
         ]);
 
-        // Notify admins of refused quote
-        $admins = User::admins()->get();
-        foreach ($admins as $admin) {
-            $admin->notify(new QuoteRefusedNotification($quote));
-        }
+        $this->notifyAfterCommit($quote, function (Quote $fresh) {
+            foreach (User::admins()->get() as $admin) {
+                $admin->notify(new QuoteRefusedNotification($fresh));
+            }
+        }, 'quote_refused');
 
         return $quote->fresh();
+    }
+
+    /**
+     * @param  callable(Quote): void  $callback
+     */
+    protected function notifyAfterCommit(Quote $quote, callable $callback, string $type): void
+    {
+        $dispatch = function () use ($quote, $callback, $type): void {
+            $fresh = $quote->fresh(['serviceRequest.client', 'serviceRequest.property']);
+            if (! $fresh) {
+                return;
+            }
+
+            try {
+                $callback($fresh);
+            } catch (Throwable $e) {
+                Log::error('Failed to emit quote notification', [
+                    'type' => $type,
+                    'quote_id' => $fresh->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        };
+
+        if (DB::transactionLevel() > 0) {
+            DB::afterCommit($dispatch);
+        } else {
+            $dispatch();
+        }
     }
 
     public function getEstimateForProperty(

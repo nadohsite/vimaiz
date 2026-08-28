@@ -11,6 +11,7 @@ import { usePage, router } from '@inertiajs/react';
 import { Bell, FileText, CreditCard, User, CheckCircle, Play, Wallet, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { visitNotification } from '@/lib/notifications';
 
 interface Notification {
     id: string;
@@ -43,6 +44,7 @@ const getNotificationIcon = (type: string) => {
         mission_completed: { icon: CheckCircle, color: 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400' },
         agent_payout: { icon: Wallet, color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400' },
         quote_refused: { icon: AlertCircle, color: 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400' },
+        quote_accepted: { icon: CheckCircle, color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400' },
         documents_verified: { icon: CheckCircle, color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400' },
         documents_rejected: { icon: AlertCircle, color: 'text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400' },
         agent_refused_client: { icon: AlertCircle, color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400' },
@@ -80,13 +82,7 @@ export function NotificationDropdown() {
     const notifications = toNotificationList(recentNotifications ?? sharedNotifications);
 
     const handleNotificationClick = (notification: Notification) => {
-        router.post(route('notifications.mark-read', notification.id), {}, {
-            preserveScroll: true,
-        });
-
-        if (notification.data?.url) {
-            router.visit(notification.data.url);
-        }
+        visitNotification(notification.id);
     };
 
     const handleMarkAllRead = () => {

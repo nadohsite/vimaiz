@@ -15,9 +15,14 @@ class QuoteController extends Controller
 
     public function show(Quote $quote)
     {
-        $this->authorize('view', $quote);
-
         $quote->load(['serviceRequest.property']);
+
+        if (! $quote->serviceRequest) {
+            return redirect()->route('notifications.index')
+                ->with('info', 'Ce devis n\'est plus disponible.');
+        }
+
+        $this->authorize('view', $quote);
 
         return Inertia::render('Client/quotes/show', [
             'quote' => $quote,

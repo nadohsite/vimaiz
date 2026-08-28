@@ -18,11 +18,11 @@
     </div>
 
     <div class="info-box">
-        <p><strong>Bien :</strong> {{ $quote->serviceRequest->property->name ?? $quote->serviceRequest->property->type }}</p>
-        <p><strong>Surface :</strong> {{ $quote->serviceRequest->property->surface_area }} m²</p>
+        <p><strong>Bien :</strong> {{ $quote->serviceRequest?->property?->name ?? $quote->serviceRequest?->property?->type ?? '—' }}</p>
+        <p><strong>Surface :</strong> {{ $quote->serviceRequest?->property?->surface_area ?? '—' }} m²</p>
         <p><strong>Date prévue :</strong>
-            {{ optional($quote->serviceRequest->scheduled_date)->format('d/m/Y') ?? '—' }}
-            @if($quote->serviceRequest->scheduled_time)
+            {{ optional($quote->serviceRequest?->scheduled_date)->format('d/m/Y') ?? '—' }}
+            @if($quote->serviceRequest?->scheduled_time)
                 à {{ $quote->serviceRequest->scheduled_time }}
             @endif
         </p>

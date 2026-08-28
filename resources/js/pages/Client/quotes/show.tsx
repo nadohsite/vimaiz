@@ -34,7 +34,7 @@ interface ServiceRequest {
     scheduled_time: string;
     requested_hours: number;
     special_instructions: string | null;
-    property: Property;
+    property: Property | null;
 }
 
 interface Quote {
@@ -50,7 +50,7 @@ interface Quote {
     status_label: string;
     sent_at: string | null;
     expires_at: string | null;
-    service_request: ServiceRequest;
+    service_request: ServiceRequest | null;
 }
 
 interface Props {
@@ -67,8 +67,8 @@ export default function QuoteShow({ quote }: Props) {
     const [isRefusing, setIsRefusing] = useState(false);
 
     const serviceRequest = quote.service_request;
-    const property = serviceRequest.property;
-    const price = quote.final_price ?? quote.estimated_price;
+    const property = serviceRequest?.property;
+    const price = Number(quote.final_price ?? quote.estimated_price ?? 0);
 
     const formatDateTime = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString('fr-FR', {
@@ -124,7 +124,7 @@ export default function QuoteShow({ quote }: Props) {
 
             <div className="mx-auto max-w-4xl px-4 py-8">
                 <Link
-                    href={route('client.requests.show', serviceRequest.id)}
+                    href={serviceRequest ? route('client.requests.show', serviceRequest.id) : route('client.requests.index')}
                     className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4" />
@@ -165,16 +165,16 @@ export default function QuoteShow({ quote }: Props) {
                                     </div>
                                     <div>
                                         <p className="font-semibold text-slate-900 dark:text-white">
-                                            {property.name || property.type_label}
+                                            {property?.name || property?.type_label || 'Logement'}
                                         </p>
                                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                                            {property.address_line1}
+                                            {property?.address_line1}
                                         </p>
                                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                                            {property.postal_code} {property.city}
+                                            {property?.postal_code} {property?.city}
                                         </p>
                                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                            Surface : {property.surface_area} m²
+                                            Surface : {property?.surface_area ?? '—'} m²
                                         </p>
                                     </div>
                                 </div>
@@ -188,12 +188,12 @@ export default function QuoteShow({ quote }: Props) {
                                         <div>
                                             <p className="text-sm text-slate-500 dark:text-slate-400">Date</p>
                                             <p className="font-medium text-slate-900 dark:text-white">
-                                                {formatAppointmentDate(serviceRequest.scheduled_date, {
+                                                {serviceRequest ? formatAppointmentDate(serviceRequest.scheduled_date, {
                                                     weekday: 'long',
                                                     day: 'numeric',
                                                     month: 'long',
                                                     year: 'numeric',
-                                                })}
+                                                }) : '—'}
                                             </p>
                                         </div>
                                     </div>
@@ -204,7 +204,7 @@ export default function QuoteShow({ quote }: Props) {
                                         <div>
                                             <p className="text-sm text-slate-500 dark:text-slate-400">Horaire</p>
                                             <p className="font-medium text-slate-900 dark:text-white">
-                                                {formatRequestTime(serviceRequest.scheduled_time)}
+                                                {serviceRequest ? formatRequestTime(serviceRequest.scheduled_time) : '—'}
                                             </p>
                                         </div>
                                     </div>
@@ -226,7 +226,7 @@ export default function QuoteShow({ quote }: Props) {
                                 )}
 
                                 {/* Special Instructions */}
-                                {serviceRequest.special_instructions && (
+                                {serviceRequest?.special_instructions && (
                                     <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50">
                                         <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                                             Instructions spéciales
@@ -365,7 +365,7 @@ export default function QuoteShow({ quote }: Props) {
                                             Estimation initiale
                                         </span>
                                         <span className="text-slate-400 line-through">
-                                            {quote.estimated_price.toFixed(2)} €
+                                            {Number(quote.estimated_price).toFixed(2)} €
                                         </span>
                                     </div>
                                 )}

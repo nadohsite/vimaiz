@@ -18,17 +18,39 @@ interface RealtimeNotification {
     data?: Record<string, unknown>;
 }
 
-function notifyBrowser(title: string, body?: string) {
+function notificationOpenUrl(id?: string, url?: string | null): string {
+    if (id) {
+        return route('notifications.open', id);
+    }
+
+    if (url) {
+        return url;
+    }
+
+    return route('notifications.index');
+}
+
+function notifyBrowser(title: string, body?: string, options?: { id?: string; url?: string | null }) {
     if (typeof window === 'undefined' || !('Notification' in window) || !body) {
         return;
     }
 
-    if (window.Notification.permission === 'granted') {
-        new window.Notification(title, {
-            body: body.substring(0, 100),
-            icon: '/favicon.ico',
-        });
+    if (window.Notification.permission !== 'granted') {
+        return;
     }
+
+    const notification = new window.Notification(title, {
+        body: body.substring(0, 100),
+        icon: '/favicon.ico',
+        tag: options?.id,
+        data: { id: options?.id, url: options?.url },
+    });
+
+    notification.onclick = () => {
+        notification.close();
+        window.focus();
+        window.location.assign(notificationOpenUrl(options?.id, options?.url));
+    };
 }
 
 export function useRealtime(userId: number | null) {
@@ -50,7 +72,10 @@ export function useRealtime(userId: number | null) {
 
             const message = data.message
                 ?? (typeof data.data?.message === 'string' ? data.data.message : undefined);
-            notifyBrowser('VIMAIZ', message);
+            const url = data.url
+                ?? (typeof data.data?.url === 'string' ? data.data.url : undefined);
+
+            notifyBrowser('VIMAIZ', message, { id: data.id, url });
         };
 
         channel.listen('.new-notification', handleNotification);

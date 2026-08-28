@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use App\Models\Quote;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class QuoteAcceptedNotification extends Notification implements ShouldQueue
+class QuoteAcceptedNotification extends Notification
 {
     use Queueable;
 
@@ -18,7 +17,7 @@ class QuoteAcceptedNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     public function toBroadcast(object $notifiable): array
@@ -28,6 +27,8 @@ class QuoteAcceptedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
+        $this->quote->loadMissing(['serviceRequest.client']);
+
         return (new MailMessage)
             ->subject('Devis accepté — '.$this->quote->quote_number)
             ->view('emails.quote-accepted', [

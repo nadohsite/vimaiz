@@ -22,8 +22,10 @@ class QuoteRefusedNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+        $this->quote->loadMissing(['serviceRequest.client']);
+
         return (new MailMessage)
-            ->subject('❌ Devis refusé - '.$this->quote->quote_number)
+            ->subject('Devis refusé — '.$this->quote->quote_number)
             ->view('emails.quote-refused', [
                 'notifiable' => $notifiable,
                 'quote' => $this->quote,
