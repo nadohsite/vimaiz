@@ -8,6 +8,7 @@ use App\Support\NotificationTarget;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class NotificationController extends Controller
 {
@@ -46,13 +47,15 @@ class NotificationController extends Controller
         $notification->markAsRead();
 
         $data = is_array($notification->data) ? $notification->data : [];
-        $url = $data['url'] ?? null;
 
-        if (! is_string($url) || $url === '') {
-            return redirect()->route('notifications.index');
+        try {
+            $url = NotificationTarget::destination($user, $data);
+        } catch (Throwable $e) {
+            report($e);
+            $url = null;
         }
 
-        if (! NotificationTarget::exists($data)) {
+        if (! is_string($url) || $url === '') {
             return redirect()->route('notifications.index')
                 ->with('info', NotificationTarget::unavailableMessage($data));
         }

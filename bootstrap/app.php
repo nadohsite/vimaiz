@@ -33,15 +33,24 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function (Response $response, \Throwable $e, Request $request) {
             if (
-                $response->getStatusCode() !== 404
-                || ! $request->header('X-Inertia')
+                ! $request->header('X-Inertia')
                 || ! $request->user()
-                || $request->routeIs('notifications.index', 'notifications.open')
+                || $request->routeIs('notifications.index')
             ) {
                 return $response;
             }
 
-            return redirect()->route('notifications.index')
-                ->with('info', 'Cet élément n\'est plus disponible.');
+            $status = $response->getStatusCode();
+            if (! in_array($status, [403, 404, 500, 503], true)) {
+                return $response;
+            }
+
+            $message = match ($status) {
+                403 => 'Vous n\'avez pas accès à cet élément.',
+                404 => 'Cet élément n\'est plus disponible.',
+                default => 'Une erreur est survenue.',
+            };
+
+            return redirect()->route('notifications.index')->with('info', $message);
         });
     })->create();

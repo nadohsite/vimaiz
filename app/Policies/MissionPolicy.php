@@ -18,8 +18,8 @@ class MissionPolicy
 
     public function view(User $user, Mission $mission): bool
     {
-        if ($user->id === $mission->client_id
-            || $user->id === $mission->agent_id
+        if ((int) $user->id === (int) $mission->client_id
+            || (int) $user->id === (int) $mission->agent_id
             || $user->isAdmin()) {
             return true;
         }

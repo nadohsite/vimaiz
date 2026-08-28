@@ -17,7 +17,7 @@ class QuotePolicy
 
     public function view(User $user, Quote $quote): bool
     {
-        return $user->id === $quote->serviceRequest?->client_id || $user->isAdmin();
+        return (int) $user->id === (int) $quote->serviceRequest?->client_id || $user->isAdmin();
     }
 
     public function create(User $user): bool
@@ -32,7 +32,7 @@ class QuotePolicy
             return true;
         }
         
-        return $user->id === $quote->serviceRequest?->client_id &&
+        return (int) $user->id === (int) $quote->serviceRequest?->client_id &&
                in_array($quote->status, [Quote::STATUS_SENT, Quote::STATUS_ACCEPTED]);
     }
 
@@ -43,11 +43,11 @@ class QuotePolicy
 
     public function accept(User $user, Quote $quote): bool
     {
-        return $user->id === $quote->serviceRequest?->client_id && $quote->canBeAccepted();
+        return (int) $user->id === (int) $quote->serviceRequest?->client_id && $quote->canBeAccepted();
     }
 
     public function refuse(User $user, Quote $quote): bool
     {
-        return $user->id === $quote->serviceRequest?->client_id && $quote->isSent();
+        return (int) $user->id === (int) $quote->serviceRequest?->client_id && $quote->isSent();
     }
 }

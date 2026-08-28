@@ -45,7 +45,7 @@ class WithdrawalRequestNotification extends Notification
             'agent_name' => $this->agent->name,
             'amount' => $this->transaction->amount,
             'message' => $this->agent->name.' demande un retrait de '.number_format($this->transaction->amount, 2, ',', ' ').' €',
-            'url' => '/admin/withdrawal-requests/'.$this->transaction->id,
+            'url' => '/admin/wallet-transactions/'.$this->transaction->id,
         ];
     }
 }

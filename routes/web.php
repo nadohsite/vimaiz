@@ -138,7 +138,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Messages (shared by clients and agents)
     Route::get('/messages', [ConversationController::class, 'index'])->name('messages.index');
-    Route::get('/messages/{conversation}', [ConversationController::class, 'show'])->name('messages.show');
+    Route::get('/messages/{conversation}', [ConversationController::class, 'show'])
+        ->name('messages.show')
+        ->missing(fn () => redirect()->route('notifications.index')->with('info', 'Cette conversation n\'est plus disponible.'));
     Route::post('/messages', [ConversationController::class, 'store'])->name('messages.store');
     Route::post('/messages/{conversation}/send', [ConversationController::class, 'sendMessage'])->name('messages.send');
 
@@ -166,7 +168,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/requests', [ClientServiceRequestController::class, 'index'])->name('requests.index');
         Route::get('/requests/create', [ClientServiceRequestController::class, 'create'])->name('requests.create');
         Route::post('/requests', [ClientServiceRequestController::class, 'store'])->name('requests.store');
-        Route::get('/requests/{serviceRequest}', [ClientServiceRequestController::class, 'show'])->name('requests.show');
+        Route::get('/requests/{serviceRequest}', [ClientServiceRequestController::class, 'show'])
+            ->name('requests.show')
+            ->missing(fn () => redirect()->route('notifications.index')->with('info', 'Cette demande n\'est plus disponible.'));
         Route::post('/requests/{serviceRequest}/cancel', [ClientServiceRequestController::class, 'cancel'])->name('requests.cancel');
         Route::post('/requests/estimate', [ClientServiceRequestController::class, 'estimate'])->name('requests.estimate');
 
@@ -188,7 +192,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // VIMAIZ - Missions
         Route::get('/missions', [ClientMissionController::class, 'index'])->name('missions.index');
-        Route::get('/missions/{mission}', [ClientMissionController::class, 'show'])->name('missions.show');
+        Route::get('/missions/{mission}', [ClientMissionController::class, 'show'])
+            ->name('missions.show')
+            ->missing(fn () => redirect()->route('notifications.index')->with('info', 'Cette intervention n\'est plus disponible.'));
         Route::post('/missions/{mission}/review', [ClientMissionController::class, 'storeReview'])->name('missions.review');
 
         // VIMAIZ - Retours mécontentement (Client)
@@ -219,7 +225,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // VIMAIZ - Missions Agent
         Route::get('/missions', [AgentMissionController::class, 'index'])->name('missions.index');
-        Route::get('/missions/{mission}', [AgentMissionController::class, 'show'])->name('missions.show');
+        Route::get('/missions/{mission}', [AgentMissionController::class, 'show'])
+            ->name('missions.show')
+            ->missing(fn () => redirect()->route('notifications.index')->with('info', 'Cette intervention n\'est plus disponible.'));
         Route::post('/missions/{mission}/accept', [AgentMissionController::class, 'accept'])->name('missions.accept');
         Route::post('/missions/{mission}/refuse', [AgentMissionController::class, 'refuse'])->name('missions.refuse');
         Route::post('/missions/{mission}/start', [AgentMissionController::class, 'start'])->name('missions.start');

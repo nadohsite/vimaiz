@@ -54,6 +54,10 @@ class Quote extends Model
 
     const STATUS_PAID = 'paid';
 
+    protected $appends = [
+        'status_label',
+    ];
+
     protected static function boot()
     {
         parent::boot();

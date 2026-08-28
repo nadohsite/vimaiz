@@ -37,7 +37,7 @@ class ConversationController extends Controller
         $user = $request->user();
         
         // Authorize access
-        if ($conversation->client_id !== $user->id && $conversation->agent_id !== $user->id) {
+        if ((int) $conversation->client_id !== (int) $user->id && (int) $conversation->agent_id !== (int) $user->id) {
             abort(403);
         }
 
@@ -123,7 +123,7 @@ class ConversationController extends Controller
         $user = $request->user();
         
         // Authorize access
-        if ($conversation->client_id !== $user->id && $conversation->agent_id !== $user->id) {
+        if ((int) $conversation->client_id !== (int) $user->id && (int) $conversation->agent_id !== (int) $user->id) {
             abort(403);
         }
 

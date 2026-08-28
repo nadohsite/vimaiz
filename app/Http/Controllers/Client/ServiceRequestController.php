@@ -152,7 +152,7 @@ class ServiceRequestController extends Controller
 
     public function show(ServiceRequest $serviceRequest): Response
     {
-        abort_unless($serviceRequest->client_id === auth()->id(), 403);
+        abort_unless((int) $serviceRequest->client_id === (int) auth()->id(), 403);
 
         $serviceRequest->load([
             'property',
@@ -172,7 +172,7 @@ class ServiceRequestController extends Controller
 
     public function cancel(ServiceRequest $serviceRequest): RedirectResponse
     {
-        abort_unless($serviceRequest->client_id === auth()->id(), 403);
+        abort_unless((int) $serviceRequest->client_id === (int) auth()->id(), 403);
 
         if (! $serviceRequest->canBeCancelled()) {
             return back()->with('error', 'Cette demande ne peut plus être annulée.');

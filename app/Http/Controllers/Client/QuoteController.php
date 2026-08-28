@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Services\QuoteCalculationService;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class QuoteController extends Controller
@@ -17,12 +18,10 @@ class QuoteController extends Controller
     {
         $quote->load(['serviceRequest.property']);
 
-        if (! $quote->serviceRequest) {
+        if (! $quote->serviceRequest || ! Gate::allows('view', $quote)) {
             return redirect()->route('notifications.index')
                 ->with('info', 'Ce devis n\'est plus disponible.');
         }
-
-        $this->authorize('view', $quote);
 
         return Inertia::render('Client/quotes/show', [
             'quote' => $quote,

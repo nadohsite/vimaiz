@@ -66,6 +66,22 @@ export default function QuoteShow({ quote }: Props) {
     const [isAccepting, setIsAccepting] = useState(false);
     const [isRefusing, setIsRefusing] = useState(false);
 
+    if (!quote?.id) {
+        return (
+            <AppSidebarLayout breadcrumbs={breadcrumbs}>
+                <Head title="Devis introuvable" />
+                <div className="mx-auto max-w-lg px-4 py-16 text-center">
+                    <p className="text-lg font-medium text-slate-800 dark:text-slate-100">
+                        Ce devis n&apos;est plus disponible.
+                    </p>
+                    <Link href="/notifications" className="mt-4 inline-block text-sky-600 hover:underline">
+                        Retour aux notifications
+                    </Link>
+                </div>
+            </AppSidebarLayout>
+        );
+    }
+
     const serviceRequest = quote.service_request;
     const property = serviceRequest?.property;
     const price = Number(quote.final_price ?? quote.estimated_price ?? 0);
@@ -87,6 +103,7 @@ export default function QuoteShow({ quote }: Props) {
             accepted: { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <CheckCircle className="h-3 w-3" /> },
             refused: { color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: <XCircle className="h-3 w-3" /> },
             expired: { color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', icon: <Clock className="h-3 w-3" /> },
+            paid: { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <CheckCircle className="h-3 w-3" /> },
         };
 
         const config = statusConfig[quote.status] || statusConfig.draft;

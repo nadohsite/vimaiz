@@ -33,6 +33,21 @@ class NotificationTargetTest extends TestCase
         ]));
     }
 
+    public function test_url_allowed_for_role(): void
+    {
+        $client = new User(['role' => 'client']);
+        $admin = new User(['role' => 'admin']);
+        $agent = new User(['role' => 'agent']);
+
+        $this->assertTrue(NotificationTarget::urlAllowedFor($client, '/client/quotes/42'));
+        $this->assertFalse(NotificationTarget::urlAllowedFor($client, '/admin/quotes/42'));
+        $this->assertFalse(NotificationTarget::urlAllowedFor($client, '/agent/missions/3'));
+
+        $this->assertTrue(NotificationTarget::urlAllowedFor($admin, '/admin/quotes/9'));
+        $this->assertTrue(NotificationTarget::urlAllowedFor($agent, '/agent/missions/3'));
+        $this->assertFalse(NotificationTarget::urlAllowedFor($agent, '/client/quotes/1'));
+    }
+
     public function test_unavailable_message_for_quote(): void
     {
         $this->assertSame(
