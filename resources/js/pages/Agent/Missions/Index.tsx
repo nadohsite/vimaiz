@@ -1,10 +1,11 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Home, Clock, ChevronRight, Filter } from 'lucide-react';
+import { formatAppointmentDateTime } from '@/lib/datetime';
+import { AgentProposalActions } from '@/components/missions/AgentProposalActions';
 
 interface Property {
     id: number;
@@ -41,6 +42,8 @@ interface Props {
 }
 
 export default function Index({ missions, currentStatus, statuses }: Props) {
+    const { flash } = usePage<{ flash?: { success?: string; error?: string; info?: string } }>().props;
+
     const getStatusColor = (status: string) => {
         const colors: Record<string, string> = {
             pending_agent: 'bg-orange-100 text-orange-800 border-orange-200',
@@ -86,67 +89,89 @@ export default function Index({ missions, currentStatus, statuses }: Props) {
                         </div>
                     </div>
 
+                    {(flash?.success || flash?.info || flash?.error) && (
+                        <div className="mb-6 space-y-3">
+                            {(flash.success || flash.info) && (
+                                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
+                                    {flash.success || flash.info}
+                                </div>
+                            )}
+                            {flash.error && (
+                                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+                                    {flash.error}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {missions.data.length > 0 ? (
                         <div className="space-y-4">
                             {missions.data.map((mission) => (
-                                <Link key={mission.id} href={route('agent.missions.show', mission.id)}>
-                                    <Card className={`hover:shadow-md transition-shadow cursor-pointer ${
-                                        mission.status === 'pending_agent' ? 'border-orange-300 bg-orange-50/50' : ''
-                                    }`}>
-                                        <CardContent className="p-4 sm:p-6">
-                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                                <div className="flex items-start gap-4">
-                                                    <div className={`p-2 rounded-lg shrink-0 ${
-                                                        mission.status === 'pending_agent' ? 'bg-orange-100' : 'bg-sky-50'
-                                                    }`}>
-                                                        <Calendar className={`h-6 w-6 ${
-                                                            mission.status === 'pending_agent' ? 'text-orange-500' : 'text-sky-500'
-                                                        }`} />
+                                <Card
+                                    key={mission.id}
+                                    className={`transition-shadow ${
+                                        mission.status === 'pending_agent' ? 'border-orange-300 bg-orange-50/50' : 'hover:shadow-md'
+                                    }`}
+                                >
+                                    <CardContent className="p-4 sm:p-6">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <Link
+                                                href={route('agent.missions.show', mission.id)}
+                                                className="flex items-start gap-4 min-w-0 flex-1"
+                                            >
+                                                <div className={`p-2 rounded-lg shrink-0 ${
+                                                    mission.status === 'pending_agent' ? 'bg-orange-100' : 'bg-sky-50'
+                                                }`}>
+                                                    <Calendar className={`h-6 w-6 ${
+                                                        mission.status === 'pending_agent' ? 'text-orange-500' : 'text-sky-500'
+                                                    }`} />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className="font-semibold text-slate-900">
+                                                            {mission.mission_number}
+                                                        </span>
+                                                        <Badge className={getStatusColor(mission.status)}>
+                                                            {mission.status_label}
+                                                        </Badge>
                                                     </div>
-                                                    <div>
-                                                        <div className="flex items-center gap-2 flex-wrap">
-                                                            <span className="font-semibold text-slate-900">
-                                                                {mission.mission_number}
-                                                            </span>
-                                                            <Badge className={getStatusColor(mission.status)}>
-                                                                {mission.status_label}
-                                                            </Badge>
-                                                        </div>
-                                                        <div className="flex items-center gap-4 mt-2 text-sm text-slate-500 flex-wrap">
-                                                            <span className="flex items-center gap-1">
-                                                                <Home className="h-4 w-4" />
-                                                                {mission.property.city}
-                                                            </span>
-                                                            <span className="flex items-center gap-1">
-                                                                <Calendar className="h-4 w-4" />
-                                                                {new Date(mission.scheduled_at).toLocaleDateString('fr-FR', {
-                                                                    weekday: 'short',
-                                                                    day: 'numeric',
-                                                                    month: 'short',
-                                                                    hour: '2-digit',
-                                                                    minute: '2-digit'
-                                                                })}
-                                                            </span>
-                                                            <span className="flex items-center gap-1">
-                                                                <Clock className="h-4 w-4" />
-                                                                {mission.duration_hours}h
-                                                            </span>
-                                                        </div>
+                                                    <div className="flex items-center gap-4 mt-2 text-sm text-slate-500 flex-wrap">
+                                                        <span className="flex items-center gap-1">
+                                                            <Home className="h-4 w-4" />
+                                                            {mission.property.city}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <Calendar className="h-4 w-4" />
+                                                            {formatAppointmentDateTime(mission.scheduled_at)}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock className="h-4 w-4" />
+                                                            {mission.duration_hours}h
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-4">
+                                            </Link>
+                                            <div className="flex flex-col items-stretch sm:items-end gap-3">
+                                                <div className="flex items-center justify-between sm:justify-end gap-4">
                                                     <div className="text-right">
                                                         <p className="text-lg font-bold text-green-600">
                                                             {mission.agent_payout} €
                                                         </p>
                                                         <p className="text-xs text-slate-500">Votre gain</p>
                                                     </div>
-                                                    <ChevronRight className="h-5 w-5 text-slate-400" />
+                                                    {mission.status !== 'pending_agent' && (
+                                                        <Link href={route('agent.missions.show', mission.id)}>
+                                                            <ChevronRight className="h-5 w-5 text-slate-400" />
+                                                        </Link>
+                                                    )}
                                                 </div>
+                                                {mission.status === 'pending_agent' && (
+                                                    <AgentProposalActions missionId={mission.id} variant="compact" />
+                                                )}
                                             </div>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             ))}
                         </div>
                     ) : (

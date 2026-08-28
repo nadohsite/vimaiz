@@ -11,7 +11,9 @@ import InterventionReportWizard, {
     type ReportCategory,
 } from '@/components/missions/InterventionReportWizard';
 import InterventionReportCard, { type ReportAnomaly, type ReportSummary } from '@/components/missions/InterventionReportCard';
+import { AgentProposalActions } from '@/components/missions/AgentProposalActions';
 import { elapsedMinutesBetween, formatDurationMinutes } from '@/lib/duration';
+import { formatAppointmentDate, formatAppointmentTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -47,6 +49,7 @@ interface Mission {
     id: number;
     mission_number: string;
     scheduled_at: string;
+    scheduled_time_label?: string | null;
     started_at: string | null;
     completed_at: string | null;
     duration_hours: number;
@@ -148,10 +151,6 @@ export default function Show({
             cancelled: 'bg-gray-100 text-gray-800',
         };
         return colors[status] || 'bg-gray-100 text-gray-800';
-    };
-
-    const handleAccept = () => {
-        router.post(route('agent.missions.accept', mission.id));
     };
 
     const handleRefuse = () => {
@@ -294,18 +293,7 @@ export default function Show({
                         <Card className="mb-6 border-orange-300 bg-orange-50">
                             <CardContent className="p-6">
                                 <h3 className="font-semibold text-orange-800 mb-4">Répondez à cette intervention</h3>
-                                <div className="flex flex-col sm:flex-row gap-4">
-                                    <Button onClick={handleAccept} className="bg-green-500 hover:bg-green-600 flex-1">
-                                        <CheckCircle className="h-4 w-4 mr-2" />
-                                        Accepter l'intervention
-                                    </Button>
-                                    {canRefuse && (
-                                        <Button variant="outline" onClick={handleRefuse} disabled={refuseProcessing} className="flex-1 text-red-600">
-                                            <XCircle className="h-4 w-4 mr-2" />
-                                            Refuser l'intervention
-                                        </Button>
-                                    )}
-                                </div>
+                                <AgentProposalActions missionId={mission.id} />
                             </CardContent>
                         </Card>
                     )}
@@ -678,15 +666,15 @@ export default function Show({
                                     <div className="flex justify-between">
                                         <span className="text-slate-500">Date</span>
                                         <span className="font-medium">
-                                            {new Date(mission.scheduled_at).toLocaleDateString('fr-FR', {
-                                                weekday: 'long', day: 'numeric', month: 'long'
+                                            {formatAppointmentDate(mission.scheduled_at, {
+                                                weekday: 'long', day: 'numeric', month: 'long',
                                             })}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-slate-500">Heure</span>
                                         <span className="font-medium">
-                                            {new Date(mission.scheduled_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                            {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">

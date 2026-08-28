@@ -8,6 +8,7 @@ use App\Support\DurationFormatter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -81,6 +82,10 @@ class Mission extends Model
         'return_validated_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'scheduled_time_label',
+    ];
+
     const STATUS_PENDING_AGENT = 'pending_agent';
 
     const STATUS_AGENT_ACCEPTED = 'agent_accepted';
@@ -150,6 +155,22 @@ class Mission extends Model
         return $this->belongsTo(User::class, 'agent_id');
     }
 
+    public function declinedAgents(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'mission_declines', 'mission_id', 'agent_id')
+            ->withPivot('reason')
+            ->withTimestamps();
+    }
+
+    public function hasBeenDeclinedBy(User $agent): bool
+    {
+        if ($this->relationLoaded('declinedAgents')) {
+            return $this->declinedAgents->contains('id', $agent->id);
+        }
+
+        return $this->declinedAgents()->where('users.id', $agent->id)->exists();
+    }
+
     public function qualityReviewedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'quality_reviewed_by');
@@ -201,6 +222,10 @@ class Mission extends Model
     {
         if ($this->agent_id === $agent->id) {
             return true;
+        }
+
+        if ($this->hasBeenDeclinedBy($agent)) {
+            return false;
         }
 
         if (! $this->isOpenForAgents()) {
@@ -349,6 +374,11 @@ class Mission extends Model
             'estimated_duration_minutes' => $this->estimatedDurationMinutes(),
             'estimated_duration_label' => $this->estimated_duration_label,
         ];
+    }
+
+    public function getScheduledTimeLabelAttribute(): ?string
+    {
+        return $this->scheduled_at?->format('H:i');
     }
 
     public function getStatusLabelAttribute(): string

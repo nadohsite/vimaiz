@@ -2,8 +2,7 @@ import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Briefcase, Clock, CheckCircle, Euro, ArrowRight, MapPin, Calendar } from 'lucide-react';
-import RcpClauseModal from '@/components/RcpClauseModal';
-import { useState } from 'react';
+import { formatAppointmentDateTime } from '@/lib/datetime';
 
 interface Mission {
     id: number;
@@ -36,7 +35,6 @@ interface Props {
     pendingMissions?: Mission[];
     activeMissions?: Mission[];
     stats?: Stats;
-    rcpClauseAccepted?: boolean;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -46,8 +44,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function AgentDashboard({ pendingMissions = [], activeMissions = [], stats, rcpClauseAccepted = false }: Props) {
-    const [showRcpModal, setShowRcpModal] = useState(!rcpClauseAccepted);
+export default function AgentDashboard({ pendingMissions = [], activeMissions = [], stats }: Props) {
     const { auth } = usePage<SharedData>().props;
     const firstName = auth.user?.first_name || auth.user?.name?.split(' ')[0] || '';
     const getStatusColor = (status: string) => {
@@ -76,13 +73,7 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
     };
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('fr-FR', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
+        return formatAppointmentDateTime(dateString);
     };
 
     return (
@@ -244,12 +235,6 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
                     )}
                 </div>
             </div>
-
-            {/* RCP Clause Modal */}
-            <RcpClauseModal 
-                show={showRcpModal} 
-                onAccepted={() => setShowRcpModal(false)} 
-            />
         </AppSidebarLayout>
     );
 }

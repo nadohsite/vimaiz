@@ -6,6 +6,7 @@ use App\Models\Mission;
 use App\Models\User;
 use App\Support\Geo;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class GeographicMatchingService
 {
@@ -112,7 +113,12 @@ class GeographicMatchingService
             return [];
         }
 
+        $declinedIds = DB::table('mission_declines')
+            ->where('agent_id', $agent->id)
+            ->pluck('mission_id');
+
         return $this->openPaidMissions()
+            ->reject(fn (Mission $mission) => $declinedIds->contains($mission->id))
             ->filter(fn (Mission $mission) => $this->isGeographicallyEligible($agent, $mission))
             ->pluck('id')
             ->all();

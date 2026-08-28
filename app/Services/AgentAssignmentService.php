@@ -6,6 +6,7 @@ use App\Models\AgentProfile;
 use App\Models\Mission;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class AgentAssignmentService
 {
@@ -36,6 +37,13 @@ class AgentAssignmentService
             'assignment_attempts' => $mission->assignment_attempts + 1,
         ]);
 
+        if ($agents->isEmpty()) {
+            Log::info('No eligible agents to propose mission to', [
+                'mission_id' => $mission->id,
+                'except_agent_id' => $exceptAgentId,
+            ]);
+        }
+
         return $agents->values();
     }
 
@@ -49,6 +57,8 @@ class AgentAssignmentService
     public function findEligibleAgents(Mission $mission): Collection
     {
         $mission->loadMissing('property');
+
+        $declinedAgentIds = $mission->declinedAgents()->pluck('users.id');
 
         return User::agents()
             ->where('is_active', true)
@@ -65,6 +75,7 @@ class AgentAssignmentService
             })
             ->with(['agentProfile', 'addresses'])
             ->get()
+            ->reject(fn (User $agent) => $declinedAgentIds->contains($agent->id))
             ->reject(fn (User $agent) => $this->hasPendingMission($agent))
             ->reject(fn (User $agent) => $mission->scheduled_at && $this->hasConflictingMission($agent, $mission))
             ->filter(fn (User $agent) => $this->geoMatching->isGeographicallyEligible($agent, $mission))

@@ -7,9 +7,8 @@ use App\Models\PricingRule;
 use App\Models\Quote;
 use App\Models\ServiceRequest;
 use App\Services\QuoteCalculationService;
+use App\Support\ScheduledTime;
 use BackedEnum;
-use Carbon\Carbon;
-use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -21,9 +20,9 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\View as SchemaView;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\View as SchemaView;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
@@ -126,19 +125,7 @@ class QuoteResource extends Resource
 
     protected static function formatScheduledTime(mixed $time): string
     {
-        if (blank($time)) {
-            return '—';
-        }
-
-        if ($time instanceof CarbonInterface) {
-            return $time->format('H:i');
-        }
-
-        try {
-            return Carbon::parse((string) $time)->format('H:i');
-        } catch (\Throwable) {
-            return trim((string) $time);
-        }
+        return ScheduledTime::toHi($time) ?? '—';
     }
 
     /**

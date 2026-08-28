@@ -1,4 +1,3 @@
-import RcpClauseModal from '@/components/RcpClauseModal';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -18,7 +17,8 @@ import {
     User,
     Wallet,
 } from 'lucide-react';
-import { useState } from 'react';
+import { formatAppointmentDateTime } from '@/lib/datetime';
+import { AgentProposalActions } from '@/components/missions/AgentProposalActions';
 
 interface Property {
     id: number;
@@ -59,17 +59,10 @@ interface Props {
     pendingMissions: Mission[];
     upcomingMissions: Mission[];
     recentMissions: Mission[];
-    rcpClauseAccepted?: boolean;
 }
 
 function formatDate(value: string) {
-    return new Date(value).toLocaleDateString('fr-FR', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
+    return formatAppointmentDateTime(value);
 }
 
 function propertyLabel(property: Property) {
@@ -81,9 +74,7 @@ export default function Dashboard({
     pendingMissions,
     upcomingMissions,
     recentMissions,
-    rcpClauseAccepted = false,
 }: Props) {
-    const [showRcpModal, setShowRcpModal] = useState(!rcpClauseAccepted);
     const { auth } = usePage<SharedData>().props;
     const firstName = auth.user?.first_name || auth.user?.name?.split(' ')[0] || '';
 
@@ -298,13 +289,16 @@ export default function Dashboard({
                                                 </span>
                                             )}
                                         </div>
-                                        <Link
-                                            href={route('agent.missions.show', mission.id)}
-                                            className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-600"
-                                        >
-                                            Voir et répondre
-                                            <ArrowRight className="h-4 w-4" />
-                                        </Link>
+                                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                                            <AgentProposalActions missionId={mission.id} variant="compact" />
+                                            <Link
+                                                href={route('agent.missions.show', mission.id)}
+                                                className="inline-flex items-center gap-2 text-sm font-medium text-amber-800 transition hover:underline dark:text-amber-300"
+                                            >
+                                                Voir le détail
+                                                <ArrowRight className="h-4 w-4" />
+                                            </Link>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -492,9 +486,6 @@ export default function Dashboard({
                     </div>
                 </div>
             </div>
-
-            {/* RCP Clause Modal */}
-            <RcpClauseModal show={showRcpModal} onAccepted={() => setShowRcpModal(false)} />
         </AppSidebarLayout>
     );
 }

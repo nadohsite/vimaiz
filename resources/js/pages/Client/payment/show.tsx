@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, CreditCard, Shield, Clock, Home, Calendar, CheckCircle, Loader2 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { formatAppointmentDate, formatRequestTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -157,15 +158,6 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
     const serviceRequest = quote.service_request;
     const property = serviceRequest.property;
 
-    const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString('fr-FR', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-        });
-    };
-
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
             <Head title="Paiement" />
@@ -262,10 +254,15 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
                                     </div>
                                     <div>
                                         <p className="font-medium text-slate-900 dark:text-white">
-                                            {formatDate(serviceRequest.scheduled_date)}
+                                            {formatAppointmentDate(serviceRequest.scheduled_date, {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric',
+                                            })}
                                         </p>
                                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                                            à {serviceRequest.scheduled_time}
+                                            à {formatRequestTime(serviceRequest.scheduled_time)}
                                         </p>
                                     </div>
                                 </div>

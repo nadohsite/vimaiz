@@ -3,6 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Home, User, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { formatAppointmentDateTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -88,13 +89,7 @@ export default function Index({ missions = [] }: Props) {
                                                             </span>
                                                             <span className="flex items-center gap-1">
                                                                 <Calendar className="h-4 w-4" />
-                                                                {new Date(mission.scheduled_at).toLocaleDateString('fr-FR', {
-                                                                    weekday: 'short',
-                                                                    day: 'numeric',
-                                                                    month: 'short',
-                                                                    hour: '2-digit',
-                                                                    minute: '2-digit'
-                                                                })}
+                                                                {formatAppointmentDateTime(mission.scheduled_at)}
                                                             </span>
                                                             {mission.agent && (
                                                                 <span className="flex items-center gap-1">

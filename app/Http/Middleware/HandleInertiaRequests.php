@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Message;
+use App\Models\User;
 use App\Support\NotificationPayload;
 use Closure;
 use Illuminate\Foundation\Inspiring;
@@ -96,6 +97,18 @@ class HandleInertiaRequests extends Middleware
             'recentNotifications' => $recentNotifications,
             'unreadNotificationsCount' => $user ? $user->unreadNotifications()->count() : 0,
             'unreadMessagesCount' => $unreadMessagesCount,
+            'rcpClauseAccepted' => $this->rcpClauseAccepted($user),
         ];
+    }
+
+    protected function rcpClauseAccepted(?User $user): bool
+    {
+        if (! $user || ! $user->isAgent()) {
+            return true;
+        }
+
+        $user->loadMissing('agentProfile');
+
+        return (bool) $user->agentProfile?->rcp_clause_accepted;
     }
 }

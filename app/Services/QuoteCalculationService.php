@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\NewQuoteNotification;
 use App\Notifications\QuoteAcceptedNotification;
 use App\Notifications\QuoteRefusedNotification;
+use App\Support\ScheduledTime;
 use Carbon\Carbon;
 
 class QuoteCalculationService
@@ -33,8 +34,9 @@ class QuoteCalculationService
             throw new \Exception('No active pricing rule found');
         }
 
-        $scheduledAt = Carbon::parse(
-            $request->scheduled_date->format('Y-m-d').' '.$request->scheduled_time
+        $scheduledAt = ScheduledTime::combine(
+            $request->scheduled_date,
+            $request->scheduled_time
         );
 
         return $this->pricingRule->calculatePrice(

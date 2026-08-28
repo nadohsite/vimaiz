@@ -92,11 +92,16 @@ class MissionController extends Controller
         ]);
 
         try {
-            $this->missionService->agentRefuseMission($mission, $validated['reason'] ?? null);
+            $wasAssigned = (bool) $mission->agent_id;
+            $this->missionService->agentRefuseMission($mission, $request->user(), $validated['reason'] ?? null);
+
+            $message = $wasAssigned
+                ? 'Intervention déclinée. Elle a été proposée à d\'autres intervenants.'
+                : 'Intervention déclinée. Elle reste disponible pour d\'autres intervenants.';
 
             return redirect()
                 ->route('agent.missions.index')
-                ->with('info', 'Intervention déclinée. Elle a été proposée à d\'autres intervenants.');
+                ->with('info', $message);
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

@@ -16,6 +16,7 @@ import {
     Sparkles
 } from 'lucide-react';
 import { useState } from 'react';
+import { formatAppointmentDate, formatRequestTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -68,15 +69,6 @@ export default function QuoteShow({ quote }: Props) {
     const serviceRequest = quote.service_request;
     const property = serviceRequest.property;
     const price = quote.final_price ?? quote.estimated_price;
-
-    const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString('fr-FR', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-        });
-    };
 
     const formatDateTime = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString('fr-FR', {
@@ -196,7 +188,12 @@ export default function QuoteShow({ quote }: Props) {
                                         <div>
                                             <p className="text-sm text-slate-500 dark:text-slate-400">Date</p>
                                             <p className="font-medium text-slate-900 dark:text-white">
-                                                {formatDate(serviceRequest.scheduled_date)}
+                                                {formatAppointmentDate(serviceRequest.scheduled_date, {
+                                                    weekday: 'long',
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric',
+                                                })}
                                             </p>
                                         </div>
                                     </div>
@@ -207,7 +204,7 @@ export default function QuoteShow({ quote }: Props) {
                                         <div>
                                             <p className="text-sm text-slate-500 dark:text-slate-400">Horaire</p>
                                             <p className="font-medium text-slate-900 dark:text-white">
-                                                {serviceRequest.scheduled_time}
+                                                {formatRequestTime(serviceRequest.scheduled_time)}
                                             </p>
                                         </div>
                                     </div>

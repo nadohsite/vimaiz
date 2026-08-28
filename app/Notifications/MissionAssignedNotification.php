@@ -13,9 +13,7 @@ class MissionAssignedNotification extends Notification
 
     public function __construct(
         public Mission $mission
-    ) {
-        $this->afterCommit();
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -43,7 +41,7 @@ class MissionAssignedNotification extends Notification
             'type' => 'mission_assigned',
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
-            'scheduled_at' => $this->mission->scheduled_at->toISOString(),
+            'scheduled_at' => $this->mission->scheduled_at?->toISOString(),
             'payout' => $this->mission->agent_payout,
             'message' => 'Une intervention vous est proposée. Acceptez-la pour la réserver.',
             'url' => '/agent/missions/'.$this->mission->id,

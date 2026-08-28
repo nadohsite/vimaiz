@@ -24,14 +24,16 @@ use App\Notifications\MissionStartedNotification;
 use App\Notifications\PaymentReceivedNotification;
 use App\Support\DefaultPropertyChecklist;
 use App\Support\InterventionReportCatalog;
-use Carbon\Carbon;
+use App\Support\ScheduledTime;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Refund;
 use Stripe\Stripe;
+use Throwable;
 
 class MissionService
 {
@@ -49,15 +51,9 @@ class MissionService
         $request = $quote->serviceRequest;
         $property = $request->property;
 
-        // Extract time from scheduled_time (might be datetime or just time)
-        $timeString = $request->scheduled_time;
-        if (strpos($timeString, ' ') !== false) {
-            // If it contains a space, it's likely a full datetime, extract time only
-            $timeString = Carbon::parse($timeString)->format('H:i:s');
-        }
-
-        $scheduledAt = Carbon::parse(
-            $request->scheduled_date->format('Y-m-d').' '.$timeString
+        $scheduledAt = ScheduledTime::combine(
+            $request->scheduled_date,
+            $request->scheduled_time
         );
 
         $effectivePrice = $quote->final_price ?? $quote->estimated_price;
@@ -87,7 +83,7 @@ class MissionService
 
     public function fulfillPaidQuote(Quote $quote, string $paymentIntentId): Mission
     {
-        return DB::transaction(function () use ($quote, $paymentIntentId) {
+        [$mission, $notifiedAgents] = DB::transaction(function () use ($quote, $paymentIntentId) {
             $quote = Quote::query()->whereKey($quote->id)->lockForUpdate()->firstOrFail();
 
             $mission = Mission::query()
@@ -108,12 +104,19 @@ class MissionService
 
             return $this->markAsPaid($mission, $paymentIntentId);
         });
+
+        $this->notifyAfterPayment($mission, $notifiedAgents);
+
+        return $mission;
     }
 
-    public function markAsPaid(Mission $mission, string $paymentIntentId): Mission
+    /**
+     * @return array{0: Mission, 1: Collection<int, User>}
+     */
+    public function markAsPaid(Mission $mission, string $paymentIntentId): array
     {
         if ($mission->isPaid()) {
-            return $mission->fresh();
+            return [$mission->fresh(), collect()];
         }
 
         $hadAgent = (bool) $mission->agent_id;
@@ -134,8 +137,6 @@ class MissionService
             'status' => ServiceRequest::STATUS_PAID,
         ]);
 
-        $notifiedAgents = collect();
-
         if ($hadAgent && $mission->agent) {
             $notifiedAgents = collect([$mission->agent]);
         } else {
@@ -154,18 +155,7 @@ class MissionService
             Invoice::createFromMission($mission->fresh());
         }
 
-        $mission->client->notify(new PaymentReceivedNotification($mission->fresh()));
-
-        $freshMission = $mission->fresh(['property']);
-        foreach ($notifiedAgents as $agent) {
-            $agent->notify(new MissionAssignedNotification($freshMission));
-        }
-
-        if ($notifiedAgents->isEmpty() && ! $mission->agent_id) {
-            User::notifyAdmins(new MissionNeedsAgentNotification($freshMission));
-        }
-
-        return $mission->fresh();
+        return [$mission->fresh(), $notifiedAgents];
     }
 
     public function assignSpecificAgent(Mission $mission, User $agent): Mission
@@ -181,9 +171,68 @@ class MissionService
             'status' => ServiceRequest::STATUS_ASSIGNED,
         ]);
 
-        $agent->notify(new MissionAssignedNotification($mission->fresh()));
+        $this->notifyAgentsOfProposal(collect([$agent]), $mission->fresh(['property']));
 
         return $mission->fresh();
+    }
+
+    /**
+     * @param  Collection<int, User>  $notifiedAgents
+     */
+    protected function notifyAfterPayment(Mission $mission, Collection $notifiedAgents): void
+    {
+        $freshMission = $mission->fresh(['property', 'client']);
+
+        if ($freshMission->client) {
+            $this->safeNotify(
+                fn () => $freshMission->client->notify(new PaymentReceivedNotification($freshMission)),
+                'payment_received',
+                $freshMission,
+            );
+        }
+
+        $this->notifyAgentsOfProposal($notifiedAgents, $freshMission);
+
+        if ($notifiedAgents->isEmpty() && ! $freshMission->agent_id) {
+            $this->safeNotify(
+                fn () => User::notifyAdmins(new MissionNeedsAgentNotification($freshMission)),
+                'mission_needs_agent',
+                $freshMission,
+            );
+        }
+    }
+
+    /**
+     * @param  Collection<int, User>  $agents
+     */
+    protected function notifyAgentsOfProposal(Collection $agents, Mission $mission): void
+    {
+        $freshMission = $mission->relationLoaded('property')
+            ? $mission
+            : $mission->fresh(['property']);
+
+        foreach ($agents as $agent) {
+            $this->safeNotify(
+                fn () => $agent->notify(new MissionAssignedNotification($freshMission)),
+                'mission_assigned',
+                $freshMission,
+                $agent,
+            );
+        }
+    }
+
+    protected function safeNotify(callable $callback, string $type, Mission $mission, ?User $agent = null): void
+    {
+        try {
+            $callback();
+        } catch (Throwable $e) {
+            Log::error('Failed to emit notification', [
+                'type' => $type,
+                'mission_id' => $mission->id,
+                'agent_id' => $agent?->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function agentAcceptMission(Mission $mission, User $agent): Mission
@@ -233,8 +282,28 @@ class MissionService
         });
     }
 
-    public function agentRefuseMission(Mission $mission, ?string $reason = null): Mission
+    public function agentRefuseMission(Mission $mission, User $agent, ?string $reason = null): Mission
     {
+        $mission->declinedAgents()->syncWithoutDetaching([
+            $agent->id => ['reason' => $reason],
+        ]);
+
+        $wasAssignedToAgent = $mission->agent_id === $agent->id;
+
+        if (! $wasAssignedToAgent) {
+            $remaining = $this->assignmentService->findEligibleAgents($mission);
+
+            if ($remaining->isEmpty()) {
+                $this->safeNotify(
+                    fn () => User::notifyAdmins(new MissionNeedsAgentNotification($mission->fresh(['property']))),
+                    'mission_needs_agent',
+                    $mission,
+                );
+            }
+
+            return $mission->fresh();
+        }
+
         $client = $mission->client;
 
         $mission->update([
@@ -255,17 +324,19 @@ class MissionService
 
         $newAgents = $this->assignmentService->reassignMission($mission);
 
-        $freshMission = $mission->fresh();
+        $freshMission = $mission->fresh(['property']);
 
         if ($newAgents->isNotEmpty()) {
-            foreach ($newAgents as $newAgent) {
-                $newAgent->notify(new MissionAssignedNotification($freshMission));
-            }
+            $this->notifyAgentsOfProposal($newAgents, $freshMission);
         } else {
             $mission->serviceRequest->update([
                 'status' => ServiceRequest::STATUS_PAID,
             ]);
-            User::notifyAdmins(new MissionNeedsAgentNotification($freshMission));
+            $this->safeNotify(
+                fn () => User::notifyAdmins(new MissionNeedsAgentNotification($freshMission)),
+                'mission_needs_agent',
+                $freshMission,
+            );
         }
 
         return $mission->fresh();

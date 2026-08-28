@@ -72,7 +72,8 @@ class MissionResource extends Resource
                 Section::make('Planification')
                     ->schema([
                         Forms\Components\DateTimePicker::make('scheduled_at')
-                            ->label('Date et heure prévues'),
+                            ->label('Date et heure prévues')
+                            ->seconds(false),
                         Forms\Components\TextInput::make('duration_hours')
                             ->label('Durée estimée')
                             ->suffix('heures')

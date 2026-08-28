@@ -13,7 +13,7 @@ use App\Notifications\NewServiceRequestNotification;
 use App\Notifications\ServiceRequestReceivedNotification;
 use App\Services\QuoteCalculationService;
 use App\Support\DefaultPropertyChecklist;
-use Carbon\Carbon;
+use App\Support\ScheduledTime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -204,8 +204,9 @@ class ServiceRequestController extends Controller
             return response()->json(['error' => 'Non autorisé'], 403);
         }
 
-        $scheduledAt = Carbon::parse(
-            $validated['scheduled_date'].' '.$validated['scheduled_time']
+        $scheduledAt = ScheduledTime::combine(
+            $validated['scheduled_date'],
+            $validated['scheduled_time']
         );
 
         try {

@@ -2,6 +2,7 @@ import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import { AgentRcpGate } from '@/components/RcpClauseModal';
 import { useRealtime, requestNotificationPermission } from '@/hooks/use-realtime';
 import { type BreadcrumbItem } from '@/types';
 import { usePage } from '@inertiajs/react';
@@ -12,15 +13,13 @@ export default function AppSidebarLayout({
     breadcrumbs = [],
 }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
     const { auth } = usePage<{ auth: { user: { id: number } | null } }>().props;
-    
-    // Initialize real-time notifications
+
     useRealtime(auth?.user?.id ?? null);
-    
-    // Request browser notification permission on mount
+
     useEffect(() => {
         requestNotificationPermission();
     }, []);
-    
+
     return (
         <AppShell variant="sidebar">
             <AppSidebar />
@@ -28,6 +27,7 @@ export default function AppSidebarLayout({
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
                 {children}
             </AppContent>
+            <AgentRcpGate />
         </AppShell>
     );
 }

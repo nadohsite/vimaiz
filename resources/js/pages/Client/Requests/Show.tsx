@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Home, Calendar, Clock, MapPin, FileText, CreditCard, User, XCircle, CheckCircle, ClipboardList } from 'lucide-react';
+import { formatAppointmentDate, formatRequestTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -369,16 +370,16 @@ export default function Show({ serviceRequest, canCancel, canAcceptQuote, canPro
                                     <div className="flex justify-between">
                                         <span className="text-slate-500 dark:text-slate-400">Date</span>
                                         <span className="font-medium dark:text-white">
-                                            {new Date(serviceRequest.scheduled_date).toLocaleDateString('fr-FR', {
+                                            {formatAppointmentDate(serviceRequest.scheduled_date, {
                                                 weekday: 'long',
                                                 day: 'numeric',
-                                                month: 'long'
+                                                month: 'long',
                                             })}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-slate-500 dark:text-slate-400">Heure</span>
-                                        <span className="font-medium dark:text-white">{serviceRequest.scheduled_time}</span>
+                                        <span className="font-medium dark:text-white">{formatRequestTime(serviceRequest.scheduled_time)}</span>
                                     </div>
                                 </CardContent>
                             </Card>

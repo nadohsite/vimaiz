@@ -14,6 +14,7 @@ import {
     Sparkles,
     User,
 } from 'lucide-react';
+import { formatAppointmentDateTime } from '@/lib/datetime';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -73,16 +74,6 @@ const MISSION_STATUS: Record<string, { label: string; className: string }> = {
     },
 };
 
-function formatDate(value: string) {
-    return new Date(value).toLocaleDateString('fr-FR', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-}
-
 function MissionRow({ mission }: { mission: Mission }) {
     const status = MISSION_STATUS[mission.status] ?? {
         label: mission.status,
@@ -106,7 +97,15 @@ function MissionRow({ mission }: { mission: Mission }) {
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
                     <span className="inline-flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
-                        {formatDate(mission.completed_at ?? mission.scheduled_at)}
+                        {mission.completed_at
+                            ? new Date(mission.completed_at).toLocaleDateString('fr-FR', {
+                                  weekday: 'short',
+                                  day: 'numeric',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                              })
+                            : formatAppointmentDateTime(mission.scheduled_at)}
                     </span>
                     <span className="inline-flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5" />

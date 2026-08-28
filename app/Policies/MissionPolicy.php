@@ -54,11 +54,12 @@ class MissionPolicy
 
     public function refuse(User $user, Mission $mission): bool
     {
+        if ($this->accept($user, $mission)) {
+            return true;
+        }
+
         return $user->id === $mission->agent_id
-            && in_array($mission->status, [
-                Mission::STATUS_PENDING_AGENT,
-                Mission::STATUS_AGENT_ACCEPTED,
-            ], true);
+            && $mission->status === Mission::STATUS_AGENT_ACCEPTED;
     }
 
     public function create(User $user): bool
@@ -83,7 +84,7 @@ class MissionPolicy
 
     public function uploadPhotos(User $user, Mission $mission): bool
     {
-        return $user->id === $mission->agent_id 
+        return $user->id === $mission->agent_id
             && in_array($mission->status, [
                 Mission::STATUS_AGENT_ACCEPTED,
                 Mission::STATUS_IN_PROGRESS,

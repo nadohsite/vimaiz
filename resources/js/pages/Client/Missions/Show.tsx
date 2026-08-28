@@ -8,6 +8,7 @@ import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Do
 import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useState } from 'react';
 import InterventionReportCard, { type ReportAnomaly, type ReportSummary } from '@/components/missions/InterventionReportCard';
+import { formatAppointmentDate, formatAppointmentTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -48,6 +49,7 @@ interface Mission {
     id: number;
     mission_number: string;
     scheduled_at: string;
+    scheduled_time_label?: string | null;
     started_at: string | null;
     completed_at: string | null;
     duration_hours: number;
@@ -629,20 +631,17 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                     <div className="flex justify-between">
                                         <span className="text-slate-500 dark:text-slate-400">Date</span>
                                         <span className="font-medium dark:text-white">
-                                            {new Date(mission.scheduled_at).toLocaleDateString('fr-FR', {
+                                            {formatAppointmentDate(mission.scheduled_at, {
                                                 weekday: 'long',
                                                 day: 'numeric',
-                                                month: 'long'
+                                                month: 'long',
                                             })}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-slate-500 dark:text-slate-400">Heure</span>
                                         <span className="font-medium dark:text-white">
-                                            {new Date(mission.scheduled_at).toLocaleTimeString('fr-FR', {
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })}
+                                            {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">

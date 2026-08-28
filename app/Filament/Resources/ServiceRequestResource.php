@@ -4,27 +4,27 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ServiceRequestResource\Pages;
 use App\Models\ServiceRequest;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
+use App\Support\ScheduledTime;
+use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 use UnitEnum;
-use BackedEnum;
 
 class ServiceRequestResource extends Resource
 {
     protected static ?string $model = ServiceRequest::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
-    
+
     protected static string|UnitEnum|null $navigationGroup = 'Demandes & Interventions';
 
     protected static ?string $navigationLabel = "Demandes d'intervention";
@@ -68,6 +68,7 @@ class ServiceRequestResource extends Resource
                             ->required(),
                         Forms\Components\TimePicker::make('scheduled_time')
                             ->label('Heure prévue')
+                            ->seconds(false)
                             ->required(),
                         Forms\Components\TextInput::make('requested_hours')
                             ->label('Heures demandées')
@@ -86,17 +87,17 @@ class ServiceRequestResource extends Resource
                         Forms\Components\Placeholder::make('checklist_axes')
                             ->label('Axes d\'intervention')
                             ->content(function (?ServiceRequest $record): string {
-                                if (!$record || empty($record->checklist)) {
+                                if (! $record || empty($record->checklist)) {
                                     return 'Aucun axe sélectionné';
                                 }
 
                                 $lines = [];
                                 foreach ($record->checklist as $section) {
-                                    $title = trim(($section['emoji'] ?? '') . ' ' . ($section['title'] ?? 'Section'));
+                                    $title = trim(($section['emoji'] ?? '').' '.($section['title'] ?? 'Section'));
                                     $itemCount = count($section['items'] ?? []);
-                                    $lines[] = "{$title} ({$itemCount} tâche" . ($itemCount > 1 ? 's' : '') . ')';
+                                    $lines[] = "{$title} ({$itemCount} tâche".($itemCount > 1 ? 's' : '').')';
                                     foreach ($section['items'] ?? [] as $item) {
-                                        $lines[] = '  • ' . ($item['label'] ?? '');
+                                        $lines[] = '  • '.($item['label'] ?? '');
                                     }
                                 }
 
@@ -162,7 +163,7 @@ class ServiceRequestResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('scheduled_time')
                     ->label('Heure')
-                    ->time('H:i'),
+                    ->formatStateUsing(fn ($state) => ScheduledTime::toHi($state) ?? '—'),
                 Tables\Columns\TextColumn::make('requested_hours')
                     ->label('Heures')
                     ->suffix('h'),
@@ -227,7 +228,7 @@ class ServiceRequestResource extends Resource
                     ->label('Créer devis')
                     ->icon('heroicon-o-document-text')
                     ->color('success')
-                    ->visible(fn ($record) => $record->status === 'pending' && !$record->quote)
+                    ->visible(fn ($record) => $record->status === 'pending' && ! $record->quote)
                     ->url(fn ($record) => QuoteResource::getUrl('create', ['service_request_id' => $record->id])),
                 ViewAction::make(),
                 EditAction::make(),

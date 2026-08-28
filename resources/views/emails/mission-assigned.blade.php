@@ -16,9 +16,13 @@
     </div>
 
     <div class="info-box">
-        <p><strong>Bien :</strong> {{ $mission->property->name ?? $mission->property->type }}</p>
-        <p><strong>Surface :</strong> {{ $mission->property->surface_area }} m²</p>
-        <p><strong>Adresse :</strong> {{ $mission->property->address_line1 }}, {{ $mission->property->postal_code }} {{ $mission->property->city }}</p>
+        <p><strong>Bien :</strong> {{ $mission->property?->name ?? $mission->property?->type ?? '—' }}</p>
+        @if($mission->property?->surface_area)
+            <p><strong>Surface :</strong> {{ $mission->property->surface_area }} m²</p>
+        @endif
+        @if($mission->property)
+            <p><strong>Adresse :</strong> {{ $mission->property->address_line1 }}, {{ $mission->property->postal_code }} {{ $mission->property->city }}</p>
+        @endif
         <p><strong>Durée estimée :</strong> {{ $mission->duration_hours }} heure(s)</p>
     </div>
 
