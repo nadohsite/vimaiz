@@ -82,7 +82,9 @@ export default function Profile({
     };
 
     const avatarUrl = avatarPreview || getAvatarUrl((auth.user as any).avatar, auth.user.name);
-    const hasCoordinates = data.latitude !== null && data.longitude !== null;
+    const latitude = data.latitude == null || data.latitude === '' ? NaN : Number(data.latitude);
+    const longitude = data.longitude == null || data.longitude === '' ? NaN : Number(data.longitude);
+    const hasCoordinates = Number.isFinite(latitude) && Number.isFinite(longitude);
 
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
@@ -247,8 +249,8 @@ export default function Profile({
                                 {hasCoordinates ? (
                                     <p className="flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400">
                                         <MapPin className="h-4 w-4" />
-                                        Position enregistrée ({Number(data.latitude).toFixed(4)},{' '}
-                                        {Number(data.longitude).toFixed(4)})
+                                        Position enregistrée ({latitude.toFixed(4)},{' '}
+                                        {longitude.toFixed(4)})
                                     </p>
                                 ) : (
                                     <p className="text-sm text-amber-700 dark:text-amber-400">

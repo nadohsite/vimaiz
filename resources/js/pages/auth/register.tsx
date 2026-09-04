@@ -2,6 +2,7 @@ import GoogleLoginButton from '@/components/GoogleLoginButton';
 import { login } from '@/routes';
 import { useForm, Head } from '@inertiajs/react';
 
+import AddressAutocomplete from '@/components/address/AddressAutocomplete';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { PasswordInput } from '@/components/ui/password-input';
 import AuthLayout from '@/layouts/auth-layout';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronRight, User, Briefcase } from 'lucide-react';
+import { ChevronRight, User, Briefcase, MapPin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import {
@@ -23,7 +24,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 
-export default function Register() {
+export default function Register({ extendedRadiusKm = 150 }: { extendedRadiusKm?: number }) {
   // Check URL params for pre-selected role (e.g., from Professionals page)
   const urlParams = new URLSearchParams(window.location.search);
   const initialRole = urlParams.get('role') === 'agent' ? 'agent' : 'client';
@@ -42,12 +43,39 @@ export default function Register() {
     experience_years: '',
     max_surface_area: 'medium',
     supported_property_types: [] as string[],
+    street_address: '',
+    city: '',
+    postal_code: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
     terms_accepted: false,
   });
 
   useEffect(() => {
     setData('role', role);
   }, [role]);
+
+  useEffect(() => {
+    if (
+      role === 'agent' &&
+      (errors.agent_type ||
+        errors.phone ||
+        errors.experience_years ||
+        errors.max_surface_area ||
+        errors.supported_property_types ||
+        errors.street_address ||
+        errors.city ||
+        errors.postal_code ||
+        errors.latitude ||
+        errors.longitude)
+    ) {
+      setStep(2);
+    }
+  }, [errors, role]);
+
+  const latitude = data.latitude == null ? NaN : Number(data.latitude);
+  const longitude = data.longitude == null ? NaN : Number(data.longitude);
+  const hasCoordinates = Number.isFinite(latitude) && Number.isFinite(longitude);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -346,6 +374,80 @@ export default function Register() {
                       ))}
                     </div>
                     <InputError message={errors.supported_property_types} />
+                  </div>
+
+                  <div className="space-y-4 border-t border-slate-200 pt-5 dark:border-slate-700">
+                    <div>
+                      <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Localisation de référence
+                      </Label>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Les interventions vous sont proposées dans un rayon d’environ {extendedRadiusKm} km.
+                      </p>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="street_address" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Adresse
+                      </Label>
+                      <AddressAutocomplete
+                        initialValue={data.street_address}
+                        placeholder="Rechercher votre adresse..."
+                        onAddressSelect={(selected) => {
+                          setData({
+                            ...data,
+                            street_address: selected.address_line1,
+                            city: selected.city || data.city,
+                            postal_code: selected.postal_code || data.postal_code,
+                            latitude: selected.latitude,
+                            longitude: selected.longitude,
+                          });
+                        }}
+                      />
+                      <InputError message={errors.street_address || errors.latitude || errors.longitude} />
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="grid gap-2">
+                        <Label htmlFor="city" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Ville
+                        </Label>
+                        <input
+                          id="city"
+                          type="text"
+                          value={data.city}
+                          onChange={(e) => setData('city', e.target.value)}
+                          placeholder="Ville"
+                          className={inputStyles}
+                        />
+                        <InputError message={errors.city} />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="postal_code" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Code postal
+                        </Label>
+                        <input
+                          id="postal_code"
+                          type="text"
+                          value={data.postal_code}
+                          onChange={(e) => setData('postal_code', e.target.value)}
+                          placeholder="73000"
+                          className={inputStyles}
+                        />
+                        <InputError message={errors.postal_code} />
+                      </div>
+                    </div>
+
+                    {hasCoordinates ? (
+                      <p className="flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400">
+                        <MapPin className="h-4 w-4" />
+                        Position enregistrée ({latitude.toFixed(4)}, {longitude.toFixed(4)})
+                      </p>
+                    ) : (
+                      <p className="text-sm text-amber-700 dark:text-amber-400">
+                        Choisissez une adresse dans la liste pour recevoir des interventions près de chez vous.
+                      </p>
+                    )}
                   </div>
                 </div>
 

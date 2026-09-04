@@ -135,6 +135,11 @@ export default function AddressAutocomplete({
 
     const handleSelect = (result: AddressResult) => {
         const parsed = parseAddress(result);
+
+        if (!Number.isFinite(parsed.latitude) || !Number.isFinite(parsed.longitude)) {
+            return;
+        }
+
         setQuery(parsed.address_line1);
         setShowDropdown(false);
         setResults([]);

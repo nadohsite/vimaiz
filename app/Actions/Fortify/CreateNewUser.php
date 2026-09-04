@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Address;
 use App\Models\Property;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
@@ -38,6 +39,17 @@ class CreateNewUser implements CreatesNewUsers
             'max_surface_area' => ['required_if:role,agent', 'nullable', 'string', 'in:small,medium,large,extra'],
             'supported_property_types' => ['required_if:role,agent', 'nullable', 'array'],
             'supported_property_types.*' => [Rule::in(array_keys(Property::TYPES))],
+            'street_address' => ['required_if:role,agent', 'nullable', 'string', 'max:255'],
+            'city' => ['required_if:role,agent', 'nullable', 'string', 'max:100'],
+            'postal_code' => ['required_if:role,agent', 'nullable', 'string', 'max:20'],
+            'latitude' => ['required_if:role,agent', 'nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['required_if:role,agent', 'nullable', 'numeric', 'between:-180,180'],
+        ], [
+            'street_address.required_if' => 'Sélectionnez votre adresse de référence dans la liste.',
+            'city.required_if' => 'La ville est obligatoire.',
+            'postal_code.required_if' => 'Le code postal est obligatoire.',
+            'latitude.required_if' => 'Choisissez une adresse dans la liste pour enregistrer votre position.',
+            'longitude.required_if' => 'Choisissez une adresse dans la liste pour enregistrer votre position.',
         ])->validate();
 
         $user = User::create([
@@ -68,6 +80,18 @@ class CreateNewUser implements CreatesNewUsers
                 'max_surface_area' => $surfaceMap[$input['max_surface_area'] ?? 'medium'] ?? 100,
                 'verification_status' => 'pending',
                 'is_available' => true, // Make available by default after onboarding info is provided
+            ]);
+
+            Address::create([
+                'user_id' => $user->id,
+                'label' => 'Localisation de référence',
+                'street_address' => $input['street_address'],
+                'city' => $input['city'] ?: 'Non précisée',
+                'postal_code' => $input['postal_code'] ?? null,
+                'country' => 'France',
+                'latitude' => $input['latitude'],
+                'longitude' => $input['longitude'],
+                'is_default' => true,
             ]);
         }
 
