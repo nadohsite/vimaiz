@@ -6,7 +6,7 @@ import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, CreditCard, Shield, Clock, Home, Calendar, CheckCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, Shield, Home, Calendar, CheckCircle, Loader2 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import { formatAppointmentDate, formatRequestTime } from '@/lib/datetime';
 
@@ -263,21 +263,6 @@ export default function PaymentShow({ quote, clientSecret, stripeKey }: Props) {
                                         </p>
                                         <p className="text-sm text-slate-500 dark:text-slate-400">
                                             à {formatRequestTime(serviceRequest.scheduled_time)}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Duration */}
-                                <div className="flex items-start gap-3">
-                                    <div className="rounded-lg bg-amber-100 dark:bg-amber-900/30 p-2">
-                                        <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-slate-900 dark:text-white">
-                                            {serviceRequest.requested_hours} heure{serviceRequest.requested_hours > 1 ? 's' : ''}
-                                        </p>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                                            d'intervention
                                         </p>
                                     </div>
                                 </div>

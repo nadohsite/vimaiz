@@ -36,7 +36,7 @@ class PropertyController extends Controller
     {
         $validated = $request->validate([
             'payment_method' => 'nullable',
-            'type' => 'required|in:maison,villa,chalet',
+            'type' => 'required|in:appartement,maison,villa,chalet,gite',
             'name' => 'nullable|string|max:255',
             'address_line1' => 'required|string|max:255',
             'address_line2' => 'nullable|string|max:255',
@@ -104,7 +104,7 @@ class PropertyController extends Controller
         }
 
         $validated = $request->validate([
-            'type' => 'required|in:maison,villa,chalet',
+            'type' => 'required|in:appartement,maison,villa,chalet,gite',
             'name' => 'nullable|string|max:255',
             'address_line1' => 'required|string|max:255',
             'address_line2' => 'nullable|string|max:255',

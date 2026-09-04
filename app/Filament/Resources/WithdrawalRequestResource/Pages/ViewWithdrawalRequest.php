@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\WithdrawalRequestResource\Pages;
 
 use App\Filament\Resources\WithdrawalRequestResource;
+use App\Models\AgentProfile;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -13,6 +14,9 @@ class ViewWithdrawalRequest extends ViewRecord
 
     protected function getHeaderActions(): array
     {
+        $isMobileMoney = ($this->record->metadata['payment_method'] ?? AgentProfile::PAYOUT_BANK_TRANSFER)
+            === AgentProfile::PAYOUT_MOBILE_MONEY;
+
         return [
             Action::make('approve')
                 ->label('Valider le retrait')
@@ -20,7 +24,9 @@ class ViewWithdrawalRequest extends ViewRecord
                 ->color('success')
                 ->requiresConfirmation()
                 ->modalHeading('Valider le retrait')
-                ->modalDescription('Confirmez-vous avoir effectué le virement bancaire à cet intervenant ?')
+                ->modalDescription($isMobileMoney
+                    ? 'Confirmez-vous avoir effectué le transfert Mobile Money à cet intervenant ?'
+                    : 'Confirmez-vous avoir effectué le virement bancaire à cet intervenant ?')
                 ->modalSubmitActionLabel('Oui, valider')
                 ->visible(fn () => $this->record->status === 'pending')
                 ->action(function () {

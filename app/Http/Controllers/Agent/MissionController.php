@@ -7,12 +7,14 @@ use App\Models\Mission;
 use App\Models\MissionPhoto;
 use App\Services\MissionService;
 use App\Support\InterventionReportCatalog;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class MissionController extends Controller
 {
@@ -51,6 +53,7 @@ class MissionController extends Controller
             'client',
             'quote',
             'serviceRequest',
+            'invoice',
             'anomalies',
             'photos' => fn ($q) => $q->orderBy('type')->orderByDesc('created_at'),
         ]);
@@ -63,10 +66,32 @@ class MissionController extends Controller
             'canRefuse' => $request->user()->can('refuse', $mission),
             'canStart' => $request->user()->can('start', $mission),
             'canComplete' => $mission->canComplete(),
+            'canDownloadInvoice' => $mission->status === Mission::STATUS_COMPLETED && $mission->invoice !== null,
             'checklistProgress' => $mission->checklistProgress(),
             'reportCatalog' => InterventionReportCatalog::categories(),
             'reportSummary' => $mission->reportSummary(),
         ]);
+    }
+
+    public function downloadInvoice(Mission $mission): HttpResponse
+    {
+        $this->authorize('view', $mission);
+
+        $mission->load('invoice');
+
+        if ($mission->status !== Mission::STATUS_COMPLETED || ! $mission->invoice) {
+            abort(404);
+        }
+
+        $this->authorize('view', $mission->invoice);
+
+        $invoice = $mission->invoice->load(['mission.property', 'user']);
+
+        $pdf = Pdf::loadView('pdf.invoice', [
+            'invoice' => $invoice,
+        ]);
+
+        return $pdf->download('facture-'.$invoice->invoice_number.'.pdf');
     }
 
     public function accept(Request $request, Mission $mission): RedirectResponse

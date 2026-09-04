@@ -234,11 +234,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/missions/{mission}/photos', [AgentMissionController::class, 'uploadPhoto'])->name('missions.upload-photo');
         Route::delete('/missions/{mission}/photos/{photo}', [AgentMissionController::class, 'deletePhoto'])->name('missions.delete-photo');
         Route::post('/missions/{mission}/complete', [AgentMissionController::class, 'complete'])->name('missions.complete');
+        Route::get('/missions/{mission}/invoice', [AgentMissionController::class, 'downloadInvoice'])->name('missions.invoice');
         Route::patch('/missions/{mission}/checklist', [AgentMissionController::class, 'updateChecklist'])->name('missions.checklist');
 
         // VIMAIZ - Wallet Agent
         Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
         Route::put('/wallet/bank-details', [WalletController::class, 'updateBankDetails'])->name('wallet.bank-details');
+        Route::put('/wallet/mobile-money-details', [WalletController::class, 'updateMobileMoneyDetails'])->name('wallet.mobile-money-details');
         Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 
         // VIMAIZ - Documents Agent

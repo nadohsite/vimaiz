@@ -17,6 +17,9 @@ class AgentProfile extends Model
         'bank_account_holder',
         'iban',
         'bic',
+        'mobile_money_provider',
+        'mobile_money_phone',
+        'mobile_money_account_name',
         'tva_number',
         'website',
         'description',
@@ -63,6 +66,9 @@ class AgentProfile extends Model
         'iban',
         'bic',
         'bank_account_holder',
+        'mobile_money_provider',
+        'mobile_money_phone',
+        'mobile_money_account_name',
     ];
 
     protected $casts = [
@@ -86,6 +92,18 @@ class AgentProfile extends Model
 
     const COMPANY_TYPE_AUTO_ENTREPRENEUR = 'auto_entrepreneur';
     const COMPANY_TYPE_SOCIETE = 'societe';
+
+    public const PAYOUT_BANK_TRANSFER = 'bank_transfer';
+
+    public const PAYOUT_MOBILE_MONEY = 'mobile_money';
+
+    public const MOBILE_MONEY_PROVIDERS = [
+        'lydia' => 'Lydia',
+        'paylib' => 'Paylib',
+        'paypal' => 'PayPal',
+        'revolut' => 'Revolut',
+        'other' => 'Autre',
+    ];
 
     // Relationships
     public function user()
@@ -171,6 +189,27 @@ class AgentProfile extends Model
         return filled($this->iban) && filled($this->bank_account_holder);
     }
 
+    public function hasMobileMoneyDetails(): bool
+    {
+        return filled($this->mobile_money_provider)
+            && filled($this->mobile_money_phone)
+            && filled($this->mobile_money_account_name);
+    }
+
+    public function hasPayoutMethod(): bool
+    {
+        return $this->hasBankDetails() || $this->hasMobileMoneyDetails();
+    }
+
+    public function getMobileMoneyProviderLabelAttribute(): ?string
+    {
+        if (! $this->mobile_money_provider) {
+            return null;
+        }
+
+        return self::MOBILE_MONEY_PROVIDERS[$this->mobile_money_provider] ?? $this->mobile_money_provider;
+    }
+
     public static function normalizeIban(?string $iban): ?string
     {
         if ($iban === null || trim($iban) === '') {
@@ -191,6 +230,30 @@ class AgentProfile extends Model
         return trim(chunk_split($normalized, 4, ' '));
     }
 
+    public static function normalizeMobileMoneyPhone(?string $phone): ?string
+    {
+        if ($phone === null || trim($phone) === '') {
+            return null;
+        }
+
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        if ($digits === null || $digits === '') {
+            return null;
+        }
+
+        // Convert French local format 06/07… to +336/+337…
+        if (preg_match('/^0([67]\d{8})$/', $digits, $matches)) {
+            return '+33'.$matches[1];
+        }
+
+        if (preg_match('/^33([67]\d{8})$/', $digits, $matches)) {
+            return '+33'.$matches[1];
+        }
+
+        return str_starts_with($phone, '+') ? '+'.$digits : $digits;
+    }
+
     public function bankDetailsForWallet(): array
     {
         return [
@@ -199,6 +262,40 @@ class AgentProfile extends Model
             'bank_account_holder' => $this->bank_account_holder,
             'is_complete' => $this->hasBankDetails(),
         ];
+    }
+
+    public function mobileMoneyDetailsForWallet(): array
+    {
+        return [
+            'provider' => $this->mobile_money_provider,
+            'provider_label' => $this->mobile_money_provider_label,
+            'phone' => $this->mobile_money_phone,
+            'account_name' => $this->mobile_money_account_name,
+            'is_complete' => $this->hasMobileMoneyDetails(),
+        ];
+    }
+
+    public function payoutMethodsForWallet(): array
+    {
+        $methods = [];
+
+        if ($this->hasBankDetails()) {
+            $methods[] = [
+                'id' => self::PAYOUT_BANK_TRANSFER,
+                'label' => 'Virement bancaire',
+                'summary' => trim(($this->bank_account_holder ?? '').' — '.self::formatIban($this->iban)),
+            ];
+        }
+
+        if ($this->hasMobileMoneyDetails()) {
+            $methods[] = [
+                'id' => self::PAYOUT_MOBILE_MONEY,
+                'label' => 'Mobile Money',
+                'summary' => trim(($this->mobile_money_provider_label ?? '').' — '.$this->mobile_money_phone),
+            ];
+        }
+
+        return $methods;
     }
 
     public function updateRating()

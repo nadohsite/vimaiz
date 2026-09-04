@@ -35,7 +35,7 @@ class Wallet extends Model
         return $this->hasMany(WalletTransaction::class);
     }
 
-    public function credit(float $amount, string $description = null, Booking|Mission|null $related = null): WalletTransaction
+    public function credit(float $amount, ?string $description = null, Booking|Mission|null $related = null): WalletTransaction
     {
         $this->balance += $amount;
         $this->total_earned += $amount;
@@ -57,7 +57,7 @@ class Wallet extends Model
         return $this->transactions()->create($data);
     }
 
-    public function debit(float $amount, string $description = null): WalletTransaction
+    public function debit(float $amount, ?string $description = null): WalletTransaction
     {
         if ($this->balance < $amount) {
             throw new \Exception('Insufficient balance');
@@ -75,17 +75,45 @@ class Wallet extends Model
         ]);
     }
 
-    public function withdraw(float $amount, AgentProfile $profile): WalletTransaction
-    {
+    public function withdraw(
+        float $amount,
+        AgentProfile $profile,
+        string $paymentMethod = AgentProfile::PAYOUT_BANK_TRANSFER
+    ): WalletTransaction {
         if ($this->balance < $amount) {
             throw new \Exception('Solde insuffisant');
         }
 
-        if (! $profile->hasBankDetails()) {
-            throw new \Exception('Coordonnées bancaires manquantes');
-        }
+        if ($paymentMethod === AgentProfile::PAYOUT_MOBILE_MONEY) {
+            if (! $profile->hasMobileMoneyDetails()) {
+                throw new \Exception('Coordonnées Mobile Money manquantes');
+            }
 
-        $iban = AgentProfile::normalizeIban($profile->iban);
+            $reference = $profile->mobile_money_phone;
+            $description = 'Retrait Mobile Money ('.$profile->mobile_money_provider_label.') vers '.$profile->mobile_money_account_name;
+            $metadata = [
+                'payment_method' => AgentProfile::PAYOUT_MOBILE_MONEY,
+                'provider' => $profile->mobile_money_provider,
+                'provider_label' => $profile->mobile_money_provider_label,
+                'phone' => $profile->mobile_money_phone,
+                'account_name' => $profile->mobile_money_account_name,
+            ];
+        } else {
+            if (! $profile->hasBankDetails()) {
+                throw new \Exception('Coordonnées bancaires manquantes');
+            }
+
+            $iban = AgentProfile::normalizeIban($profile->iban);
+            $reference = $iban;
+            $description = 'Retrait vers '.$profile->bank_account_holder;
+            $metadata = [
+                'payment_method' => AgentProfile::PAYOUT_BANK_TRANSFER,
+                'bank_account' => $iban,
+                'iban' => $iban,
+                'bic' => $profile->bic,
+                'bank_account_holder' => $profile->bank_account_holder,
+            ];
+        }
 
         $this->balance -= $amount;
         $this->total_withdrawn += $amount;
@@ -95,15 +123,10 @@ class Wallet extends Model
             'type' => 'withdrawal',
             'amount' => $amount,
             'balance_after' => $this->balance,
-            'reference' => $iban,
-            'description' => 'Retrait vers '.$profile->bank_account_holder,
+            'reference' => $reference,
+            'description' => $description,
             'status' => 'pending',
-            'metadata' => [
-                'bank_account' => $iban,
-                'iban' => $iban,
-                'bic' => $profile->bic,
-                'bank_account_holder' => $profile->bank_account_holder,
-            ],
+            'metadata' => $metadata,
         ]);
     }
 }

@@ -24,7 +24,9 @@ class WithdrawalRequestNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $bankAccount = $this->transaction->metadata['bank_account'] ?? 'Non renseigné';
+        $bankAccount = $this->transaction->metadata['phone']
+            ?? $this->transaction->metadata['bank_account']
+            ?? 'Non renseigné';
 
         return (new MailMessage)
             ->subject('Nouvelle demande de retrait - '.number_format($this->transaction->amount, 2, ',', ' ').' €')

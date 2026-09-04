@@ -23,7 +23,6 @@
         @if($mission->property)
             <p><strong>Adresse :</strong> {{ $mission->property->address_line1 }}, {{ $mission->property->postal_code }} {{ $mission->property->city }}</p>
         @endif
-        <p><strong>Durée estimée :</strong> {{ $mission->duration_hours }} heure(s)</p>
     </div>
 
     <div class="warning-box">

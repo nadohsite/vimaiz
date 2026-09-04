@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Property;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -36,6 +37,7 @@ class CreateNewUser implements CreatesNewUsers
             'experience_years' => ['required_if:role,agent', 'nullable', 'integer', 'min:0'],
             'max_surface_area' => ['required_if:role,agent', 'nullable', 'string', 'in:small,medium,large,extra'],
             'supported_property_types' => ['required_if:role,agent', 'nullable', 'array'],
+            'supported_property_types.*' => [Rule::in(array_keys(Property::TYPES))],
         ])->validate();
 
         $user = User::create([

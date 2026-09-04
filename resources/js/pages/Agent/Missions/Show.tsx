@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, Home, MapPin, User, CheckCircle, XCircle, Play, Star, Award, AlertCircle, Maximize, BedDouble, Bath, Layers, DoorOpen, Wifi, Trash2, Clock } from 'lucide-react';
+import { ArrowLeft, Calendar, Home, MapPin, User, CheckCircle, XCircle, Play, Star, Award, AlertCircle, Maximize, BedDouble, Bath, Layers, DoorOpen, Wifi, Trash2, Clock, Download } from 'lucide-react';
 import PropertyMap from '@/components/map/PropertyMap';
 import { useEffect, useState } from 'react';
 import InterventionReportWizard, {
@@ -81,6 +81,10 @@ interface Mission {
     } | null;
     anomalies?: ReportAnomaly[];
     report_nothing_to_report?: boolean | null;
+    invoice?: {
+        id: number;
+        invoice_number: string;
+    } | null;
 }
 
 interface Props {
@@ -89,6 +93,7 @@ interface Props {
     canRefuse: boolean;
     canStart: boolean;
     canComplete: boolean;
+    canDownloadInvoice?: boolean;
     checklistProgress: {
         total: number;
         checked: number;
@@ -108,6 +113,7 @@ export default function Show({
     canRefuse = false,
     canStart,
     canComplete,
+    canDownloadInvoice = false,
     checklistProgress = { total: 0, checked: 0, complete: true },
     reportCatalog = [],
     reportSummary,
@@ -270,6 +276,14 @@ export default function Show({
                                 </div>
                                 <p className="text-lg font-bold text-green-600 mt-1">{mission.agent_payout} €</p>
                             </div>
+                            {canDownloadInvoice && mission.invoice && (
+                                <a href={route('agent.missions.invoice', mission.id)}>
+                                    <Button className="bg-sky-600 hover:bg-sky-700">
+                                        <Download className="h-4 w-4 mr-2" />
+                                        Télécharger la facture
+                                    </Button>
+                                </a>
+                            )}
                         </div>
                     </div>
 
@@ -672,29 +686,23 @@ export default function Show({
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500">Heure</span>
+                                        <span className="text-slate-500">Heure souhaitée</span>
                                         <span className="font-medium">
                                             {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">Durée estimée</span>
-                                        <span className="font-medium">
-                                            {mission.estimated_duration_label || `${mission.duration_hours}h`}
-                                        </span>
-                                    </div>
-                                    {durationLabel && (
-                                        <div className="flex justify-between">
-                                            <span className="text-slate-500">Temps passé</span>
-                                            <span className="font-medium">{durationLabel}</span>
-                                        </div>
-                                    )}
                                     {mission.started_at && (
                                         <div className="flex justify-between">
-                                            <span className="text-slate-500">Démarrée</span>
+                                            <span className="text-slate-500">Heure de début</span>
                                             <span className="font-medium">
                                                 {new Date(mission.started_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                                             </span>
+                                        </div>
+                                    )}
+                                    {mission.completed_at && durationLabel && (
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Durée de l&apos;intervention</span>
+                                            <span className="font-medium">{durationLabel}</span>
                                         </div>
                                     )}
                                 </CardContent>

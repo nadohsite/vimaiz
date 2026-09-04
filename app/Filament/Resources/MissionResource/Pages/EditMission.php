@@ -28,6 +28,18 @@ class EditMission extends EditRecord
             return;
         }
 
+        if (
+            $mission->wasChanged(['internal_quality_score', 'internal_quality_notes'])
+            && $mission->internal_quality_score
+        ) {
+            app(MissionService::class)->setQualityScore(
+                $mission,
+                (int) $mission->internal_quality_score,
+                (string) ($mission->internal_quality_notes ?? ''),
+                auth()->id()
+            );
+        }
+
         if (! $mission->wasChanged('agent_id') || ! $mission->agent_id) {
             return;
         }

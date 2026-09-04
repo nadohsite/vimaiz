@@ -174,10 +174,10 @@ class MissionResource extends Resource
                     ->columns(2)
                     ->collapsed(fn (?Mission $record) => ! $record?->hasReport()),
 
-                Section::make('Contrôle qualité (Admin)')
+                Section::make('Notation intervenant (Admin)')
                     ->schema([
                         Forms\Components\Select::make('internal_quality_score')
-                            ->label('Note qualité interne')
+                            ->label('Note de l\'intervenant')
                             ->options([
                                 1 => '1 - Très mauvais',
                                 2 => '2 - Mauvais',
@@ -186,8 +186,9 @@ class MissionResource extends Resource
                                 5 => '5 - Excellent',
                             ]),
                         Forms\Components\Textarea::make('internal_quality_notes')
-                            ->label('Notes qualité (internes)')
-                            ->rows(3),
+                            ->label('Commentaire')
+                            ->rows(3)
+                            ->placeholder('Commentaire visible par l\'intervenant'),
                     ])->columns(2),
 
                 Section::make('Annulation')
@@ -349,13 +350,17 @@ class MissionResource extends Resource
                     ->color('info')
                     ->url(fn ($record) => MissionResource::getUrl('photos', ['record' => $record])),
                 Action::make('quality_check')
-                    ->label('Contrôle qualité')
+                    ->label(fn ($record) => $record->internal_quality_score ? 'Modifier la note' : 'Noter l\'intervenant')
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn ($record) => $record->status === 'completed' && ! $record->internal_quality_score)
+                    ->visible(fn ($record) => $record->status === Mission::STATUS_COMPLETED && $record->agent_id)
+                    ->fillForm(fn ($record) => [
+                        'internal_quality_score' => $record->internal_quality_score,
+                        'internal_quality_notes' => $record->internal_quality_notes,
+                    ])
                     ->form([
                         Forms\Components\Select::make('internal_quality_score')
-                            ->label('Note qualité')
+                            ->label('Note de l\'intervenant')
                             ->options([
                                 1 => '1 - Très mauvais',
                                 2 => '2 - Mauvais',
@@ -365,13 +370,20 @@ class MissionResource extends Resource
                             ])
                             ->required(),
                         Forms\Components\Textarea::make('internal_quality_notes')
-                            ->label('Notes (internes)')
-                            ->rows(3),
+                            ->label('Commentaire')
+                            ->rows(3)
+                            ->placeholder('Commentaire visible par l\'intervenant'),
                     ])
                     ->action(function ($record, array $data) {
-                        $record->update($data);
+                        app(MissionService::class)->setQualityScore(
+                            $record,
+                            (int) $data['internal_quality_score'],
+                            $data['internal_quality_notes'] ?? '',
+                            auth()->id()
+                        );
+
                         Notification::make()
-                            ->title('Contrôle qualité enregistré')
+                            ->title('Note de l\'intervenant enregistrée')
                             ->success()
                             ->send();
                     }),

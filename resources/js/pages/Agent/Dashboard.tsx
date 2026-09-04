@@ -8,7 +8,6 @@ import {
     Calendar,
     CheckCircle2,
     ChevronRight,
-    Clock,
     FileText,
     Hourglass,
     MapPin,
@@ -276,12 +275,6 @@ export default function Dashboard({
                                                 <Calendar className="h-4 w-4" />
                                                 {formatDate(mission.scheduled_at)}
                                             </span>
-                                            {mission.duration_hours && (
-                                                <span className="inline-flex items-center gap-1.5">
-                                                    <Clock className="h-4 w-4" />
-                                                    {mission.duration_hours}h
-                                                </span>
-                                            )}
                                             {mission.client && (
                                                 <span className="inline-flex items-center gap-1.5">
                                                     <User className="h-4 w-4" />

@@ -318,23 +318,29 @@ export default function Register() {
 
                   <div className="space-y-3">
                     <Label className="text-sm font-semibold text-slate-700">Types de biens supportés</Label>
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                      {['appartement', 'maison', 'villa', 'chalet'].map((type) => (
-                        <div key={type} className="flex items-center gap-2">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {[
+                        { value: 'appartement', label: 'Appartement' },
+                        { value: 'maison', label: 'Maison' },
+                        { value: 'villa', label: 'Villa' },
+                        { value: 'chalet', label: 'Chalet' },
+                        { value: 'gite', label: 'Gîte' },
+                      ].map(({ value, label }) => (
+                        <div key={value} className="flex items-center gap-2">
                           <Checkbox 
-                            id={`property-${type}`}
-                            checked={data.supported_property_types?.includes(type)}
+                            id={`property-${value}`}
+                            checked={data.supported_property_types?.includes(value)}
                             onCheckedChange={(checked) => {
                               const current = data.supported_property_types || [];
                               const next = checked 
-                                ? [...current, type]
-                                : current.filter((t: string) => t !== type);
+                                ? [...current, value]
+                                : current.filter((t: string) => t !== value);
                               setData('supported_property_types', next);
                             }}
                             className="border-slate-300 data-[state=checked]:bg-sky-500 data-[state=checked]:border-sky-500"
                           />
-                          <Label htmlFor={`property-${type}`} className="text-xs font-medium capitalize text-slate-600 cursor-pointer">
-                            {type}
+                          <Label htmlFor={`property-${value}`} className="text-xs font-medium text-slate-600 cursor-pointer">
+                            {label}
                           </Label>
                         </div>
                       ))}

@@ -215,12 +215,6 @@ export default function Show({ serviceRequest, canCancel, canAcceptQuote, canPro
                                                 <span className="text-slate-600 dark:text-slate-400">Surface</span>
                                                 <span className="font-medium dark:text-white">{serviceRequest.property.surface_area} m²</span>
                                             </div>
-                                            {serviceRequest.quote.estimated_hours && (
-                                                <div className="flex items-center justify-between text-sm">
-                                                    <span className="text-slate-600 dark:text-slate-400">Durée estimée</span>
-                                                    <span className="font-medium dark:text-white">{serviceRequest.quote.estimated_hours} heure(s)</span>
-                                                </div>
-                                            )}
                                         </div>
 
                                         {serviceRequest.quote.price_adjustment_reason && (
@@ -378,7 +372,7 @@ export default function Show({ serviceRequest, canCancel, canAcceptQuote, canPro
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500 dark:text-slate-400">Heure</span>
+                                        <span className="text-slate-500 dark:text-slate-400">Heure souhaitée</span>
                                         <span className="font-medium dark:text-white">{formatRequestTime(serviceRequest.scheduled_time)}</span>
                                     </div>
                                 </CardContent>

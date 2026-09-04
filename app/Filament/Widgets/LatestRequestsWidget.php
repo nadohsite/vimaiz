@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Property;
 use App\Models\ServiceRequest;
 use App\Filament\Resources\ServiceRequestResource;
 use Filament\Tables;
@@ -36,11 +37,14 @@ class LatestRequestsWidget extends BaseWidget
                     ->label('Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
+                        'appartement' => 'gray',
                         'maison' => 'info',
                         'villa' => 'success',
                         'chalet' => 'warning',
+                        'gite' => 'primary',
                         default => 'gray',
-                    }),
+                    })
+                    ->formatStateUsing(fn (string $state): string => Property::TYPES[$state] ?? ucfirst($state)),
                 Tables\Columns\TextColumn::make('property.city')
                     ->label('Ville'),
                 Tables\Columns\TextColumn::make('scheduled_date')

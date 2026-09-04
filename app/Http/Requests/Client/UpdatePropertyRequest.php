@@ -52,7 +52,7 @@ class UpdatePropertyRequest extends FormRequest
     {
         return [
             'type.required' => 'Le type de bien est obligatoire.',
-            'type.in' => 'Le type de bien doit être appartement, maison, villa ou chalet.',
+            'type.in' => 'Le type de bien doit être appartement, maison, villa, chalet ou gîte.',
             'address_line1.required' => 'L\'adresse est obligatoire.',
             'city.required' => 'La ville est obligatoire.',
             'postal_code.required' => 'Le code postal est obligatoire.',

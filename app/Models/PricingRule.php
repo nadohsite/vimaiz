@@ -15,6 +15,7 @@ class PricingRule extends Model
         'maison_multiplier',
         'villa_multiplier',
         'chalet_multiplier',
+        'gite_multiplier',
         'surface_threshold_m2',
         'surface_extra_rate',
         'weekend_multiplier',
@@ -34,6 +35,7 @@ class PricingRule extends Model
         'maison_multiplier' => 'decimal:2',
         'villa_multiplier' => 'decimal:2',
         'chalet_multiplier' => 'decimal:2',
+        'gite_multiplier' => 'decimal:2',
         'surface_extra_rate' => 'decimal:2',
         'weekend_multiplier' => 'decimal:2',
         'holiday_multiplier' => 'decimal:2',
@@ -57,6 +59,7 @@ class PricingRule extends Model
             'maison' => $this->maison_multiplier,
             'villa' => $this->villa_multiplier,
             'chalet' => $this->chalet_multiplier,
+            'gite' => $this->gite_multiplier ?? 1.00,
             default => 1.00,
         };
     }

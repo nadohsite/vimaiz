@@ -26,9 +26,6 @@
                 à {{ $quote->serviceRequest->scheduled_time }}
             @endif
         </p>
-        @if($quote->estimated_hours)
-            <p><strong>Durée estimée :</strong> {{ $quote->estimated_hours }} heure(s)</p>
-        @endif
     </div>
 
     @if($quote->price_adjustment_reason)

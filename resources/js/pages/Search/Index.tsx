@@ -239,6 +239,8 @@ export default function SearchIndex({ agents, filters, services }: Props) {
                                         <SelectItem value="appartement">Appartement</SelectItem>
                                         <SelectItem value="maison">Maison</SelectItem>
                                         <SelectItem value="villa">Villa</SelectItem>
+                                        <SelectItem value="chalet">Chalet</SelectItem>
+                                        <SelectItem value="gite">Gîte</SelectItem>
                                         <SelectItem value="bureau">Bureau</SelectItem>
                                     </SelectContent>
                                 </Select>

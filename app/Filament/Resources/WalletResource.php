@@ -95,6 +95,23 @@ class WalletResource extends Resource
                     ])
                     ->columns(3)
                     ->visible(fn (?Wallet $record): bool => $record?->user?->isAgent() ?? false),
+                Section::make('Mobile Money')
+                    ->schema([
+                        TextEntry::make('mobile_money_provider')
+                            ->label('Fournisseur')
+                            ->state(fn (Wallet $record): ?string => $record->user?->agentProfile?->mobile_money_provider_label)
+                            ->placeholder('Non renseigné'),
+                        TextEntry::make('mobile_money_account_name')
+                            ->label('Titulaire')
+                            ->state(fn (Wallet $record): ?string => $record->user?->agentProfile?->mobile_money_account_name)
+                            ->placeholder('Non renseigné'),
+                        TextEntry::make('mobile_money_phone')
+                            ->label('Numéro')
+                            ->state(fn (Wallet $record): ?string => $record->user?->agentProfile?->mobile_money_phone)
+                            ->placeholder('Non renseigné'),
+                    ])
+                    ->columns(3)
+                    ->visible(fn (?Wallet $record): bool => $record?->user?->isAgent() ?? false),
             ]);
     }
 

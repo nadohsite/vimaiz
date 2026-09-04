@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Home, Clock, ChevronRight, Filter } from 'lucide-react';
+import { Calendar, Home, ChevronRight, Filter } from 'lucide-react';
 import { formatAppointmentDateTime } from '@/lib/datetime';
 import { AgentProposalActions } from '@/components/missions/AgentProposalActions';
 
@@ -143,10 +143,6 @@ export default function Index({ missions, currentStatus, statuses }: Props) {
                                                         <span className="flex items-center gap-1">
                                                             <Calendar className="h-4 w-4" />
                                                             {formatAppointmentDateTime(mission.scheduled_at)}
-                                                        </span>
-                                                        <span className="flex items-center gap-1">
-                                                            <Clock className="h-4 w-4" />
-                                                            {mission.duration_hours}h
                                                         </span>
                                                     </div>
                                                 </div>

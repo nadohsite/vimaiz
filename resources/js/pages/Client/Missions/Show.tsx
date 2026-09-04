@@ -347,7 +347,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                         {!showReturnForm ? (
                                             <div>
                                                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                                                    Si vous n'êtes pas satisfait de la prestation, vous pouvez demander un retour gratuit de l'intervenant dans les 7 jours suivant l'intervention.
+                                                    Si vous n'êtes pas satisfait de la prestation, vous pouvez demander un retour gratuit de l'intervenant dans les 48 heures suivant l'intervention.
                                                 </p>
                                                 <Button
                                                     variant="outline"
@@ -624,7 +624,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-base dark:text-white">
                                         <Calendar className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                        Planification
+                                        Horaires
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
@@ -639,20 +639,14 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-slate-500 dark:text-slate-400">Heure</span>
+                                        <span className="text-slate-500 dark:text-slate-400">Heure souhaitée</span>
                                         <span className="font-medium dark:text-white">
                                             {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500 dark:text-slate-400">Durée estimée</span>
-                                        <span className="font-medium dark:text-white">
-                                            {mission.estimated_duration_label || `${mission.duration_hours}h`}
-                                        </span>
-                                    </div>
-                                    {mission.started_at && !mission.completed_at && (
+                                    {mission.started_at && (
                                         <div className="flex justify-between">
-                                            <span className="text-slate-500 dark:text-slate-400">Démarrée</span>
+                                            <span className="text-slate-500 dark:text-slate-400">Heure de début</span>
                                             <span className="font-medium dark:text-white">
                                                 {new Date(mission.started_at).toLocaleTimeString('fr-FR', {
                                                     hour: '2-digit',
@@ -661,9 +655,9 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                             </span>
                                         </div>
                                     )}
-                                    {mission.actual_duration_label && (
+                                    {mission.completed_at && mission.actual_duration_label && (
                                         <div className="flex justify-between">
-                                            <span className="text-slate-500 dark:text-slate-400">Durée réelle</span>
+                                            <span className="text-slate-500 dark:text-slate-400">Durée de l&apos;intervention</span>
                                             <span className="font-medium dark:text-white">
                                                 {mission.actual_duration_label}
                                             </span>

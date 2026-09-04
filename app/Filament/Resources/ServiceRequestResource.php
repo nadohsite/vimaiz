@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ServiceRequestResource\Pages;
+use App\Models\Property;
 use App\Models\ServiceRequest;
 use App\Support\ScheduledTime;
 use BackedEnum;
@@ -149,11 +150,14 @@ class ServiceRequestResource extends Resource
                     ->label('Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
+                        'appartement' => 'gray',
                         'maison' => 'info',
                         'villa' => 'success',
                         'chalet' => 'warning',
+                        'gite' => 'primary',
                         default => 'gray',
-                    }),
+                    })
+                    ->formatStateUsing(fn (string $state): string => Property::TYPES[$state] ?? ucfirst($state)),
                 Tables\Columns\TextColumn::make('property.city')
                     ->label('Ville')
                     ->searchable(),
@@ -217,11 +221,7 @@ class ServiceRequestResource extends Resource
                     ]),
                 Tables\Filters\SelectFilter::make('property.type')
                     ->label('Type de bien')
-                    ->options([
-                        'maison' => 'Maison',
-                        'villa' => 'Villa',
-                        'chalet' => 'Chalet',
-                    ]),
+                    ->options(Property::TYPES),
             ])
             ->actions([
                 Action::make('create_quote')

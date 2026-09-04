@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Agent\UpdateBankDetailsRequest;
+use App\Http\Requests\Agent\UpdateMobileMoneyDetailsRequest;
 use App\Http\Requests\Agent\WithdrawRequest;
 use App\Models\AgentProfile;
 use App\Models\User;
@@ -56,6 +57,17 @@ class WalletController extends Controller
                     'bank_account_holder' => null,
                     'is_complete' => false,
                 ],
+            'mobileMoneyDetails' => $agentProfile
+                ? $agentProfile->mobileMoneyDetailsForWallet()
+                : [
+                    'provider' => null,
+                    'provider_label' => null,
+                    'phone' => null,
+                    'account_name' => null,
+                    'is_complete' => false,
+                ],
+            'payoutMethods' => $agentProfile ? $agentProfile->payoutMethodsForWallet() : [],
+            'mobileMoneyProviders' => AgentProfile::MOBILE_MONEY_PROVIDERS,
         ]);
     }
 
@@ -73,14 +85,41 @@ class WalletController extends Controller
         return redirect()->back()->with('success', 'Coordonnées bancaires enregistrées.');
     }
 
+    public function updateMobileMoneyDetails(UpdateMobileMoneyDetailsRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $agentProfile = $user->agentProfile ?? AgentProfile::create([
+            'user_id' => $user->id,
+            'verification_status' => 'pending',
+        ]);
+
+        $agentProfile->update($request->validated());
+
+        return redirect()->back()->with('success', 'Coordonnées Mobile Money enregistrées.');
+    }
+
     public function withdraw(WithdrawRequest $request): RedirectResponse
     {
         $user = $request->user();
         $agentProfile = $user->agentProfile;
+        $paymentMethod = $request->validated('payment_method');
 
-        if (! $agentProfile || ! $agentProfile->hasBankDetails()) {
+        if (! $agentProfile || ! $agentProfile->hasPayoutMethod()) {
             return redirect()->back()->withErrors([
-                'amount' => 'Renseignez votre IBAN avant de demander un retrait.',
+                'payment_method' => 'Enregistrez un mode de paiement avant de demander un retrait.',
+            ]);
+        }
+
+        if ($paymentMethod === AgentProfile::PAYOUT_BANK_TRANSFER && ! $agentProfile->hasBankDetails()) {
+            return redirect()->back()->withErrors([
+                'payment_method' => 'Renseignez votre IBAN avant de demander un retrait bancaire.',
+            ]);
+        }
+
+        if ($paymentMethod === AgentProfile::PAYOUT_MOBILE_MONEY && ! $agentProfile->hasMobileMoneyDetails()) {
+            return redirect()->back()->withErrors([
+                'payment_method' => 'Renseignez votre Mobile Money avant de demander un retrait.',
             ]);
         }
 
@@ -91,7 +130,11 @@ class WalletController extends Controller
         }
 
         try {
-            $transaction = $wallet->withdraw($request->validated('amount'), $agentProfile);
+            $transaction = $wallet->withdraw(
+                (float) $request->validated('amount'),
+                $agentProfile,
+                $paymentMethod
+            );
 
             User::notifyAdmins(new WithdrawalRequestNotification($transaction, $user));
 

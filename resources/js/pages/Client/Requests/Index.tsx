@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Calendar, Home, Clock, ChevronRight, FileText } from 'lucide-react';
+import { formatRequestTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -119,7 +120,7 @@ export default function Index({ requests, statuses }: Props) {
                                                             </span>
                                                             <span className="flex items-center gap-1">
                                                                 <Clock className="h-4 w-4" />
-                                                                {request.requested_hours}h
+                                                                {formatRequestTime(request.scheduled_time)}
                                                             </span>
                                                         </div>
                                                     </div>

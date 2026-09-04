@@ -39,6 +39,28 @@ class WithdrawalRequestResource extends Resource
             ->with(['wallet.user']);
     }
 
+    protected static function paymentMethod(WalletTransaction $record): string
+    {
+        return $record->metadata['payment_method'] ?? AgentProfile::PAYOUT_BANK_TRANSFER;
+    }
+
+    protected static function isMobileMoney(WalletTransaction $record): bool
+    {
+        return static::paymentMethod($record) === AgentProfile::PAYOUT_MOBILE_MONEY;
+    }
+
+    protected static function paymentMethodLabel(WalletTransaction $record): string
+    {
+        return static::isMobileMoney($record) ? 'Mobile Money' : 'Virement bancaire';
+    }
+
+    protected static function approveModalDescription(WalletTransaction $record): string
+    {
+        return static::isMobileMoney($record)
+            ? 'Confirmez-vous avoir effectué le transfert Mobile Money à cet intervenant ?'
+            : 'Confirmez-vous avoir effectué le virement bancaire à cet intervenant ?';
+    }
+
     public static function infolist(Schema $schema): Schema
     {
         return $schema
@@ -52,14 +74,33 @@ class WithdrawalRequestResource extends Resource
                         TextEntry::make('amount')
                             ->label('Montant')
                             ->money('EUR'),
+                        TextEntry::make('payment_method_label')
+                            ->label('Mode de paiement')
+                            ->state(fn (WalletTransaction $record): string => static::paymentMethodLabel($record))
+                            ->badge()
+                            ->color(fn (WalletTransaction $record): string => static::isMobileMoney($record) ? 'info' : 'primary'),
                         TextEntry::make('metadata.bank_account_holder')
                             ->label('Titulaire')
+                            ->state(fn (WalletTransaction $record): ?string => static::isMobileMoney($record)
+                                ? ($record->metadata['account_name'] ?? null)
+                                : ($record->metadata['bank_account_holder'] ?? null))
                             ->placeholder('Non renseigné'),
                         TextEntry::make('reference')
-                            ->label('IBAN')
-                            ->formatStateUsing(fn (?string $state): string => AgentProfile::formatIban($state) ?? ($state ?: 'Non renseigné')),
+                            ->label(fn (WalletTransaction $record): string => static::isMobileMoney($record) ? 'Numéro Mobile Money' : 'IBAN')
+                            ->formatStateUsing(function (?string $state, WalletTransaction $record): string {
+                                if (static::isMobileMoney($record)) {
+                                    return $state ?: ($record->metadata['phone'] ?? 'Non renseigné');
+                                }
+
+                                return AgentProfile::formatIban($state) ?? ($state ?: 'Non renseigné');
+                            }),
+                        TextEntry::make('metadata.provider_label')
+                            ->label('Fournisseur')
+                            ->visible(fn (WalletTransaction $record): bool => static::isMobileMoney($record))
+                            ->placeholder('Non renseigné'),
                         TextEntry::make('metadata.bic')
                             ->label('BIC')
+                            ->visible(fn (WalletTransaction $record): bool => ! static::isMobileMoney($record))
                             ->placeholder('Non renseigné'),
                         TextEntry::make('status')
                             ->label('Statut')
@@ -112,14 +153,28 @@ class WithdrawalRequestResource extends Resource
                     ->label('Montant')
                     ->money('EUR')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('metadata.bank_account_holder')
-                    ->label('Titulaire')
-                    ->placeholder('—')
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->label('Mode')
+                    ->state(fn (WalletTransaction $record): string => static::paymentMethodLabel($record))
+                    ->badge()
+                    ->color(fn (WalletTransaction $record): string => static::isMobileMoney($record) ? 'info' : 'primary'),
+                Tables\Columns\TextColumn::make('destination')
+                    ->label('Destination')
+                    ->state(function (WalletTransaction $record): string {
+                        if (static::isMobileMoney($record)) {
+                            $provider = $record->metadata['provider_label'] ?? 'Mobile Money';
+                            $phone = $record->metadata['phone'] ?? $record->reference;
+
+                            return trim($provider.' — '.$phone);
+                        }
+
+                        $holder = $record->metadata['bank_account_holder'] ?? '';
+                        $iban = AgentProfile::formatIban($record->reference) ?? $record->reference;
+
+                        return trim($holder.' — '.$iban, ' —');
+                    })
+                    ->limit(40)
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('reference')
-                    ->label('IBAN')
-                    ->formatStateUsing(fn (?string $state): ?string => AgentProfile::formatIban($state) ?? $state)
-                    ->limit(27),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
@@ -161,7 +216,7 @@ class WithdrawalRequestResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalHeading('Valider le retrait')
-                    ->modalDescription('Confirmez-vous avoir effectué le virement bancaire à cet intervenant ?')
+                    ->modalDescription(fn ($record) => static::approveModalDescription($record))
                     ->modalSubmitActionLabel('Oui, valider')
                     ->visible(fn ($record) => $record->status === 'pending')
                     ->action(function ($record) {
@@ -172,7 +227,7 @@ class WithdrawalRequestResource extends Resource
                                 'approved_by' => auth()->id(),
                             ]),
                         ]);
-                        
+
                         Notification::make()
                             ->title('Retrait validé')
                             ->success()
@@ -188,12 +243,11 @@ class WithdrawalRequestResource extends Resource
                     ->modalSubmitActionLabel('Rejeter et rembourser')
                     ->visible(fn ($record) => $record->status === 'pending')
                     ->action(function ($record) {
-                        // Rembourser le solde
                         $wallet = $record->wallet;
                         $wallet->balance += $record->amount;
                         $wallet->total_withdrawn -= $record->amount;
                         $wallet->save();
-                        
+
                         $record->update([
                             'status' => 'rejected',
                             'metadata' => array_merge($record->metadata ?? [], [
@@ -201,7 +255,7 @@ class WithdrawalRequestResource extends Resource
                                 'rejected_by' => auth()->id(),
                             ]),
                         ]);
-                        
+
                         Notification::make()
                             ->title('Retrait rejeté et remboursé')
                             ->warning()

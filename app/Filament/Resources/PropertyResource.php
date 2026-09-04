@@ -53,11 +53,7 @@ class PropertyResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('type')
                             ->label('Type de bien')
-                            ->options([
-                                'maison' => 'Maison',
-                                'villa' => 'Villa',
-                                'chalet' => 'Chalet',
-                            ])
+                            ->options(Property::TYPES)
                             ->required(),
                         Forms\Components\TextInput::make('name')
                             ->label('Nom du bien')
@@ -141,12 +137,14 @@ class PropertyResource extends Resource
                     ->label('Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
+                        'appartement' => 'gray',
                         'maison' => 'info',
                         'villa' => 'success',
                         'chalet' => 'warning',
+                        'gite' => 'primary',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state)),
+                    ->formatStateUsing(fn (string $state): string => Property::TYPES[$state] ?? ucfirst($state)),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nom')
                     ->searchable()
@@ -175,11 +173,7 @@ class PropertyResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Type')
-                    ->options([
-                        'maison' => 'Maison',
-                        'villa' => 'Villa',
-                        'chalet' => 'Chalet',
-                    ]),
+                    ->options(Property::TYPES),
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label('Client')
                     ->relationship('user', 'name', fn ($query) => $query->where('role', 'client'))

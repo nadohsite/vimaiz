@@ -4,7 +4,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-const TYPE_OPTIONS = ['Appartement', 'Maison', 'Villa', 'Chalet'] as const;
+const TYPE_OPTIONS = ['Appartement', 'Maison', 'Villa', 'Chalet', 'Gîte'] as const;
 
 /** Tarif ménage interne — non affiché au public */
 const PRICE_PER_M2 = 1.7;

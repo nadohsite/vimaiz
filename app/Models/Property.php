@@ -16,12 +16,14 @@ class Property extends Model
     const TYPE_MAISON = 'maison';
     const TYPE_VILLA = 'villa';
     const TYPE_CHALET = 'chalet';
+    const TYPE_GITE = 'gite';
 
     const TYPES = [
         self::TYPE_APPARTEMENT => 'Appartement',
         self::TYPE_MAISON => 'Maison',
         self::TYPE_VILLA => 'Villa',
         self::TYPE_CHALET => 'Chalet',
+        self::TYPE_GITE => 'Gîte',
     ];
 
     protected $fillable = [

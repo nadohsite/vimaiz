@@ -151,6 +151,8 @@ export default function AddressModal({ address, trigger, open, onOpenChange }: A
                                     <SelectItem value="appartement">Appartement</SelectItem>
                                     <SelectItem value="maison">Maison</SelectItem>
                                     <SelectItem value="villa">Villa</SelectItem>
+                                    <SelectItem value="chalet">Chalet</SelectItem>
+                                    <SelectItem value="gite">Gîte</SelectItem>
                                     <SelectItem value="bureau">Bureau</SelectItem>
                                     <SelectItem value="autre">Autre</SelectItem>
                                 </SelectContent>

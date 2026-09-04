@@ -434,7 +434,7 @@ class Mission extends Model
         return $this->status === self::STATUS_COMPLETED
             && ! $this->return_requested
             && $this->completed_at
-            && $this->completed_at->diffInDays(now()) <= 7; // 7 jours pour demander un retour
+            && $this->completed_at->greaterThanOrEqualTo(now()->subHours(48));
     }
 
     public function getReturnStatusLabelAttribute(): ?string

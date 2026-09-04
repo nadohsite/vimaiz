@@ -167,10 +167,6 @@ export default function AgentDashboard({ pendingMissions = [], activeMissions = 
                                             <Calendar className="h-4 w-4" />
                                             {formatDate(mission.scheduled_at)}
                                         </span>
-                                        <span className="flex items-center gap-1">
-                                            <Clock className="h-4 w-4" />
-                                            {mission.service_request?.requested_hours}h
-                                        </span>
                                     </div>
                                     <Link
                                         href={route('agent.missions.show', mission.id)}
