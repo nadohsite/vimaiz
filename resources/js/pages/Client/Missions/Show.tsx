@@ -560,6 +560,77 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 </Card>
                             )}
 
+                            {/* Intervenant + Horaires */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {mission.agent && (
+                                    <Card className="dark:bg-slate-800 dark:border-slate-700">
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                                <User className="h-4 w-4 text-sky-500 dark:text-sky-400" />
+                                                Intervenant
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 bg-sky-100 dark:bg-sky-900/50 rounded-full flex items-center justify-center">
+                                                    <User className="h-6 w-6 text-sky-600 dark:text-sky-400" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium dark:text-white">{mission.agent.name}</p>
+                                                    <p className="text-sm text-slate-500 dark:text-slate-400">Intervenant VIMAIZ</p>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                            <Calendar className="h-4 w-4 text-sky-500 dark:text-sky-400" />
+                                            Horaires
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-2">
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500 dark:text-slate-400">Date</span>
+                                            <span className="font-medium dark:text-white">
+                                                {formatAppointmentDate(mission.scheduled_at, {
+                                                    weekday: 'long',
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                })}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500 dark:text-slate-400">Heure souhaitée</span>
+                                            <span className="font-medium dark:text-white">
+                                                {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
+                                            </span>
+                                        </div>
+                                        {mission.started_at && (
+                                            <div className="flex justify-between">
+                                                <span className="text-slate-500 dark:text-slate-400">Heure de début</span>
+                                                <span className="font-medium dark:text-white">
+                                                    {new Date(mission.started_at).toLocaleTimeString('fr-FR', {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {mission.completed_at && mission.actual_duration_label && (
+                                            <div className="flex justify-between">
+                                                <span className="text-slate-500 dark:text-slate-400">Durée de l&apos;intervention</span>
+                                                <span className="font-medium dark:text-white">
+                                                    {mission.actual_duration_label}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </div>
+
                             {/* Suivi géolocalisé */}
                             {(mission.photos || []).length === 0 && (
                                 <Card className="dark:bg-slate-800 dark:border-slate-700">
@@ -576,29 +647,6 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
 
                         {/* Sidebar */}
                         <div className="space-y-6">
-                            {/* Agent */}
-                            {mission.agent && (
-                                <Card className="dark:bg-slate-800 dark:border-slate-700">
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2 text-base dark:text-white">
-                                            <User className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                            Intervenant
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-sky-100 dark:bg-sky-900/50 rounded-full flex items-center justify-center">
-                                                <User className="h-6 w-6 text-sky-600 dark:text-sky-400" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium dark:text-white">{mission.agent.name}</p>
-                                                <p className="text-sm text-slate-500 dark:text-slate-400">Intervenant VIMAIZ</p>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-
                             {/* Property */}
                             <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
@@ -616,53 +664,6 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                     <p className="text-sm text-slate-500 dark:text-slate-400">
                                         {mission.property.postal_code} {mission.property.city}
                                     </p>
-                                </CardContent>
-                            </Card>
-
-                            {/* Schedule */}
-                            <Card className="dark:bg-slate-800 dark:border-slate-700">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-base dark:text-white">
-                                        <Calendar className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                        Horaires
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-2">
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500 dark:text-slate-400">Date</span>
-                                        <span className="font-medium dark:text-white">
-                                            {formatAppointmentDate(mission.scheduled_at, {
-                                                weekday: 'long',
-                                                day: 'numeric',
-                                                month: 'long',
-                                            })}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500 dark:text-slate-400">Heure souhaitée</span>
-                                        <span className="font-medium dark:text-white">
-                                            {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
-                                        </span>
-                                    </div>
-                                    {mission.started_at && (
-                                        <div className="flex justify-between">
-                                            <span className="text-slate-500 dark:text-slate-400">Heure de début</span>
-                                            <span className="font-medium dark:text-white">
-                                                {new Date(mission.started_at).toLocaleTimeString('fr-FR', {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                })}
-                                            </span>
-                                        </div>
-                                    )}
-                                    {mission.completed_at && mission.actual_duration_label && (
-                                        <div className="flex justify-between">
-                                            <span className="text-slate-500 dark:text-slate-400">Durée de l&apos;intervention</span>
-                                            <span className="font-medium dark:text-white">
-                                                {mission.actual_duration_label}
-                                            </span>
-                                        </div>
-                                    )}
                                 </CardContent>
                             </Card>
 
