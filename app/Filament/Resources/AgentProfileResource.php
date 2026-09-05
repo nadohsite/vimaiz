@@ -79,18 +79,6 @@ class AgentProfileResource extends Resource
                             ->placeholder('BNPAFRPP'),
                     ])->columns(3),
 
-                Section::make('Mobile Money')
-                    ->schema([
-                        Forms\Components\Select::make('mobile_money_provider')
-                            ->label('Fournisseur')
-                            ->options(AgentProfile::MOBILE_MONEY_PROVIDERS),
-                        Forms\Components\TextInput::make('mobile_money_account_name')
-                            ->label('Titulaire'),
-                        Forms\Components\TextInput::make('mobile_money_phone')
-                            ->label('Numéro')
-                            ->placeholder('+33 6 12 34 56 78'),
-                    ])->columns(3),
-
                 Section::make('Statut de vérification')
                     ->schema([
                         Forms\Components\Select::make('verification_status')

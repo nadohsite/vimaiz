@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\Mission;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,11 +26,12 @@ class ConversationController extends Controller
                 $q->where('sender_id', '!=', $user->id)
                   ->where('is_read', false);
             }])
-            ->orderByDesc('last_message_at')
+            ->orderByRaw('COALESCE(last_message_at, created_at) DESC')
             ->paginate(20);
 
         return Inertia::render('Messages/Index', [
             'conversations' => $conversations,
+            'currentUserId' => $user->id,
         ]);
     }
 
@@ -57,20 +60,19 @@ class ConversationController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // Get other conversations for sidebar
+        // Get conversations for sidebar (including current)
         $otherConversations = Conversation::query()
             ->where(function ($q) use ($user) {
                 $q->where('client_id', $user->id)
                   ->orWhere('agent_id', $user->id);
             })
-            ->where('id', '!=', $conversation->id)
             ->with(['client:id,name', 'agent:id,name'])
             ->withCount(['messages as unread_count' => function ($q) use ($user) {
                 $q->where('sender_id', '!=', $user->id)
                   ->where('is_read', false);
             }])
-            ->orderByDesc('last_message_at')
-            ->limit(10)
+            ->orderByRaw('COALESCE(last_message_at, created_at) DESC')
+            ->limit(20)
             ->get();
 
         return Inertia::render('Messages/Show', [
@@ -81,7 +83,7 @@ class ConversationController extends Controller
         ]);
     }
 
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $user = $request->user();
         
@@ -100,12 +102,9 @@ class ConversationController extends Controller
         })->first();
 
         if (!$conversation) {
-            // Determine who is client and who is agent
-            $recipient = \App\Models\User::find($validated['recipient_id']);
-            
             $conversation = Conversation::create([
-                'client_id' => $user->hasRole('client') ? $user->id : $validated['recipient_id'],
-                'agent_id' => $user->hasRole('agent') ? $user->id : $validated['recipient_id'],
+                'client_id' => $user->isClient() ? $user->id : $validated['recipient_id'],
+                'agent_id' => $user->isAgent() ? $user->id : $validated['recipient_id'],
             ]);
         }
 
@@ -118,7 +117,37 @@ class ConversationController extends Controller
         return redirect()->route('messages.show', $conversation);
     }
 
-    public function sendMessage(Request $request, Conversation $conversation): \Illuminate\Http\RedirectResponse
+    /**
+     * Open or create the conversation between the mission client and assigned agent.
+     */
+    public function forMission(Request $request, Mission $mission): RedirectResponse
+    {
+        $user = $request->user();
+
+        $this->authorize('view', $mission);
+
+        if (! $mission->agent_id || ! $mission->client_id) {
+            return back()->with('error', 'Aucun interlocuteur disponible pour cette intervention.');
+        }
+
+        $isParticipant = (int) $user->id === (int) $mission->client_id
+            || (int) $user->id === (int) $mission->agent_id;
+
+        if (! $isParticipant) {
+            abort(403);
+        }
+
+        $conversation = Conversation::firstOrCreate(
+            [
+                'client_id' => $mission->client_id,
+                'agent_id' => $mission->agent_id,
+            ],
+        );
+
+        return redirect()->route('messages.show', $conversation);
+    }
+
+    public function sendMessage(Request $request, Conversation $conversation): RedirectResponse
     {
         $user = $request->user();
         

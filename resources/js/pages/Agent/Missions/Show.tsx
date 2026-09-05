@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, Home, MapPin, User, CheckCircle, XCircle, Play, Star, Award, AlertCircle, Maximize, BedDouble, Bath, Layers, DoorOpen, Wifi, Trash2, Clock, Download } from 'lucide-react';
+import { ArrowLeft, Calendar, Home, MapPin, User, CheckCircle, XCircle, Play, Star, Award, AlertCircle, Maximize, BedDouble, Bath, Layers, DoorOpen, Wifi, Trash2, Clock, Download, MessageSquare } from 'lucide-react';
 import PropertyMap from '@/components/map/PropertyMap';
 import { useEffect, useState } from 'react';
 import InterventionReportWizard, {
@@ -48,6 +48,7 @@ interface Client {
 interface Mission {
     id: number;
     mission_number: string;
+    agent_id: number | null;
     scheduled_at: string;
     scheduled_time_label?: string | null;
     started_at: string | null;
@@ -715,12 +716,25 @@ export default function Show({
                                         Client
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <p className="font-medium">{mission.client.name}</p>
-                                    {mission.client.phone && (
-                                        <a href={`tel:${mission.client.phone}`} className="text-sm text-sky-600 hover:underline">
-                                            {mission.client.phone}
-                                        </a>
+                                <CardContent className="space-y-4">
+                                    <div>
+                                        <p className="font-medium">{mission.client.name}</p>
+                                        {mission.client.phone && (
+                                            <a href={`tel:${mission.client.phone}`} className="text-sm text-sky-600 hover:underline">
+                                                {mission.client.phone}
+                                            </a>
+                                        )}
+                                    </div>
+                                    {mission.agent_id && (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="w-full"
+                                            onClick={() => router.post(route('messages.mission', mission.id))}
+                                        >
+                                            <MessageSquare className="h-4 w-4 mr-2" />
+                                            Conversation
+                                        </Button>
                                     )}
                                 </CardContent>
                             </Card>

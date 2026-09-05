@@ -15,9 +15,8 @@ import {
     Banknote,
     CreditCard,
     AlertTriangle,
-    Smartphone,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -64,16 +63,8 @@ interface BankDetails {
     is_complete: boolean;
 }
 
-interface MobileMoneyDetails {
-    provider: string | null;
-    provider_label: string | null;
-    phone: string | null;
-    account_name: string | null;
-    is_complete: boolean;
-}
-
 interface PayoutMethod {
-    id: 'bank_transfer' | 'mobile_money';
+    id: 'bank_transfer';
     label: string;
     summary: string;
 }
@@ -82,9 +73,7 @@ interface Props {
     wallet: WalletData;
     transactions: PaginatedTransactions;
     bankDetails: BankDetails;
-    mobileMoneyDetails: MobileMoneyDetails;
     payoutMethods: PayoutMethod[];
-    mobileMoneyProviders: Record<string, string>;
 }
 
 const breadcrumbs = [
@@ -102,15 +91,11 @@ export default function WalletIndex({
     wallet,
     transactions,
     bankDetails,
-    mobileMoneyDetails,
     payoutMethods,
-    mobileMoneyProviders,
 }: Props) {
     const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
     const { props } = usePage<{ flash?: { success?: string; error?: string } }>();
     const flash = props.flash;
-
-    const defaultPaymentMethod = payoutMethods[0]?.id ?? 'bank_transfer';
 
     const bankForm = useForm({
         bank_account_holder: bankDetails.bank_account_holder ?? '',
@@ -118,40 +103,16 @@ export default function WalletIndex({
         bic: bankDetails.bic ?? '',
     });
 
-    const mobileMoneyForm = useForm({
-        mobile_money_provider: mobileMoneyDetails.provider ?? Object.keys(mobileMoneyProviders)[0] ?? 'lydia',
-        mobile_money_phone: mobileMoneyDetails.phone ?? '',
-        mobile_money_account_name: mobileMoneyDetails.account_name ?? '',
-    });
-
     const withdrawForm = useForm({
         amount: '',
-        payment_method: defaultPaymentMethod,
     });
 
-    useEffect(() => {
-        if (
-            payoutMethods.length > 0
-            && !payoutMethods.some((method) => method.id === withdrawForm.data.payment_method)
-        ) {
-            withdrawForm.setData('payment_method', payoutMethods[0].id);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- sync only when available payout methods change
-    }, [payoutMethods]);
-
     const canWithdraw = payoutMethods.length > 0 && Number(wallet.balance) >= 1;
-    const selectedPayoutMethod = payoutMethods.find((method) => method.id === withdrawForm.data.payment_method);
+    const selectedPayoutMethod = payoutMethods[0];
 
     const handleSaveBankDetails = (e: React.FormEvent) => {
         e.preventDefault();
         bankForm.put(route('agent.wallet.bank-details'), {
-            preserveScroll: true,
-        });
-    };
-
-    const handleSaveMobileMoneyDetails = (e: React.FormEvent) => {
-        e.preventDefault();
-        mobileMoneyForm.put(route('agent.wallet.mobile-money-details'), {
             preserveScroll: true,
         });
     };
@@ -294,7 +255,7 @@ export default function WalletIndex({
                         </Card>
                     </div>
 
-                    <div className="mb-8 grid gap-6 lg:grid-cols-2">
+                    <div className="mb-8">
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 dark:text-white">
@@ -310,11 +271,11 @@ export default function WalletIndex({
                                     <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
                                         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
                                         <p className="text-sm text-amber-800 dark:text-amber-300">
-                                            Ajoutez vos coordonnées bancaires pour pouvoir les sélectionner lors d&apos;un retrait.
+                                            Ajoutez vos coordonnées bancaires pour pouvoir demander un retrait.
                                         </p>
                                     </div>
                                 )}
-                                <form onSubmit={handleSaveBankDetails} className="space-y-4">
+                                <form onSubmit={handleSaveBankDetails} className="space-y-4 max-w-xl">
                                     <div className="space-y-2">
                                         <Label htmlFor="bank_account_holder">Titulaire du compte</Label>
                                         <Input
@@ -365,81 +326,6 @@ export default function WalletIndex({
                                 </form>
                             </CardContent>
                         </Card>
-
-                        <Card className="dark:bg-slate-800 dark:border-slate-700">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 dark:text-white">
-                                    <Smartphone className="h-5 w-5" />
-                                    Mobile Money
-                                </CardTitle>
-                                <CardDescription className="dark:text-slate-400">
-                                    Enregistrez votre compte Mobile Money pour les retraits.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {!mobileMoneyDetails.is_complete && (
-                                    <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
-                                        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
-                                        <p className="text-sm text-amber-800 dark:text-amber-300">
-                                            Ajoutez vos coordonnées Mobile Money pour pouvoir les sélectionner lors d&apos;un retrait.
-                                        </p>
-                                    </div>
-                                )}
-                                <form onSubmit={handleSaveMobileMoneyDetails} className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="mobile_money_provider">Fournisseur</Label>
-                                        <select
-                                            id="mobile_money_provider"
-                                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                            value={mobileMoneyForm.data.mobile_money_provider}
-                                            onChange={(e) => mobileMoneyForm.setData('mobile_money_provider', e.target.value)}
-                                        >
-                                            {Object.entries(mobileMoneyProviders).map(([value, label]) => (
-                                                <option key={value} value={value}>
-                                                    {label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {mobileMoneyForm.errors.mobile_money_provider && (
-                                            <p className="text-sm text-red-500">{mobileMoneyForm.errors.mobile_money_provider}</p>
-                                        )}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="mobile_money_account_name">Nom du titulaire</Label>
-                                        <Input
-                                            id="mobile_money_account_name"
-                                            type="text"
-                                            autoComplete="name"
-                                            placeholder="Nom associé au compte"
-                                            value={mobileMoneyForm.data.mobile_money_account_name}
-                                            onChange={(e) => mobileMoneyForm.setData('mobile_money_account_name', e.target.value)}
-                                        />
-                                        {mobileMoneyForm.errors.mobile_money_account_name && (
-                                            <p className="text-sm text-red-500">{mobileMoneyForm.errors.mobile_money_account_name}</p>
-                                        )}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="mobile_money_phone">Numéro Mobile Money</Label>
-                                        <Input
-                                            id="mobile_money_phone"
-                                            type="tel"
-                                            autoComplete="tel"
-                                            placeholder="+33 6 12 34 56 78"
-                                            value={mobileMoneyForm.data.mobile_money_phone}
-                                            onChange={(e) => mobileMoneyForm.setData('mobile_money_phone', e.target.value)}
-                                        />
-                                        {mobileMoneyForm.errors.mobile_money_phone && (
-                                            <p className="text-sm text-red-500">{mobileMoneyForm.errors.mobile_money_phone}</p>
-                                        )}
-                                    </div>
-                                    <div className="flex justify-end">
-                                        <Button type="submit" disabled={mobileMoneyForm.processing}>
-                                            {mobileMoneyForm.processing ? 'Enregistrement...' : 'Enregistrer'}
-                                        </Button>
-                                    </div>
-                                </form>
-                            </CardContent>
-                        </Card>
                     </div>
 
                     <div className="flex flex-col gap-3 mb-8 sm:flex-row sm:items-center">
@@ -462,45 +348,9 @@ export default function WalletIndex({
                                 </DialogHeader>
                                 <form onSubmit={handleWithdraw}>
                                     <div className="space-y-4 py-4">
-                                        <div className="space-y-2">
-                                            <Label>Mode de paiement</Label>
-                                            <div className="space-y-2">
-                                                {payoutMethods.map((method) => (
-                                                    <label
-                                                        key={method.id}
-                                                        className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${
-                                                            withdrawForm.data.payment_method === method.id
-                                                                ? 'border-sky-500 bg-sky-50 dark:border-sky-400 dark:bg-sky-950/40'
-                                                                : 'border-slate-200 dark:border-slate-700'
-                                                        }`}
-                                                    >
-                                                        <input
-                                                            type="radio"
-                                                            name="payment_method"
-                                                            value={method.id}
-                                                            checked={withdrawForm.data.payment_method === method.id}
-                                                            onChange={() => withdrawForm.setData('payment_method', method.id)}
-                                                            className="mt-1"
-                                                        />
-                                                        <span>
-                                                            <span className="block font-medium text-slate-900 dark:text-white">
-                                                                {method.label}
-                                                            </span>
-                                                            <span className="block text-sm text-slate-500 dark:text-slate-400">
-                                                                {method.summary}
-                                                            </span>
-                                                        </span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                            {withdrawForm.errors.payment_method && (
-                                                <p className="text-sm text-red-500">{withdrawForm.errors.payment_method}</p>
-                                            )}
-                                        </div>
-
                                         {selectedPayoutMethod && (
                                             <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-900/50">
-                                                <p className="text-slate-500 dark:text-slate-400">Paiement vers</p>
+                                                <p className="text-slate-500 dark:text-slate-400">Virement vers</p>
                                                 <p className="mt-1 font-medium text-slate-900 dark:text-white">
                                                     {selectedPayoutMethod.label}
                                                 </p>
@@ -540,7 +390,7 @@ export default function WalletIndex({
                         </Dialog>
                         {payoutMethods.length === 0 && (
                             <p className="text-sm text-slate-500 dark:text-slate-400">
-                                Enregistrez un IBAN ou un compte Mobile Money pour activer les retraits.
+                                Enregistrez votre IBAN pour activer les retraits.
                             </p>
                         )}
                         {payoutMethods.length > 0 && Number(wallet.balance) < 1 && (

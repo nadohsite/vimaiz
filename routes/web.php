@@ -138,6 +138,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Messages (shared by clients and agents)
     Route::get('/messages', [ConversationController::class, 'index'])->name('messages.index');
+    Route::post('/messages/mission/{mission}', [ConversationController::class, 'forMission'])->name('messages.mission');
     Route::get('/messages/{conversation}', [ConversationController::class, 'show'])
         ->name('messages.show')
         ->missing(fn () => redirect()->route('notifications.index')->with('info', 'Cette conversation n\'est plus disponible.'));
@@ -240,7 +241,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // VIMAIZ - Wallet Agent
         Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
         Route::put('/wallet/bank-details', [WalletController::class, 'updateBankDetails'])->name('wallet.bank-details');
-        Route::put('/wallet/mobile-money-details', [WalletController::class, 'updateMobileMoneyDetails'])->name('wallet.mobile-money-details');
         Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 
         // VIMAIZ - Documents Agent

@@ -1,10 +1,10 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Download, FileText, Star, Send, AlertTriangle, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Download, FileText, Star, Send, AlertTriangle, ThumbsUp, ThumbsDown, MessageSquare } from 'lucide-react';
 import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useState } from 'react';
 import InterventionReportCard, { type ReportAnomaly, type ReportSummary } from '@/components/missions/InterventionReportCard';
@@ -199,7 +199,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                     <div className="grid gap-6 lg:grid-cols-3">
                         {/* Main Content */}
                         <div className="lg:col-span-2 space-y-6">
-                            {/* Status Timeline */}
+                            {/* 1. Statut */}
                             {mission.status === 'completed' && (
                                 <Card className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800">
                                     <CardContent className="p-6">
@@ -230,6 +230,109 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 </Card>
                             )}
 
+                            {/* 2. Intervenant */}
+                            {mission.agent && (
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                            <User className="h-4 w-4 text-sky-500 dark:text-sky-400" />
+                                            Intervenant
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 bg-sky-100 dark:bg-sky-900/50 rounded-full flex items-center justify-center">
+                                                <User className="h-6 w-6 text-sky-600 dark:text-sky-400" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium dark:text-white">{mission.agent.name}</p>
+                                                <p className="text-sm text-slate-500 dark:text-slate-400">Intervenant VIMAIZ</p>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="w-full"
+                                            onClick={() => router.post(route('messages.mission', mission.id))}
+                                        >
+                                            <MessageSquare className="h-4 w-4 mr-2" />
+                                            Conversation
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* 3. Suivi géolocalisé */}
+                            <Card className="dark:bg-slate-800 dark:border-slate-700">
+                                <CardContent className="p-6 text-center">
+                                    <MapPin className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                        L&apos;arrivée de l&apos;intervenant est vérifiée par géolocalisation à proximité
+                                        du bien, et le début comme la fin de l&apos;intervention sont horodatés.
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            {/* 4. Photos */}
+                            {beforePhotos.length > 0 && (
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 dark:text-white">
+                                            <Camera className="h-5 w-5 text-sky-500" />
+                                            Photos avant intervention
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                            {beforePhotos.map((photo, idx) => (
+                                                <div key={photo.id} className="relative group cursor-pointer" onClick={() => openLightbox(beforePhotos, idx, 'avant')}>
+                                                    <img
+                                                        src={`/storage/${photo.path}`}
+                                                        alt={photo.description || 'Photo avant'}
+                                                        className="w-full h-32 object-cover rounded-lg hover:opacity-90 transition-opacity"
+                                                    />
+                                                    {photo.room && (
+                                                        <span className="absolute bottom-2 left-2 text-xs bg-black/50 text-white px-2 py-1 rounded">
+                                                            {photo.room}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {afterPhotos.length > 0 && (
+                                <Card className="dark:bg-slate-800 dark:border-slate-700">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 dark:text-white">
+                                            <Camera className="h-5 w-5 text-green-500" />
+                                            Photos après intervention
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                            {afterPhotos.map((photo, idx) => (
+                                                <div key={photo.id} className="relative group cursor-pointer" onClick={() => openLightbox(afterPhotos, idx, 'après')}>
+                                                    <img
+                                                        src={`/storage/${photo.path}`}
+                                                        alt={photo.description || 'Photo après'}
+                                                        className="w-full h-32 object-cover rounded-lg hover:opacity-90 transition-opacity"
+                                                    />
+                                                    {photo.room && (
+                                                        <span className="absolute bottom-2 left-2 text-xs bg-black/50 text-white px-2 py-1 rounded">
+                                                            {photo.room}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* 5. Rapport */}
                             {mission.status === 'completed' && reportSummary && (
                                 <InterventionReportCard
                                     propertyName={mission.property.name || mission.property.type_label}
@@ -241,7 +344,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 />
                             )}
 
-                            {/* Review Form */}
+                            {/* 6. Avis */}
                             {canReview && (
                                 <Card className="border-sky-200 dark:border-sky-800 dark:bg-slate-800">
                                     <CardHeader>
@@ -297,7 +400,6 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 </Card>
                             )}
 
-                            {/* Existing Review */}
                             {mission.review && (
                                 <Card className="border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-900/20">
                                     <CardHeader>
@@ -334,7 +436,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 </Card>
                             )}
 
-                            {/* Retour mécontentement - Demande */}
+                            {/* 7. Retour */}
                             {canRequestReturn && !mission.return_requested && (
                                 <Card className="border-amber-200 dark:border-amber-800 dark:bg-slate-800">
                                     <CardHeader>
@@ -399,7 +501,6 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 </Card>
                             )}
 
-                            {/* Retour mécontentement - Statut */}
                             {mission.return_requested && (
                                 <Card className={`border-2 ${
                                     mission.return_status === 'validated' ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-900/20' :
@@ -499,155 +600,56 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                     </CardContent>
                                 </Card>
                             )}
-
-                            {/* Photos Before */}
-                            {beforePhotos.length > 0 && (
-                                <Card className="dark:bg-slate-800 dark:border-slate-700">
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <Camera className="h-5 w-5 text-sky-500" />
-                                            Photos avant intervention
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {beforePhotos.map((photo, idx) => (
-                                                <div key={photo.id} className="relative group cursor-pointer" onClick={() => openLightbox(beforePhotos, idx, 'avant')}>
-                                                    <img
-                                                        src={`/storage/${photo.path}`}
-                                                        alt={photo.description || 'Photo avant'}
-                                                        className="w-full h-32 object-cover rounded-lg hover:opacity-90 transition-opacity"
-                                                    />
-                                                    {photo.room && (
-                                                        <span className="absolute bottom-2 left-2 text-xs bg-black/50 text-white px-2 py-1 rounded">
-                                                            {photo.room}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* Photos After */}
-                            {afterPhotos.length > 0 && (
-                                <Card className="dark:bg-slate-800 dark:border-slate-700">
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <Camera className="h-5 w-5 text-green-500" />
-                                            Photos après intervention
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {afterPhotos.map((photo, idx) => (
-                                                <div key={photo.id} className="relative group cursor-pointer" onClick={() => openLightbox(afterPhotos, idx, 'après')}>
-                                                    <img
-                                                        src={`/storage/${photo.path}`}
-                                                        alt={photo.description || 'Photo après'}
-                                                        className="w-full h-32 object-cover rounded-lg hover:opacity-90 transition-opacity"
-                                                    />
-                                                    {photo.room && (
-                                                        <span className="absolute bottom-2 left-2 text-xs bg-black/50 text-white px-2 py-1 rounded">
-                                                            {photo.room}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* Intervenant + Horaires */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {mission.agent && (
-                                    <Card className="dark:bg-slate-800 dark:border-slate-700">
-                                        <CardHeader>
-                                            <CardTitle className="flex items-center gap-2 text-base dark:text-white">
-                                                <User className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                                Intervenant
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 bg-sky-100 dark:bg-sky-900/50 rounded-full flex items-center justify-center">
-                                                    <User className="h-6 w-6 text-sky-600 dark:text-sky-400" />
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium dark:text-white">{mission.agent.name}</p>
-                                                    <p className="text-sm text-slate-500 dark:text-slate-400">Intervenant VIMAIZ</p>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                )}
-
-                                <Card className="dark:bg-slate-800 dark:border-slate-700">
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2 text-base dark:text-white">
-                                            <Calendar className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                            Horaires
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-2">
-                                        <div className="flex justify-between">
-                                            <span className="text-slate-500 dark:text-slate-400">Date</span>
-                                            <span className="font-medium dark:text-white">
-                                                {formatAppointmentDate(mission.scheduled_at, {
-                                                    weekday: 'long',
-                                                    day: 'numeric',
-                                                    month: 'long',
-                                                })}
-                                            </span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-slate-500 dark:text-slate-400">Heure souhaitée</span>
-                                            <span className="font-medium dark:text-white">
-                                                {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
-                                            </span>
-                                        </div>
-                                        {mission.started_at && (
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-500 dark:text-slate-400">Heure de début</span>
-                                                <span className="font-medium dark:text-white">
-                                                    {new Date(mission.started_at).toLocaleTimeString('fr-FR', {
-                                                        hour: '2-digit',
-                                                        minute: '2-digit',
-                                                    })}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {mission.completed_at && mission.actual_duration_label && (
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-500 dark:text-slate-400">Durée de l&apos;intervention</span>
-                                                <span className="font-medium dark:text-white">
-                                                    {mission.actual_duration_label}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </div>
-
-                            {/* Suivi géolocalisé */}
-                            {(mission.photos || []).length === 0 && (
-                                <Card className="dark:bg-slate-800 dark:border-slate-700">
-                                    <CardContent className="p-6 text-center">
-                                        <MapPin className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-                                        <p className="text-slate-500 dark:text-slate-400">
-                                            L&apos;arrivée de l&apos;intervenant est vérifiée par géolocalisation à proximité
-                                            du bien, et le début comme la fin de l&apos;intervention sont horodatés.
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            )}
                         </div>
 
                         {/* Sidebar */}
-                        <div className="space-y-6">
-                            {/* Property */}
+                        <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+                            <Card className="dark:bg-slate-800 dark:border-slate-700">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-base dark:text-white">
+                                        <Calendar className="h-4 w-4 text-sky-500 dark:text-sky-400" />
+                                        Horaires
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                    <div className="flex justify-between gap-3">
+                                        <span className="text-slate-500 dark:text-slate-400">Date</span>
+                                        <span className="font-medium dark:text-white text-right">
+                                            {formatAppointmentDate(mission.scheduled_at, {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long',
+                                            })}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between gap-3">
+                                        <span className="text-slate-500 dark:text-slate-400">Heure souhaitée</span>
+                                        <span className="font-medium dark:text-white">
+                                            {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
+                                        </span>
+                                    </div>
+                                    {mission.started_at && (
+                                        <div className="flex justify-between gap-3">
+                                            <span className="text-slate-500 dark:text-slate-400">Heure de début</span>
+                                            <span className="font-medium dark:text-white">
+                                                {new Date(mission.started_at).toLocaleTimeString('fr-FR', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </span>
+                                        </div>
+                                    )}
+                                    {mission.completed_at && mission.actual_duration_label && (
+                                        <div className="flex justify-between gap-3">
+                                            <span className="text-slate-500 dark:text-slate-400">Durée</span>
+                                            <span className="font-medium dark:text-white">
+                                                {mission.actual_duration_label}
+                                            </span>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+
                             <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-base dark:text-white">
@@ -658,7 +660,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 <CardContent>
                                     <p className="font-medium dark:text-white">{mission.property.name || mission.property.type_label}</p>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-1">
-                                        <MapPin className="h-3 w-3" />
+                                        <MapPin className="h-3 w-3 shrink-0" />
                                         {mission.property.address_line1}
                                     </p>
                                     <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -667,7 +669,6 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 </CardContent>
                             </Card>
 
-                            {/* Price */}
                             <Card className="dark:bg-slate-800 dark:border-slate-700">
                                 <CardHeader>
                                     <CardTitle className="text-base dark:text-white">Montant</CardTitle>
@@ -677,7 +678,6 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Payé</p>
                                 </CardContent>
                             </Card>
-
                         </div>
                     </div>
                 </div>

@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\Agent;
 
-use App\Models\AgentProfile;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class WithdrawRequest extends FormRequest
 {
@@ -17,14 +15,6 @@ class WithdrawRequest extends FormRequest
     {
         return [
             'amount' => ['required', 'numeric', 'min:1'],
-            'payment_method' => [
-                'required',
-                'string',
-                Rule::in([
-                    AgentProfile::PAYOUT_BANK_TRANSFER,
-                    AgentProfile::PAYOUT_MOBILE_MONEY,
-                ]),
-            ],
         ];
     }
 
@@ -34,8 +24,6 @@ class WithdrawRequest extends FormRequest
             'amount.required' => 'Le montant est obligatoire.',
             'amount.numeric' => 'Le montant doit être un nombre.',
             'amount.min' => 'Le montant minimum est de 1 €.',
-            'payment_method.required' => 'Choisissez un mode de paiement.',
-            'payment_method.in' => 'Le mode de paiement n\'est pas valide.',
         ];
     }
 }
