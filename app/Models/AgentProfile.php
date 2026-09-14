@@ -17,6 +17,9 @@ class AgentProfile extends Model
         'bank_account_holder',
         'iban',
         'bic',
+        'stripe_account_id',
+        'stripe_payouts_enabled',
+        'stripe_onboarding_status',
         'tva_number',
         'website',
         'description',
@@ -82,6 +85,7 @@ class AgentProfile extends Model
         'banned_at' => 'datetime',
         'rcp_clause_accepted' => 'boolean',
         'rcp_clause_accepted_at' => 'datetime',
+        'stripe_payouts_enabled' => 'boolean',
     ];
 
     const COMPANY_TYPE_AUTO_ENTREPRENEUR = 'auto_entrepreneur';
@@ -91,6 +95,15 @@ class AgentProfile extends Model
 
     /** @deprecated Kept for historical withdrawal metadata display */
     public const PAYOUT_MOBILE_MONEY = 'mobile_money';
+
+    // Statuts d'onboarding Stripe Connect (colonne stripe_onboarding_status)
+    public const STRIPE_STATUS_NOT_STARTED = 'not_started';
+
+    public const STRIPE_STATUS_INCOMPLETE = 'incomplete';
+
+    public const STRIPE_STATUS_PENDING = 'pending_review';
+
+    public const STRIPE_STATUS_VERIFIED = 'verified';
 
     // Relationships
     public function user()
@@ -209,6 +222,24 @@ class AgentProfile extends Model
             'bank_account_holder' => $this->bank_account_holder,
             'is_complete' => $this->hasBankDetails(),
         ];
+    }
+
+    /**
+     * Statut de vérification Stripe Connect à afficher dans le portefeuille
+     * (bandeau "à compléter" / badge "vérifié").
+     */
+    public function stripeConnectStatusForWallet(): array
+    {
+        return [
+            'has_account' => filled($this->stripe_account_id),
+            'payouts_enabled' => (bool) $this->stripe_payouts_enabled,
+            'onboarding_status' => $this->stripe_onboarding_status ?: self::STRIPE_STATUS_NOT_STARTED,
+        ];
+    }
+
+    public function hasStripePayoutsEnabled(): bool
+    {
+        return (bool) $this->stripe_payouts_enabled;
     }
 
     public function payoutMethodsForWallet(): array

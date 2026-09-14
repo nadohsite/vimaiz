@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guide utilisateur — Intervenant Vimaiz</title>
+  <style>
+    :root {
+      --sky: #0284c7;
+      --sky-soft: #e0f2fe;
+      --sky-mid: #0ea5e9;
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --ok: #059669;
+      --ok-soft: #ecfdf5;
+      --warn: #d97706;
+      --warn-soft: #fffbeb;
+      --paper: #f8fafc;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      line-height: 1.55;
+      background: var(--paper);
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px 80px; }
+    header.cover {
+      background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 55%, #38bdf8 100%);
+      color: #fff;
+      padding: 56px 24px 48px;
+      margin-bottom: 36px;
+    }
+    .cover-inner { max-width: 880px; margin: 0 auto; }
+    .cover-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .cover-brand img { height: 40px; width: auto; filter: brightness(0) invert(1); }
+    .cover-brand span { font-weight: 700; letter-spacing: .02em; }
+    header.cover h1 { font-size: 2.15rem; line-height: 1.2; margin: 0 0 12px; }
+    header.cover p.lead { font-size: 1.1rem; opacity: .95; max-width: 640px; margin: 0; }
+    .meta { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .pill {
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: .85rem;
+    }
+    nav.toc {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px 26px;
+      margin-bottom: 36px;
+    }
+    nav.toc h2 { margin: 0 0 12px; font-size: 1.05rem; }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc a { color: var(--sky); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    h2.chapter {
+      font-size: 1.45rem;
+      margin: 48px 0 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+    }
+    h2.chapter:first-of-type { border-top: 0; }
+    h3 { font-size: 1.12rem; margin: 28px 0 8px; color: #0c4a6e; }
+    p, li { color: var(--muted); }
+    strong { color: var(--ink); }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0 28px;
+    }
+    .step-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .step-card b {
+      display: block;
+      color: var(--sky);
+      font-size: .75rem;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .step-card span { font-size: .86rem; color: var(--ink); }
+    figure {
+      margin: 18px 0 8px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+    }
+    figure img { display: block; width: 100%; height: auto; }
+    figcaption {
+      font-size: .82rem;
+      color: #64748b;
+      padding: 10px 14px 12px;
+      background: #f8fafc;
+      border-top: 1px solid var(--line);
+    }
+    .callout {
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 16px 0;
+    }
+    .callout.info { background: var(--sky-soft); border: 1px solid #bae6fd; }
+    .callout.ok { background: var(--ok-soft); border: 1px solid #a7f3d0; }
+    .callout.warn { background: var(--warn-soft); border: 1px solid #fde68a; }
+    .callout p { margin: 0; color: var(--ink); }
+    ol.howto, ul.docs { color: var(--muted); }
+    ol.howto li, ul.docs li { margin: 6px 0; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+    .fake-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 8px; padding: 8px 14px; font-weight: 700; font-size: .9rem;
+    }
+    .fake-btn.green { background: #22c55e; color: #fff; }
+    .fake-btn.red { background: #fff; color: #dc2626; border: 1px solid #fecaca; }
+    .fake-btn.sky { background: #0ea5e9; color: #fff; }
+    table {
+      width: 100%; border-collapse: collapse; background: #fff;
+      border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+      margin: 16px 0 24px; font-size: .92rem;
+    }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    th { background: #f1f5f9; color: var(--ink); }
+    td { color: var(--muted); }
+    footer.guide-foot {
+      margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line);
+      font-size: .85rem; color: #64748b;
+    }
+    .print-bar {
+      position: sticky; top: 0; z-index: 20;
+      background: #fff; border-bottom: 1px solid var(--line);
+      padding: 10px 24px;
+    }
+    .print-bar-inner {
+      max-width: 880px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .print-bar button {
+      background: var(--sky); color: #fff; border: 0; border-radius: 999px;
+      padding: 8px 16px; font-weight: 700; cursor: pointer;
+    }
+    @media (max-width: 800px) {
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      header.cover h1 { font-size: 1.6rem; }
+    }
+    @media print {
+      .print-bar { display: none; }
+      body { background: #fff; }
+      header.cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      figure { break-inside: avoid; box-shadow: none; }
+      h2.chapter { break-before: page; }
+      h2.chapter:first-of-type { break-before: auto; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-bar">
+    <div class="print-bar-inner">
+      <strong>Guide intervenant Vimaiz</strong>
+      <button type="button" onclick="window.print()">Imprimer / PDF</button>
+    </div>
+  </div>
+
+  <header class="cover">
+    <div class="cover-inner">
+      <div class="cover-brand">
+        <img src="logo.png" alt="Vimaiz" />
+        <span>Espace pro</span>
+      </div>
+      <h1>Guide utilisateur intervenant</h1>
+      <p class="lead">
+        De la création de votre compte jusqu’au paiement : toutes les étapes
+        pour rejoindre le réseau, accepter des interventions et retirer vos gains.
+      </p>
+      <div class="meta">
+        <span class="pill">Parcours complet</span>
+        <span class="pill">Captures de l’espace pro</span>
+        <span class="pill">Septembre 2026</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <nav class="toc" aria-label="Sommaire">
+      <h2>Sommaire</h2>
+      <ol>
+        <li><a href="#parcours">Le parcours en un coup d’œil</a></li>
+        <li><a href="#inscription">Créer votre compte</a></li>
+        <li><a href="#connexion">Vous connecter</a></li>
+        <li><a href="#tableau">Votre tableau de bord</a></li>
+        <li><a href="#profil">Compléter votre profil</a></li>
+        <li><a href="#documents">Déposer vos documents</a></li>
+        <li><a href="#rcp">Accepter la clause RCP</a></li>
+        <li><a href="#propositions">Recevoir et accepter une intervention</a></li>
+        <li><a href="#realiser">Réaliser l’intervention</a></li>
+        <li><a href="#paiement">Portefeuille et paiement</a></li>
+        <li><a href="#suivi">Messages, avis et retours</a></li>
+      </ol>
+    </nav>
+
+    <h2 class="chapter" id="parcours">1. Le parcours en un coup d’œil</h2>
+    <p>
+      Vimaiz met en relation des propriétaires de locations saisonnières avec des
+      professionnels du ménage. Vous restez libre d’accepter ou de refuser chaque
+      intervention. Le montant affiché est <strong>votre rémunération nette</strong>
+      (Vimaiz prélève 20&nbsp;% pour la mise en relation, la plateforme et le support).
+    </p>
+    <div class="steps">
+      <div class="step-card"><b>01</b><span>Inscription</span></div>
+      <div class="step-card"><b>02</b><span>Profil &amp; documents</span></div>
+      <div class="step-card"><b>03</b><span>Vérification</span></div>
+      <div class="step-card"><b>04</b><span>Proposition</span></div>
+      <div class="step-card"><b>05</b><span>Acceptation</span></div>
+      <div class="step-card"><b>06</b><span>Intervention</span></div>
+      <div class="step-card"><b>07</b><span>Rapport</span></div>
+      <div class="step-card"><b>08</b><span>Paiement</span></div>
+    </div>
+    <div class="callout info">
+      <p>
+        <strong>Prérequis.</strong> Vous devez exercer légalement
+        (micro-entreprise, société ou autre statut déclaré). Une pièce d’identité,
+        un justificatif de domicile de moins de 3 mois et un extrait KBIS / INSEE
+        sont obligatoires. L’assurance RCP est fortement recommandée dès l’inscription
+        et devient obligatoire dans les 3 mois.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="inscription">2. Créer votre compte</h2>
+    <p>
+      Ouvrez le site Vimaiz, cliquez sur <strong>Devenir intervenant</strong>
+      (menu ou page dédiée), puis sur le bouton bleu du même nom.
+    </p>
+    <figure>
+      <img src="captures/01-professionnels.png" alt="Page Devenir intervenant Vimaiz" />
+      <figcaption>Fig. 1 — Page « Devenir intervenant » : inscription gratuite, paiement sécurisé, gestion des interventions.</figcaption>
+    </figure>
+
+    <h3>Étape 1 — Vos identifiants</h3>
+    <ol class="howto">
+      <li>Renseignez votre <strong>nom complet</strong>, votre <strong>e-mail</strong> et un mot de passe (à confirmer).</li>
+      <li>Choisissez le rôle <strong>Intervenant</strong> (icône mallette), pas Client.</li>
+      <li>Cochez l’acceptation des mentions légales et de la politique de confidentialité.</li>
+      <li>Cliquez sur <strong>Continuer</strong>. Vous pouvez aussi utiliser <strong>Continuer avec Google</strong>.</li>
+    </ol>
+    <figure>
+      <img src="captures/02-inscription-etape-1.png" alt="Formulaire d’inscription étape 1, rôle Intervenant sélectionné" />
+      <figcaption>Fig. 2 — Création de compte : le rôle Intervenant doit être sélectionné avant de continuer.</figcaption>
+    </figure>
+
+    <h3>Étape 2 — Votre profil professionnel</h3>
+    <p>Ces informations servent à vous proposer des interventions adaptées.</p>
+    <ul class="docs">
+      <li><strong>Type d’intervenant</strong> : Indépendant ou Agence / Société.</li>
+      <li><strong>Téléphone professionnel</strong>.</li>
+      <li><strong>Années d’expérience</strong>.</li>
+      <li><strong>Surface maximale</strong> : petite (− 50 m²), moyenne (− 100 m²), grande (− 200 m²) ou illimitée.</li>
+      <li><strong>Types de biens</strong> : appartement, maison, villa, chalet, gîte.</li>
+      <li><strong>Localisation de référence</strong> : saisissez votre adresse et <em>choisissez-la dans la liste</em>. Les missions vous sont proposées dans un rayon d’environ <strong>150 km</strong>.</li>
+    </ul>
+    <figure>
+      <img src="captures/03-inscription-etape-2.png" alt="Formulaire d’inscription étape 2, profil professionnel" />
+      <figcaption>Fig. 3 — Deuxième étape : métier, surface, types de biens et adresse de référence.</figcaption>
+    </figure>
+    <div class="callout warn">
+      <p>
+        Sans adresse sélectionnée dans la liste, votre position GPS n’est pas
+        enregistrée et vous ne recevrez pas d’interventions près de chez vous.
+        Cliquez ensuite sur <strong>Finaliser mon inscription</strong>.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="connexion">3. Vous connecter</h2>
+    <p>
+      Rendez-vous sur <strong>Connexion</strong>, saisissez votre e-mail et votre mot de passe,
+      puis cliquez sur <strong>Se connecter</strong>. Cochez « Se souvenir de moi » si vous
+      utilisez un appareil personnel. La connexion Google est également disponible.
+    </p>
+    <figure>
+      <img src="captures/04-connexion.png" alt="Page de connexion Vimaiz" />
+      <figcaption>Fig. 4 — Connexion à l’espace personnalisé.</figcaption>
+    </figure>
+    <p>
+      Mot de passe oublié ? Cliquez sur <strong>Oublié ?</strong>, indiquez votre e-mail
+      puis <strong>Envoyer le lien de réinitialisation</strong>.
+    </p>
+    <figure>
+      <img src="captures/05-mot-de-passe-oublie.png" alt="Page mot de passe oublié" />
+      <figcaption>Fig. 5 — Réinitialisation du mot de passe par e-mail.</figcaption>
+    </figure>
+
+    <h2 class="chapter" id="tableau">4. Votre tableau de bord</h2>
+    <p>
+      Après connexion, vous arrivez sur l’<strong>Espace pro</strong>. Le menu de gauche
+      regroupe tout le parcours : interventions, documents, clause RCP, portefeuille,
+      avis, retours clients, messages et profil.
+    </p>
+    <figure>
+      <img src="captures/06-tableau-de-bord.png" alt="Tableau de bord intervenant" />
+      <figcaption>Fig. 6 — Tableau de bord : solde, interventions, revenus et rappels de profil.</figcaption>
+    </figure>
+    <p>Vous y voyez notamment :</p>
+    <ul class="docs">
+      <li><strong>Solde disponible</strong> et montant <strong>en attente de paiement</strong>.</li>
+      <li>Le nombre d’<strong>interventions terminées</strong> et votre <strong>note interne</strong>.</li>
+      <li>Les <strong>interventions en attente de votre réponse</strong> (bandeau orange « À confirmer »).</li>
+      <li>Les <strong>interventions à venir</strong> et les <strong>dernières terminées</strong>.</li>
+    </ul>
+    <div class="callout info">
+      <p>
+        Si le bandeau « Indiquez votre localisation » apparaît, cliquez sur
+        <strong>Compléter mon profil</strong> avant d’attendre des missions.
+        Tant que vos documents ne sont pas validés, un bandeau orange
+        « Finalisez vos documents » s’affiche aussi.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="profil">5. Compléter votre profil</h2>
+    <p>
+      Menu <strong>Mon profil</strong>. Ajoutez une photo (JPG ou PNG, 2 Mo max),
+      votre prénom, nom, e-mail, téléphone, puis surtout votre
+      <strong>localisation de référence</strong>. Enregistrez.
+    </p>
+    <figure>
+      <img src="captures/07-profil.png" alt="Page Paramètres du profil" />
+      <figcaption>Fig. 7 — Paramètres du profil : identité, photo et adresse dans un rayon de 150 km.</figcaption>
+    </figure>
+    <p>
+      Les onglets <strong>Mot de passe</strong>, <strong>Sécurité</strong> et
+      <strong>Apparence</strong> permettent de changer le mot de passe, d’activer
+      la double authentification et de choisir le thème de l’interface.
+    </p>
+
+    <h2 class="chapter" id="documents">6. Déposer vos documents</h2>
+    <p>
+      Menu <strong>Mes documents</strong>. Téléchargez chaque justificatif
+      (JPEG, PNG ou PDF, 5 Mo max), puis cliquez sur
+      <strong>Soumettre pour vérification</strong> lorsque tous les documents
+      obligatoires sont en place. L’équipe Vimaiz valide ensuite votre profil.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Document</th><th>Obligatoire</th><th>Détail</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Pièce d’identité</td><td>Oui</td><td>CNI ou passeport en cours de validité</td></tr>
+        <tr><td>Justificatif de domicile</td><td>Oui</td><td>Facture de moins de 3 mois</td></tr>
+        <tr><td>Extrait KBIS ou INSEE</td><td>Oui</td><td>Atteste de votre SIRET</td></tr>
+        <tr><td>Permis de conduire</td><td>Non</td><td>Recto-verso, optionnel</td></tr>
+        <tr><td>Attestation RC Pro</td><td>Recommandé</td><td>Obligatoire sous 3 mois</td></tr>
+      </tbody>
+    </table>
+    <figure>
+      <img src="captures/08-documents.png" alt="Page Mes documents, statut Vérifié" />
+      <figcaption>Fig. 8 — Une fois le statut « Vérifié », vous pouvez recevoir des interventions. Vous pouvez encore Voir / Remplacer un fichier.</figcaption>
+    </figure>
+    <div class="callout ok">
+      <p>
+        Vous êtes notifié par e-mail et dans l’espace Notifications lorsque les
+        documents sont validés : « Vous pouvez maintenant recevoir des interventions. »
+        En cas de rejet, la raison s’affiche sur cette page : corrigez le fichier et renvoyez.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="rcp">7. Accepter la clause RCP</h2>
+    <p>
+      Menu <strong>Clause RCP</strong>. Lisez le texte, cochez
+      « Je reconnais avoir pris connaissance de cette clause… », puis
+      <strong>Valider et continuer</strong>.
+    </p>
+    <figure>
+      <img src="captures/09-clause-rcp.png" alt="Clause Responsabilité Civile Professionnelle acceptée" />
+      <figcaption>Fig. 9 — Clause RCP : responsabilité professionnelle et consigne qualité en cas de mécontentement client.</figcaption>
+    </figure>
+    <p>
+      Sans assurance RCP valide, vous assumez seul les dommages causés pendant
+      vos prestations. La plateforme n’en est pas responsable. Un retour sur site
+      est fortement conseillé si un client est mécontent à juste titre.
+    </p>
+
+    <h2 class="chapter" id="propositions">8. Recevoir et accepter une intervention</h2>
+    <p>
+      Dès qu’une mission correspond à votre zone, vous êtes notifié
+      (« Une intervention vous est proposée »). Elle apparaît :
+    </p>
+    <ul class="docs">
+      <li>sur le <strong>tableau de bord</strong>, encadré orange « À confirmer », avec le gain et la date ;</li>
+      <li>dans <strong>Mes interventions</strong>, avec le filtre de statut ;</li>
+      <li>en détail, en cliquant sur la mission.</li>
+    </ul>
+    <figure>
+      <img src="captures/10-interventions.png" alt="Liste Mes interventions" />
+      <figcaption>Fig. 10 — Liste des interventions : numéro, ville, date/heure et « Votre gain » (rémunération nette).</figcaption>
+    </figure>
+    <p>Sur une proposition, deux actions s’affichent :</p>
+    <div class="btn-row">
+      <span class="fake-btn green">✓ Accepter</span>
+      <span class="fake-btn red">✕ Décliner</span>
+    </div>
+    <ul class="docs">
+      <li><strong>Accepter</strong> : vous devenez responsable de l’intervention. Les autres intervenants ne peuvent plus la prendre.</li>
+      <li><strong>Décliner</strong> : la mission disparaît de votre liste et reste proposée aux autres. Une confirmation vous est demandée.</li>
+    </ul>
+    <div class="callout warn">
+      <p>
+        Le premier intervenant qui accepte réserve la mission. Relisez le gain,
+        la date, la ville et le détail du bien avant de confirmer.
+      </p>
+    </div>
+    <figure>
+      <img src="captures/16-notifications.png" alt="Centre de notifications" />
+      <figcaption>Fig. 11 — Notifications : proposition, documents validés, intervention confirmée, crédit portefeuille.</figcaption>
+    </figure>
+
+    <h2 class="chapter" id="realiser">9. Réaliser l’intervention</h2>
+    <h3>Avant le jour J</h3>
+    <p>
+      Ouvrez la mission pour retrouver l’adresse, les caractéristiques du bien,
+      le code d’accès, le Wi-Fi, les consignes poubelles, la carte et le client.
+      Un bouton <strong>Conversation</strong> permet d’écrire au propriétaire.
+      Google Maps et Waze sont proposés pour l’itinéraire.
+    </p>
+
+    <h3>Démarrer sur place</h3>
+    <p>
+      Placez-vous <strong>devant le bien</strong>, autorisez la localisation,
+      puis cliquez sur <strong>Démarrer l’intervention</strong>. Vimaiz vérifie
+      que vous êtes au bon endroit. Tant que l’intervention n’est pas démarrée,
+      vous pouvez encore la décliner si un empêchement survient.
+    </p>
+    <div class="btn-row">
+      <span class="fake-btn sky">▶ Démarrer l’intervention</span>
+    </div>
+
+    <h3>Pendant la prestation</h3>
+    <p>
+      Cochez la <strong>checklist du bien</strong> (salon, cuisine, salles d’eau,
+      chambres, terrasse, consommables, vérifications). Le compteur
+      « Checklist : X / Y » et le temps passé s’affichent.
+    </p>
+    <figure>
+      <img src="captures/11-intervention-en-cours.png" alt="Fiche d’une intervention en cours" />
+      <figcaption>Fig. 12 — Intervention en cours : checklist, accès, horaires, client et carte.</figcaption>
+    </figure>
+
+    <h3>Terminer et envoyer le rapport</h3>
+    <ol class="howto">
+      <li>Cliquez sur <strong>Terminer l’intervention</strong>.</li>
+      <li>Si tout est conforme : <strong>Rien à signaler</strong> (rapport généré automatiquement).</li>
+      <li>Sinon : <strong>Oui, signaler un élément</strong>, choisissez le lieu puis le type d’anomalie.</li>
+    </ol>
+    <figure>
+      <img src="captures/12-rapport-fin.png" alt="Fenêtre Rapport de fin d’intervention" />
+      <figcaption>Fig. 13 — Rapport de fin : rien à signaler, ou signalement guidé sans rédaction obligatoire.</figcaption>
+    </figure>
+    <p>
+      Une fois terminée, le statut passe à <strong>Intervention terminée</strong>.
+      Vous pouvez télécharger la facture. Le client peut ensuite laisser un avis.
+    </p>
+    <figure>
+      <img src="captures/13-intervention-terminee.png" alt="Fiche d’une intervention terminée" />
+      <figcaption>Fig. 14 — Mission terminée : checklist cochée, rapport, facture et localisation.</figcaption>
+    </figure>
+
+    <h2 class="chapter" id="paiement">10. Portefeuille et paiement</h2>
+    <p>
+      À la clôture de l’intervention, votre gain est <strong>crédité sur le portefeuille</strong>
+      (notification du type « 56,25 € crédités »). Menu <strong>Mon portefeuille</strong>.
+    </p>
+    <figure>
+      <img src="captures/14-portefeuille.png" alt="Page Mon portefeuille" />
+      <figcaption>Fig. 15 — Portefeuille : solde disponible, en attente, total gagné, total retiré et historique.</figcaption>
+    </figure>
+    <h3>Enregistrer votre IBAN</h3>
+    <ol class="howto">
+      <li>Titulaire du compte</li>
+      <li>IBAN (format FR76…)</li>
+      <li>BIC (optionnel)</li>
+      <li><strong>Enregistrer</strong></li>
+    </ol>
+    <p>
+      Sans IBAN, le bouton <strong>Demander un retrait</strong> reste inactif
+      (« Enregistrez votre IBAN pour activer les retraits »).
+    </p>
+    <h3>Demander un retrait</h3>
+    <ol class="howto">
+      <li>Cliquez sur <strong>Demander un retrait</strong>.</li>
+      <li>Vérifiez le virement indiqué (titulaire + IBAN).</li>
+      <li>Saisissez le montant (minimum <strong>1 €</strong>, maximum = solde disponible).</li>
+      <li>Confirmez. La demande passe en <strong>En attente</strong> jusqu’au virement effectué par Vimaiz.</li>
+    </ol>
+    <div class="callout info">
+      <p>
+        <strong>Solde disponible</strong> = déjà crédité et retirable.
+        <strong>En attente</strong> = paiement encore en cours de traitement.
+        L’historique liste chaque crédit de mission et chaque retrait.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="suivi">11. Messages, avis et retours</h2>
+    <h3>Messages</h3>
+    <p>
+      Menu <strong>Messages</strong>, ou bouton <strong>Conversation</strong> depuis une mission.
+      Échangez uniquement via la plateforme pour garder la trace de l’intervention.
+    </p>
+    <figure>
+      <img src="captures/17-messages.png" alt="Liste des conversations" />
+      <figcaption>Fig. 16 — Conversations avec les clients rattachés à vos interventions.</figcaption>
+    </figure>
+
+    <h3>Avis clients</h3>
+    <p>
+      Menu <strong>Mes avis</strong> : note moyenne, nombre d’avis et commentaires
+      après les missions terminées.
+    </p>
+    <figure>
+      <img src="captures/18-avis.png" alt="Page Mes avis clients" />
+      <figcaption>Fig. 17 — Suivi de votre réputation après les prestations.</figcaption>
+    </figure>
+
+    <h3>Retours clients</h3>
+    <p>
+      Si un client signale un mécontentement, la demande apparaît dans
+      <strong>Retours clients</strong>. Démarrez le retour, corrigez la prestation,
+      ajoutez vos notes puis marquez-le comme effectué. Le client valide ensuite.
+    </p>
+    <figure>
+      <img src="captures/19-retours.png" alt="Page Retours mécontentement" />
+      <figcaption>Fig. 18 — Gestion des retours : ici, aucun retour en attente.</figcaption>
+    </figure>
+
+    <h2 class="chapter">Pour aller plus loin</h2>
+    <table>
+      <thead>
+        <tr><th>Question</th><th>Réponse courte</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Dois-je accepter toutes les missions ?</td><td>Non. Vous restez libre selon vos disponibilités.</td></tr>
+        <tr><td>Quel montant vais-je toucher ?</td><td>Celui affiché en vert (« Votre gain »), déjà net de commission 20&nbsp;%.</td></tr>
+        <tr><td>Dois-je apporter le matériel ?</td><td>Oui, sauf mention contraire dans la fiche mission.</td></tr>
+        <tr><td>Pourquoi je ne reçois pas de missions ?</td><td>Vérifiez adresse GPS, documents « Vérifié » et clause RCP.</td></tr>
+        <tr><td>Comment retirer l’argent ?</td><td>IBAN enregistré, puis Demander un retrait (min. 1 €).</td></tr>
+      </tbody>
+    </table>
+    <div class="callout ok">
+      <p>
+        Besoin d’aide ? Utilisez la page <strong>Contact</strong> du site Vimaiz
+        ou répondez à un e-mail de notification. Conservez vos justificatifs à jour
+        pour rester éligible aux nouvelles interventions.
+      </p>
+    </div>
+
+    <footer class="guide-foot">
+      Guide utilisateur intervenant — Vimaiz Espace pro · Captures réalisées sur l’interface réelle ·
+      Document interne / formation · Septembre 2026
+    </footer>
+  </div>
+</body>
+</html>

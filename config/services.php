@@ -46,6 +46,10 @@ return [
         'secret' => env('STRIPE_SECRET'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
         'currency' => env('STRIPE_CURRENCY', 'eur'),
+
+        // Pays utilisé pour la création des comptes Stripe Connect Express des
+        // intervenants (détermine les infos légales/KYC demandées par Stripe).
+        'connect_country' => env('STRIPE_CONNECT_COUNTRY', 'FR'),
     ],
 
 ];

@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ import {
     Banknote,
     CreditCard,
     AlertTriangle,
+    ShieldCheck,
+    ExternalLink,
 } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -69,11 +71,18 @@ interface PayoutMethod {
     summary: string;
 }
 
+interface StripeStatus {
+    has_account: boolean;
+    payouts_enabled: boolean;
+    onboarding_status: 'not_started' | 'incomplete' | 'pending_review' | 'verified' | string;
+}
+
 interface Props {
     wallet: WalletData;
     transactions: PaginatedTransactions;
     bankDetails: BankDetails;
     payoutMethods: PayoutMethod[];
+    stripeStatus: StripeStatus;
 }
 
 const breadcrumbs = [
@@ -92,6 +101,7 @@ export default function WalletIndex({
     transactions,
     bankDetails,
     payoutMethods,
+    stripeStatus,
 }: Props) {
     const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
     const { props } = usePage<{ flash?: { success?: string; error?: string } }>();
@@ -258,12 +268,19 @@ export default function WalletIndex({
                     <div className="mb-8">
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 dark:text-white">
+                                <CardTitle className="flex flex-wrap items-center gap-2 dark:text-white">
                                     <CreditCard className="h-5 w-5" />
                                     Virement bancaire
+                                    {stripeStatus.payouts_enabled && (
+                                        <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                            <ShieldCheck className="mr-1 h-3.5 w-3.5" />
+                                            Compte bancaire vérifié
+                                        </Badge>
+                                    )}
                                 </CardTitle>
                                 <CardDescription className="dark:text-slate-400">
-                                    Enregistrez votre IBAN pour recevoir des virements.
+                                    Enregistrez votre IBAN pour recevoir des virements. Stripe vérifie ensuite votre
+                                    identité et vos informations bancaires réelles de paiement.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -273,6 +290,22 @@ export default function WalletIndex({
                                         <p className="text-sm text-amber-800 dark:text-amber-300">
                                             Ajoutez vos coordonnées bancaires pour pouvoir demander un retrait.
                                         </p>
+                                    </div>
+                                )}
+                                {bankDetails.is_complete && !stripeStatus.payouts_enabled && (
+                                    <div className="mb-6 flex flex-col gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20 sm:flex-row sm:items-center sm:justify-between">
+                                        <div className="flex items-start gap-3">
+                                            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+                                            <p className="text-sm text-amber-800 dark:text-amber-300">
+                                                Complétez la vérification de paiement pour activer les virements Stripe.
+                                            </p>
+                                        </div>
+                                        <Button asChild size="sm" className="shrink-0 bg-amber-600 hover:bg-amber-700">
+                                            <Link href={route('agent.wallet.stripe.onboarding')}>
+                                                Continuer sur Stripe
+                                                <ExternalLink className="ml-2 h-4 w-4" />
+                                            </Link>
+                                        </Button>
                                     </div>
                                 )}
                                 <form onSubmit={handleSaveBankDetails} className="space-y-4 max-w-xl">

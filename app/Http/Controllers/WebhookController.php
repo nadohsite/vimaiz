@@ -8,15 +8,18 @@ use App\Models\Mission;
 use App\Models\Quote;
 use App\Models\Wallet;
 use App\Services\MissionService;
+use App\Services\StripeConnectService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Stripe\Account;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Webhook;
 
 class WebhookController extends Controller
 {
     public function __construct(
-        protected MissionService $missionService
+        protected MissionService $missionService,
+        protected StripeConnectService $stripeConnect
     ) {}
 
     public function handleStripeWebhook(Request $request)
@@ -44,6 +47,10 @@ class WebhookController extends Controller
 
             case 'charge.refunded':
                 $this->handleChargeRefunded($event->data->object);
+                break;
+
+            case 'account.updated':
+                $this->handleAccountUpdated($event->data->object);
                 break;
 
             default:
@@ -168,5 +175,25 @@ class WebhookController extends Controller
 
             Log::info('Refund processed for booking: '.$booking->booking_number);
         }
+    }
+
+    /**
+     * Stripe Connect : suivi du statut de vérification / activation des payouts
+     * d'un compte Express d'intervenant (déclenché à chaque évolution du compte
+     * côté Stripe : identité soumise, banque validée, payouts activés, etc.).
+     */
+    protected function handleAccountUpdated(Account $account): void
+    {
+        $profile = $this->stripeConnect->findProfileByAccountId($account->id);
+
+        if (! $profile) {
+            Log::info('Webhook account.updated reçu pour un compte inconnu: '.$account->id);
+
+            return;
+        }
+
+        $this->stripeConnect->applyAccountStatus($profile, $account);
+
+        Log::info('Stripe Connect account.updated traité pour '.$account->id.' (payouts_enabled: '.($account->payouts_enabled ? 'oui' : 'non').')');
     }
 }

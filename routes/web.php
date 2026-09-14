@@ -243,6 +243,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/wallet/bank-details', [WalletController::class, 'updateBankDetails'])->name('wallet.bank-details');
         Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 
+        // VIMAIZ - Stripe Connect (onboarding paiement agent)
+        Route::get('/wallet/stripe/onboarding', [WalletController::class, 'connectOnboarding'])->name('wallet.stripe.onboarding');
+        Route::get('/wallet/stripe/return', [WalletController::class, 'connectReturn'])->name('wallet.stripe.return');
+        Route::get('/wallet/stripe/refresh', [WalletController::class, 'connectRefresh'])->name('wallet.stripe.refresh');
+
         // VIMAIZ - Documents Agent
         Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
         Route::post('/documents/{type}/upload', [DocumentController::class, 'upload'])->name('documents.upload');
