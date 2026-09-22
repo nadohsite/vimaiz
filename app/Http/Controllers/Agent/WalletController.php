@@ -13,6 +13,7 @@ use App\Services\StripeConnectNotConfiguredException;
 use App\Services\StripeConnectService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 use Stripe\Exception\ApiErrorException;
@@ -107,6 +108,12 @@ class WalletController extends Controller
                 'Coordonnées bancaires enregistrées. La vérification de paiement Stripe n\'est pas encore configurée côté serveur, elle sera disponible prochainement.'
             );
         } catch (ApiErrorException $e) {
+            Log::error('Stripe Connect (updateBankDetails): '.$e->getMessage(), [
+                'user_id' => $user->id,
+                'exception_class' => get_class($e),
+                'http_status' => method_exists($e, 'getHttpStatus') ? $e->getHttpStatus() : null,
+            ]);
+
             return redirect()->route('agent.wallet.index')->with(
                 'success',
                 'Coordonnées bancaires enregistrées. La vérification Stripe n\'a pas pu démarrer automatiquement, réessayez via "Continuer sur Stripe".'
@@ -192,6 +199,12 @@ class WalletController extends Controller
                 'iban' => 'La vérification de paiement Stripe n\'est pas encore configurée côté serveur.',
             ]);
         } catch (ApiErrorException $e) {
+            Log::error('Stripe Connect (buildOnboardingUrl): '.$e->getMessage(), [
+                'user_id' => $request->user()->id,
+                'exception_class' => get_class($e),
+                'http_status' => method_exists($e, 'getHttpStatus') ? $e->getHttpStatus() : null,
+            ]);
+
             return redirect()->route('agent.wallet.index')->withErrors([
                 'iban' => 'Impossible de contacter Stripe pour le moment, réessayez dans quelques instants.',
             ]);

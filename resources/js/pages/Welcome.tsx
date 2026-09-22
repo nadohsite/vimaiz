@@ -217,19 +217,19 @@ export default function Welcome({
 
     return (
         <PublicLayout
-            title="VIMAIZ — Dormez l'esprit Tranquille"
-            description="Dormez l'esprit Tranquille. Vimaiz veille à ce que chacun de vos logements soit toujours prêt à accueillir les prochains voyageurs."
+            title="VIMAIZ — Vous habitez loin. Vimaiz veille sur votre logement."
+            description="Vous habitez loin. Vimaiz veille sur votre logement."
         >
             <section className="hero wrap">
                 <div className="hero-grid">
                     <div>
                         {/* <span className="eyebrow rise-1">Plateforme de préparation des logements</span> */}
                         <h1 className="rise-2">
-                            Dormez l&apos;esprit
-                            <span className="accent"> Tranquille</span>
+                            Vous habitez loin.
+                            <span className="accent"> Vimaiz veille sur votre logement.</span>
                         </h1>
                         <p className="hero-sub rise-3">
-                            Vimaiz veille à ce que chacun de vos logements soit toujours prêt à
+                            Vimaiz veille à ce que vos logements soit toujours prêt à
                             accueillir les prochains voyageurs.
                         </p>
                         <div className="hero-ctas rise-4">
@@ -243,15 +243,19 @@ export default function Welcome({
                         <div className="trust-row trust-row-centered">
                             <span>
                                 <CheckIcon />
-                                Paiement sécurisé
+                                Vous programmez
                             </span>
                             <span>
                                 <CheckIcon />
-                                Intervenants vérifiés SIRET
+                                Vimaiz assigne
                             </span>
                             <span>
                                 <CheckIcon />
-                                Suivi des prestations
+                                L&apos;intervention est suivie
+                            </span>
+                            <span>
+                                <CheckIcon />
+                                Vous êtes informé
                             </span>
                         </div>
 
@@ -694,8 +698,8 @@ export default function Welcome({
                                         />
                                     </svg>
                                 </div>
-                                <h3>Intervenants vérifiés</h3>
-                                <p>SIRET et documents contrôlés avant intégration au réseau.</p>
+                                <h3>Vous programmez</h3>
+                                <p>Choisissez votre logement, la date et l&apos;intervention.</p>
                             </div>
                             <div className="about-card">
                                 <div className="type-icon">
@@ -722,8 +726,8 @@ export default function Welcome({
                                         />
                                     </svg>
                                 </div>
-                                <h3>Paiement sécurisé</h3>
-                                <p>Débité avant chaque intervention, jamais avant validation.</p>
+                                <h3>Vimaiz assigne</h3>
+                                <p>Un intervenant disponible reçoit la mission et choisit de l&apos;accepter.</p>
                             </div>
                             <div className="about-card">
                                 <div className="type-icon">
@@ -742,10 +746,10 @@ export default function Welcome({
                                         />
                                     </svg>
                                 </div>
-                                <h3>Organisation claire</h3>
+                                <h3>L&apos;intervention est suivie</h3>
                                 <p>
-                                    Suivi des prestations, échanges et historique centralisés dans
-                                    un seul espace.
+                                    Arrivée, début, durée, checklist et éventuelles anomalies sont
+                                    enregistrés.
                                 </p>
                             </div>
                             <div className="about-card">
@@ -772,10 +776,10 @@ export default function Welcome({
                                         />
                                     </svg>
                                 </div>
-                                <h3>Partout en France</h3>
+                                <h3>Vous êtes informé</h3>
                                 <p>
-                                    Un réseau national de professionnels, disponible où que vous
-                                    soyez.
+                                    Recevez le compte rendu et validez l&apos;intervention ou
+                                    demandez un nouveau passage.
                                 </p>
                             </div>
                         </div>

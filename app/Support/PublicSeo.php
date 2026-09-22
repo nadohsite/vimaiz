@@ -14,7 +14,7 @@ class PublicSeo
         $pages = [
             'Welcome' => [
                 'title' => 'VIMAIZ — Dormez l\'esprit Tranquille',
-                'description' => 'Dormez l\'esprit Tranquille. Vimaiz veille à ce que chacun de vos logements soit toujours prêt à accueillir les prochains voyageurs.',
+                'description' => 'Dormez l\'esprit Tranquille. Vimaiz veille à ce que vos logements soit toujours prêt à accueillir les prochains voyageurs.',
             ],
             'auth/login' => [
                 'title' => 'Connexion',

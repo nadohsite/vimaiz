@@ -303,6 +303,18 @@
     text-align: center;
 }
 
+@media (min-width: 641px) {
+    .welcome-page .hero-grid:not(.hero-grid-solo) .trust-row {
+        flex-wrap: nowrap;
+        gap: 14px;
+        font-size: 13px;
+    }
+
+    .welcome-page .hero-grid:not(.hero-grid-solo) .trust-row span {
+        white-space: nowrap;
+    }
+}
+
 .welcome-page .hero-grid-solo {
     grid-template-columns: 1fr;
     max-width: 720px;
