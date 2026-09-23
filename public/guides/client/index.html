@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guide utilisateur — Client Vimaiz</title>
+  <style>
+    :root {
+      --sky: #0284c7;
+      --sky-soft: #e0f2fe;
+      --sky-mid: #0ea5e9;
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --ok: #059669;
+      --ok-soft: #ecfdf5;
+      --warn: #d97706;
+      --warn-soft: #fffbeb;
+      --paper: #f8fafc;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      line-height: 1.55;
+      background: var(--paper);
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px 80px; }
+    header.cover {
+      background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 55%, #38bdf8 100%);
+      color: #fff;
+      padding: 56px 24px 48px;
+      margin-bottom: 36px;
+    }
+    .cover-inner { max-width: 880px; margin: 0 auto; }
+    .cover-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .cover-brand img { height: 40px; width: auto; filter: brightness(0) invert(1); }
+    .cover-brand span { font-weight: 700; letter-spacing: .02em; }
+    header.cover h1 { font-size: 2.15rem; line-height: 1.2; margin: 0 0 12px; }
+    header.cover p.lead { font-size: 1.1rem; opacity: .95; max-width: 640px; margin: 0; }
+    .meta { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .pill {
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: .85rem;
+    }
+    nav.toc {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px 26px;
+      margin-bottom: 36px;
+    }
+    nav.toc h2 { margin: 0 0 12px; font-size: 1.05rem; }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc a { color: var(--sky); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    h2.chapter {
+      font-size: 1.45rem;
+      margin: 48px 0 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+    }
+    h2.chapter:first-of-type { border-top: 0; }
+    h3 { font-size: 1.12rem; margin: 28px 0 8px; color: #0c4a6e; }
+    p, li { color: var(--muted); }
+    strong { color: var(--ink); }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0 28px;
+    }
+    .step-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .step-card b {
+      display: block;
+      color: var(--sky);
+      font-size: .75rem;
+      letter-spacing: .08em;
+      margin-bottom: 6px;
+    }
+    .step-card span { font-size: .86rem; color: var(--ink); }
+    .callout {
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 16px 0;
+    }
+    .callout.info { background: var(--sky-soft); border: 1px solid #bae6fd; }
+    .callout.ok { background: var(--ok-soft); border: 1px solid #a7f3d0; }
+    .callout.warn { background: var(--warn-soft); border: 1px solid #fde68a; }
+    .callout p { margin: 0; color: var(--ink); }
+    ol.howto, ul.docs { color: var(--muted); }
+    ol.howto li, ul.docs li { margin: 6px 0; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+    .fake-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 8px; padding: 8px 14px; font-weight: 700; font-size: .9rem;
+    }
+    .fake-btn.green { background: #22c55e; color: #fff; }
+    .fake-btn.red { background: #fff; color: #dc2626; border: 1px solid #fecaca; }
+    .fake-btn.sky { background: #0ea5e9; color: #fff; }
+    .fake-btn.ghost { background: #fff; color: #0284c7; border: 1px solid #bae6fd; }
+    table {
+      width: 100%; border-collapse: collapse; background: #fff;
+      border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+      margin: 16px 0 24px; font-size: .92rem;
+    }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    th { background: #f1f5f9; color: var(--ink); }
+    td { color: var(--muted); }
+    footer.guide-foot {
+      margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line);
+      font-size: .85rem; color: #64748b;
+    }
+    .print-bar {
+      position: sticky; top: 0; z-index: 20;
+      background: #fff; border-bottom: 1px solid var(--line);
+      padding: 10px 24px;
+    }
+    .print-bar-inner {
+      max-width: 880px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .print-bar button {
+      background: var(--sky); color: #fff; border: 0; border-radius: 999px;
+      padding: 8px 16px; font-weight: 700; cursor: pointer;
+    }
+    @media (max-width: 800px) {
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      header.cover h1 { font-size: 1.6rem; }
+    }
+    @media print {
+      .print-bar { display: none; }
+      body { background: #fff; }
+      header.cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      h2.chapter { break-before: page; }
+      h2.chapter:first-of-type { break-before: auto; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-bar">
+    <div class="print-bar-inner">
+      <strong>Guide client Vimaiz</strong>
+      <button type="button" onclick="window.print()">Imprimer / PDF</button>
+    </div>
+  </div>
+
+  <header class="cover">
+    <div class="cover-inner">
+      <div class="cover-brand">
+        <img src="logo.png" alt="Vimaiz" />
+        <span>Espace client</span>
+      </div>
+      <h1>Guide utilisateur client</h1>
+      <p class="lead">
+        Vous habitez loin de votre logement ? Vimaiz vous permet de garder le contrôle
+        à distance : programmez, suivez et payez l’entretien de vos logements en
+        location saisonnière depuis votre espace, où que vous soyez.
+      </p>
+      <div class="meta">
+        <span class="pill">Parcours complet</span>
+        <span class="pill">Espace propriétaire</span>
+        <span class="pill">Septembre 2026</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <nav class="toc" aria-label="Sommaire">
+      <h2>Sommaire</h2>
+      <ol>
+        <li><a href="#parcours">Le parcours en un coup d’œil</a></li>
+        <li><a href="#inscription">Créer votre compte</a></li>
+        <li><a href="#connexion">Vous connecter</a></li>
+        <li><a href="#tableau">Votre tableau de bord</a></li>
+        <li><a href="#biens">Ajouter et gérer vos biens</a></li>
+        <li><a href="#demande">Programmer une intervention</a></li>
+        <li><a href="#devis">Recevoir et accepter votre devis</a></li>
+        <li><a href="#paiement">Payer votre intervention</a></li>
+        <li><a href="#suivi">Suivre l’intervention à distance</a></li>
+        <li><a href="#apres">Compte rendu, avis et retour</a></li>
+        <li><a href="#factures">Factures, notifications et messages</a></li>
+      </ol>
+    </nav>
+
+    <h2 class="chapter" id="parcours">1. Le parcours en un coup d’œil</h2>
+    <p>
+      Vimaiz coordonne les interventions nécessaires à l’entretien de vos logements
+      et vous permet de suivre leur déroulement depuis votre espace, même lorsque
+      vous êtes à plusieurs centaines de kilomètres. Vous programmez, un intervenant
+      vérifié s’en charge, et vous gardez une vision claire de chaque étape jusqu’au
+      compte rendu final.
+    </p>
+    <div class="steps">
+      <div class="step-card"><b>01</b><span>Inscription</span></div>
+      <div class="step-card"><b>02</b><span>Ajout d’un bien</span></div>
+      <div class="step-card"><b>03</b><span>Demande</span></div>
+      <div class="step-card"><b>04</b><span>Devis</span></div>
+      <div class="step-card"><b>05</b><span>Paiement</span></div>
+      <div class="step-card"><b>06</b><span>Suivi à distance</span></div>
+      <div class="step-card"><b>07</b><span>Compte rendu</span></div>
+      <div class="step-card"><b>08</b><span>Avis</span></div>
+    </div>
+    <div class="callout info">
+      <p>
+        <strong>Prérequis.</strong> Il vous faut au moins un bien enregistré dans
+        <strong>Mes biens</strong> pour pouvoir créer une demande d’intervention.
+        Chaque demande donne lieu à un devis sous 24&nbsp;h, que vous acceptez et
+        payez en ligne avant que l’intervention ne soit programmée.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="inscription">2. Créer votre compte</h2>
+    <p>
+      Ouvrez la page <strong>Inscription</strong> et renseignez votre
+      <strong>nom complet</strong>, votre <strong>adresse e-mail</strong> et un
+      <strong>mot de passe</strong> (à confirmer).
+    </p>
+    <ol class="howto">
+      <li>Sous « Je souhaite m’inscrire en tant que », choisissez la tuile <strong>Client</strong> (et non Intervenant).</li>
+      <li>Cochez l’acceptation des <strong>Mentions légales</strong> et de la <strong>Politique de confidentialité</strong>.</li>
+      <li>Cliquez sur <strong>Créer mon compte client</strong>. Vous pouvez aussi utiliser <strong>Continuer avec Google</strong>.</li>
+    </ol>
+    <div class="callout ok">
+      <p>
+        Contrairement au parcours intervenant, aucune information professionnelle
+        n’est demandée : votre compte client est immédiatement actif et vous
+        accédez directement à votre tableau de bord.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="connexion">3. Vous connecter</h2>
+    <p>
+      Rendez-vous sur <strong>Connexion</strong>, saisissez votre e-mail et votre mot
+      de passe, puis cliquez sur <strong>Se connecter</strong>. Cochez « Se souvenir
+      de moi » si vous utilisez un appareil personnel. La connexion Google est
+      également disponible.
+    </p>
+    <p>
+      Mot de passe oublié ? Cliquez sur <strong>Oublié ?</strong>, indiquez votre
+      e-mail puis envoyez le lien de réinitialisation.
+    </p>
+
+    <h2 class="chapter" id="tableau">4. Votre tableau de bord</h2>
+    <p>
+      Après connexion, vous arrivez sur votre espace avec le message
+      « Bonjour {Votre prénom} — Gérez vos biens et interventions en toute
+      simplicité. » Un bouton <strong>Nouvelle intervention</strong> est accessible
+      directement depuis cette page.
+    </p>
+    <p>Vous y retrouvez :</p>
+    <ul class="docs">
+      <li>Quatre indicateurs : <strong>Biens</strong>, <strong>Demandes en cours</strong>, <strong>Interventions effectuées</strong> et <strong>Total dépensé</strong>.</li>
+      <li>La section <strong>Prochaines interventions</strong>, avec un lien « Voir tout » vers <strong>Mes interventions</strong>.</li>
+      <li>Un bloc <strong>Accès rapide</strong> : Mes biens, Mes demandes, Historique.</li>
+      <li>Un aperçu de <strong>Mes biens</strong>, avec le bouton <strong>Ajouter un bien</strong> si vous n’en avez pas encore.</li>
+    </ul>
+    <table>
+      <thead>
+        <tr><th>Statut affiché</th><th>Signification</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Intervention en attente</td><td>La demande est payée, en attente qu’un intervenant l’accepte.</td></tr>
+        <tr><td>Intervention confirmée</td><td>Un intervenant a accepté la mission.</td></tr>
+        <tr><td>En cours</td><td>L’intervenant est sur place et réalise la prestation.</td></tr>
+        <tr><td>Terminé</td><td>L’intervention est achevée ; le compte rendu est disponible.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="chapter" id="biens">5. Ajouter et gérer vos biens</h2>
+    <p>
+      Menu <strong>Mes biens</strong>, puis <strong>Ajouter un bien</strong>. Ces
+      informations permettent à Vimaiz de calculer un devis précis et de transmettre
+      à l’intervenant tout ce dont il a besoin en votre absence.
+    </p>
+    <h3>Informations générales</h3>
+    <ul class="docs">
+      <li><strong>Type de bien</strong> (appartement, maison, villa, chalet, gîte…) et <strong>nom</strong> optionnel.</li>
+    </ul>
+    <h3>Adresse</h3>
+    <ul class="docs">
+      <li><strong>Adresse</strong> : commencez à taper puis sélectionnez-la dans la liste (« ✓ Adresse géolocalisée »).</li>
+      <li><strong>Complément d’adresse</strong>, <strong>code postal</strong> et <strong>ville</strong>.</li>
+    </ul>
+    <h3>Caractéristiques</h3>
+    <ul class="docs">
+      <li>Surface (m²), chambres, salles de bain, toilettes, autres pièces, étages, surface extérieure (jardin, terrasse…).</li>
+    </ul>
+    <h3>Informations pour l’intervenant</h3>
+    <ul class="docs">
+      <li>Code d’accès, instructions particulières, où trouver les clés, etc. — essentiel lorsque vous n’êtes pas sur place pour accueillir l’intervenant.</li>
+    </ul>
+    <h3>Checklist du bien</h3>
+    <p>
+      Personnalisez les tâches propres à ce logement (salon, cuisine, salles d’eau,
+      chambres, terrasse…). Vous choisirez ensuite, à chaque demande, les
+      <strong>axes d’intervention</strong> à réaliser parmi cette checklist.
+    </p>
+    <p>Cliquez sur <strong>Enregistrer</strong> pour valider le bien.</p>
+    <div class="callout warn">
+      <p>
+        Sur la liste <strong>Mes biens</strong>, chaque carte affiche un badge
+        <strong>Actif</strong> / <strong>Inactif</strong> et les boutons Voir,
+        modifier et supprimer. Un bien ne peut pas être supprimé tant qu’il a des
+        demandes en cours.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="demande">6. Programmer une intervention</h2>
+    <p>
+      Depuis le tableau de bord ou le menu <strong>Mes demandes</strong>, cliquez sur
+      <strong>Nouvelle intervention</strong>.
+    </p>
+    <div class="btn-row">
+      <span class="fake-btn sky">Nouvelle intervention</span>
+    </div>
+    <ol class="howto">
+      <li>Sélectionnez le <strong>bien</strong> concerné. Sans bien enregistré, un lien direct vous propose d’en <strong>ajouter un</strong>.</li>
+      <li>Choisissez les <strong>axes d’intervention</strong> à réaliser parmi la checklist du bien (boutons « Tout sélectionner » / « Tout retirer »).</li>
+      <li>Renseignez la <strong>date</strong> et l’<strong>heure de début</strong> souhaitées (créneaux de 8 h à 17 h).</li>
+      <li>Ajoutez, si besoin, des <strong>instructions particulières</strong> (« Insister sur la salle de bain… »).</li>
+      <li>Cliquez sur <strong>Envoyer la demande</strong>.</li>
+    </ol>
+    <div class="callout info">
+      <p>
+        <strong>Devis personnalisé.</strong> Vous recevrez un devis détaillé sous
+        24&nbsp;h après réception de votre demande.
+      </p>
+    </div>
+    <p>
+      Si une intervention précédente a signalé une anomalie, vous pouvez créer une
+      <strong>intervention de suivi</strong> directement depuis ce signalement : la
+      demande est pré-remplie avec les détails du problème constaté.
+    </p>
+
+    <h2 class="chapter" id="devis">7. Recevoir et accepter votre devis</h2>
+    <p>
+      Vous êtes notifié dès qu’un devis est prêt. Ouvrez <strong>Mes demandes</strong>
+      puis la demande concernée : un suivi de progression affiche les étapes
+      <strong>Demande envoyée → Devis reçu → Paiement → Intervenant assigné → Terminé</strong>.
+    </p>
+    <p>La fiche du devis détaille la surface, la prestation prévue, le montant total et sa date d’expiration.</p>
+    <div class="btn-row">
+      <span class="fake-btn green">Accepter et payer</span>
+      <span class="fake-btn red">Refuser</span>
+    </div>
+    <ul class="docs">
+      <li><strong>Accepter et payer</strong> : vous êtes redirigé vers le paiement pour confirmer votre réservation.</li>
+      <li><strong>Refuser</strong> : une confirmation vous est demandée ; vous pouvez ensuite créer une nouvelle demande si besoin.</li>
+    </ul>
+    <div class="callout warn">
+      <p>
+        Passé sa date d’expiration, le devis n’est plus valide : il faut alors créer
+        une nouvelle demande pour en obtenir un autre.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="paiement">8. Payer votre intervention</h2>
+    <p>
+      Après acceptation du devis, cliquez sur <strong>Procéder au paiement</strong>,
+      puis renseignez vos coordonnées bancaires. Le récapitulatif rappelle le bien,
+      la date et l’heure, le numéro de devis et le <strong>total à payer</strong>.
+    </p>
+    <div class="btn-row">
+      <span class="fake-btn sky">Payer {montant} €</span>
+    </div>
+    <div class="callout ok">
+      <p>
+        <strong>Paiement sécurisé par Stripe.</strong> Intervenant vérifié,
+        intervention géolocalisée et horodatée, satisfaction garantie. Une fois le
+        paiement validé, l’intervention apparaît dans <strong>Mes interventions</strong>,
+        en attente qu’un intervenant disponible l’accepte.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="suivi">9. Suivre l’intervention à distance</h2>
+    <p>
+      Menu <strong>Mes interventions</strong>, puis ouvrez la mission concernée. Un
+      bouton <strong>Conversation</strong> permet d’écrire directement à
+      l’intervenant assigné si besoin.
+    </p>
+    <div class="callout info">
+      <p>
+        L’arrivée de l’intervenant est vérifiée par géolocalisation à proximité du
+        bien, et le début comme la fin de l’intervention sont horodatés. Vous gardez
+        ainsi une vision fiable du déroulement, même à distance.
+      </p>
+    </div>
+    <p>
+      Les photos <strong>avant intervention</strong> et <strong>après
+      intervention</strong> s’affichent sur la fiche dès qu’elles sont disponibles.
+      Dans la colonne <strong>Horaires</strong>, vous retrouvez la date, l’heure
+      souhaitée, l’heure de début réelle et la durée une fois l’intervention
+      terminée.
+    </p>
+
+    <h2 class="chapter" id="apres">10. Compte rendu, avis et retour</h2>
+    <p>
+      Une fois l’intervention terminée, son statut passe à <strong>Intervention
+      terminée</strong> et un compte rendu récapitule la prestation et sa durée
+      réelle. Vous pouvez télécharger la facture correspondante depuis cette même
+      fiche.
+    </p>
+    <h3>Laisser un avis</h3>
+    <p>
+      Attribuez une note sur 5 étoiles et ajoutez, si vous le souhaitez, un
+      commentaire, puis cliquez sur <strong>Envoyer mon avis</strong>.
+    </p>
+    <h3>Pas satisfait ?</h3>
+    <p>
+      Vous disposez de <strong>48 heures</strong> après l’intervention pour demander
+      un <strong>retour gratuit</strong> de l’intervenant.
+    </p>
+    <ol class="howto">
+      <li>Cliquez sur <strong>Demander un retour</strong>.</li>
+      <li>Décrivez le problème rencontré, puis <strong>Envoyer la demande</strong>.</li>
+      <li>Vous êtes notifié à chaque étape : prise en charge, retour en cours, puis retour terminé.</li>
+      <li>Une fois le retour effectué, confirmez si vous êtes satisfait (<strong>Oui, je suis satisfait</strong> / <strong>Non</strong>).</li>
+    </ol>
+    <div class="callout ok">
+      <p>
+        Le retour ne donne lieu à aucun nouveau paiement. En cas de réponse
+        « Non », votre dossier est examiné par l’équipe Vimaiz, qui revient vers
+        vous.
+      </p>
+    </div>
+
+    <h2 class="chapter" id="factures">11. Factures, notifications et messages</h2>
+    <h3>Mes factures</h3>
+    <p>
+      Historique complet, avec les statuts <strong>Brouillon</strong>,
+      <strong>En attente</strong>, <strong>Payée</strong> et <strong>Remboursée</strong>.
+      Téléchargez chaque facture en un clic depuis l’icône dédiée.
+    </p>
+    <h3>Notifications</h3>
+    <p>
+      Le centre de notifications rassemble devis prêts, paiements confirmés,
+      interventions assignées, débutées ou terminées. Le bouton <strong>Tout
+      marquer comme lu</strong> permet de tout traiter en une fois.
+    </p>
+    <h3>Messages</h3>
+    <p>
+      Échangez avec l’intervenant assigné à une mission via le bouton
+      <strong>Conversation</strong> ou le menu <strong>Messages</strong>. Passez
+      systématiquement par la plateforme afin de garder une trace de chaque
+      échange.
+    </p>
+
+    <h2 class="chapter">Pour aller plus loin</h2>
+    <table>
+      <thead>
+        <tr><th>Question</th><th>Réponse courte</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Dois-je être présent pendant l’intervention ?</td><td>Non. Tout est organisé et suivi à distance depuis votre espace.</td></tr>
+        <tr><td>Comment savoir que l’intervenant est bien arrivé ?</td><td>Son arrivée est vérifiée automatiquement par géolocalisation.</td></tr>
+        <tr><td>Que se passe-t-il si je ne suis pas satisfait ?</td><td>Vous disposez de 48 h pour demander un retour gratuit.</td></tr>
+        <tr><td>Puis-je choisir mon intervenant ?</td><td>Non, Vimaiz assigne automatiquement un intervenant disponible et vérifié.</td></tr>
+        <tr><td>Comment récupérer mes factures ?</td><td>Depuis le menu Mes factures, téléchargement en un clic.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout ok">
+      <p>
+        Besoin d’aide ? Utilisez la page <strong>Contact</strong> du site Vimaiz ou
+        répondez à un e-mail de notification.
+      </p>
+    </div>
+
+    <footer class="guide-foot">
+      Guide utilisateur client — Vimaiz Espace client · Document interne / formation · Septembre 2026
+    </footer>
+  </div>
+</body>
+</html>

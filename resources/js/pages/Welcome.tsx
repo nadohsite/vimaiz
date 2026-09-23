@@ -1,7 +1,7 @@
 import PublicLayout from '@/components/public/public-layout';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronDown } from 'lucide-react';
+import { BellRing, Calendar, ChevronDown, ClipboardCheck, UserCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const TYPE_OPTIONS = ['Appartement', 'Maison', 'Villa', 'Chalet', 'Gîte'] as const;
@@ -14,71 +14,84 @@ const CLIENT_FAQS = [
     {
         question: 'Qu’est-ce que Vimaiz ?',
         answer: [
-            'Vimaiz est une solution pensée pour simplifier l’organisation des prestations nécessaires à la préparation de vos logements.',
-            'Nous permettons de centraliser vos demandes, suivre vos interventions et garder une vision claire de chaque étape, afin que vos logements soient toujours prêts au bon moment.',
+            'Vimaiz est une plateforme d’organisation et de suivi des interventions pour les logements en location saisonnière.',
+            'Elle permet aux propriétaires qui ne peuvent pas être sur place de programmer leurs interventions et de suivre leur déroulement depuis leur espace.',
         ],
     },
     {
         question: 'À qui s’adresse Vimaiz ?',
         answer: [
-            'Vimaiz accompagne les professionnels qui souhaitent gagner en sérénité dans la gestion de leurs logements et de leurs arrivées voyageurs.',
-            'Que vous gériez un seul logement ou plusieurs, Vimaiz vous aide à structurer votre organisation.',
+            'Vimaiz s’adresse principalement aux propriétaires de logements en location saisonnière qui vivent loin de leur bien et souhaitent pouvoir organiser et suivre les interventions à distance.',
         ],
     },
     {
-        question: 'Comment Vimaiz garantit-il que mon logement sera prêt ?',
+        question: 'Comment fonctionne une intervention ?',
         answer: [
-            'Chaque demande est organisée et suivie depuis votre espace Vimaiz.',
-            'Vous gardez une visibilité sur les prestations prévues, leur avancement et les informations importantes liées à chaque intervention.',
+            'Vous programmez votre intervention depuis votre espace Vimaiz. Un intervenant disponible reçoit la mission et choisit de l’accepter.',
+            'Une fois la mission réalisée, vous recevez les informations et le compte rendu de l’intervention.',
         ],
     },
     {
-        question: 'Est-ce que je peux suivre mes interventions ?',
-        answer: [
-            'Oui.',
-            'Votre espace Vimaiz vous permet de retrouver facilement vos prestations, vos échanges, vos documents et l’historique de vos interventions.',
-        ],
-    },
-    {
-        question: 'Puis-je gérer plusieurs logements ?',
+        question: 'Puis-je suivre mon intervention à distance ?',
         answer: [
             'Oui.',
-            'Vimaiz est conçu pour accompagner les besoins des utilisateurs qui souhaitent garder une organisation claire, même lorsque le nombre de logements augmente.',
+            'Vimaiz vous permet de suivre les principales étapes de l’intervention, notamment l’arrivée de l’intervenant, le début et la fin de la mission ainsi que sa durée.',
+        ],
+    },
+    {
+        question: 'Comment Vimaiz sait-il que l’intervenant est arrivé ?',
+        answer: [
+            'Le système utilise la géolocalisation du bien pour enregistrer l’arrivée de l’intervenant lorsqu’il se trouve à proximité du logement.',
+            'Les différentes étapes de l’intervention sont ensuite enregistrées dans votre espace.',
+        ],
+    },
+    {
+        question: 'Que contient le compte rendu d’une intervention ?',
+        answer: [
+            'À la fin de chaque intervention, l’intervenant peut signaler les éventuelles anomalies constatées dans le logement.',
+            'Vous recevez ensuite un compte rendu vous permettant de garder une vision claire de l’état du bien.',
+        ],
+    },
+    {
+        question: 'Que se passe-t-il si je ne suis pas satisfait de l’intervention ?',
+        answer: [
+            'Vous disposez de 48 heures après l’intervention pour signaler un problème et demander un nouveau passage.',
+            'L’intervention peut ensuite être validée définitivement lorsque vous êtes satisfait.',
+        ],
+    },
+    {
+        question: 'Puis-je choisir moi-même mon intervenant ?',
+        answer: [
+            'Non.',
+            'Vimaiz assigne automatiquement un intervenant disponible à votre mission. Cela permet de centraliser la recherche et la coordination des interventions, sans que vous ayez à contacter plusieurs intervenants vous-même.',
+        ],
+    },
+    {
+        question: 'Puis-je échanger avec l’intervenant ?',
+        answer: [
+            'Oui.',
+            'Un espace de conversation permet au propriétaire et à l’intervenant assigné d’échanger au sujet de la mission. Les échanges restent encadrés par Vimaiz.',
+        ],
+    },
+    {
+        question: 'Puis-je gérer plusieurs logements avec Vimaiz ?',
+        answer: [
+            'Oui.',
+            'Vimaiz permet de centraliser l’organisation et le suivi des interventions de plusieurs logements depuis un même espace.',
         ],
     },
     {
         question: 'Comment fonctionne le paiement ?',
         answer: [
-            'Chaque prestation est encadrée avant sa réalisation.',
-            'Vous retrouvez les informations nécessaires directement depuis votre espace Vimaiz afin de garder une gestion simple et transparente.',
+            'Le montant de l’intervention est indiqué avant sa réalisation.',
+            'Le paiement est géré via la plateforme afin de centraliser et simplifier la gestion de chaque intervention.',
         ],
     },
     {
-        question: 'Puis-je choisir les professionnels qui interviennent ?',
+        question: 'Dois-je habiter à une certaine distance de mon logement pour utiliser Vimaiz ?',
         answer: [
-            'Vimaiz fonctionne avec un réseau de professionnels dont les profils sont vérifiés.',
-            'L’objectif est de vous permettre de bénéficier d’une organisation fiable sans avoir à gérer toute la recherche et la coordination.',
-        ],
-    },
-    {
-        question: 'Que se passe-t-il en cas d’imprévu ?',
-        answer: [
-            'L’objectif de Vimaiz est justement de réduire les situations où un imprévu peut compromettre une arrivée.',
-            'Grâce au suivi et à la centralisation des informations, vous disposez d’une meilleure visibilité sur votre organisation.',
-        ],
-    },
-    {
-        question: 'Pourquoi utiliser Vimaiz plutôt que gérer directement ses prestations ?',
-        answer: [
-            'Parce qu’une bonne organisation ne devrait pas dépendre de multiples échanges, fichiers ou rappels.',
-            'Vimaiz rassemble les éléments essentiels pour vous permettre de garder le contrôle simplement.',
-        ],
-    },
-    {
-        question: 'Est-ce que Vimaiz remplace mon organisation actuelle ?',
-        answer: [
-            'Vimaiz s’adapte à votre fonctionnement.',
-            'La plateforme vous accompagne pour structurer vos prestations et simplifier votre quotidien.',
+            'Non.',
+            'Vimaiz est particulièrement adapté aux propriétaires qui ne peuvent pas facilement être présents sur place, quelle que soit la distance. L’objectif est de vous permettre de garder une vision claire de votre logement à distance.',
         ],
     },
 ];
@@ -229,8 +242,9 @@ export default function Welcome({
                             <span className="accent"> Vimaiz veille sur votre logement.</span>
                         </h1>
                         <p className="hero-sub rise-3">
-                            Vimaiz veille à ce que vos logements soit toujours prêt à
-                            accueillir les prochains voyageurs.
+                            Vous louez votre logement à distance ? Vimaiz coordonne les
+                            interventions et vous permet de suivre ce qui s&apos;y passe,
+                            même lorsque vous n&apos;êtes pas sur place.
                         </p>
                         <div className="hero-ctas rise-4">
                             <a className="btn btn-primary" href="#service">
@@ -261,10 +275,12 @@ export default function Welcome({
 
                         <div className="why-vimaiz">
                             <div className="sec-eyebrow">Pourquoi Vimaiz ?</div>
-                            <h3>Une location saisonnière ne se résume pas à seulement accueillir des voyageurs</h3>
+                            <h3>Gérer un logement à distance ne devrait pas être une source de stress.</h3>
                             <p>
-                                Chaque arrivée demande une organisation précise, où le moindre
-                                imprévu peut rapidement devenir une source de stress.
+                                Quand vous ne pouvez pas être sur place, chaque intervention doit
+                                être organisée, suivie et fiable. Vimaiz vous permet de garder une
+                                vision claire de ce qui se passe dans votre logement, même à
+                                distance.
                             </p>
                         </div>
                     </div>
@@ -586,8 +602,9 @@ export default function Welcome({
                         <div className="sec-eyebrow">Le parcours</div>
                         <h2>Comment ça fonctionne</h2>
                         <p className="sec-sub">
-                            Un processus en cinq temps, pour que chaque logement soit prêt au bon
-                            moment.
+                            Un intervenant disponible reçoit la mission et choisit de
+                            l&apos;accepter ou de la refuser. En cas de refus, la mission est
+                            automatiquement proposée à un autre intervenant disponible.
                         </p>
                     </div>
                     <div className="steps steps-5">
@@ -612,11 +629,13 @@ export default function Welcome({
                         <article className="split-card split-card-conviction rise-2">
                             <div className="sec-eyebrow">Notre Conviction</div>
                             <h2>
-                                Une location saisonnière devrait toujours être prête à accueillir
-                                ses voyageurs
+                                Être loin de son logement ne devrait pas signifier perdre le
+                                contrôle
                             </h2>
                             <p>
-                                La décoration attire le regard. La propreté inspire confiance.
+                                Nous pensons qu&apos;une bonne organisation permet aux propriétaires
+                                de gérer leurs logements à distance avec plus de sérénité, sans
+                                avoir à être présents à chaque intervention.
                             </p>
                         </article>
                         <article id="agent" className="split-card split-card-cta rise-3">
@@ -626,12 +645,22 @@ export default function Welcome({
                                 Vimaiz vous aide à développer votre activité en vous proposant des
                                 interventions selon vos disponibilités. Numéro de SIRET obligatoire.
                             </p>
-                            <Link
-                                className="btn btn-primary"
-                                href={route('professionals.index')}
-                            >
-                                Devenir intervenant
-                            </Link>
+                            <div className="hero-ctas">
+                                <Link
+                                    className="btn btn-primary"
+                                    href={route('professionals.index')}
+                                >
+                                    Devenir intervenant
+                                </Link>
+                                <a
+                                    className="btn btn-ghost"
+                                    href="/guides/intervenant/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Voir le guide
+                                </a>
+                            </div>
                         </article>
                     </div>
                 </div>
@@ -644,107 +673,66 @@ export default function Welcome({
                             <div className="sec-eyebrow">La plateforme</div>
                             <h2 style={{ marginBottom: 16 }}>À propos de Vimaiz</h2>
                             <p>
-                                Chez Vimaiz, nous croyons qu&apos;une location saisonnière devrait
-                                toujours être prête à accueillir ses voyageurs.
+                                Chez Vimaiz, nous sommes partis d&apos;un constat simple :
                             </p>
                             <p>
-                                Pourtant, derrière chaque arrivée se cache une organisation exigeante
-                                où le moindre imprévu peut avoir des conséquences importantes.
+                                gérer un logement en location saisonnière devient beaucoup plus
+                                compliqué lorsque l&apos;on ne peut pas être sur place.
                             </p>
                             <ul className="about-list">
-                                <li>Un retard.</li>
-                                <li>Une absence.</li>
+                                <li>Un intervenant absent.</li>
                                 <li>Une intervention annulée.</li>
-                                <li>Une mauvaise expérience voyageur.</li>
+                                <li>Un logement qui n&apos;est pas prêt.</li>
+                                <li>Une anomalie découverte trop tard.</li>
+                                <li>Un propriétaire qui doit gérer chaque imprévu à distance.</li>
                             </ul>
                             <p>
-                                Nous avons créé Vimaiz pour apporter plus de sérénité aux
-                                professionnels de la location saisonnière.
+                                Nous avons créé Vimaiz pour simplifier cette organisation.
+                            </p>
+                            <p>
+                                Vimaiz coordonne les interventions nécessaires à l&apos;entretien de
+                                vos logements et vous permet de suivre leur déroulement depuis votre
+                                espace, même lorsque vous êtes à plusieurs centaines de kilomètres.
+                            </p>
+                            <p>
+                                Chaque intervention est organisée, assignée à un intervenant,
+                                suivie et clôturée avec un compte rendu.
                             </p>
                             <p>
                                 Notre objectif n&apos;est pas d&apos;ajouter un outil de plus.
                             </p>
                             <p>
-                                Notre objectif est de simplifier toute l&apos;organisation qui
-                                permet à un logement d&apos;être prêt au bon moment.
+                                Notre objectif est de permettre aux propriétaires qui ne peuvent
+                                pas être sur place de garder une vision claire de ce qui se passe
+                                dans leurs logements.
                             </p>
                             <p>
-                                Nous croyons qu&apos;une bonne organisation est invisible.
-                            </p>
-                            <p>Lorsqu&apos;elle fonctionne, personne n&apos;y pense.</p>
-                            <p>
-                                Lorsqu&apos;elle manque, tout le monde en subit les conséquences.
+                                Parce qu&apos;une bonne organisation devrait vous permettre de gérer
+                                votre bien à distance sans avoir à être physiquement présent à
+                                chaque étape.
                             </p>
                             <p>
-                                C&apos;est cette tranquillité d&apos;esprit que nous voulons offrir
-                                à chaque utilisateur de Vimaiz.
+                                <strong>Vimaiz — Votre logement est loin. Vimaiz veille sur lui.</strong>
                             </p>
                         </div>
                         <div className="about-cards">
                             <div className="about-card">
                                 <div className="type-icon">
-                                    <svg
-                                        width="19"
-                                        height="19"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3z"
-                                            stroke="currentColor"
-                                            strokeWidth="1.6"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
+                                    <Calendar width="19" height="19" strokeWidth={1.6} aria-hidden="true" />
                                 </div>
                                 <h3>Vous programmez</h3>
                                 <p>Choisissez votre logement, la date et l&apos;intervention.</p>
                             </div>
                             <div className="about-card">
                                 <div className="type-icon">
-                                    <svg
-                                        width="19"
-                                        height="19"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        aria-hidden="true"
-                                    >
-                                        <rect
-                                            x="3"
-                                            y="6"
-                                            width="18"
-                                            height="13"
-                                            rx="2"
-                                            stroke="currentColor"
-                                            strokeWidth="1.6"
-                                        />
-                                        <path
-                                            d="M3 10h18"
-                                            stroke="currentColor"
-                                            strokeWidth="1.6"
-                                        />
-                                    </svg>
+                                    <UserCheck width="19" height="19" strokeWidth={1.6} aria-hidden="true" />
                                 </div>
                                 <h3>Vimaiz assigne</h3>
-                                <p>Un intervenant disponible reçoit la mission et choisit de l&apos;accepter.</p>
+                                <p>Un intervenant disponible reçoit la mission et choisit de l&apos;accepter ou de refuser.</p>
                             </div>
                             <div className="about-card">
                                 <div className="type-icon">
-                                    <svg
-                                        width="19"
-                                        height="19"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            d="M12 17.3l-5.4 3 1-6-4.4-4.3 6.1-.9L12 3l2.7 5.1 6.1.9-4.4 4.3 1 6z"
-                                            stroke="currentColor"
-                                            strokeWidth="1.6"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
+                                    <ClipboardCheck width="19" height="19" strokeWidth={1.6} aria-hidden="true" />
                                 </div>
                                 <h3>L&apos;intervention est suivie</h3>
                                 <p>
@@ -754,27 +742,7 @@ export default function Welcome({
                             </div>
                             <div className="about-card">
                                 <div className="type-icon">
-                                    <svg
-                                        width="19"
-                                        height="19"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            d="M12 21s-7-6.3-7-11.5A7 7 0 0 1 12 2a7 7 0 0 1 7 7.5C19 14.7 12 21 12 21z"
-                                            stroke="currentColor"
-                                            strokeWidth="1.6"
-                                            strokeLinejoin="round"
-                                        />
-                                        <circle
-                                            cx="12"
-                                            cy="9.5"
-                                            r="2.4"
-                                            stroke="currentColor"
-                                            strokeWidth="1.6"
-                                        />
-                                    </svg>
+                                    <BellRing width="19" height="19" strokeWidth={1.6} aria-hidden="true" />
                                 </div>
                                 <h3>Vous êtes informé</h3>
                                 <p>
@@ -792,6 +760,10 @@ export default function Welcome({
                     <div className="sec-head">
                         <div className="sec-eyebrow">FAQ</div>
                         <h2>Questions fréquentes</h2>
+                        <p className="sec-sub">
+                            Vous habitez loin de votre logement → Vimaiz vous permet de garder le
+                            contrôle à distance.
+                        </p>
                     </div>
                     {CLIENT_FAQS.map((faq, index) => (
                         <div

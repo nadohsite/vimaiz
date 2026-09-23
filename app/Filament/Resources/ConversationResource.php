@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Actions\ViewAction;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Table;
+use Filament\Tables\Grouping\Group;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -133,6 +134,15 @@ class ConversationResource extends Resource
                     ->sortable(),
             ])
             ->defaultSort('last_message_at', 'desc')
+            ->groups([
+                Group::make('client.name')
+                    ->label('Client')
+                    ->collapsible(),
+                Group::make('agent.name')
+                    ->label('Intervenant')
+                    ->collapsible(),
+            ])
+            ->defaultGroup('client.name')
             ->filters([
                 //
             ])

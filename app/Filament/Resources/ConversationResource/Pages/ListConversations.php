@@ -76,7 +76,7 @@ class ListConversations extends ListRecords
                     $this->redirect(ConversationResource::getUrl('view', ['record' => $conversation]));
                 }),
             Actions\CreateAction::make()
-                ->label('Lier un client à un intervenant'),
+                ->label('Nouvelle conversation'),
         ];
     }
 }
