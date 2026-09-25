@@ -2021,6 +2021,13 @@
     animation: welcome-faq-reveal 0.28s ease both;
 }
 
+.welcome-page .faq-guide-link {
+    display: inline-flex;
+    margin-top: 6px;
+    padding: 8px 16px;
+    font-size: 13.5px;
+}
+
 @keyframes welcome-faq-reveal {
     from {
         opacity: 0;

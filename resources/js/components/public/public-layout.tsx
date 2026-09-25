@@ -86,6 +86,12 @@ export default function PublicLayout({ title, description, children }: PublicLay
                         <div className="foot-col">
                             <h4>Professionnels</h4>
                             <Link href={route('professionals.index')}>Devenir intervenant</Link>
+                            <a href="/guides/intervenant/" target="_blank" rel="noopener noreferrer">
+                                Guide intervenant
+                            </a>
+                            <a href="/guides/client/" target="_blank" rel="noopener noreferrer">
+                                Guide client
+                            </a>
                         </div>
                         <div className="foot-col">
                             <h4>Légal</h4>

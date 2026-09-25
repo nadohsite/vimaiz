@@ -1,6 +1,7 @@
 import PublicLayout from '@/components/public/public-layout';
 import { Link } from '@inertiajs/react';
 import {
+    BookOpen,
     Briefcase,
     Calendar,
     ChevronDown,
@@ -27,7 +28,12 @@ function CheckIcon() {
 
 type FaqAnswer = string | { paragraphs: string[]; list?: string[]; afterList?: string[] };
 
-const benefits = [
+const benefits: {
+    icon: typeof Sparkles;
+    title: string;
+    description: string;
+    links?: { label: string; href: string }[];
+}[] = [
     {
         icon: Sparkles,
         title: 'Développez votre activité.',
@@ -56,6 +62,16 @@ const benefits = [
         title: 'Une plateforme pensée pour les professionnels.',
         description:
             'Nous simplifions votre quotidien afin que vous puissiez vous concentrer sur votre savoir-faire.',
+    },
+    {
+        icon: BookOpen,
+        title: 'Consultez nos guides.',
+        description:
+            'Toutes les étapes détaillées pour bien démarrer sur Vimaiz, intervenant comme client.',
+        links: [
+            { label: 'Guide intervenant', href: '/guides/intervenant/' },
+            { label: 'Guide client', href: '/guides/client/' },
+        ],
     },
 ];
 
@@ -274,7 +290,30 @@ export default function Professionals() {
                                     <benefit.icon size={19} />
                                 </div>
                                 <h3>{benefit.title}</h3>
-                                <p style={{ marginBottom: 0 }}>{benefit.description}</p>
+                                <p style={{ marginBottom: benefit.links ? 12 : 0 }}>
+                                    {benefit.description}
+                                </p>
+                                {benefit.links && (
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 6,
+                                        }}
+                                    >
+                                        {benefit.links.map((link) => (
+                                            <a
+                                                key={link.href}
+                                                className="btn-link"
+                                                href={link.href}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {link.label} →
+                                            </a>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
