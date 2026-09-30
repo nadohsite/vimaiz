@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Services\GeographicMatchingService;
 use App\Support\DefaultPropertyChecklist;
 use App\Support\DurationFormatter;
+use App\Support\ScheduledTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -82,8 +83,12 @@ class Mission extends Model
         'return_validated_at' => 'datetime',
     ];
 
+    // status_label used to be appended by hand in each controller's show()
+    // method and forgotten in index() (list pages), leaving the status
+    // badge blank there. Appending it globally here fixes both at once.
     protected $appends = [
         'scheduled_time_label',
+        'status_label',
     ];
 
     const STATUS_PENDING_AGENT = 'pending_agent';
@@ -378,7 +383,10 @@ class Mission extends Model
 
     public function getScheduledTimeLabelAttribute(): ?string
     {
-        return $this->scheduled_at?->format('H:i');
+        // scheduled_at is stored as a real UTC instant — convert back to
+        // the business timezone before formatting, otherwise this label
+        // shows the raw UTC hour instead of the hour the client picked.
+        return $this->scheduled_at?->copy()->timezone(ScheduledTime::TIMEZONE)->format('H:i');
     }
 
     public function getStatusLabelAttribute(): string

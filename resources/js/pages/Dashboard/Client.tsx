@@ -14,7 +14,7 @@ import {
     Sparkles,
     User,
 } from 'lucide-react';
-import { formatAppointmentDateTime } from '@/lib/datetime';
+import { formatInstantDateTime } from '@/lib/datetime';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -105,7 +105,7 @@ function MissionRow({ mission }: { mission: Mission }) {
                                   hour: '2-digit',
                                   minute: '2-digit',
                               })
-                            : formatAppointmentDateTime(mission.scheduled_at)}
+                            : formatInstantDateTime(mission.scheduled_at)}
                     </span>
                     <span className="inline-flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5" />

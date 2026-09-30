@@ -91,9 +91,16 @@ class BookingController extends Controller
             ->with('success', 'Booking created successfully! Booking #' . $booking->booking_number);
     }
 
-    public function show(Booking $booking)
+    public function show(Request $request, Booking $booking)
     {
-        // $this->authorize('view', $booking);
+        // No BookingPolicy exists for this legacy resource — check ownership
+        // directly instead of leaving the endpoint open to any authenticated
+        // user (it previously exposed any booking's client/agent/price data).
+        $user = $request->user();
+        abort_unless(
+            (int) $booking->client_id === (int) $user->id || (int) $booking->agent_id === (int) $user->id,
+            403
+        );
 
         return Inertia::render('Bookings/Show', [
             'booking' => $booking->load(['client', 'agent.agentProfile', 'service', 'address']),
@@ -113,20 +120,28 @@ class BookingController extends Controller
         ]);
     }
 
-    public function accept(Booking $booking)
+    public function accept(Request $request, Booking $booking)
     {
+        // Previously unchecked — any authenticated agent could accept a
+        // booking that was not assigned to them.
+        abort_unless((int) $booking->agent_id === (int) $request->user()->id, 403);
+
         $booking->update(['status' => 'confirmed']);
         return back()->with('success', 'Booking accepted.');
     }
 
-    public function reject(Booking $booking)
+    public function reject(Request $request, Booking $booking)
     {
+        abort_unless((int) $booking->agent_id === (int) $request->user()->id, 403);
+
         $booking->update(['status' => 'cancelled']);
         return back()->with('info', 'Booking rejected.');
     }
 
     public function updateStatus(Request $request, Booking $booking)
     {
+        abort_unless((int) $booking->agent_id === (int) $request->user()->id, 403);
+
         $validated = $request->validate([
             'status' => 'required|string|in:en_route,in_service,done,completed'
         ]);

@@ -168,12 +168,12 @@
                 <td style="border: none; padding: 0; text-align: right; vertical-align: top;">
                     <h1 style="font-size: 32px; color: #0f172a; margin-bottom: 5px;">FACTURE</h1>
                     <div class="invoice-number">{{ $invoice->invoice_number }}</div>
-                    <div class="invoice-date">Date: {{ $invoice->issued_at->format('d/m/Y') }}</div>
+                    <div class="invoice-date">Date: {{ $invoice->issued_at->copy()->timezone('Europe/Paris')->format('d/m/Y') }}</div>
                     @if($invoice->isPaid())
                         <div class="paid-badge">✓ PAYÉE</div>
                         @if($invoice->paid_at)
                             <div style="font-size: 10px; color: #166534; margin-top: 5px;">
-                                le {{ $invoice->paid_at->format('d/m/Y') }}
+                                le {{ $invoice->paid_at->copy()->timezone('Europe/Paris')->format('d/m/Y') }}
                             </div>
                         @endif
                     @endif
@@ -200,7 +200,7 @@
                     <p>{{ $invoice->mission->property->postal_code }} {{ $invoice->mission->property->city }}</p>
                     @if($invoice->mission->scheduled_at)
                         <p style="margin-top: 8px; color: #64748b;">
-                            Date: {{ \Carbon\Carbon::parse($invoice->mission->scheduled_at)->format('d/m/Y à H:i') }}
+                            Date: {{ $invoice->mission->scheduled_at->copy()->timezone('Europe/Paris')->format('d/m/Y à H:i') }}
                         </p>
                     @endif
                 </td>

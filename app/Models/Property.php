@@ -26,6 +26,14 @@ class Property extends Model
         self::TYPE_GITE => 'Gîte',
     ];
 
+    // Without this, type_label is only present when a controller manually
+    // calls ->append('type_label') — several controllers rely on it as a
+    // fallback for an empty property name without doing so, leaving that
+    // fallback silently blank on the frontend.
+    protected $appends = [
+        'type_label',
+    ];
+
     protected $fillable = [
         'user_id',
         'type',

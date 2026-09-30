@@ -13,7 +13,7 @@ import InterventionReportWizard, {
 import InterventionReportCard, { type ReportAnomaly, type ReportSummary } from '@/components/missions/InterventionReportCard';
 import { AgentProposalActions } from '@/components/missions/AgentProposalActions';
 import { elapsedMinutesBetween, formatDurationMinutes } from '@/lib/duration';
-import { formatAppointmentDate, formatAppointmentTime } from '@/lib/datetime';
+import { formatInstantDate, formatInstantTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -75,7 +75,7 @@ interface Mission {
     client: Client;
     internal_quality_score: number | null;
     internal_quality_notes: string | null;
-    client_review?: {
+    review?: {
         rating: number;
         comment: string | null;
         created_at: string;
@@ -153,7 +153,10 @@ export default function Show({
         const colors: Record<string, string> = {
             pending_agent: 'bg-orange-100 text-orange-800',
             agent_accepted: 'bg-blue-100 text-blue-800',
+            agent_refused: 'bg-red-100 text-red-800',
             in_progress: 'bg-sky-100 text-sky-800',
+            photos_before: 'bg-purple-100 text-purple-800',
+            photos_after: 'bg-purple-100 text-purple-800',
             completed: 'bg-green-100 text-green-800',
             cancelled: 'bg-gray-100 text-gray-800',
         };
@@ -502,7 +505,7 @@ export default function Show({
                                             </div>
                                         )}
 
-                                        {mission.client_review && (
+                                        {mission.review && (
                                             <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
                                                 <h4 className="font-medium text-slate-700 mb-2 flex items-center gap-2">
                                                     <User className="h-4 w-4 text-sky-500" />
@@ -513,19 +516,19 @@ export default function Show({
                                                         <Star
                                                             key={star}
                                                             className={`h-5 w-5 ${
-                                                                star <= mission.client_review!.rating
+                                                                star <= mission.review!.rating
                                                                     ? 'text-yellow-400 fill-yellow-400'
                                                                     : 'text-gray-300'
                                                             }`}
                                                         />
                                                     ))}
                                                     <span className="ml-2 text-sm font-medium text-slate-600">
-                                                        {mission.client_review.rating}/5
+                                                        {mission.review.rating}/5
                                                     </span>
                                                 </div>
-                                                {mission.client_review.comment && (
+                                                {mission.review.comment && (
                                                     <p className="text-sm text-slate-600 italic">
-                                                        &quot;{mission.client_review.comment}&quot;
+                                                        &quot;{mission.review.comment}&quot;
                                                     </p>
                                                 )}
                                             </div>
@@ -681,7 +684,7 @@ export default function Show({
                                     <div className="flex justify-between">
                                         <span className="text-slate-500">Date</span>
                                         <span className="font-medium">
-                                            {formatAppointmentDate(mission.scheduled_at, {
+                                            {formatInstantDate(mission.scheduled_at, {
                                                 weekday: 'long', day: 'numeric', month: 'long',
                                             })}
                                         </span>
@@ -689,7 +692,7 @@ export default function Show({
                                     <div className="flex justify-between">
                                         <span className="text-slate-500">Heure souhaitée</span>
                                         <span className="font-medium">
-                                            {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
+                                            {mission.scheduled_time_label || formatInstantTime(mission.scheduled_at)}
                                         </span>
                                     </div>
                                     {mission.started_at && (

@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Home, ChevronRight, Filter } from 'lucide-react';
-import { formatAppointmentDateTime } from '@/lib/datetime';
+import { formatInstantDateTime } from '@/lib/datetime';
 import { AgentProposalActions } from '@/components/missions/AgentProposalActions';
 
 interface Property {
@@ -48,7 +48,10 @@ export default function Index({ missions, currentStatus, statuses }: Props) {
         const colors: Record<string, string> = {
             pending_agent: 'bg-orange-100 text-orange-800 border-orange-200',
             agent_accepted: 'bg-blue-100 text-blue-800 border-blue-200',
+            agent_refused: 'bg-red-100 text-red-800 border-red-200',
             in_progress: 'bg-sky-100 text-sky-800 border-sky-200',
+            photos_before: 'bg-purple-100 text-purple-800 border-purple-200',
+            photos_after: 'bg-purple-100 text-purple-800 border-purple-200',
             completed: 'bg-green-100 text-green-800 border-green-200',
             cancelled: 'bg-gray-100 text-gray-800 border-gray-200',
         };
@@ -142,7 +145,7 @@ export default function Index({ missions, currentStatus, statuses }: Props) {
                                                         </span>
                                                         <span className="flex items-center gap-1">
                                                             <Calendar className="h-4 w-4" />
-                                                            {formatAppointmentDateTime(mission.scheduled_at)}
+                                                            {formatInstantDateTime(mission.scheduled_at)}
                                                         </span>
                                                     </div>
                                                 </div>

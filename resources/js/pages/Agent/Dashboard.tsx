@@ -16,7 +16,7 @@ import {
     User,
     Wallet,
 } from 'lucide-react';
-import { formatAppointmentDateTime } from '@/lib/datetime';
+import { formatInstantDateTime } from '@/lib/datetime';
 import { AgentProposalActions } from '@/components/missions/AgentProposalActions';
 
 interface Property {
@@ -61,7 +61,7 @@ interface Props {
 }
 
 function formatDate(value: string) {
-    return formatAppointmentDateTime(value);
+    return formatInstantDateTime(value);
 }
 
 function propertyLabel(property: Property) {

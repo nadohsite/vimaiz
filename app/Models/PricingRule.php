@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ScheduledTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -75,12 +76,18 @@ class PricingRule extends Model
         return $this->zone_multipliers[$prefix] ?? 1.00;
     }
 
-    public function getTimeMultiplier(\DateTime $dateTime): float
+    public function getTimeMultiplier(\DateTimeInterface $dateTime): float
     {
         $multiplier = 1.00;
-        
-        $hour = (int) $dateTime->format('H');
-        $dayOfWeek = (int) $dateTime->format('N');
+
+        // $dateTime is a real UTC instant — convert to the business
+        // timezone before reading the hour/day, otherwise the early
+        // morning / evening / weekend surcharges are evaluated against
+        // the wrong (UTC) hour instead of the client's local hour.
+        $local = \Carbon\Carbon::instance($dateTime)->copy()->timezone(ScheduledTime::TIMEZONE);
+
+        $hour = (int) $local->format('H');
+        $dayOfWeek = (int) $local->format('N');
         
         if ($hour < 8) {
             $multiplier *= $this->early_morning_multiplier;

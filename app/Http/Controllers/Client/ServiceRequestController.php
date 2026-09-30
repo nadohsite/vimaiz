@@ -88,8 +88,8 @@ class ServiceRequestController extends Controller
                     'category_label' => $anomaly->category_label,
                     'label' => $anomaly->label,
                     'notes' => $anomaly->notes,
-                    'mission_date' => $anomaly->mission->completed_at?->format('d/m/Y')
-                        ?? $anomaly->mission->scheduled_at?->format('d/m/Y'),
+                    'mission_date' => $anomaly->mission->completed_at?->copy()->timezone(\App\Support\ScheduledTime::TIMEZONE)->format('d/m/Y')
+                        ?? $anomaly->mission->scheduled_at?->copy()->timezone(\App\Support\ScheduledTime::TIMEZONE)->format('d/m/Y'),
                 ];
             }
         }

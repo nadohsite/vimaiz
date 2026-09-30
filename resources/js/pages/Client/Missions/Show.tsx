@@ -8,7 +8,7 @@ import { ArrowLeft, Calendar, Home, MapPin, User, Camera, Clock, CheckCircle, Do
 import { ImageLightbox } from '@/components/ui/image-lightbox';
 import { useState } from 'react';
 import InterventionReportCard, { type ReportAnomaly, type ReportSummary } from '@/components/missions/InterventionReportCard';
-import { formatAppointmentDate, formatAppointmentTime } from '@/lib/datetime';
+import { formatInstantDate, formatInstantTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -148,7 +148,10 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
         const colors: Record<string, string> = {
             pending_agent: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
             agent_accepted: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+            agent_refused: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
             in_progress: 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
+            photos_before: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+            photos_after: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
             completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
             cancelled: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
         };
@@ -615,7 +618,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                     <div className="flex justify-between gap-3">
                                         <span className="text-slate-500 dark:text-slate-400">Date</span>
                                         <span className="font-medium dark:text-white text-right">
-                                            {formatAppointmentDate(mission.scheduled_at, {
+                                            {formatInstantDate(mission.scheduled_at, {
                                                 weekday: 'long',
                                                 day: 'numeric',
                                                 month: 'long',
@@ -625,7 +628,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                     <div className="flex justify-between gap-3">
                                         <span className="text-slate-500 dark:text-slate-400">Heure souhaitée</span>
                                         <span className="font-medium dark:text-white">
-                                            {mission.scheduled_time_label || formatAppointmentTime(mission.scheduled_at)}
+                                            {mission.scheduled_time_label || formatInstantTime(mission.scheduled_at)}
                                         </span>
                                     </div>
                                     {mission.started_at && (

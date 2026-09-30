@@ -29,7 +29,7 @@ class InvoiceController extends Controller
                 ->sum('total'),
         ];
 
-        return Inertia::render('client/invoices/index', [
+        return Inertia::render('Client/invoices/index', [
             'invoices' => $invoices,
             'stats' => $stats,
         ]);
@@ -41,7 +41,7 @@ class InvoiceController extends Controller
 
         $invoice->load(['mission.property', 'user']);
 
-        return Inertia::render('client/invoices/show', [
+        return Inertia::render('Client/invoices/show', [
             'invoice' => $invoice,
         ]);
     }

@@ -105,3 +105,72 @@ export function formatRequestTime(value: string | null | undefined): string {
 
     return match ? match[1] : value;
 }
+
+/**
+ * Mission.scheduled_at is a REAL UTC instant (unlike the naive wall-clock
+ * request fields above). These formatters explicitly convert to the
+ * business timezone so the displayed hour is correct no matter where the
+ * viewer's browser is set — never rely on the browser's own local timezone
+ * for this field, and never mix it with the naive formatters above.
+ */
+const BUSINESS_TIMEZONE = 'Europe/Paris';
+
+function parseInstant(value: string | null | undefined): Date | null {
+    if (!value) {
+        return null;
+    }
+
+    const date = new Date(value);
+
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function formatInstantDate(
+    value: string | null | undefined,
+    options: Intl.DateTimeFormatOptions = {},
+): string {
+    const date = parseInstant(value);
+
+    if (!date) {
+        return '—';
+    }
+
+    return date.toLocaleDateString('fr-FR', { timeZone: BUSINESS_TIMEZONE, ...options });
+}
+
+export function formatInstantTime(value: string | null | undefined): string {
+    const date = parseInstant(value);
+
+    if (!date) {
+        return '—';
+    }
+
+    return date.toLocaleTimeString('fr-FR', {
+        timeZone: BUSINESS_TIMEZONE,
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+export function formatInstantDateTime(value: string | null | undefined): string {
+    const date = parseInstant(value);
+
+    if (!date) {
+        return '—';
+    }
+
+    const dateLabel = date.toLocaleDateString('fr-FR', {
+        timeZone: BUSINESS_TIMEZONE,
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+    });
+
+    const timeLabel = date.toLocaleTimeString('fr-FR', {
+        timeZone: BUSINESS_TIMEZONE,
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
+    return `${dateLabel} à ${timeLabel}`;
+}

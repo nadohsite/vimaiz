@@ -11,7 +11,7 @@
 
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
-        <p><strong>Date prévue :</strong> {{ ($mission->scheduled_at ?? now())->format('d/m/Y à H:i') }}</p>
+        <p><strong>Date prévue :</strong> {{ ($mission->scheduled_at ?? now())->copy()->timezone('Europe/Paris')->format('d/m/Y à H:i') }}</p>
         <p><strong>Rémunération :</strong> {{ number_format($mission->agent_payout, 2, ',', ' ') }} €</p>
     </div>
 

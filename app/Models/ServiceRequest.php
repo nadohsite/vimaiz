@@ -34,6 +34,13 @@ class ServiceRequest extends Model
         'checklist' => 'array',
     ];
 
+    // status_label is read directly by the frontend (Requests/Show.tsx,
+    // Requests/Index.tsx) but no controller ever appends it manually,
+    // leaving the status badge blank without this.
+    protected $appends = [
+        'status_label',
+    ];
+
     const STATUS_PENDING = 'pending';
 
     const STATUS_QUOTE_SENT = 'quote_sent';

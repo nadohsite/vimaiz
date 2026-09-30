@@ -73,6 +73,7 @@ class MissionResource extends Resource
                     ->schema([
                         Forms\Components\DateTimePicker::make('scheduled_at')
                             ->label('Date et heure prévues')
+                            ->timezone('Europe/Paris')
                             ->seconds(false),
                         Forms\Components\TextInput::make('duration_hours')
                             ->label('Durée estimée')
@@ -82,9 +83,11 @@ class MissionResource extends Resource
                             ->label('Durée réelle')
                             ->content(fn (?Mission $record): string => $record?->actual_duration_label ?? '—'),
                         Forms\Components\DateTimePicker::make('started_at')
-                            ->label('Démarrée le'),
+                            ->label('Démarrée le')
+                            ->timezone('Europe/Paris'),
                         Forms\Components\DateTimePicker::make('completed_at')
-                            ->label('Terminée le'),
+                            ->label('Terminée le')
+                            ->timezone('Europe/Paris'),
                     ])->columns(2),
 
                 Section::make('Tarification')
@@ -225,7 +228,7 @@ class MissionResource extends Resource
                     ->label('Ville'),
                 Tables\Columns\TextColumn::make('scheduled_at')
                     ->label('Planifiée')
-                    ->dateTime('d/m/Y H:i')
+                    ->dateTime('d/m/Y H:i', timezone: 'Europe/Paris')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('Prix')

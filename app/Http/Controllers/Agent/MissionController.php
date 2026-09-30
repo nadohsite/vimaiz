@@ -55,6 +55,7 @@ class MissionController extends Controller
             'serviceRequest',
             'invoice',
             'anomalies',
+            'review',
             'photos' => fn ($q) => $q->orderBy('type')->orderByDesc('created_at'),
         ]);
 
@@ -101,8 +102,12 @@ class MissionController extends Controller
         try {
             $this->missionService->agentAcceptMission($mission, $request->user());
 
+            // scheduled_at is stored as a real UTC instant — convert to the
+            // business timezone before showing it in this flash message,
+            // otherwise it displays the raw UTC hour instead of the hour
+            // the client actually picked.
             return back()->with('success', 'Intervention confirmée. Rendez-vous le '.
-                $mission->scheduled_at->format('d/m/Y à H:i'));
+                $mission->scheduled_at->copy()->timezone(\App\Support\ScheduledTime::TIMEZONE)->format('d/m/Y à H:i'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

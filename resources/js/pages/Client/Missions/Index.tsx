@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Home, User, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { formatAppointmentDateTime } from '@/lib/datetime';
+import { formatInstantDateTime } from '@/lib/datetime';
 
 interface Property {
     id: number;
@@ -36,6 +36,7 @@ export default function Index({ missions = [] }: Props) {
         const colors: Record<string, string> = {
             pending_agent: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
             agent_accepted: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+            agent_refused: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
             in_progress: 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
             photos_before: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
             photos_after: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
@@ -89,7 +90,7 @@ export default function Index({ missions = [] }: Props) {
                                                             </span>
                                                             <span className="flex items-center gap-1">
                                                                 <Calendar className="h-4 w-4" />
-                                                                {formatAppointmentDateTime(mission.scheduled_at)}
+                                                                {formatInstantDateTime(mission.scheduled_at)}
                                                             </span>
                                                             {mission.agent && (
                                                                 <span className="flex items-center gap-1">
