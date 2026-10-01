@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, LocateFixed } from 'lucide-react';
 import debounce from 'lodash/debounce';
 
 interface AddressResult {
@@ -47,6 +47,8 @@ export default function AddressAutocomplete({
     const [isLoading, setIsLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [isLocating, setIsLocating] = useState(false);
+    const [locationError, setLocationError] = useState<string | null>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -146,6 +148,88 @@ export default function AddressAutocomplete({
         onAddressSelect(parsed);
     };
 
+    const parseReverseResult = (result: AddressResult, latitude: number, longitude: number): ParsedAddress => {
+        const addr = result.address || {};
+        const houseNumber = addr.house_number || '';
+        const road = addr.road || '';
+        const addressLine1 = [houseNumber, road].filter(Boolean).join(' ').trim()
+            || result.display_name?.split(',')[0]
+            || '';
+        const city = addr.city || addr.town || addr.village || addr.municipality || '';
+        const postalCode = addr.postcode || '';
+
+        return {
+            address_line1: addressLine1,
+            city,
+            postal_code: postalCode,
+            // Keep the device's actual GPS coordinates rather than the
+            // reverse-geocoded address's centroid — more precise when the
+            // client is standing at the property itself.
+            latitude,
+            longitude,
+        };
+    };
+
+    const handleUseMyLocation = () => {
+        setLocationError(null);
+
+        if (!('geolocation' in navigator)) {
+            setLocationError("La géolocalisation n'est pas disponible sur cet appareil.");
+            return;
+        }
+
+        setShowDropdown(false);
+        setIsLocating(true);
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+
+                try {
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?` +
+                        new URLSearchParams({
+                            lat: String(latitude),
+                            lon: String(longitude),
+                            format: 'json',
+                            addressdetails: '1',
+                        }),
+                        { headers: { 'Accept-Language': 'fr' } }
+                    );
+
+                    const parsed = response.ok
+                        ? parseReverseResult(await response.json(), latitude, longitude)
+                        : { address_line1: query, city: '', postal_code: '', latitude, longitude };
+
+                    if (parsed.address_line1) {
+                        setQuery(parsed.address_line1);
+                    }
+                    setResults([]);
+                    setShowDropdown(false);
+                    onAddressSelect(parsed);
+                } catch (error) {
+                    console.error('Reverse geocoding failed:', error);
+                    // The address text couldn't be resolved, but the GPS
+                    // coordinates themselves are still valid and useful.
+                    onAddressSelect({ address_line1: query, city: '', postal_code: '', latitude, longitude });
+                } finally {
+                    setIsLocating(false);
+                }
+            },
+            (error) => {
+                setIsLocating(false);
+                if (error.code === error.PERMISSION_DENIED) {
+                    setLocationError("Localisation refusée. Autorisez l'accès à votre position dans les réglages du navigateur.");
+                } else if (error.code === error.TIMEOUT) {
+                    setLocationError('La localisation a pris trop de temps. Réessayez.');
+                } else {
+                    setLocationError('Impossible de récupérer votre position actuelle.');
+                }
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (!showDropdown || results.length === 0) return;
 
@@ -182,13 +266,31 @@ export default function AddressAutocomplete({
                     onKeyDown={handleKeyDown}
                     onFocus={() => results.length > 0 && setShowDropdown(true)}
                     placeholder={placeholder}
-                    className="pl-10 pr-10"
+                    className="pl-10 pr-16"
                     autoComplete="off"
                 />
                 {isLoading && (
-                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 animate-spin" />
+                    <Loader2 className="absolute right-9 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 animate-spin" />
                 )}
+                <button
+                    type="button"
+                    onClick={handleUseMyLocation}
+                    disabled={isLocating}
+                    title="Utiliser ma position actuelle"
+                    aria-label="Utiliser ma position actuelle"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-slate-400 hover:text-sky-600 hover:bg-sky-50 disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-sky-900/30 dark:hover:text-sky-400 transition-colors"
+                >
+                    {isLocating ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <LocateFixed className="h-4 w-4" />
+                    )}
+                </button>
             </div>
+
+            {locationError && (
+                <p className="mt-1 text-xs text-red-500">{locationError}</p>
+            )}
 
             {showDropdown && results.length > 0 && (
                 <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
