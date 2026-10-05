@@ -78,6 +78,10 @@ Route::get('/confidentialite', function () {
     return inertia('Privacy');
 })->name('privacy');
 
+Route::get('/remuneration-transparence', function () {
+    return inertia('RemunerationTransparence');
+})->name('remuneration-transparence');
+
 Route::get('/a-propos', function () {
     return inertia('About');
 })->name('about');
@@ -96,6 +100,7 @@ Route::get('/sitemap.xml', function () {
         ['loc' => route('professionals.index'), 'changefreq' => 'monthly', 'priority' => '0.7'],
         ['loc' => route('legal.notice'), 'changefreq' => 'yearly', 'priority' => '0.3'],
         ['loc' => route('privacy'), 'changefreq' => 'yearly', 'priority' => '0.3'],
+        ['loc' => route('remuneration-transparence'), 'changefreq' => 'yearly', 'priority' => '0.5'],
     ];
 
     return response()

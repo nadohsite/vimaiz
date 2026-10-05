@@ -133,7 +133,7 @@ class QuoteResource extends Resource
      */
     protected static function amountsFromForm(Get $get): array
     {
-        $rate = (float) ($get('commission_rate') ?? (PricingRule::getActive()?->platform_commission_rate ?? 20));
+        $rate = (float) ($get('commission_rate') ?? (PricingRule::getActive()?->platform_commission_rate ?? 25));
         $final = (float) ($get('final_price') ?? 0);
         $commission = round($final * ($rate / 100), 2);
 
@@ -215,7 +215,7 @@ class QuoteResource extends Resource
                                     ->label('Taux commission')
                                     ->numeric()
                                     ->suffix('%')
-                                    ->default(fn () => PricingRule::getActive()?->platform_commission_rate ?? 20)
+                                    ->default(fn () => PricingRule::getActive()?->platform_commission_rate ?? 25)
                                     ->live(),
                             ]),
                         Grid::make(2)

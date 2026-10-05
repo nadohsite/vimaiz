@@ -1240,6 +1240,21 @@
     margin: 0;
 }
 
+.welcome-page .about-card-wide {
+    grid-column: 1 / -1;
+}
+
+.welcome-page .about-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-ink);
+}
+
 /* footer */
 .welcome-page .welcome-footer {
     border-top: 1px solid var(--border);

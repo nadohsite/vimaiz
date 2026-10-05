@@ -82,6 +82,7 @@ export default function PublicLayout({ title, description, children }: PublicLay
                             <h4>Clients</h4>
                             <Link href={route('register')}>S&apos;inscrire</Link>
                             <Link href={route('login')}>Connexion</Link>
+                            <Link href={route('contact.index')}>Contact</Link>
                         </div>
                         <div className="foot-col">
                             <h4>Professionnels</h4>
@@ -97,7 +98,7 @@ export default function PublicLayout({ title, description, children }: PublicLay
                             <h4>Légal</h4>
                             <Link href={route('legal.notice')}>Mentions légales</Link>
                             <Link href={route('privacy')}>Confidentialité</Link>
-                            <Link href={route('contact.index')}>Contact</Link>
+                            <Link href={route('remuneration-transparence')}>Rémunération et transparence</Link>
                         </div>
                     </div>
                     <div className="foot-bottom">

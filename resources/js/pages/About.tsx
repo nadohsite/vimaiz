@@ -1,6 +1,6 @@
 import PublicLayout from '@/components/public/public-layout';
 import { Link } from '@inertiajs/react';
-import { LayoutDashboard, MapPin, Shield, Wallet } from 'lucide-react';
+import { ArrowRight, LayoutDashboard, MapPin, Percent, Shield, Wallet } from 'lucide-react';
 
 const pillars = [
     {
@@ -93,6 +93,21 @@ export default function About() {
                                     <p>{description}</p>
                                 </div>
                             ))}
+                            <div className="about-card about-card-wide">
+                                <div className="type-icon">
+                                    <Percent size={19} />
+                                </div>
+                                <h3>Rémunération et transparence</h3>
+                                <p>
+                                    75 % du montant de chaque intervention revient directement à
+                                    l&apos;intervenant. Découvrez comment les 25 % prélevés par la
+                                    plateforme se traduisent en clients garantis et en trésorerie
+                                    sécurisée.
+                                </p>
+                                <Link href={route('remuneration-transparence')} className="about-card-link">
+                                    En savoir plus <ArrowRight size={14} />
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

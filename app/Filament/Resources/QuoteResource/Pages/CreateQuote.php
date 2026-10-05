@@ -26,7 +26,7 @@ class CreateQuote extends CreateRecord
             if ($request) {
                 $this->form->fill([
                     'service_request_id' => $serviceRequestId,
-                    'commission_rate' => PricingRule::getActive()?->platform_commission_rate ?? 20,
+                    'commission_rate' => PricingRule::getActive()?->platform_commission_rate ?? 25,
                     'status' => Quote::STATUS_SENT,
                 ]);
             }
@@ -36,7 +36,7 @@ class CreateQuote extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $final = (float) ($data['final_price'] ?? 0);
-        $rate = (float) ($data['commission_rate'] ?? (PricingRule::getActive()?->platform_commission_rate ?? 20));
+        $rate = (float) ($data['commission_rate'] ?? (PricingRule::getActive()?->platform_commission_rate ?? 25));
         $commission = round($final * ($rate / 100), 2);
 
         $data['estimated_price'] = $data['estimated_price'] ?? $final;

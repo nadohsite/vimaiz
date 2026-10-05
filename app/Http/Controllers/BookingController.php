@@ -65,7 +65,11 @@ class BookingController extends Controller
             // Calculate pricing
             $hours = $validated['duration_minutes'] / 60;
             $servicePrice = $agent->hourly_rate * $hours;
-            $platformFee = $servicePrice * 0.10; // 10% platform fee
+            // Aligned with the config-driven rate used by the equivalent
+            // API controller (App\Http\Controllers\Api\BookingController)
+            // instead of a separate hardcoded value that drifted out of
+            // sync with it.
+            $platformFee = $servicePrice * (config('vimaiz.commission_rate') / 100);
             $totalPrice = $servicePrice + $platformFee;
 
             // Generate unique booking number
