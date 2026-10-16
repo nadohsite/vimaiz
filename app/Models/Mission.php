@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+// Brigades multi-agents (cahier des charges "grands espaces", Volets 6-7,
+// octobre 2026) — voir le plan technique dans le projet Claude Vimaiz.
+use App\Models\MissionAgent;
+
 class Mission extends Model
 {
     use HasFactory;
@@ -24,6 +28,9 @@ class Mission extends Model
         'property_id',
         'client_id',
         'agent_id',
+        'required_agents',
+        'accepted_agents_count',
+        'client_validated_at',
         'scheduled_at',
         'duration_hours',
         'started_at',
@@ -61,6 +68,9 @@ class Mission extends Model
     ];
 
     protected $casts = [
+        'required_agents' => 'integer',
+        'accepted_agents_count' => 'integer',
+        'client_validated_at' => 'datetime',
         'scheduled_at' => 'datetime',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
@@ -160,6 +170,11 @@ class Mission extends Model
         return $this->belongsTo(User::class, 'agent_id');
     }
 
+    public function missionAgents(): HasMany
+    {
+        return $this->hasMany(MissionAgent::class);
+    }
+
     public function declinedAgents(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'mission_declines', 'mission_id', 'agent_id')
@@ -216,16 +231,39 @@ class Mission extends Model
         return $this->payment_status === self::PAYMENT_PAID;
     }
 
+    /**
+     * Nombre de créneaux de brigade encore ouverts (ni acceptés, ni déjà
+     * proposés à un agent en attente de réponse).
+     */
+    public function openSlotsCount(): int
+    {
+        $filled = $this->missionAgents()
+            ->whereIn('status', MissionAgent::ACTIVE_STATUSES)
+            ->count();
+
+        return max(0, (int) $this->required_agents - $filled);
+    }
+
+    public function isFullyStaffed(): bool
+    {
+        return $this->accepted_agents_count >= $this->required_agents;
+    }
+
     public function isOpenForAgents(): bool
     {
-        return $this->agent_id === null
-            && $this->status === self::STATUS_PENDING_AGENT
-            && $this->isPaid();
+        return $this->status === self::STATUS_PENDING_AGENT
+            && $this->isPaid()
+            && ! $this->isFullyStaffed();
     }
 
     public function isVisibleToAgent(User $agent): bool
     {
-        if ($this->agent_id === $agent->id) {
+        $isBrigadeMember = $this->missionAgents()
+            ->where('agent_id', $agent->id)
+            ->whereIn('status', MissionAgent::ACTIVE_STATUSES)
+            ->exists();
+
+        if ($isBrigadeMember) {
             return true;
         }
 
@@ -251,8 +289,18 @@ class Mission extends Model
         $openIds = app(GeographicMatchingService::class)
             ->visibleOpenMissionIdsFor($agent);
 
-        return $query->where(function ($q) use ($agent, $openIds) {
+        // Brigades : un agent co-assigné doit voir la mission même s'il
+        // n'est pas (ou plus) l'agent_id "référent".
+        $memberMissionIds = MissionAgent::where('agent_id', $agent->id)
+            ->whereIn('status', MissionAgent::ACTIVE_STATUSES)
+            ->pluck('mission_id');
+
+        return $query->where(function ($q) use ($agent, $openIds, $memberMissionIds) {
             $q->where('agent_id', $agent->id);
+
+            if ($memberMissionIds->isNotEmpty()) {
+                $q->orWhereIn('id', $memberMissionIds);
+            }
 
             if ($openIds !== []) {
                 $q->orWhereIn('id', $openIds);
@@ -262,8 +310,7 @@ class Mission extends Model
 
     public function needsAgent(): bool
     {
-        return $this->status === self::STATUS_AGENT_REFUSED ||
-               ($this->status === self::STATUS_PENDING_AGENT && ! $this->agent_id);
+        return $this->status === self::STATUS_AGENT_REFUSED || $this->isOpenForAgents();
     }
 
     public function canStart(): bool
@@ -443,6 +490,16 @@ class Mission extends Model
             && ! $this->return_requested
             && $this->completed_at
             && $this->completed_at->greaterThanOrEqualTo(now()->subHours(48));
+    }
+
+    /**
+     * Volet 7 — validation anticipée du client avant l'échéance des 48h :
+     * débloque immédiatement le paiement retenu des intervenants au lieu
+     * d'attendre le job planifié vimaiz:release-held-mission-payouts.
+     */
+    public function canValidateNow(): bool
+    {
+        return $this->status === self::STATUS_COMPLETED && ! $this->client_validated_at;
     }
 
     public function getReturnStatusLabelAttribute(): ?string

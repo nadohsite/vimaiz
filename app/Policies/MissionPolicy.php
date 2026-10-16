@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Models\Mission;
+use App\Models\MissionAgent;
 use App\Models\User;
-use App\Services\GeographicMatchingService;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MissionPolicy
@@ -38,18 +38,31 @@ class MissionPolicy
             return false;
         }
 
-        if ($mission->agent_id === $user->id) {
-            return true;
-        }
-
-        if (! $mission->isOpenForAgents()) {
+        if ($mission->isFullyStaffed()) {
             return false;
         }
 
-        return app(GeographicMatchingService::class)->isGeographicallyEligible($user, $mission)
-            && ! Mission::where('agent_id', $user->id)
-                ->where('status', Mission::STATUS_PENDING_AGENT)
-                ->exists();
+        // Source de vérité unique : une ligne mission_agents en attente pour
+        // CET agent sur CETTE mission — que le créneau vienne de la mise en
+        // relation automatique (AgentAssignmentService::proposeToAvailableAgents)
+        // ou d'une attribution manuelle admin (MissionService::assignSpecificAgent).
+        // Les deux créent désormais une ligne pending_agent, donc on n'a plus
+        // besoin (et on ne doit plus) de re-vérifier l'éligibilité géographique
+        // ici : c'était déjà fait avant de proposer le créneau, et le
+        // bypass admin en dépendait.
+        $hasPendingSlot = $mission->missionAgents()
+            ->where('agent_id', $user->id)
+            ->where('status', MissionAgent::STATUS_PENDING_AGENT)
+            ->exists();
+
+        if (! $hasPendingSlot) {
+            return false;
+        }
+
+        return ! MissionAgent::where('agent_id', $user->id)
+            ->where('status', MissionAgent::STATUS_PENDING_AGENT)
+            ->where('mission_id', '!=', $mission->id)
+            ->exists();
     }
 
     public function refuse(User $user, Mission $mission): bool
@@ -58,8 +71,13 @@ class MissionPolicy
             return true;
         }
 
-        return $user->id === $mission->agent_id
-            && $mission->status === Mission::STATUS_AGENT_ACCEPTED;
+        // Brigades : tout intervenant ayant accepté son créneau peut se
+        // désister, pas seulement le référent (cf. MissionService::agentRefuseMission
+        // qui gère déjà le réassignement du rôle de référent le cas échéant).
+        return $mission->missionAgents()
+            ->where('agent_id', $user->id)
+            ->where('status', MissionAgent::STATUS_ACCEPTED)
+            ->exists();
     }
 
     public function create(User $user): bool
@@ -79,7 +97,16 @@ class MissionPolicy
 
     public function start(User $user, Mission $mission): bool
     {
-        return $user->id === $mission->agent_id && $mission->canStart();
+        if (! $mission->canStart()) {
+            return false;
+        }
+
+        // Brigades : n'importe quel agent ayant accepté son créneau peut
+        // démarrer (arrivée géolocalisée), pas seulement le référent.
+        return $mission->missionAgents()
+            ->where('agent_id', $user->id)
+            ->where('status', MissionAgent::STATUS_ACCEPTED)
+            ->exists();
     }
 
     public function uploadPhotos(User $user, Mission $mission): bool

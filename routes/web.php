@@ -78,16 +78,21 @@ Route::get('/confidentialite', function () {
     return inertia('Privacy');
 })->name('privacy');
 
-Route::get('/remuneration-transparence', function () {
-    return inertia('RemunerationTransparence');
-})->name('remuneration-transparence');
-
 Route::get('/a-propos', function () {
     return inertia('About');
 })->name('about');
 
 Route::get('/contact', function () {
-    return inertia('Contact');
+    $settings = \App\Models\PlatformSetting::current();
+
+    return inertia('Contact', [
+        'contact' => [
+            'email' => $settings->contact_email,
+            'phone' => $settings->contact_phone,
+            'hours' => $settings->contact_hours,
+            'address' => $settings->contact_address,
+        ],
+    ]);
 })->name('contact.index');
 
 Route::get('/sitemap.xml', function () {
@@ -100,7 +105,6 @@ Route::get('/sitemap.xml', function () {
         ['loc' => route('professionals.index'), 'changefreq' => 'monthly', 'priority' => '0.7'],
         ['loc' => route('legal.notice'), 'changefreq' => 'yearly', 'priority' => '0.3'],
         ['loc' => route('privacy'), 'changefreq' => 'yearly', 'priority' => '0.3'],
-        ['loc' => route('remuneration-transparence'), 'changefreq' => 'yearly', 'priority' => '0.5'],
     ];
 
     return response()
@@ -207,6 +211,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/missions/{mission}/return-request', [MissionReturnController::class, 'requestReturn'])->name('missions.return-request');
         Route::post('/missions/{mission}/return-validate', [MissionReturnController::class, 'validateReturn'])->name('missions.return-validate');
 
+        // VIMAIZ - Validation anticipée (débloque le paiement avant 48h)
+        Route::post('/missions/{mission}/validate', [ClientMissionController::class, 'validateIntervention'])->name('missions.validate');
+
         // VIMAIZ - Factures (Invoices)
         Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
         Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
@@ -265,6 +272,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // VIMAIZ - Clause RCP
         Route::get('/rcp-acceptance', [RCPAcceptanceController::class, 'index'])->name('rcp-acceptance');
         Route::post('/rcp-acceptance', [RCPAcceptanceController::class, 'store'])->name('rcp-acceptance.store');
+
+        // VIMAIZ - Rémunération et transparence
+        Route::get('/remuneration-transparence', function () {
+            return Inertia::render('RemunerationTransparence');
+        })->name('remuneration-transparence');
 
         // VIMAIZ - Retours mécontentement (Agent)
         Route::get('/returns', [MissionReturnController::class, 'agentReturns'])->name('returns.index');

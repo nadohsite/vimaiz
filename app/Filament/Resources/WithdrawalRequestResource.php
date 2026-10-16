@@ -5,15 +5,19 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\WithdrawalRequestResource\Pages;
 use App\Models\AgentProfile;
 use App\Models\WalletTransaction;
+use App\Services\SepaCreditTransferFileBuilder;
+use App\Services\SepaNotConfiguredException;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
 class WithdrawalRequestResource extends Resource
@@ -190,6 +194,14 @@ class WithdrawalRequestResource extends Resource
                         'rejected' => 'danger',
                         default => 'gray',
                     }),
+                Tables\Columns\TextColumn::make('sepa_export')
+                    ->label('Virement groupé')
+                    ->state(fn (WalletTransaction $record): string => ($record->metadata['sepa_export_status'] ?? null) === 'exported'
+                        ? 'Exporté, en attente de confirmation'
+                        : '—')
+                    ->badge()
+                    ->color(fn (WalletTransaction $record): string => ($record->metadata['sepa_export_status'] ?? null) === 'exported' ? 'info' : 'gray')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Date')
                     ->dateTime('d/m/Y H:i')
@@ -225,6 +237,7 @@ class WithdrawalRequestResource extends Resource
                             'metadata' => array_merge($record->metadata ?? [], [
                                 'approved_at' => now()->toISOString(),
                                 'approved_by' => auth()->id(),
+                                'payout_method' => $record->metadata['payout_method'] ?? 'manual',
                             ]),
                         ]);
 
@@ -262,7 +275,145 @@ class WithdrawalRequestResource extends Resource
                             ->send();
                     }),
             ])
-            ->bulkActions([]);
+            ->bulkActions([
+                BulkAction::make('exportSepa')
+                    ->label('Exporter en virement groupé (SEPA)')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('primary')
+                    ->requiresConfirmation()
+                    ->modalHeading('Exporter ce lot en virement groupé SEPA')
+                    ->modalDescription(
+                        'Génère un fichier à importer dans votre espace bancaire professionnel (virements groupés). '
+                        .'Les demandes sélectionnées restent "en attente" jusqu\'à ce que vous confirmiez l\'envoi '
+                        .'avec l\'action "Confirmer l\'envoi", une fois la banque passée.'
+                    )
+                    ->modalSubmitActionLabel('Générer le fichier')
+                    ->deselectRecordsAfterCompletion()
+                    ->action(function (Collection $records) {
+                        $pending = $records->filter(fn (WalletTransaction $record) => $record->status === 'pending');
+
+                        if ($pending->isEmpty()) {
+                            Notification::make()
+                                ->title('Aucune demande en attente dans la sélection')
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
+                        // Limites de la banque Shine pour un virement groupé :
+                        // 100 virements max par fichier, 10 000 € max par virement.
+                        // Un montant au-delà serait rejeté par Shine ; on l'exclut
+                        // de ce lot plutôt que de générer un fichier inutilisable.
+                        $tooLarge = $pending->filter(fn (WalletTransaction $record) => (float) $record->amount > 10000);
+                        $pending = $pending->diff($tooLarge);
+
+                        if ($pending->isEmpty()) {
+                            Notification::make()
+                                ->title('Export impossible')
+                                ->body('Tous les montants sélectionnés dépassent 10 000 €, la limite de Shine par virement.')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        $overflow = collect();
+                        if ($pending->count() > 100) {
+                            $pending = $pending->sortBy('created_at')->values();
+                            $overflow = $pending->slice(100);
+                            $pending = $pending->take(100);
+                        }
+
+                        $batchId = 'VMZ-'.now()->format('Ymd-His');
+
+                        try {
+                            $xml = app(SepaCreditTransferFileBuilder::class)->build($pending, $batchId);
+                        } catch (SepaNotConfiguredException $e) {
+                            Notification::make()
+                                ->title('Export impossible')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        foreach ($pending as $record) {
+                            $record->update([
+                                'metadata' => array_merge($record->metadata ?? [], [
+                                    'sepa_export_status' => 'exported',
+                                    'sepa_batch_id' => $batchId,
+                                    'sepa_exported_at' => now()->toISOString(),
+                                    'sepa_exported_by' => auth()->id(),
+                                    'payout_method' => 'sepa_batch',
+                                ]),
+                            ]);
+                        }
+
+                        $warnings = [];
+                        if ($overflow->isNotEmpty()) {
+                            $warnings[] = $overflow->count().' demande(s) laissée(s) en attente (limite Shine : 100 virements par fichier) — à exporter dans un second lot.';
+                        }
+                        if ($tooLarge->isNotEmpty()) {
+                            $warnings[] = $tooLarge->count().' demande(s) exclue(s) car supérieure(s) à 10 000 € (limite Shine par virement) — à traiter manuellement.';
+                        }
+
+                        Notification::make()
+                            ->title($pending->count().' virement(s) exporté(s)')
+                            ->body(trim(
+                                'Importez ce fichier dans votre espace bancaire Shine (Paiements > Faire un virement > Virement groupé), '
+                                .'puis revenez cliquer "Confirmer l\'envoi" une fois le virement passé.'
+                                .($warnings ? ' '.implode(' ', $warnings) : '')
+                            ))
+                            ->success()
+                            ->send();
+
+                        return response()->streamDownload(
+                            fn () => print ($xml),
+                            $batchId.'.xml',
+                            ['Content-Type' => 'application/xml']
+                        );
+                    }),
+                BulkAction::make('confirmSepaSent')
+                    ->label('Confirmer l\'envoi')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Confirmer l\'envoi du virement groupé')
+                    ->modalDescription('Confirmez-vous que votre banque a bien exécuté ce lot de virements ?')
+                    ->deselectRecordsAfterCompletion()
+                    ->action(function (Collection $records) {
+                        $exported = $records->filter(
+                            fn (WalletTransaction $record) => $record->status === 'pending'
+                                && ($record->metadata['sepa_export_status'] ?? null) === 'exported'
+                        );
+
+                        if ($exported->isEmpty()) {
+                            Notification::make()
+                                ->title('Aucune demande exportée et en attente dans la sélection')
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
+                        foreach ($exported as $record) {
+                            $record->update([
+                                'status' => 'completed',
+                                'metadata' => array_merge($record->metadata ?? [], [
+                                    'approved_at' => now()->toISOString(),
+                                    'approved_by' => auth()->id(),
+                                ]),
+                            ]);
+                        }
+
+                        Notification::make()
+                            ->title($exported->count().' retrait(s) validé(s)')
+                            ->success()
+                            ->send();
+                    }),
+            ]);
     }
 
     public static function getPages(): array

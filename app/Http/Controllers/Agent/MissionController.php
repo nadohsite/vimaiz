@@ -149,6 +149,7 @@ class MissionController extends Controller
         try {
             $this->missionService->startMission(
                 $mission,
+                $request->user(),
                 (float) $validated['latitude'],
                 (float) $validated['longitude'],
             );

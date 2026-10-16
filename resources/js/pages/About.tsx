@@ -5,24 +5,27 @@ import { ArrowRight, LayoutDashboard, MapPin, Percent, Shield, Wallet } from 'lu
 const pillars = [
     {
         icon: Shield,
-        title: 'Intervenants vérifiés',
-        description: 'SIRET et documents contrôlés avant intégration au réseau.',
+        title: 'Intervenants certifiés',
+        description:
+            'SIRET, URSSAF et assurance professionnelle vérifiés avant intégration au réseau — la meilleure protection contre le travail dissimulé.',
     },
     {
         icon: Wallet,
         title: 'Paiement sécurisé',
-        description: 'Débité avant chaque intervention, jamais avant validation.',
+        description:
+            'Réglé en ligne avant l’intervention, reversé aux intervenants seulement après votre validation finale.',
     },
     {
         icon: LayoutDashboard,
-        title: 'Organisation claire',
+        title: 'Suivi en temps réel',
         description:
-            'Suivi des prestations, échanges et historique centralisés dans un seul espace.',
+            'Arrivée géolocalisée, rapport de clôture et historique centralisés dans votre espace, même à des milliers de kilomètres.',
     },
     {
         icon: MapPin,
-        title: 'Partout en France',
-        description: 'Un réseau national de professionnels, disponible où que vous soyez.',
+        title: 'Un réseau de brigades',
+        description:
+            'Co-assignation automatique de plusieurs intervenants certifiés selon la superficie de votre bien, pour ne jamais dépasser 125 m² de charge chacun.',
     },
 ];
 
@@ -30,16 +33,16 @@ export default function About() {
     return (
         <PublicLayout
             title="À propos"
-            description="Découvrez VIMAIZ, la plateforme qui simplifie l'organisation des interventions pour vos locations saisonnières."
+            description="Vimaiz, pensé pour les grandes résidences secondaires gérées à distance : l'histoire et la mission de la plateforme."
         >
             <section className="welcome-section">
                 <div className="wrap">
                     <div className="page-hero">
-                        <div className="sec-eyebrow">La plateforme</div>
+                        <div className="sec-eyebrow">Notre histoire</div>
                         <h1>À propos de Vimaiz</h1>
                         <p>
-                            Chez Vimaiz, nous croyons qu&apos;une location saisonnière devrait
-                            toujours être prête à accueillir ses voyageurs.
+                            Chez Vimaiz, nous croyons que l&apos;éloignement ne doit jamais
+                            justifier la perte de contrôle sur votre grand patrimoine.
                         </p>
                     </div>
                 </div>
@@ -49,33 +52,47 @@ export default function About() {
                 <div className="wrap">
                     <div className="about-grid">
                         <div>
+                            <p>Tout est parti d&apos;un constat, fait au fil de nombreux voyages entre la France et l&apos;Espagne.</p>
                             <p>
-                                Pourtant, derrière chaque arrivée se cache une organisation exigeante
-                                où le moindre imprévu peut avoir des conséquences importantes.
-                            </p>
-                            <ul className="about-list">
-                                <li>Un retard.</li>
-                                <li>Une absence.</li>
-                                <li>Une intervention annulée.</li>
-                                <li>Une mauvaise expérience voyageur.</li>
-                            </ul>
-                            <p>
-                                Nous avons créé Vimaiz pour apporter plus de sérénité aux
-                                professionnels de la location saisonnière.
-                            </p>
-                            <p>Notre objectif n&apos;est pas d&apos;ajouter un outil de plus.</p>
-                            <p>
-                                Notre objectif est de simplifier toute l&apos;organisation qui
-                                permet à un logement d&apos;être prêt au bon moment.
-                            </p>
-                            <p>Nous croyons qu&apos;une bonne organisation est invisible.</p>
-                            <p>Lorsqu&apos;elle fonctionne, personne n&apos;y pense.</p>
-                            <p>
-                                Lorsqu&apos;elle manque, tout le monde en subit les conséquences.
+                                En observant le lien touristique qui unit ces deux pays, j&apos;ai
+                                réalisé combien de propriétaires possèdent une résidence
+                                secondaire qu&apos;ils ne peuvent pas surveiller eux-mêmes — trop
+                                loin, trop occupés, ou simplement de l&apos;autre côté d&apos;une
+                                frontière.
                             </p>
                             <p>
-                                C&apos;est cette tranquillité d&apos;esprit que nous voulons offrir
-                                à chaque utilisateur de Vimaiz.
+                                <em>Vivienda</em>, en espagnol, c&apos;est le logement.{' '}
+                                <em>Maison</em>, en français, dit la même chose. J&apos;ai fusionné
+                                les deux mots, remplacé le « s » par un « z » : Vimaiz était né.
+                            </p>
+                            <p>
+                                Pour l&apos;instant, Vimaiz est déployée uniquement sur le marché
+                                français. Mais l&apos;ambition ne s&apos;arrête pas à nos
+                                frontières : l&apos;Espagne, puis le reste de l&apos;Europe, sont
+                                les prochaines étapes — c&apos;est aussi pour cela que le nom, et
+                                le .com, ont été pensés dès le départ à l&apos;international.
+                            </p>
+                            <p>
+                                Plus notre réseau grandissait, plus un constat s&apos;imposait : un
+                                bien de 70 m² et un domaine de 400 m² n&apos;ont rien à voir. Le
+                                second exige une coordination que personne, sur le marché,
+                                n&apos;avait pensée à cette échelle.
+                            </p>
+                            <p>
+                                Nous avons donc fait un choix : nous concentrer exclusivement sur
+                                les grandes résidences secondaires, celles de plus de 200 m², et
+                                construire pour elles l&apos;organisation qu&apos;elles méritent —
+                                des brigades de plusieurs intervenants certifiés, coordonnées comme
+                                une seule équipe, suivies du début à la fin.
+                            </p>
+                            <p>Notre mission tient en une phrase :</p>
+                            <p>
+                                <strong>Être vos yeux là où vous n&apos;en avez pas.</strong>
+                            </p>
+                            <p style={{ marginTop: 24 }}>
+                                MBARGA JEAN
+                                <br />
+                                Fondateur de Vimaiz
                             </p>
                             <div style={{ marginTop: 24 }}>
                                 <Link href={route('register')} className="btn btn-primary">

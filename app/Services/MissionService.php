@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\Mission;
+use App\Models\MissionAgent;
 use App\Models\MissionAnomaly;
 use App\Models\MissionPhoto;
+use App\Models\Property;
 use App\Models\Quote;
 use App\Models\ServiceRequest;
 use App\Models\User;
@@ -76,9 +78,25 @@ class MissionService
             'platform_fee' => $commissionAmount,
             'status' => Mission::STATUS_PENDING_AGENT,
             'payment_status' => Mission::PAYMENT_PENDING,
+            'required_agents' => $this->requiredAgentsForProperty($property),
         ]);
 
         return $mission;
+    }
+
+    /**
+     * Volet 6 du cahier des charges "grands espaces" (décision du
+     * 14/10/2026) : 125 m² maximum par intervenant, calculé dynamiquement,
+     * sans exception. Les biens sous 200 m² (parc existant conservé,
+     * décision du 14/10/2026) restent en mono-agent.
+     */
+    protected function requiredAgentsForProperty(Property $property): int
+    {
+        if ((float) $property->surface_area < 200) {
+            return 1;
+        }
+
+        return max(2, (int) ceil((float) $property->surface_area / 125));
     }
 
     public function fulfillPaidQuote(Quote $quote, string $paymentIntentId): Mission
@@ -158,10 +176,24 @@ class MissionService
         return [$mission->fresh(), $notifiedAgents];
     }
 
+    /**
+     * Attribution manuelle (admin) d'un intervenant à un créneau de la
+     * mission. Sur une brigade, ceci pourvoit UN créneau ouvert — pas
+     * forcément tous — l'admin peut l'utiliser plusieurs fois pour compléter
+     * une brigade restée incomplète.
+     */
     public function assignSpecificAgent(Mission $mission, User $agent): Mission
     {
+        MissionAgent::updateOrCreate(
+            ['mission_id' => $mission->id, 'agent_id' => $agent->id],
+            [
+                'status' => MissionAgent::STATUS_PENDING_AGENT,
+                'notified_at' => now(),
+                'refusal_reason' => null,
+            ]
+        );
+
         $mission->update([
-            'agent_id' => $agent->id,
             'status' => Mission::STATUS_PENDING_AGENT,
             'agent_notified_at' => now(),
             'assignment_attempts' => $mission->assignment_attempts + 1,
@@ -235,6 +267,12 @@ class MissionService
         }
     }
 
+    /**
+     * Acceptation par agent, créneau par créneau (brigades). Sur une
+     * mission mono-agent (required_agents = 1), le premier (et seul)
+     * créneau accepté complète immédiatement la brigade : le comportement
+     * observable reste identique à avant cette évolution.
+     */
     public function agentAcceptMission(Mission $mission, User $agent): Mission
     {
         return DB::transaction(function () use ($mission, $agent) {
@@ -244,8 +282,16 @@ class MissionService
                 throw new \Exception('Cette intervention n\'est plus disponible.');
             }
 
-            if ($mission->agent_id && $mission->agent_id !== $agent->id) {
-                throw new \Exception('Cette intervention a déjà été prise par un autre intervenant.');
+            if ($mission->isFullyStaffed()) {
+                throw new \Exception('Cette intervention a déjà sa brigade complète.');
+            }
+
+            $missionAgent = MissionAgent::where('mission_id', $mission->id)
+                ->where('agent_id', $agent->id)
+                ->first();
+
+            if (! $missionAgent || $missionAgent->status !== MissionAgent::STATUS_PENDING_AGENT) {
+                throw new \Exception('Cette intervention ne vous a pas été proposée ou n\'est plus disponible.');
             }
 
             $alreadyPending = Mission::query()
@@ -254,46 +300,156 @@ class MissionService
                 ->whereKeyNot($mission->id)
                 ->exists();
 
+            if (! $alreadyPending) {
+                // Brigades : l'agent peut avoir une proposition en attente
+                // sur une autre mission sans en être (encore) le référent
+                // (même logique que GeographicMatchingService::hasPendingMission()
+                // / AgentAssignmentService::hasPendingMission()).
+                $alreadyPending = MissionAgent::query()
+                    ->where('agent_id', $agent->id)
+                    ->where('status', MissionAgent::STATUS_PENDING_AGENT)
+                    ->where('mission_id', '!=', $mission->id)
+                    ->exists();
+            }
+
             if ($alreadyPending) {
                 throw new \Exception('Vous avez déjà une intervention en attente de réponse.');
             }
 
+            $isFirstAcceptance = $mission->accepted_agents_count === 0;
+
+            $missionAgent->update([
+                'status' => MissionAgent::STATUS_ACCEPTED,
+                'responded_at' => now(),
+                'is_lead' => $isFirstAcceptance,
+            ]);
+
+            $newAcceptedCount = $mission->accepted_agents_count + 1;
+            $isFullyStaffed = $newAcceptedCount >= $mission->required_agents;
+
             $mission->update([
-                'agent_id' => $agent->id,
-                'status' => Mission::STATUS_AGENT_ACCEPTED,
+                // Le premier agent à accepter devient le référent (compat
+                // avec tout le code qui ne connaît que missions.agent_id).
+                'agent_id' => $isFirstAcceptance ? $agent->id : $mission->agent_id,
+                'accepted_agents_count' => $newAcceptedCount,
+                'status' => $isFullyStaffed ? Mission::STATUS_AGENT_ACCEPTED : Mission::STATUS_PENDING_AGENT,
                 'agent_responded_at' => now(),
             ]);
 
-            $mission->serviceRequest->update([
-                'status' => ServiceRequest::STATUS_ASSIGNED,
-            ]);
+            if ($isFullyStaffed) {
+                $mission->serviceRequest->update([
+                    'status' => ServiceRequest::STATUS_ASSIGNED,
+                ]);
+            }
 
             $mission = $mission->fresh(['client', 'agent', 'property']);
 
-            $mission->client->notify(new AgentAcceptedMissionNotification($mission));
-
-            if ($mission->agent) {
-                $mission->agent->notify(new AgentInterventionConfirmedNotification($mission));
+            // Le client et l'admin ne sont notifiés "intervention confirmée"
+            // qu'une fois la brigade complète, pour ne pas envoyer N
+            // notifications identiques sur une mission à plusieurs agents.
+            if ($isFullyStaffed) {
+                $this->safeNotify(
+                    fn () => $mission->client->notify(new AgentAcceptedMissionNotification($mission)),
+                    'agent_accepted_mission',
+                    $mission,
+                );
+                $this->safeNotify(
+                    fn () => User::notifyAdmins(new AgentAcceptedMissionAdminNotification($mission)),
+                    'agent_accepted_mission_admin',
+                    $mission,
+                );
             }
 
-            User::notifyAdmins(new AgentAcceptedMissionAdminNotification($mission));
+            $this->safeNotify(
+                fn () => $agent->notify(new AgentInterventionConfirmedNotification($mission)),
+                'agent_intervention_confirmed',
+                $mission,
+                $agent,
+            );
 
             return $mission;
         });
     }
 
+    /**
+     * Refus par agent, créneau par créneau (brigades). Un désistement après
+     * acceptation ne libère QUE le créneau de cet agent — pas toute la
+     * mission — et, puisque la répartition du paiement n'est calculée qu'à
+     * la clôture (cf. holdBrigadePayouts()), le pool se redivise
+     * automatiquement sur les agents réellement restants (décision
+     * utilisateur du 15/10/2026), sans recalcul explicite ici.
+     */
     public function agentRefuseMission(Mission $mission, User $agent, ?string $reason = null): Mission
     {
-        $mission->declinedAgents()->syncWithoutDetaching([
-            $agent->id => ['reason' => $reason],
-        ]);
+        // Verrouillage pessimiste comme agentAcceptMission() : un refus et
+        // une acceptation concurrents sur la même brigade (ou deux refus
+        // concurrents) ne doivent pas lire/écrire accepted_agents_count ou
+        // le référent (agent_id) sur la base d'un état déjà périmé.
+        [$hadAcceptedSlot, $result] = DB::transaction(function () use ($mission, $agent, $reason) {
+            $mission = Mission::query()->whereKey($mission->id)->lockForUpdate()->firstOrFail();
 
-        $wasAssignedToAgent = $mission->agent_id === $agent->id;
+            $mission->declinedAgents()->syncWithoutDetaching([
+                $agent->id => ['reason' => $reason],
+            ]);
 
-        if (! $wasAssignedToAgent) {
+            $missionAgent = MissionAgent::where('mission_id', $mission->id)
+                ->where('agent_id', $agent->id)
+                ->first();
+
+            $hadAcceptedSlot = $missionAgent && $missionAgent->status === MissionAgent::STATUS_ACCEPTED;
+
+            if ($missionAgent) {
+                $missionAgent->update([
+                    'status' => MissionAgent::STATUS_REFUSED,
+                    'responded_at' => now(),
+                    'refusal_reason' => $reason,
+                ]);
+            }
+
+            if (! $hadAcceptedSlot) {
+                // L'agent déclinait une simple proposition, sans avoir
+                // encore accepté de créneau : rien à réorganiser côté
+                // brigade déjà constituée.
+                return [false, $mission->fresh()];
+            }
+
+            // L'agent avait accepté puis se désiste : on libère son créneau.
+            $newAcceptedCount = max(0, $mission->accepted_agents_count - 1);
+            $wasLead = $mission->agent_id === $agent->id;
+
+            $mission->update([
+                'accepted_agents_count' => $newAcceptedCount,
+                'status' => Mission::STATUS_AGENT_REFUSED,
+                'agent_responded_at' => now(),
+                'cancellation_reason' => $reason,
+            ]);
+
+            if ($wasLead) {
+                // Le prochain agent déjà accepté (le plus ancien) devient le
+                // nouveau référent, pour que missions.agent_id reste cohérent
+                // avec le reste du code (photos, notes internes, policies,
+                // Filament) qui ne connaît qu'un seul "agent_id" par mission.
+                $newLead = $mission->missionAgents()
+                    ->where('status', MissionAgent::STATUS_ACCEPTED)
+                    ->oldest('responded_at')
+                    ->first();
+
+                $mission->update(['agent_id' => $newLead?->agent_id]);
+
+                if ($newLead) {
+                    $newLead->update(['is_lead' => true]);
+                }
+            }
+
+            return [true, ['newAcceptedCount' => $newAcceptedCount, 'mission' => $mission]];
+        });
+
+        if (! $hadAcceptedSlot) {
+            // Hors transaction : vérifier qu'il reste des candidats ne fait
+            // que lire et notifier, pas besoin du verrou.
             $remaining = $this->assignmentService->findEligibleAgents($mission);
 
-            if ($remaining->isEmpty()) {
+            if ($remaining->isEmpty() && $mission->accepted_agents_count === 0) {
                 $this->safeNotify(
                     fn () => User::notifyAdmins(new MissionNeedsAgentNotification($mission->fresh(['property']))),
                     'mission_needs_agent',
@@ -301,20 +457,17 @@ class MissionService
                 );
             }
 
-            return $mission->fresh();
+            return $result;
+        }
+
+        $mission = $result['mission'];
+        $newAcceptedCount = $result['newAcceptedCount'];
+
+        if ($agent->agentProfile) {
+            $agent->agentProfile->incrementMissionsRefused();
         }
 
         $client = $mission->client;
-
-        $mission->update([
-            'status' => Mission::STATUS_AGENT_REFUSED,
-            'agent_responded_at' => now(),
-            'cancellation_reason' => $reason,
-        ]);
-
-        if ($mission->agent && $mission->agent->agentProfile) {
-            $mission->agent->agentProfile->incrementMissionsRefused();
-        }
 
         User::notifyAdmins(new AgentRefusedMissionNotification($mission, $reason));
 
@@ -322,13 +475,14 @@ class MissionService
             $client->notify(new AgentRefusedMissionClientNotification($mission));
         }
 
-        $newAgents = $this->assignmentService->reassignMission($mission);
+        $newAgents = $this->assignmentService->reassignMission($mission->fresh());
 
         $freshMission = $mission->fresh(['property']);
 
         if ($newAgents->isNotEmpty()) {
             $this->notifyAgentsOfProposal($newAgents, $freshMission);
-        } else {
+            $mission->update(['status' => Mission::STATUS_PENDING_AGENT]);
+        } elseif ($newAcceptedCount === 0) {
             $mission->serviceRequest->update([
                 'status' => ServiceRequest::STATUS_PAID,
             ]);
@@ -337,13 +491,35 @@ class MissionService
                 'mission_needs_agent',
                 $freshMission,
             );
+        } else {
+            // Il reste au moins un agent accepté dans la brigade et aucun
+            // candidat de remplacement n'est disponible tout de suite :
+            // la mission continue avec un effectif réduit plutôt que de
+            // bloquer sur un créneau introuvable.
+            $mission->update(['status' => Mission::STATUS_AGENT_ACCEPTED]);
         }
 
         return $mission->fresh();
     }
 
-    public function startMission(Mission $mission, float $agentLatitude, float $agentLongitude): Mission
+    /**
+     * Arrivée géolocalisée, par agent (brigades — Volet 7.1). La mission
+     * globale passe en "en cours" dès le premier agent arrivé : le
+     * propriétaire voit l'intervention démarrer sans attendre que toute la
+     * brigade soit sur place. L'arrivée de chaque agent reste visible
+     * individuellement sur sa ligne mission_agents.
+     */
+    public function startMission(Mission $mission, User $agent, float $agentLatitude, float $agentLongitude): Mission
     {
+        $missionAgent = MissionAgent::where('mission_id', $mission->id)
+            ->where('agent_id', $agent->id)
+            ->where('status', MissionAgent::STATUS_ACCEPTED)
+            ->first();
+
+        if (! $missionAgent) {
+            throw new \Exception('Vous ne faites pas partie des intervenants assignés à cette intervention.');
+        }
+
         $property = $mission->property;
 
         if (! $property || ! $property->latitude || ! $property->longitude) {
@@ -364,17 +540,26 @@ class MissionService
             );
         }
 
-        $mission->update([
-            'status' => Mission::STATUS_IN_PROGRESS,
-            'started_at' => now(),
+        $missionAgent->update([
+            'status' => MissionAgent::STATUS_IN_PROGRESS,
+            'arrived_at' => now(),
+            'arrival_latitude' => $agentLatitude,
+            'arrival_longitude' => $agentLongitude,
         ]);
 
-        $mission->serviceRequest->update([
-            'status' => ServiceRequest::STATUS_IN_PROGRESS,
-        ]);
+        if ($mission->status === Mission::STATUS_AGENT_ACCEPTED) {
+            $mission->update([
+                'status' => Mission::STATUS_IN_PROGRESS,
+                'started_at' => now(),
+            ]);
 
-        // Notify client that mission started
-        $mission->client->notify(new MissionStartedNotification($mission));
+            $mission->serviceRequest->update([
+                'status' => ServiceRequest::STATUS_IN_PROGRESS,
+            ]);
+
+            // Notify client that mission started
+            $mission->client->notify(new MissionStartedNotification($mission));
+        }
 
         return $mission->fresh();
     }
@@ -488,7 +673,19 @@ class MissionService
                 $mission->agent->agentProfile->incrementMissionsCompleted();
             }
 
-            $this->creditAgentWallet($mission);
+            // Brigades : chaque co-équipier (pas seulement le référent) doit
+            // voir son compteur de missions terminées progresser — utilisé
+            // par AgentAssignmentService pour le score d'ancienneté.
+            $mission->missionAgents()
+                ->whereIn('status', MissionAgent::ROSTER_STATUSES)
+                ->where('agent_id', '!=', $mission->agent_id)
+                ->with('agent.agentProfile')
+                ->get()
+                ->each(function (MissionAgent $missionAgent) {
+                    $missionAgent->agent?->agentProfile?->incrementMissionsCompleted();
+                });
+
+            $this->holdBrigadePayouts($mission);
 
             return $mission->fresh(['property', 'anomalies', 'agent', 'client']);
         });
@@ -542,15 +739,62 @@ class MissionService
         return $mission->fresh();
     }
 
-    protected function creditAgentWallet(Mission $mission): void
+    /**
+     * Paiement différé 48h (cahier des charges "grands espaces", Volet 7,
+     * décision utilisateur du 15/10/2026). Au lieu de créditer le solde
+     * disponible immédiatement, on crédite le solde "en attente" (escrow)
+     * de chaque agent réellement présent à la clôture, pour un montant
+     * recalculé sur l'effectif réel (pas figé au nombre d'agents prévu au
+     * devis — si certains ont refusé en cours de route, ceux qui restent
+     * se partagent tout le pool). La libération effective vers le solde
+     * disponible se fait ensuite via releaseHeldPayout(), déclenché soit
+     * par le job planifié vimaiz:release-held-mission-payouts (48h),
+     * soit par une validation anticipée du client, soit par un admin après
+     * arbitrage d'un retour rejeté.
+     */
+    protected function holdBrigadePayouts(Mission $mission): void
     {
-        if (! $mission->agent) {
+        $roster = $mission->missionAgents()
+            ->whereIn('status', MissionAgent::ROSTER_STATUSES)
+            ->get();
+
+        if ($roster->isEmpty()) {
+            // Garde-fou pour une mission qui n'aurait aucune ligne
+            // mission_agents (créée avant cette évolution, ou anomalie) :
+            // on retombe sur l'agent référent historique plutôt que de ne
+            // payer personne.
+            if (! $mission->agent) {
+                return;
+            }
+
+            $this->holdSinglePayout($mission->agent, $mission, (float) $mission->agent_payout, null);
+
             return;
         }
 
-        $wallet = $mission->agent->wallet;
+        $count = $roster->count();
+        $baseShare = floor(((float) $mission->agent_payout / $count) * 100) / 100;
+        $distributed = round($baseShare * $count, 2);
+        $remainder = round((float) $mission->agent_payout - $distributed, 2);
+
+        foreach ($roster as $index => $missionAgent) {
+            $share = $baseShare + ($index === $count - 1 ? $remainder : 0);
+
+            $missionAgent->update([
+                'status' => MissionAgent::STATUS_COMPLETED,
+                'payout_share' => $share,
+                'payout_status' => MissionAgent::PAYOUT_HELD,
+            ]);
+
+            $this->holdSinglePayout($missionAgent->agent, $mission, $share, $missionAgent);
+        }
+    }
+
+    protected function holdSinglePayout(User $agent, Mission $mission, float $amount, ?MissionAgent $missionAgent): void
+    {
+        $wallet = $agent->wallet;
         if (! $wallet) {
-            $wallet = $mission->agent->wallet()->create([
+            $wallet = $agent->wallet()->create([
                 'balance' => 0,
                 'pending_balance' => 0,
                 'total_earned' => 0,
@@ -560,6 +804,7 @@ class MissionService
 
         $alreadyCredited = $wallet->transactions()
             ->where('mission_id', $mission->id)
+            ->when($missionAgent, fn ($q) => $q->where('mission_agent_id', $missionAgent->id))
             ->where('type', 'credit')
             ->exists();
 
@@ -567,14 +812,90 @@ class MissionService
             return;
         }
 
-        $wallet->credit(
-            $mission->agent_payout,
-            'Mission '.$mission->mission_number,
-            $mission
+        $wallet->creditPending(
+            $amount,
+            'Mission '.$mission->mission_number.' — en attente de validation (48h)',
+            $mission,
+            $missionAgent
         );
+    }
 
-        // Notify agent of payout
-        $mission->agent->notify(new AgentPayoutNotification($mission, $mission->agent_payout));
+    /**
+     * Libère un paiement retenu vers le solde disponible de l'agent.
+     * Appelé par le job planifié (48h écoulées), par une validation
+     * anticipée du client, par la validation d'un retour, ou manuellement
+     * par un admin après arbitrage d'un retour rejeté.
+     */
+    public function releaseHeldPayout(MissionAgent $missionAgent): void
+    {
+        if ($missionAgent->payout_status !== MissionAgent::PAYOUT_HELD) {
+            return;
+        }
+
+        $agent = $missionAgent->agent;
+        $wallet = $agent?->wallet;
+
+        $pendingTransaction = $wallet?->transactions()
+            ->where('mission_agent_id', $missionAgent->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if (! $wallet || ! $pendingTransaction) {
+            Log::error('Impossible de libérer le paiement retenu : transaction en attente introuvable', [
+                'mission_agent_id' => $missionAgent->id,
+            ]);
+
+            return;
+        }
+
+        $wallet->releasePending((float) $missionAgent->payout_share, $pendingTransaction);
+
+        $missionAgent->update([
+            'payout_status' => MissionAgent::PAYOUT_RELEASED,
+            'payout_released_at' => now(),
+        ]);
+
+        $this->safeNotify(
+            fn () => $agent->notify(new AgentPayoutNotification($missionAgent->mission, (float) $missionAgent->payout_share)),
+            'agent_payout_released',
+            $missionAgent->mission,
+            $agent,
+        );
+    }
+
+    /**
+     * Libère tous les paiements encore retenus d'une mission.
+     */
+    public function releaseEligiblePayoutsFor(Mission $mission): void
+    {
+        $held = $mission->missionAgents()
+            ->where('payout_status', MissionAgent::PAYOUT_HELD)
+            ->get();
+
+        foreach ($held as $missionAgent) {
+            $this->releaseHeldPayout($missionAgent);
+        }
+    }
+
+    /**
+     * Validation explicite du client avant l'échéance des 48h (Volet 7) :
+     * débloque immédiatement le paiement retenu des intervenants.
+     */
+    public function validateInterventionByClient(Mission $mission, User $client): Mission
+    {
+        if ((int) $mission->client_id !== (int) $client->id) {
+            throw new \Exception('Accès non autorisé.');
+        }
+
+        if (! $mission->canValidateNow()) {
+            throw new \Exception('Cette intervention ne peut pas être validée dans son état actuel.');
+        }
+
+        $mission->update(['client_validated_at' => now()]);
+
+        $this->releaseEligiblePayoutsFor($mission);
+
+        return $mission->fresh();
     }
 
     public function cancelMission(Mission $mission, string $reason): Mission

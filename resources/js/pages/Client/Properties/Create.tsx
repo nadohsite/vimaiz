@@ -197,11 +197,14 @@ export default function Create({ propertyTypes, defaultChecklist }: Props) {
                                         <Input
                                             id="surface_area"
                                             type="number"
-                                            min="10"
+                                            min="200"
                                             value={data.surface_area}
                                             onChange={(e) => setData('surface_area', e.target.value)}
-                                            placeholder="80"
+                                            placeholder="200"
                                         />
+                                        <p className="text-xs text-muted-foreground">
+                                            Vimaiz est réservé aux grandes résidences secondaires (200 m² minimum).
+                                        </p>
                                         {errors.surface_area && <p className="text-sm text-red-500">{errors.surface_area}</p>}
                                     </div>
                                     <div className="space-y-2">

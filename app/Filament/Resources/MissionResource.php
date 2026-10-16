@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MissionResource\Pages;
 use App\Models\Mission;
+use App\Models\MissionAgent;
 use App\Models\User;
 use App\Services\MissionService;
 use App\Support\DurationFormatter;
@@ -387,6 +388,26 @@ class MissionResource extends Resource
 
                         Notification::make()
                             ->title('Note de l\'intervenant enregistrée')
+                            ->success()
+                            ->send();
+                    }),
+                Action::make('release_rejected_return_payout')
+                    ->label('Débloquer le paiement malgré le retour rejeté')
+                    ->icon('heroicon-o-lock-open')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalDescription(
+                        'Le retour du client a été rejeté : le paiement des intervenants reste '
+                        .'retenu par défaut (décision du 15/10/2026). Cette action le débloque '
+                        .'quand même, après arbitrage manuel.'
+                    )
+                    ->visible(fn ($record) => $record->return_status === Mission::RETURN_REJECTED
+                        && $record->missionAgents()->where('payout_status', MissionAgent::PAYOUT_HELD)->exists())
+                    ->action(function ($record) {
+                        app(MissionService::class)->releaseEligiblePayoutsFor($record);
+
+                        Notification::make()
+                            ->title('Paiement débloqué')
                             ->success()
                             ->send();
                     }),

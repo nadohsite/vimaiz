@@ -66,17 +66,10 @@ class WalletController extends Controller
                     'is_complete' => false,
                 ],
             'payoutMethods' => $agentProfile ? $agentProfile->payoutMethodsForWallet() : [],
-            'stripeStatus' => $agentProfile
-                ? $agentProfile->stripeConnectStatusForWallet()
-                : [
-                    'has_account' => false,
-                    'payouts_enabled' => false,
-                    'onboarding_status' => AgentProfile::STRIPE_STATUS_NOT_STARTED,
-                ],
         ]);
     }
 
-    public function updateBankDetails(UpdateBankDetailsRequest $request): RedirectResponse|SymfonyResponse
+    public function updateBankDetails(UpdateBankDetailsRequest $request): RedirectResponse
     {
         $user = $request->user();
 
@@ -85,40 +78,15 @@ class WalletController extends Controller
             'verification_status' => 'pending',
         ]);
 
-        // On garde le titulaire / IBAN / BIC en local (pour l'admin et les demandes
-        // de retrait manuelles), Stripe reste la source de vérité pour le vrai payout.
+        // Seul le RIB (titulaire / IBAN / BIC) est nécessaire : les virements
+        // sont effectués par Vimaiz en SEPA groupé à partir de cet IBAN, sans
+        // passer par un onboarding Stripe Connect côté intervenant.
         $agentProfile->update($request->validated());
 
-        try {
-            $accountId = $this->stripeConnect->createOrRetrieveAccount($agentProfile);
-            $link = $this->stripeConnect->createAccountLink(
-                $accountId,
-                route('agent.wallet.stripe.refresh'),
-                route('agent.wallet.stripe.return')
-            );
-
-            // Redirection externe (hors domaine Vimaiz) : Inertia::location force
-            // un rechargement complet de page plutôt qu'une navigation XHR.
-            return Inertia::location($link->url);
-        } catch (StripeConnectNotConfiguredException $e) {
-            report($e);
-
-            return redirect()->route('agent.wallet.index')->with(
-                'success',
-                'Coordonnées bancaires enregistrées. La vérification de paiement Stripe n\'est pas encore configurée côté serveur, elle sera disponible prochainement.'
-            );
-        } catch (ApiErrorException $e) {
-            Log::error('Stripe Connect (updateBankDetails): '.$e->getMessage(), [
-                'user_id' => $user->id,
-                'exception_class' => get_class($e),
-                'http_status' => method_exists($e, 'getHttpStatus') ? $e->getHttpStatus() : null,
-            ]);
-
-            return redirect()->route('agent.wallet.index')->with(
-                'success',
-                'Coordonnées bancaires enregistrées. La vérification Stripe n\'a pas pu démarrer automatiquement, réessayez via "Continuer sur Stripe".'
-            );
-        }
+        return redirect()->route('agent.wallet.index')->with(
+            'success',
+            'Coordonnées bancaires enregistrées. Elles seront utilisées pour votre prochain virement.'
+        );
     }
 
     /**
@@ -229,10 +197,9 @@ class WalletController extends Controller
         }
 
         try {
-            // Tant que Stripe n'a pas validé le compte (payouts_enabled), la demande
-            // reste un virement manuel traité par l'admin (fallback), comme aujourd'hui.
-            // Une fois payouts_enabled = true, l'étape suivante sera de déclencher un
-            // Stripe Transfer ici au lieu du virement manuel.
+            // La demande part en attente : Vimaiz la traite par virement SEPA
+            // groupé (voir Admin > Finances > Demandes de retrait), à partir de
+            // l'IBAN enregistré ci-dessus. Aucun compte Stripe Connect requis.
             $transaction = $wallet->withdraw(
                 (float) $request->validated('amount'),
                 $agentProfile

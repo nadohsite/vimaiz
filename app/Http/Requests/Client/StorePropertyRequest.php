@@ -24,7 +24,10 @@ class StorePropertyRequest extends FormRequest
             'postal_code' => ['required', 'string', 'max:10', 'regex:/^[0-9]{5}$/'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
-            'surface_area' => ['required', 'numeric', 'min:10', 'max:10000'],
+            // Repositionnement grands espaces (cahier des charges 10/2026) : seules les
+            // NOUVELLES propriétés sont soumises au seuil de 200 m². Les biens déjà
+            // enregistrés (UpdatePropertyRequest) restent inchangés, décision utilisateur.
+            'surface_area' => ['required', 'numeric', 'min:200', 'max:10000'],
             'bedrooms' => ['nullable', 'integer', 'min:0', 'max:50'],
             'bathrooms' => ['nullable', 'integer', 'min:0', 'max:20'],
             'toilets' => ['nullable', 'integer', 'min:0', 'max:20'],
@@ -56,7 +59,7 @@ class StorePropertyRequest extends FormRequest
             'postal_code.required' => 'Le code postal est obligatoire.',
             'postal_code.regex' => 'Le code postal doit contenir 5 chiffres.',
             'surface_area.required' => 'La surface est obligatoire.',
-            'surface_area.min' => 'La surface doit être d\'au moins 10 m².',
+            'surface_area.min' => 'Vimaiz est réservé aux grandes résidences secondaires : la surface doit être d\'au moins 200 m².',
             'checklist.*.items.*.label.required' => 'Chaque tâche de la checklist doit avoir un libellé.',
         ];
     }

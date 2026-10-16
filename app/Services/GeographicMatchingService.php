@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Mission;
+use App\Models\MissionAgent;
 use App\Models\User;
 use App\Support\Geo;
 use Illuminate\Support\Collection;
@@ -95,7 +96,13 @@ class GeographicMatchingService
             (float) $property->longitude,
         );
 
-        return $this->evaluate($distanceKm, (float) $mission->agent_payout);
+        // Sur une brigade, agent_payout est le pool TOTAL à répartir entre
+        // required_agents intervenants, pas ce que CET agent touchera : on
+        // estime sa part pour juger si le trajet (zone étendue) en vaut la
+        // peine, plutôt que de lui montrer le pool entier.
+        $estimatedIndividualPayout = (float) $mission->agent_payout / max(1, (int) $mission->required_agents);
+
+        return $this->evaluate($distanceKm, $estimatedIndividualPayout);
     }
 
     /**
@@ -126,9 +133,20 @@ class GeographicMatchingService
 
     public function hasPendingMission(User $agent): bool
     {
-        return Mission::query()
+        $hasPendingAsLead = Mission::query()
             ->where('agent_id', $agent->id)
             ->where('status', Mission::STATUS_PENDING_AGENT)
+            ->exists();
+
+        if ($hasPendingAsLead) {
+            return true;
+        }
+
+        // Brigades : l'agent peut avoir une proposition en attente sur une
+        // mission dont il n'est pas (encore) le référent.
+        return MissionAgent::query()
+            ->where('agent_id', $agent->id)
+            ->where('status', MissionAgent::STATUS_PENDING_AGENT)
             ->exists();
     }
 
@@ -137,10 +155,14 @@ class GeographicMatchingService
      */
     protected function openPaidMissions(): Collection
     {
+        // Brigades : une mission reste "ouverte" tant que tous ses créneaux
+        // ne sont pas pourvus, même si elle a déjà un agent référent
+        // (agent_id non null) — donc on compare accepted_agents_count à
+        // required_agents plutôt que de tester agent_id IS NULL.
         return Mission::query()
-            ->whereNull('agent_id')
             ->where('status', Mission::STATUS_PENDING_AGENT)
             ->where('payment_status', Mission::PAYMENT_PAID)
+            ->whereColumn('accepted_agents_count', '<', 'required_agents')
             ->with('property')
             ->get();
     }

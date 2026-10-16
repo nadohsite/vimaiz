@@ -57,6 +57,62 @@ class Wallet extends Model
         return $this->transactions()->create($data);
     }
 
+    /**
+     * Crédite le solde "en attente" (escrow) plutôt que le solde
+     * disponible — paiement différé 48h des brigades (cahier des charges
+     * "grands espaces", Volet 7, octobre 2026). À libérer ensuite avec
+     * releasePending(), par le job planifié ou une validation anticipée du
+     * client.
+     */
+    public function creditPending(
+        float $amount,
+        ?string $description = null,
+        ?Mission $mission = null,
+        ?MissionAgent $missionAgent = null
+    ): WalletTransaction {
+        $this->pending_balance += $amount;
+        $this->total_earned += $amount;
+        $this->save();
+
+        $data = [
+            'type' => 'credit',
+            'amount' => $amount,
+            // Le solde disponible ne change pas tant que le paiement est
+            // retenu : balance_after reflète bien le solde réel à cet instant.
+            'balance_after' => $this->balance,
+            'description' => $description,
+            'status' => 'pending',
+        ];
+
+        if ($mission && Schema::hasColumn('wallet_transactions', 'mission_id')) {
+            $data['mission_id'] = $mission->id;
+        }
+
+        if ($missionAgent && Schema::hasColumn('wallet_transactions', 'mission_agent_id')) {
+            $data['mission_agent_id'] = $missionAgent->id;
+        }
+
+        return $this->transactions()->create($data);
+    }
+
+    /**
+     * Fait passer un montant retenu en pending_balance vers le solde
+     * disponible, et clôture la wallet_transaction "pending" correspondante.
+     */
+    public function releasePending(float $amount, WalletTransaction $pendingTransaction): WalletTransaction
+    {
+        $this->pending_balance = max(0, $this->pending_balance - $amount);
+        $this->balance += $amount;
+        $this->save();
+
+        $pendingTransaction->update([
+            'status' => 'completed',
+            'balance_after' => $this->balance,
+        ]);
+
+        return $pendingTransaction;
+    }
+
     public function debit(float $amount, ?string $description = null): WalletTransaction
     {
         if ($this->balance < $amount) {

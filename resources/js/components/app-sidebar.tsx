@@ -27,6 +27,7 @@ import {
     Star,
     Shield,
     AlertTriangle,
+    Percent,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -98,6 +99,11 @@ export function AppSidebar() {
             title: 'Clause RCP',
             href: route('agent.rcp-acceptance'),
             icon: Shield,
+        },
+        {
+            title: 'Rémunération et transparence',
+            href: route('agent.remuneration-transparence'),
+            icon: Percent,
         },
         {
             title: 'Mon portefeuille',

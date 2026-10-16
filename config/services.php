@@ -52,4 +52,13 @@ return [
         'connect_country' => env('STRIPE_CONNECT_COUNTRY', 'FR'),
     ],
 
+    // Identité bancaire de VIMAIZ elle-même (pas celle des intervenants),
+    // utilisée pour générer le fichier de virements groupés SEPA (pain.001)
+    // téléchargé depuis Admin > Finances > Demandes de retrait.
+    'sepa' => [
+        'creditor_name' => env('SEPA_CREDITOR_NAME'),
+        'creditor_iban' => env('SEPA_CREDITOR_IBAN'),
+        'creditor_bic' => env('SEPA_CREDITOR_BIC'),
+    ],
+
 ];

@@ -11,6 +11,7 @@ class WalletTransaction extends Model
         'wallet_id',
         'booking_id',
         'mission_id',
+        'mission_agent_id',
         'type',
         'amount',
         'balance_after',
@@ -39,5 +40,10 @@ class WalletTransaction extends Model
     public function mission(): BelongsTo
     {
         return $this->belongsTo(Mission::class);
+    }
+
+    public function missionAgent(): BelongsTo
+    {
+        return $this->belongsTo(MissionAgent::class);
     }
 }

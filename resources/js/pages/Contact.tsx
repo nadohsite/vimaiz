@@ -3,12 +3,25 @@ import { Link, useForm } from '@inertiajs/react';
 import { CheckCircle, Mail, MapPin, Phone } from 'lucide-react';
 import { useState } from 'react';
 
-interface Props {
-    success?: boolean;
+interface ContactInfo {
+    email?: string | null;
+    phone?: string | null;
+    hours?: string | null;
+    address?: string | null;
 }
 
-export default function Contact({ success }: Props) {
+interface Props {
+    success?: boolean;
+    contact?: ContactInfo;
+}
+
+export default function Contact({ success, contact }: Props) {
     const [submitted, setSubmitted] = useState(success || false);
+
+    const email = contact?.email || 'contact@vimaiz.com';
+    const phone = contact?.phone || 'Via email uniquement';
+    const hours = contact?.hours || 'Lun-Ven : 9h-18h';
+    const address = contact?.address || "12 rue porte de la ville\n73330 Le Pont de Beauvoisin, France";
 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -55,8 +68,8 @@ export default function Contact({ success }: Props) {
                                 </div>
                                 <div>
                                     <h3>Email</h3>
-                                    <a className="link" href="mailto:contact@vimaiz.com">
-                                        contact@vimaiz.com
+                                    <a className="link" href={`mailto:${email}`}>
+                                        {email}
                                     </a>
                                     <p>Réponse sous 24h</p>
                                 </div>
@@ -67,8 +80,8 @@ export default function Contact({ success }: Props) {
                                 </div>
                                 <div>
                                     <h3>Téléphone</h3>
-                                    <p>Via email uniquement</p>
-                                    <p>Lun-Ven : 9h-18h</p>
+                                    <p>{phone}</p>
+                                    <p>{hours}</p>
                                 </div>
                             </div>
                             <div className="info-card">
@@ -78,9 +91,12 @@ export default function Contact({ success }: Props) {
                                 <div>
                                     <h3>Adresse</h3>
                                     <p>
-                                        12 rue porte de la ville
-                                        <br />
-                                        73330 Le Pont de Beauvoisin, France
+                                        {address.split('\n').map((line, i) => (
+                                            <span key={i}>
+                                                {line}
+                                                {i < address.split('\n').length - 1 && <br />}
+                                            </span>
+                                        ))}
                                     </p>
                                 </div>
                             </div>

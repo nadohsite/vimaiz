@@ -7,6 +7,7 @@ use App\Models\Mission;
 use App\Models\Review;
 use App\Notifications\ClientConfirmedReadyNotification;
 use App\Notifications\ClientValidatedInterventionNotification;
+use App\Services\MissionService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -37,8 +38,26 @@ class MissionController extends Controller
             'canDownloadInvoice' => $mission->invoice !== null,
             'canReview' => $mission->status === Mission::STATUS_COMPLETED && ! $mission->review,
             'canRequestReturn' => $mission->canRequestReturn(),
+            'canValidateNow' => $mission->canValidateNow(),
             'reportSummary' => $mission->reportSummary(),
         ]);
+    }
+
+    /**
+     * Validation anticipée du client (Volet 7) : débloque immédiatement le
+     * paiement retenu des intervenants, avant l'échéance des 48h.
+     */
+    public function validateIntervention(Mission $mission)
+    {
+        $this->authorize('view', $mission);
+
+        try {
+            app(MissionService::class)->validateInterventionByClient($mission, auth()->user());
+
+            return back()->with('success', 'Merci ! Votre validation a débloqué le paiement des intervenants.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     public function storeReview(Request $request, Mission $mission)

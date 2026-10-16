@@ -6,6 +6,7 @@ use App\Models\Mission;
 use App\Models\User;
 use App\Notifications\ReturnCompletedNotification;
 use App\Notifications\ReturnRequestedNotification;
+use App\Services\MissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -122,6 +123,16 @@ class MissionReturnController extends Controller
             'return_validated_at' => now(),
             'return_client_feedback' => $validated['feedback'] ?? null,
         ]);
+
+        if ($validated['approved']) {
+            // Le client valide le retour : le paiement retenu des
+            // intervenants peut être débloqué (décision utilisateur du
+            // 15/10/2026).
+            app(MissionService::class)->releaseEligiblePayoutsFor($mission->fresh());
+        }
+        // Si le retour est rejeté, le paiement reste volontairement retenu :
+        // un admin doit trancher manuellement (action Filament "Débloquer
+        // le paiement malgré le retour rejeté" sur la fiche intervention).
 
         $message = $validated['approved']
             ? 'Merci ! Le retour a été validé.'

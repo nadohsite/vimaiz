@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AgentProfile;
 use App\Models\Mission;
+use App\Models\MissionAgent;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -22,29 +23,65 @@ class AgentAssignmentService
 
     const WEIGHT_SENIORITY = 0.10;
 
+    /**
+     * Propose la mission à des agents éligibles, en tenant compte des
+     * créneaux de brigade encore ouverts (missions.required_agents — voir
+     * le plan technique "brigades multi-agents" du projet Claude Vimaiz).
+     * Pour une mission mono-agent (required_agents = 1, le cas de tout le
+     * parc actuel sous 200 m²), ceci se comporte exactement comme avant :
+     * un seul créneau, proposé à plusieurs agents en même temps ("premier
+     * arrivé, premier servi").
+     */
     public function proposeToAvailableAgents(Mission $mission, ?int $exceptAgentId = null): Collection
     {
+        $openSlots = $mission->openSlotsCount();
+
+        if ($openSlots <= 0) {
+            return collect();
+        }
+
         $agents = $this->findEligibleAgents($mission);
 
         if ($exceptAgentId) {
             $agents = $agents->reject(fn (User $agent) => $agent->id === $exceptAgentId);
         }
 
+        // On notifie TOUS les agents éligibles trouvés, comme le faisait déjà
+        // la version mono-agent pour son unique créneau ("premier arrivé,
+        // premier servi") — pas de plafond arbitraire qui ralentirait
+        // l'attribution. Sur une brigade, les openSlots premiers à accepter
+        // gagnent un créneau ; les suivants arrivent sur une brigade déjà
+        // complète et se font refuser poliment par agentAcceptMission().
+        $candidates = $agents->values();
+
+        foreach ($candidates as $agent) {
+            MissionAgent::updateOrCreate(
+                ['mission_id' => $mission->id, 'agent_id' => $agent->id],
+                [
+                    'status' => MissionAgent::STATUS_PENDING_AGENT,
+                    'notified_at' => now(),
+                    'refusal_reason' => null,
+                ]
+            );
+        }
+
         $mission->update([
-            'agent_id' => null,
+            // On ne touche agent_id que s'il n'y a pas déjà un référent
+            // (brigade partiellement constituée après un refus partiel).
+            'agent_id' => $mission->accepted_agents_count > 0 ? $mission->agent_id : null,
             'status' => Mission::STATUS_PENDING_AGENT,
             'agent_notified_at' => now(),
             'assignment_attempts' => $mission->assignment_attempts + 1,
         ]);
 
-        if ($agents->isEmpty()) {
+        if ($candidates->isEmpty()) {
             Log::info('No eligible agents to propose mission to', [
                 'mission_id' => $mission->id,
                 'except_agent_id' => $exceptAgentId,
             ]);
         }
 
-        return $agents->values();
+        return $candidates;
     }
 
     public function assignAgentToMission(Mission $mission): ?User
@@ -59,6 +96,12 @@ class AgentAssignmentService
         $mission->loadMissing('property');
 
         $declinedAgentIds = $mission->declinedAgents()->pluck('users.id');
+
+        // Brigades : un agent déjà proposé/accepté sur CETTE mission ne doit
+        // pas être re-proposé pour un autre créneau de la même mission.
+        $alreadyInBrigadeIds = $mission->missionAgents()
+            ->whereIn('status', MissionAgent::ACTIVE_STATUSES)
+            ->pluck('agent_id');
 
         return User::agents()
             ->where('is_active', true)
@@ -76,6 +119,7 @@ class AgentAssignmentService
             ->with(['agentProfile', 'addresses'])
             ->get()
             ->reject(fn (User $agent) => $declinedAgentIds->contains($agent->id))
+            ->reject(fn (User $agent) => $alreadyInBrigadeIds->contains($agent->id))
             ->reject(fn (User $agent) => $this->hasPendingMission($agent))
             ->reject(fn (User $agent) => $mission->scheduled_at && $this->hasConflictingMission($agent, $mission))
             ->filter(fn (User $agent) => $this->geoMatching->isGeographicallyEligible($agent, $mission))
@@ -84,8 +128,18 @@ class AgentAssignmentService
 
     protected function hasPendingMission(User $agent): bool
     {
-        return Mission::where('agent_id', $agent->id)
+        $hasPendingAsLead = Mission::where('agent_id', $agent->id)
             ->where('status', Mission::STATUS_PENDING_AGENT)
+            ->exists();
+
+        if ($hasPendingAsLead) {
+            return true;
+        }
+
+        // Brigades : l'agent peut aussi avoir une proposition en attente de
+        // réponse sur une mission dont il n'est pas (encore) le référent.
+        return MissionAgent::where('agent_id', $agent->id)
+            ->where('status', MissionAgent::STATUS_PENDING_AGENT)
             ->exists();
     }
 

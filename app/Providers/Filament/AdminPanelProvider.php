@@ -56,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Gestion des Réservations'),
                 NavigationGroup::make('Communication'),
                 NavigationGroup::make('Gestion des Avis'),
+                NavigationGroup::make('Paramètres'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

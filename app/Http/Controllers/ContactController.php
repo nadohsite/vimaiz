@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
+use App\Models\PlatformSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +18,9 @@ class ContactController extends Controller
             'subject' => ['required', 'string', 'max:255'],
             'message' => ['required', 'string', 'max:5000'],
         ]);
+
+        $contactEmail = PlatformSetting::current()->contact_email
+            ?: config('mail.contact_email', 'contact@vimaiz.com');
 
         try {
             // Sauvegarder le message en base de données
@@ -34,15 +38,15 @@ class ContactController extends Controller
                 'email' => $validated['email'],
                 'subject' => $validated['subject'],
                 'content' => $validated['message'],
-                'notifiable' => new class
+                'notifiable' => new class($contactEmail)
                 {
                     public string $name = 'Vimaiz';
 
                     public string $email;
 
-                    public function __construct()
+                    public function __construct(string $email)
                     {
-                        $this->email = config('mail.contact_email', 'contact@vimaiz.com');
+                        $this->email = $email;
                     }
 
                     public function preferredFirstName(): string
@@ -55,8 +59,8 @@ class ContactController extends Controller
 
             // Tenter d'envoyer un email (optionnel - ne bloque pas si ça échoue)
             try {
-                Mail::send('emails.contact', $emailData, function ($message) use ($validated) {
-                    $message->to(config('mail.contact_email', 'contact@vimaiz.com'))
+                Mail::send('emails.contact', $emailData, function ($message) use ($validated, $contactEmail) {
+                    $message->to($contactEmail)
                         ->subject('Nouveau message de contact : ' . $validated['subject'])
                         ->replyTo($validated['email'], $validated['name']);
                 });
