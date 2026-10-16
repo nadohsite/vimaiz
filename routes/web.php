@@ -82,6 +82,18 @@ Route::get('/a-propos', function () {
     return inertia('About');
 })->name('about');
 
+// VIMAIZ - Rémunération et transparence (page publique : lien dans le footer
+// et sur /a-propos). La page existe aussi sous /agent/remuneration-transparence
+// (route 'agent.remuneration-transparence', même composant Inertia) pour
+// l'accès depuis la sidebar intervenant — les deux routes coexistent, celle-ci
+// ne remplace pas l'autre. Corrige un lien cassé (public-layout.tsx et
+// About.tsx appellent route('remuneration-transparence'), qui n'existait plus
+// que sous le nom 'agent.remuneration-transparence' depuis la réorganisation
+// des routes agent).
+Route::get('/remuneration-transparence', function () {
+    return Inertia::render('RemunerationTransparence');
+})->name('remuneration-transparence');
+
 Route::get('/contact', function () {
     $settings = \App\Models\PlatformSetting::current();
 
