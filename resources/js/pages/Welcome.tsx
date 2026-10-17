@@ -1,7 +1,7 @@
 import PublicLayout from '@/components/public/public-layout';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BellRing, Calendar, ChevronDown, ClipboardCheck, ShieldCheck, UserCheck } from 'lucide-react';
+import { ChevronDown, ShieldCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const TYPE_OPTIONS = ['Appartement', 'Maison', 'Villa', 'Chalet', 'Gîte'] as const;
@@ -152,6 +152,115 @@ const PARCOURS_STEPS = [
     },
 ];
 
+/** Exemple de suivi affiché sur l'accueil (maquette illustrative). */
+const SUIVI_EXEMPLE: {
+    time: string;
+    title: string;
+    detail: string;
+    state?: 'done' | 'flag';
+}[] = [
+    {
+        time: '09:02',
+        title: 'Arrivée de l’équipe confirmée',
+        detail: 'Géolocalisation validée à l’entrée du logement',
+    },
+    {
+        time: '09:05',
+        title: 'Intervention démarrée',
+        detail: '3 intervenants co-assignés pour 340 m²',
+    },
+    {
+        time: '11:48',
+        title: 'Liste de contrôle : 41 points validés sur 48',
+        detail: 'Chambres, salles d’eau et cuisine terminées',
+    },
+    {
+        time: '12:20',
+        title: 'Anomalie signalée',
+        detail: 'Transat endommagé en terrasse, photo jointe au rapport',
+        state: 'flag',
+    },
+    {
+        time: '13:10',
+        title: 'Logement prêt pour vos voyageurs',
+        detail: 'Rapport disponible, 48 h pour le valider',
+        state: 'done',
+    },
+];
+
+function LiveReport() {
+    const ref = useRef<HTMLDivElement>(null);
+    const [play, setPlay] = useState<'idle' | 'ready' | 'on'>('idle');
+
+    useEffect(() => {
+        const node = ref.current;
+        if (!node || typeof IntersectionObserver === 'undefined') {
+            return;
+        }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            return;
+        }
+        setPlay('ready');
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries.some((entry) => entry.isIntersecting)) {
+                    setPlay('on');
+                    observer.disconnect();
+                }
+            },
+            { threshold: 0.35 },
+        );
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div
+            className="live-report"
+            ref={ref}
+            data-play={play}
+            aria-label="Exemple de suivi d’une intervention en temps réel"
+        >
+            <div className="live-report-head">
+                <div>
+                    <div className="live-report-place">Villa de 340 m², Pays basque</div>
+                    <div className="live-report-meta">Intervention du samedi, entre deux séjours</div>
+                </div>
+                <span className="live-report-tag">Exemple de suivi</span>
+            </div>
+            <ol className="timeline">
+                {SUIVI_EXEMPLE.map((item) => (
+                    <li
+                        key={item.time}
+                        className={`timeline-item${item.state ? ` is-${item.state}` : ''}`}
+                    >
+                        <span className="timeline-time">{item.time}</span>
+                        <span className="timeline-mark" aria-hidden="true">
+                            <span className="timeline-dot" />
+                        </span>
+                        <span>
+                            <span className="timeline-title">{item.title}</span>
+                            <span className="timeline-detail" style={{ display: 'block' }}>
+                                {item.detail}
+                            </span>
+                        </span>
+                    </li>
+                ))}
+            </ol>
+            <div className="live-report-foot">
+                Vous recevez chaque étape en notification, depuis votre espace Vimaiz.
+            </div>
+        </div>
+    );
+}
+
+const TRUST_ITEMS = [
+    'Vous programmez',
+    'Vimaiz co-assigne une équipe',
+    'L’intervention est suivie',
+    'Vous êtes informé',
+];
+
 function todayIso() {
     return new Date().toISOString().split('T')[0];
 }
@@ -263,8 +372,8 @@ export default function Welcome({
             description="Suivez chaque intervention de ménage en temps réel depuis votre espace Vimaiz et préservez la réputation de votre grand patrimoine."
         >
             {/* Volet 1 — Header / bloc héros */}
-            <section className="hero wrap">
-                <div className="hero-grid hero-grid-solo">
+            <section className="hero wrap" id="estimateur">
+                <div className="hero-grid">
                     <div>
                         <h1 className="rise-2">
                             Vous louez à distance votre grande résidence secondaire en
@@ -284,301 +393,23 @@ export default function Welcome({
                                 Comment ça fonctionne
                             </a>
                         </div>
-                        <div className="trust-row trust-row-centered">
-                            <span>
-                                <CheckIcon />
-                                Vous programmez
-                            </span>
-                            <span>
-                                <CheckIcon />
-                                Vimaiz co-assigne une équipe
-                            </span>
-                            <span>
-                                <CheckIcon />
-                                L&apos;intervention est suivie
-                            </span>
-                            <span>
-                                <CheckIcon />
-                                Vous êtes informé
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Volet 1.2 — Pourquoi Vimaiz */}
-            <section id="pourquoi" className="welcome-section">
-                <div className="wrap">
-                    <div className="sec-head">
-                        <div className="sec-eyebrow">Pourquoi Vimaiz</div>
-                        <h2>
-                            Vous n&apos;avez plus besoin d&apos;être sur place pour vérifier
-                            si le ménage a été bien réalisé dans les délais.
-                        </h2>
-                        <p className="sec-sub">
-                            Vimaiz a été pensé exclusivement pour les propriétaires qui vivent
-                            loin de leur logement de grande superficie proposé en location
-                            courte durée. De l&apos;arrivée au départ de l&apos;intervenant,
-                            vous suivez tout le déroulement de la prestation en temps réel, à
-                            distance, depuis votre espace Vimaiz.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            {/* Volet 3 — Le Parcours */}
-            <section id="steps" className="welcome-section">
-                <div className="wrap">
-                    <div className="sec-head">
-                        <div className="sec-eyebrow">Le parcours</div>
-                        <h2>Un fonctionnement premium, sur mesure</h2>
-                        <p className="sec-sub">
-                            Un fonctionnement reposant sur un devis transparent, pensé pour
-                            les grandes résidences.
-                        </p>
-                    </div>
-                    <div className="steps steps-5">
-                        {PARCOURS_STEPS.map((step, index) => (
-                            <div className="step" key={step.title}>
-                                <div className="step-stamp">
-                                    {String(index + 1).padStart(2, '0')}
-                                </div>
-                                <div>
-                                    <h3>{step.title}</h3>
-                                    <p>{step.description}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Volet 4 — Notre Conviction (manifeste de marque) */}
-            <section className="welcome-section">
-                <div className="wrap">
-                    <div className="split-cards">
-                        <article className="split-card split-card-conviction rise-2">
-                            <div className="sec-eyebrow">Notre Conviction</div>
-                            <h2>L&apos;éloignement ne doit jamais justifier la perte de contrôle</h2>
-                            <p>
-                                Nous croyons fermement que posséder une grande résidence
-                                secondaire en location saisonnière à distance devrait être une
-                                source de fierté, jamais d&apos;anxiété. Chez Vimaiz, la
-                                propreté d&apos;un logement ne tolère aucun compromis ni aucune
-                                approximation.
-                            </p>
-                            <p>
-                                C&apos;est pourquoi nous mettons la technologie au service de
-                                l&apos;humain : Vimaiz vous redonne des yeux là où vous ne
-                                pouvez pas être et vous garantit la traçabilité de chaque
-                                intervention de ménage sur votre patrimoine, du début jusqu&apos;à
-                                la fin.
-                            </p>
-                        </article>
-                        <article id="agent" className="split-card split-card-cta rise-3">
-                            <div className="sec-eyebrow">Réseau Vimaiz</div>
-                            <h2>Devenir intervenant ?</h2>
-                            <p>
-                                Vimaiz vous aide à développer votre activité en vous proposant des
-                                interventions selon vos disponibilités. Numéro de SIRET obligatoire.
-                            </p>
-                            <div className="hero-ctas">
-                                <Link
-                                    className="btn btn-primary"
-                                    href={route('professionals.index')}
-                                >
-                                    Devenir intervenant
-                                </Link>
-                                <a
-                                    className="btn btn-ghost"
-                                    href="/guides/intervenant/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    Voir le guide
-                                </a>
-                            </div>
-                        </article>
-                    </div>
-                </div>
-            </section>
-
-            {/* Volet 5 — À propos (storytelling) */}
-            <section id="about" className="welcome-section">
-                <div className="wrap">
-                    <div className="about-grid">
-                        <div>
-                            <div className="sec-eyebrow">L&apos;origine de Vimaiz</div>
-                            <h2 style={{ marginBottom: 16 }}>À propos de Vimaiz</h2>
-                            <p>
-                                Vimaiz est née tout simplement d&apos;un constat de ma part.
-                                Après quelques voyages en Espagne, j&apos;ai constaté que nos
-                                deux pays incarnaient les véritables poumons du tourisme en
-                                Europe. De nombreux Espagnols possèdent des résidences
-                                secondaires en France, et c&apos;est exactement le même schéma
-                                pour les Français en Espagne.
-                            </p>
-                            <p>
-                                Louer et entretenir une grande résidence à distance sur ce
-                                marché représente un défi quotidien pour les propriétaires
-                                éloignés. C&apos;est pour répondre à cette problématique et
-                                leur permettre de suivre sereinement leurs interventions de
-                                ménage que j&apos;ai créé cette plateforme.
-                            </p>
-                            <p>
-                                Pour l&apos;instant, Vimaiz est déployée uniquement sur le
-                                marché français. Cependant, pour anticiper et renforcer cette
-                                relation touristique unique entre nos deux pays, j&apos;ai
-                                décidé d&apos;appeler la plateforme Vimaiz : la fusion naturelle
-                                entre <em>Vivienda</em> (qui signifie « logement » en espagnol)
-                                et « maison » en français — le « S » remplacé par un « Z » pour
-                                une identité plus moderne et technologique. Ce nom en .com
-                                porte notre ambition : nous développer à l&apos;avenir en
-                                Espagne, puis dans d&apos;autres pays européens.
-                            </p>
-                            <p>
-                                Vimaiz n&apos;a pas été conçu pour être un outil de gestion
-                                supplémentaire. Notre mission actuelle en France est d&apos;être
-                                vos yeux là où vous n&apos;en avez pas.
-                            </p>
-                            <p>
-                                De l&apos;arrivée au départ de l&apos;intervenant de ménage,
-                                vous suivez tout le déroulement de la prestation en temps réel,
-                                à distance, depuis votre espace Vimaiz, afin de préserver la
-                                réputation de votre grand patrimoine.
-                            </p>
-                            <p>
-                                <strong>MBARGA JEAN</strong>
-                                <br />
-                                Fondateur de Vimaiz
-                            </p>
-                        </div>
-                        <div className="about-cards">
-                            <div className="about-card">
-                                <div className="type-icon">
-                                    <Calendar width="19" height="19" strokeWidth={1.6} aria-hidden="true" />
-                                </div>
-                                <h3>Vous programmez</h3>
-                                <p>Choisissez votre logement, la date et l&apos;intervention.</p>
-                            </div>
-                            <div className="about-card">
-                                <div className="type-icon">
-                                    <UserCheck width="19" height="19" strokeWidth={1.6} aria-hidden="true" />
-                                </div>
-                                <h3>Vimaiz co-assigne</h3>
-                                <p>Les intervenants certifiés disponibles reçoivent la mission et l&apos;acceptent.</p>
-                            </div>
-                            <div className="about-card">
-                                <div className="type-icon">
-                                    <ClipboardCheck width="19" height="19" strokeWidth={1.6} aria-hidden="true" />
-                                </div>
-                                <h3>L&apos;intervention est suivie</h3>
-                                <p>
-                                    Arrivée géolocalisée, début, durée, checklist et éventuelles
-                                    anomalies sont enregistrés.
-                                </p>
-                            </div>
-                            <div className="about-card">
-                                <div className="type-icon">
-                                    <BellRing width="19" height="19" strokeWidth={1.6} aria-hidden="true" />
-                                </div>
-                                <h3>Vous êtes informé</h3>
-                                <p>
-                                    Recevez le compte rendu et validez l&apos;intervention ou
-                                    demandez un nouveau passage.
-                                </p>
+                        <div className="trust-row trust-marquee">
+                            <div className="trust-track">
+                                {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, index) => (
+                                    <span
+                                        key={`${item}-${index}`}
+                                        className={index >= TRUST_ITEMS.length ? 'trust-dup' : undefined}
+                                        aria-hidden={index >= TRUST_ITEMS.length ? true : undefined}
+                                    >
+                                        <CheckIcon />
+                                        {item}
+                                    </span>
+                                ))}
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
 
-            {/* Volet 7 — FAQ */}
-            <section id="faq" className="welcome-section">
-                <div className="wrap">
-                    <div className="sec-head">
-                        <div className="sec-eyebrow">FAQ</div>
-                        <h2>Questions fréquentes</h2>
-                        <p className="sec-sub">
-                            Les dernières objections : le modèle de répartition en équipe, la
-                            sécurité juridique, et comment Vimaiz s&apos;adapte aux grands
-                            espaces.
-                        </p>
-                    </div>
-
-                    <div className="faq-group-label">Espace propriétaires</div>
-                    {PROPRIETAIRE_FAQS.map((faq, index) => {
-                        const key = `proprietaire-${index}`;
-                        return (
-                            <div
-                                className="faq-item"
-                                key={key}
-                                data-open={openFaq === key}
-                                style={{ animationDelay: `${Math.min(index, 6) * 40}ms` }}
-                            >
-                                <button
-                                    type="button"
-                                    className="faq-q"
-                                    onClick={() => setOpenFaq(openFaq === key ? null : key)}
-                                    aria-expanded={openFaq === key}
-                                >
-                                    {faq.question}
-                                    <ChevronDown size={18} />
-                                </button>
-                                {openFaq === key && (
-                                    <div className="faq-a">
-                                        {faq.answer.map((paragraph) => (
-                                            <p key={paragraph}>{paragraph}</p>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-
-                    <div className="faq-group-label" style={{ marginTop: 32 }}>
-                        Espace intervenants
-                    </div>
-                    {INTERVENANT_FAQS.map((faq, index) => {
-                        const key = `intervenant-${index}`;
-                        return (
-                            <div
-                                className="faq-item"
-                                key={key}
-                                data-open={openFaq === key}
-                            >
-                                <button
-                                    type="button"
-                                    className="faq-q"
-                                    onClick={() => setOpenFaq(openFaq === key ? null : key)}
-                                    aria-expanded={openFaq === key}
-                                >
-                                    {faq.question}
-                                    <ChevronDown size={18} />
-                                </button>
-                                {openFaq === key && (
-                                    <div className="faq-a">
-                                        {faq.answer.map((paragraph) => (
-                                            <p key={paragraph}>{paragraph}</p>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
-            </section>
-
-            {/* Volet 2 (règle de transition) + Volet 9 — L'estimateur, tout en bas */}
-            <section id="estimateur" className="welcome-section">
-                <div className="wrap">
-                    <p className="estimateur-transition">
-                        Vous connaissez désormais notre exigence et notre philosophie.
-                        Voyons maintenant comment Vimaiz s&apos;adapte précisément à la
-                        superficie et aux besoins uniques de votre grand logement.
-                    </p>
-
-                    <div className="card-wrap card-wrap-centered">
+                    <div className="card-wrap">
                         <div className="float-badge" aria-hidden="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path
@@ -902,6 +733,182 @@ export default function Welcome({
                                 Réserver pour {total} €
                             </Link>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Volet 1.2 — Pourquoi Vimaiz */}
+            <section id="pourquoi" className="night-band">
+                <div className="wrap night-grid">
+                    <div>
+                        <h2>
+                            Vous n&apos;avez plus besoin d&apos;être sur place pour vérifier
+                            si le ménage a été bien réalisé dans les délais.
+                        </h2>
+                        <p className="sec-sub">
+                            Vimaiz a été pensé exclusivement pour les propriétaires qui vivent
+                            loin de leur logement de grande superficie proposé en location
+                            courte durée. De l&apos;arrivée au départ de l&apos;intervenant,
+                            vous suivez tout le déroulement de la prestation en temps réel, à
+                            distance, depuis votre espace Vimaiz.
+                        </p>
+                        <ul className="night-points">
+                            <li>Arrivée de l&apos;équipe validée par géolocalisation</li>
+                            <li>Liste de contrôle validée par chaque intervenant</li>
+                            <li>Photos uniquement en cas d&apos;anomalie constatée</li>
+                        </ul>
+                    </div>
+                    <LiveReport />
+                </div>
+            </section>
+
+            {/* Volet 3 — Le Parcours */}
+            <section id="steps" className="welcome-section">
+                <div className="wrap">
+                    <div className="sec-head sec-head-center">
+                        <h2>Un fonctionnement premium, sur mesure</h2>
+                        <p className="sec-sub">
+                            Un fonctionnement reposant sur un devis transparent, pensé pour
+                            les grandes résidences.
+                        </p>
+                    </div>
+                    <div className="steps steps-5">
+                        {PARCOURS_STEPS.map((step, index) => (
+                            <div className="step" key={step.title}>
+                                <div className="step-stamp">
+                                    {String(index + 1).padStart(2, '0')}
+                                </div>
+                                <div>
+                                    <h3>{step.title}</h3>
+                                    <p>{step.description}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Volet 4 — Notre Conviction (manifeste de marque) */}
+            <section className="welcome-section manifesto">
+                <div className="wrap">
+                    <h2 className="manifesto-quote">
+                        L&apos;éloignement ne doit jamais justifier la perte de contrôle.
+                    </h2>
+                    <div className="manifesto-body">
+                        <p>
+                            Nous croyons fermement que posséder une grande résidence secondaire
+                            en location saisonnière à distance devrait être une source de
+                            fierté, jamais d&apos;anxiété. Chez Vimaiz, la propreté d&apos;un
+                            logement ne tolère aucun compromis ni aucune approximation.
+                        </p>
+                        <p>
+                            C&apos;est pourquoi nous mettons la technologie au service de
+                            l&apos;humain : Vimaiz vous redonne des yeux là où vous ne pouvez
+                            pas être et vous garantit la traçabilité de chaque intervention de
+                            ménage sur votre patrimoine, du début jusqu&apos;à la fin.
+                        </p>
+                    </div>
+
+                    <div id="agent" className="pro-band">
+                        <div>
+                            <h3>Vous êtes intervenant de ménage ?</h3>
+                            <p>
+                                Vimaiz vous aide à développer votre activité en vous proposant
+                                des interventions selon vos disponibilités. Numéro de SIRET
+                                obligatoire.
+                            </p>
+                        </div>
+                        <div className="pro-band-actions">
+                            <Link className="btn btn-primary" href={route('professionals.index')}>
+                                Devenir intervenant
+                            </Link>
+                            <a
+                                className="btn btn-ghost"
+                                href="/guides/intervenant/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Voir le guide
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Volet 7 — FAQ */}
+            <section id="faq" className="welcome-section">
+                <div className="wrap faq-layout">
+                    <div className="sec-head">
+                        <h2>Questions fréquentes</h2>
+                        <p className="sec-sub">
+                            Les dernières objections : le modèle de répartition en équipe, la
+                            sécurité juridique, et comment Vimaiz s&apos;adapte aux grands
+                            espaces.
+                        </p>
+                    </div>
+
+                    <div>
+                    <div className="faq-group">
+                    <div className="faq-group-label">Espace propriétaires</div>
+                    {PROPRIETAIRE_FAQS.map((faq, index) => {
+                        const key = `proprietaire-${index}`;
+                        return (
+                            <div
+                                className="faq-item"
+                                key={key}
+                                data-open={openFaq === key}
+                            >
+                                <button
+                                    type="button"
+                                    className="faq-q"
+                                    onClick={() => setOpenFaq(openFaq === key ? null : key)}
+                                    aria-expanded={openFaq === key}
+                                >
+                                    {faq.question}
+                                    <ChevronDown size={18} />
+                                </button>
+                                {openFaq === key && (
+                                    <div className="faq-a">
+                                        {faq.answer.map((paragraph) => (
+                                            <p key={paragraph}>{paragraph}</p>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                    </div>
+
+                    <div className="faq-group">
+                    <div className="faq-group-label">Espace intervenants</div>
+                    {INTERVENANT_FAQS.map((faq, index) => {
+                        const key = `intervenant-${index}`;
+                        return (
+                            <div
+                                className="faq-item"
+                                key={key}
+                                data-open={openFaq === key}
+                            >
+                                <button
+                                    type="button"
+                                    className="faq-q"
+                                    onClick={() => setOpenFaq(openFaq === key ? null : key)}
+                                    aria-expanded={openFaq === key}
+                                >
+                                    {faq.question}
+                                    <ChevronDown size={18} />
+                                </button>
+                                {openFaq === key && (
+                                    <div className="faq-a">
+                                        {faq.answer.map((paragraph) => (
+                                            <p key={paragraph}>{paragraph}</p>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                    </div>
                     </div>
                 </div>
             </section>

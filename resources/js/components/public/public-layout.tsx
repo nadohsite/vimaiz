@@ -98,7 +98,6 @@ export default function PublicLayout({ title, description, children }: PublicLay
                             <h4>Légal</h4>
                             <Link href={route('legal.notice')}>Mentions légales</Link>
                             <Link href={route('privacy')}>Confidentialité</Link>
-                            <Link href={route('remuneration-transparence')}>Rémunération et transparence</Link>
                         </div>
                     </div>
                     <div className="foot-bottom">
