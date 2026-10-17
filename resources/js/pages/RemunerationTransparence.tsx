@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Percent, ShieldCheck, Wallet } from 'lucide-react';
+import { Percent, ShieldCheck, Users, Wallet } from 'lucide-react';
 
 const benefits = [
     {
@@ -55,6 +55,38 @@ export default function RemunerationTransparence() {
                                         Les 25 % prélevés par la plateforme servent de réinvestissement
                                         marketing, d&apos;amélioration continue et de sécurisation des
                                         données. Ils se traduisent pour vous par des avantages concrets.
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="mb-6 dark:bg-slate-800 dark:border-slate-700">
+                        <CardContent className="p-6">
+                            <div className="flex items-start gap-4">
+                                <div className="rounded-full bg-slate-100 p-3 dark:bg-slate-900/50">
+                                    <Users className="h-6 w-6 text-slate-700 dark:text-slate-300" />
+                                </div>
+                                <div className="space-y-3">
+                                    <h3 className="font-semibold text-slate-900 dark:text-white">
+                                        Les propriétés de grande superficie demandent une charge de
+                                        travail importante. Vais-je me retrouver seul(e) ?
+                                    </h3>
+                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">
+                                        Non. Votre santé physique et la sérénité de votre métier sont
+                                        nos priorités.
+                                    </p>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        Notre algorithme applique une règle stricte : aucun intervenant
+                                        ne prend en charge plus de 125 m² lors d&apos;une intervention.
+                                        Vimaiz co-assigne automatiquement d&apos;autres professionnels
+                                        indépendants certifiés de votre secteur dès que la superficie
+                                        du bien le nécessite.
+                                    </p>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        Vous travaillez en synergie, vous terminez dans les délais sans
+                                        vous épuiser, et vous percevez l&apos;intégralité de votre part
+                                        du forfait, soit 75 % du montant de l&apos;intervention.
                                     </p>
                                 </div>
                             </div>

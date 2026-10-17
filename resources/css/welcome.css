@@ -1058,8 +1058,13 @@
     margin: 0;
 }
 
+/* Les deux groupes forment une seule liste continue (intitulés retirés) */
 .welcome-page .faq-group + .faq-group {
-    margin-top: 48px;
+    margin-top: 0;
+}
+
+.welcome-page .faq-group:first-child .faq-item:first-child {
+    border-top: 1px solid var(--border);
 }
 
 .welcome-page .faq-group-label {
@@ -1610,7 +1615,7 @@
     .welcome-page .night-grid,
     .welcome-page .faq-layout,
     .welcome-page .about-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 48px;
     }
 
@@ -2011,6 +2016,15 @@
 }
 
 /* ---------------------------------------------------------------- DÉFILEMENT DES ÉTAPES (héros) */
+/* Les colonnes du héros ne doivent jamais s'élargir à cause du défilement */
+.welcome-page .hero-grid > * {
+    min-width: 0;
+}
+
+.welcome-page .trust-row.trust-marquee {
+    max-width: 100%;
+}
+
 .welcome-page .trust-row.trust-marquee {
     display: block;
     overflow: hidden;
@@ -2047,6 +2061,253 @@
     }
 }
 
+/* ---------------------------------------------------------------- PHOTOS */
+/* Héros : photo de villa, carte d'estimation superposée */
+.welcome-page .hero-photo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 11 / 8;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    background: var(--bg-soft);
+}
+
+.welcome-page .card-stack {
+    position: relative;
+    margin: -170px 0 0 36px;
+}
+
+.welcome-page .card-stack .card-request {
+    top: 96px;
+}
+
+/* Pourquoi : photo d'intérieur, suivi en direct superposé */
+.welcome-page .report-stage {
+    position: relative;
+}
+
+.welcome-page .report-photo {
+    display: block;
+    width: 82%;
+    margin-left: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+}
+
+.welcome-page .report-stage .live-report {
+    position: relative;
+    margin: -200px 0 0;
+    width: 88%;
+}
+
+/* Avis Google qui défilent (4 et 5 étoiles) */
+.welcome-page .reviews {
+    margin-top: 80px;
+}
+
+.welcome-page .reviews-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-bottom: 24px;
+}
+
+.welcome-page .reviews-head h3 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.welcome-page .reviews-test-badge {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: var(--warn);
+    background: var(--warn-tint);
+    border: 1px dashed var(--warn);
+    border-radius: 999px;
+    padding: 3px 10px;
+}
+
+.welcome-page .reviews-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.welcome-page .reviews-summary:hover span {
+    color: var(--accent-ink);
+}
+
+.welcome-page .reviews-marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.welcome-page .reviews-track {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0 8px;
+    display: flex;
+    gap: 18px;
+    width: max-content;
+    animation: welcome-reviews 40s linear infinite;
+}
+
+.welcome-page .reviews-marquee:hover .reviews-track {
+    animation-play-state: paused;
+}
+
+@keyframes welcome-reviews {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(calc(-50% - 9px));
+    }
+}
+
+.welcome-page .review-card {
+    width: 340px;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 22px 20px;
+}
+
+.welcome-page .review-stars {
+    display: inline-flex;
+    gap: 2px;
+}
+
+.welcome-page .review-stars svg {
+    fill: var(--border-strong);
+}
+
+.welcome-page .review-stars svg.on {
+    fill: #f5a623;
+}
+
+.welcome-page .review-text {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+}
+
+.welcome-page .review-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.welcome-page .review-author {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.welcome-page .review-source {
+    font-size: 12.5px;
+    color: var(--stone);
+}
+
+@media (max-width: 640px) {
+    .welcome-page .reviews {
+        margin-top: 56px;
+    }
+
+    .welcome-page .review-card {
+        width: 280px;
+        padding: 18px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .welcome-page .reviews-marquee {
+        overflow-x: auto;
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
+    .welcome-page .reviews-track li[aria-hidden='true'] {
+        display: none;
+    }
+}
+
+/* Manifeste : photo atténuée en fond */
+.welcome-page section.manifesto {
+    background:
+        linear-gradient(
+            color-mix(in srgb, var(--bg-soft) 90%, transparent),
+            color-mix(in srgb, var(--bg-soft) 84%, transparent)
+        ),
+        var(--manifesto-photo, none) center / cover no-repeat,
+        var(--bg-soft);
+}
+
+.dark .welcome-page section.manifesto {
+    background:
+        linear-gradient(
+            color-mix(in srgb, var(--bg-soft) 92%, transparent),
+            color-mix(in srgb, var(--bg-soft) 88%, transparent)
+        ),
+        var(--manifesto-photo, none) center / cover no-repeat,
+        var(--bg-soft);
+}
+
+@media (max-width: 920px) {
+    .welcome-page .card-stack {
+        margin: -110px 14px 0;
+    }
+
+    .welcome-page .hero-photo {
+        aspect-ratio: 16 / 10;
+    }
+
+    .welcome-page .report-photo {
+        width: 100%;
+    }
+
+    .welcome-page .report-stage .live-report {
+        width: auto;
+        margin: -90px 14px 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .welcome-page .card-stack {
+        margin: -70px 8px 0;
+    }
+
+    .welcome-page .report-stage .live-report {
+        margin: -60px 8px 0;
+    }
+
+}
+
 @media (prefers-reduced-motion: reduce) {
     .welcome-page *,
     .welcome-page *::before,
@@ -2073,5 +2334,32 @@
     .welcome-page .trust-row.trust-marquee {
         -webkit-mask-image: none;
         mask-image: none;
+    }
+}
+
+/* ---------------------------------------------------------------- HÉROS : colonne gauche figée (comme la FAQ) */
+@media (min-width: 921px) {
+    .welcome-page .hero-grid > div:first-child {
+        position: sticky;
+        top: 112px;
+        align-self: start;
+    }
+
+    /* La photo de la villa reste figée, la carte défile par-dessus */
+    .welcome-page .hero-photo {
+        position: sticky;
+        top: 112px;
+        z-index: 0;
+    }
+
+    .welcome-page .card-stack {
+        z-index: 1;
+    }
+
+    /* La carte d'estimation défile normalement à droite */
+    .welcome-page .card-stack .card-request,
+    .welcome-page .card-request {
+        position: relative;
+        top: auto;
     }
 }

@@ -254,12 +254,173 @@ function LiveReport() {
     );
 }
 
+/**
+ * Photos libres de droits (licence Unsplash, usage commercial autorisé).
+ * Servies depuis le CDN Unsplash ; à rapatrier dans /public/images avant
+ * la mise en production si l'on veut s'affranchir du CDN.
+ */
+const unsplash = (id: string, w: number, h: number) =>
+    `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&fit=crop&auto=format&q=72`;
+
+const PHOTOS = {
+    hero: unsplash('1596178067639-5c6e68aea6dc', 1100, 900), // The Anam
+    interieur: unsplash('1780391592801-5e8867523492', 1100, 820), // Valentin Ducrettet
+    manifeste: unsplash('1543489822-c49534f3271f', 1800, 900), // big.tiny.belly
+};
+
+/**
+ * Avis Google RÉELS de la fiche Vimaiz, recopiés tels quels (texte, prénom,
+ * note, date). Ne jamais inventer d'avis : seuls les avis 4 et 5 étoiles
+ * sont affichés, et la section reste masquée tant que la liste est vide.
+ */
+type GoogleReview = {
+    author: string;
+    rating: 1 | 2 | 3 | 4 | 5;
+    text: string;
+    date: string; // ex. « septembre 2026 »
+};
+
+const GOOGLE_REVIEWS: GoogleReview[] = [];
+
+/**
+ * AVIS DE TEST — fictifs, uniquement pour visualiser le bandeau.
+ * Ils ne s'affichent qu'en local (localhost / 127.0.0.1 / *.test), avec la
+ * mention « Avis de test », et jamais lorsque GOOGLE_REVIEWS est rempli.
+ */
+const TEST_REVIEWS: GoogleReview[] = [
+    {
+        author: 'Client test A',
+        rating: 5,
+        text: 'Texte de test. Suivi très clair : j’ai reçu l’arrivée de l’équipe puis la fin de l’intervention sans avoir à appeler qui que ce soit.',
+        date: 'test',
+    },
+    {
+        author: 'Client test B',
+        rating: 5,
+        text: 'Texte de test. Trois intervenants pour notre maison de 380 m², tout était prêt avant l’arrivée des voyageurs.',
+        date: 'test',
+    },
+    {
+        author: 'Client test C',
+        rating: 4,
+        text: 'Texte de test. Le rapport signalait une anomalie en terrasse avec photo, très pratique quand on est à 800 km.',
+        date: 'test',
+    },
+    {
+        author: 'Client test D',
+        rating: 5,
+        text: 'Texte de test. Devis clair avant l’intervention, paiement en ligne, et un tableau de bord pour mes deux propriétés.',
+        date: 'test',
+    },
+    {
+        author: 'Client test E',
+        rating: 3,
+        text: 'Texte de test à 3 étoiles : il ne doit PAS apparaître (filtre 4 et 5 étoiles).',
+        date: 'test',
+    },
+];
+
+function isLocalHost() {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+    const host = window.location.hostname;
+    return host === 'localhost' || host === '127.0.0.1' || host.endsWith('.test');
+}
+
+/** Note moyenne et nombre total d'avis affichés sur la fiche Google (null = non affiché). */
+const GOOGLE_SUMMARY: { rating: number; count: number; url: string } | null = null;
+
 const TRUST_ITEMS = [
     'Vous programmez',
     'Vimaiz co-assigne une équipe',
     'L’intervention est suivie',
     'Vous êtes informé',
 ];
+
+function Stars({ rating }: { rating: number }) {
+    return (
+        <span className="review-stars" aria-label={`${rating} étoiles sur 5`}>
+            {[1, 2, 3, 4, 5].map((n) => (
+                <svg
+                    key={n}
+                    width="15"
+                    height="15"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                    className={n <= rating ? 'on' : undefined}
+                >
+                    <path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.6 7.7l5.8-.8z" />
+                </svg>
+            ))}
+        </span>
+    );
+}
+
+function GoogleReviews() {
+    const [local, setLocal] = useState(false);
+    useEffect(() => setLocal(isLocalHost()), []);
+
+    const isTest = GOOGLE_REVIEWS.length === 0;
+    if (isTest && !local) {
+        return null;
+    }
+    const reviews = (isTest ? TEST_REVIEWS : GOOGLE_REVIEWS).filter(
+        (review) => review.rating >= 4,
+    );
+    if (reviews.length === 0) {
+        return null;
+    }
+    const loop = [...reviews, ...reviews];
+
+    return (
+        <div className="reviews">
+            <div className="reviews-head">
+                <h3>
+                    Ce que disent nos clients
+                    {isTest && <span className="reviews-test-badge">Avis de test, visibles en local uniquement</span>}
+                </h3>
+                {GOOGLE_SUMMARY && (
+                    <a
+                        className="reviews-summary"
+                        href={GOOGLE_SUMMARY.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <Stars rating={Math.round(GOOGLE_SUMMARY.rating)} />
+                        <span>
+                            {GOOGLE_SUMMARY.rating.toFixed(1).replace('.', ',')} sur Google (
+                            {GOOGLE_SUMMARY.count} avis)
+                        </span>
+                    </a>
+                )}
+            </div>
+            <div className="reviews-marquee">
+                <ul
+                    className="reviews-track"
+                    style={{ animationDuration: `${Math.max(30, reviews.length * 9)}s` }}
+                >
+                    {loop.map((review, index) => (
+                        <li
+                            className="review-card"
+                            key={`${review.author}-${index}`}
+                            aria-hidden={index >= reviews.length ? true : undefined}
+                        >
+                            <Stars rating={review.rating} />
+                            <p className="review-text">« {review.text} »</p>
+                            <div className="review-meta">
+                                <span className="review-author">{review.author}</span>
+                                <span className="review-source">
+                                    {isTest ? 'Avis de test' : `Avis Google, ${review.date}`}
+                                </span>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    );
+}
 
 function todayIso() {
     return new Date().toISOString().split('T')[0];
@@ -410,6 +571,15 @@ export default function Welcome({
                     </div>
 
                     <div className="card-wrap">
+                        <img
+                            className="hero-photo"
+                            src={PHOTOS.hero}
+                            alt="Grande villa avec piscine entourée de palmiers"
+                            width={1100}
+                            height={900}
+                            fetchPriority="high"
+                        />
+                        <div className="card-stack">
                         <div className="float-badge" aria-hidden="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path
@@ -733,6 +903,7 @@ export default function Welcome({
                                 Réserver pour {total} €
                             </Link>
                         </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -758,7 +929,18 @@ export default function Welcome({
                             <li>Photos uniquement en cas d&apos;anomalie constatée</li>
                         </ul>
                     </div>
-                    <LiveReport />
+                    <div className="report-stage">
+                        <img
+                            className="report-photo"
+                            src={PHOTOS.interieur}
+                            alt="Grand salon lumineux d'un chalet, avec poutres apparentes et baies vitrées"
+                            width={1100}
+                            height={820}
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <LiveReport />
+                    </div>
                 </div>
             </section>
 
@@ -785,11 +967,15 @@ export default function Welcome({
                             </div>
                         ))}
                     </div>
+                    <GoogleReviews />
                 </div>
             </section>
 
             {/* Volet 4 — Notre Conviction (manifeste de marque) */}
-            <section className="welcome-section manifesto">
+            <section
+                className="welcome-section manifesto"
+                style={{ ['--manifesto-photo' as string]: `url(${PHOTOS.manifeste})` }}
+            >
                 <div className="wrap">
                     <h2 className="manifesto-quote">
                         L&apos;éloignement ne doit jamais justifier la perte de contrôle.
@@ -849,7 +1035,6 @@ export default function Welcome({
 
                     <div>
                     <div className="faq-group">
-                    <div className="faq-group-label">Espace propriétaires</div>
                     {PROPRIETAIRE_FAQS.map((faq, index) => {
                         const key = `proprietaire-${index}`;
                         return (
@@ -880,7 +1065,6 @@ export default function Welcome({
                     </div>
 
                     <div className="faq-group">
-                    <div className="faq-group-label">Espace intervenants</div>
                     {INTERVENANT_FAQS.map((faq, index) => {
                         const key = `intervenant-${index}`;
                         return (
