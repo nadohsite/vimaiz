@@ -2257,6 +2257,67 @@
     }
 }
 
+/* Invitation à laisser un avis Google */
+.welcome-page .review-invite {
+    margin-top: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 28px;
+    background: var(--accent-tint);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 26px;
+}
+
+.welcome-page .reviews + .review-invite {
+    margin-top: 28px;
+}
+
+.welcome-page .review-invite-copy {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex: 1 1 380px;
+}
+
+.welcome-page .review-invite-copy .review-stars {
+    flex: none;
+    padding-top: 3px;
+}
+
+.welcome-page .review-invite-title {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.welcome-page .review-invite-text {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--stone);
+}
+
+@media (max-width: 640px) {
+    .welcome-page .review-invite {
+        margin-top: 56px;
+        padding: 20px;
+    }
+
+    .welcome-page .review-invite-copy {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .welcome-page .review-invite .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 /* Manifeste : photo atténuée en fond */
 .welcome-page section.manifesto {
     background:

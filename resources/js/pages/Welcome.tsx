@@ -422,6 +422,38 @@ function GoogleReviews() {
     );
 }
 
+/** Lien Google « laisser un avis », défini dans .env (VITE_GOOGLE_REVIEW_URL). */
+const GOOGLE_REVIEW_URL: string = (import.meta.env.VITE_GOOGLE_REVIEW_URL ?? '').trim();
+
+function ReviewInvite() {
+    if (!GOOGLE_REVIEW_URL) {
+        return null;
+    }
+
+    return (
+        <div className="review-invite">
+            <div className="review-invite-copy">
+                <Stars rating={5} />
+                <div>
+                    <p className="review-invite-title">Vous avez fait appel à Vimaiz ?</p>
+                    <p className="review-invite-text">
+                        Votre avis aide d’autres propriétaires à nous faire confiance. Une
+                        minute suffit, directement sur Google.
+                    </p>
+                </div>
+            </div>
+            <a
+                className="btn btn-primary"
+                href={GOOGLE_REVIEW_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Laisser un avis
+            </a>
+        </div>
+    );
+}
+
 function todayIso() {
     return new Date().toISOString().split('T')[0];
 }
@@ -977,6 +1009,7 @@ export default function Welcome({
                         ))}
                     </div>
                     <GoogleReviews />
+                    <ReviewInvite />
                 </div>
             </section>
 
