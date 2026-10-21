@@ -2633,3 +2633,83 @@
 .welcome-page .hero-grid > div:first-child .hero-ctas {
     justify-content: center;
 }
+
+/* ---------------------------------------------------------------- CENTRAGE
+ * Grand écran : grands titres de section centrés.
+ * Mobile (≤ 640px) : tous les textes de la page centrés, sauf le formulaire
+ * de l'estimateur (champs de saisie), qui reste aligné à gauche.
+ */
+.welcome-page h2,
+.welcome-page .night-band h2,
+.welcome-page .faq-layout .sec-head h2 {
+    text-align: center;
+}
+
+.welcome-page .manifesto-quote {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.welcome-page .reviews-head {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .welcome-page section,
+    .welcome-page .sec-head,
+    .welcome-page .sec-sub,
+    .welcome-page .night-band,
+    .welcome-page .manifesto-body p,
+    .welcome-page .pro-band,
+    .welcome-page .faq-a,
+    .welcome-page .review-card,
+    .welcome-page .review-invite {
+        text-align: center;
+    }
+
+    .welcome-page .sec-sub,
+    .welcome-page .hero-sub {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .welcome-page .night-points li {
+        justify-content: center;
+    }
+
+    .welcome-page .pro-band-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .welcome-page .faq-q {
+        text-align: center;
+    }
+
+    .welcome-page .faq-a {
+        padding-right: 0;
+    }
+
+    .welcome-page .faq-a ul {
+        padding-left: 0;
+        list-style-position: inside;
+    }
+
+    .welcome-page .review-card .review-stars,
+    .welcome-page .review-meta {
+        align-self: center;
+        align-items: center;
+    }
+
+    .welcome-page .review-invite-copy {
+        align-items: center;
+    }
+
+    /* Le formulaire de l'estimateur reste lisible aligné à gauche */
+    .welcome-page .card-request {
+        text-align: left;
+    }
+}

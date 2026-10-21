@@ -1000,7 +1000,7 @@ export default function Welcome({
                     <div className="sec-head sec-head-center">
                         <h2>Un fonctionnement premium, sur mesure</h2>
                         <p className="sec-sub">
-                            Un fonctionnement reposant sur un devis transparent, pensé pour
+                            Reposant sur un devis transparent, pensé pour
                             les grandes résidences.
                         </p>
                     </div>
