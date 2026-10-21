@@ -71,12 +71,12 @@ Route::get('/', function () {
             ->values()
             ->all();
 
-        $settings = \App\Models\PlatformSetting::current();
-        if ($settings->google_rating !== null && $settings->google_rating_count) {
+        $summary = \App\Models\GoogleReviewSummary::query()->first();
+        if ($summary && $summary->rating !== null && $summary->rating_count) {
             $googleSummary = [
-                'rating' => (float) $settings->google_rating,
-                'count' => (int) $settings->google_rating_count,
-                'url' => $settings->google_maps_url,
+                'rating' => (float) $summary->rating,
+                'count' => (int) $summary->rating_count,
+                'url' => $summary->google_maps_url,
             ];
         }
     } catch (\Illuminate\Database\QueryException $e) {

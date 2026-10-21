@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\GoogleReviewResource\Pages;
 
 use App\Filament\Resources\GoogleReviewResource;
-use App\Models\PlatformSetting;
+use App\Models\GoogleReviewSummary;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms;
@@ -16,15 +16,15 @@ class ManageGoogleReviews extends ManageRecords
 
     public function getSubheading(): ?string
     {
-        $settings = PlatformSetting::current();
+        $summary = GoogleReviewSummary::current();
 
-        if ($settings->google_rating === null) {
+        if ($summary->rating === null) {
             return 'Note globale Google non renseignée (elle ne s\'affiche pas sur le site).';
         }
 
         return 'Note globale affichée sur le site : '
-            . number_format((float) $settings->google_rating, 1, ',', ' ') . '/5 ('
-            . (int) $settings->google_rating_count . ' avis)';
+            . number_format((float) $summary->rating, 1, ',', ' ') . '/5 ('
+            . (int) $summary->rating_count . ' avis)';
     }
 
     protected function getHeaderActions(): array
@@ -36,11 +36,15 @@ class ManageGoogleReviews extends ManageRecords
                 ->color('gray')
                 ->modalHeading('Note globale de la fiche Google')
                 ->modalDescription('Recopiez la note moyenne et le nombre total d\'avis affichés sur votre fiche Google. Laissez vide pour ne pas l\'afficher.')
-                ->fillForm(fn () => [
-                    'google_rating' => PlatformSetting::current()->google_rating,
-                    'google_rating_count' => PlatformSetting::current()->google_rating_count,
-                    'google_maps_url' => PlatformSetting::current()->google_maps_url,
-                ])
+                ->fillForm(function () {
+                    $summary = GoogleReviewSummary::current();
+
+                    return [
+                        'google_rating' => $summary->rating,
+                        'google_rating_count' => $summary->rating_count,
+                        'google_maps_url' => $summary->google_maps_url,
+                    ];
+                })
                 ->schema([
                     Forms\Components\TextInput::make('google_rating')
                         ->label('Note moyenne (ex. 4,9)')
@@ -59,9 +63,9 @@ class ManageGoogleReviews extends ManageRecords
                         ->maxLength(1024),
                 ])
                 ->action(function (array $data) {
-                    PlatformSetting::current()->update([
-                        'google_rating' => filled($data['google_rating']) ? (float) str_replace(',', '.', $data['google_rating']) : null,
-                        'google_rating_count' => filled($data['google_rating_count']) ? (int) $data['google_rating_count'] : null,
+                    GoogleReviewSummary::current()->update([
+                        'rating' => filled($data['google_rating']) ? (float) str_replace(',', '.', $data['google_rating']) : null,
+                        'rating_count' => filled($data['google_rating_count']) ? (int) $data['google_rating_count'] : null,
                         'google_maps_url' => $data['google_maps_url'] ?: null,
                     ]);
 
