@@ -144,15 +144,11 @@ export default function Dashboard({
                         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
                             <div className="min-w-0">
                                 <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-                                    Bonjour{firstName ? ` ${firstName}` : ''}
+                                    Bonjour{firstName ? ` ${firstName}` : ''}, ravi de vous revoir 👋
                                 </h1>
-                                <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400 sm:text-base">
-                                    Gérez vos interventions et suivez vos revenus.
-                                </p>
-                                <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400 sm:text-base">
-                                    Vimaiz prélève une commission de 20 % sur chaque intervention
-                                    pour couvrir la mise en relation, la gestion de la plateforme
-                                    et le support.
+                                <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-400 sm:text-base">
+                                    Bienvenue dans votre espace Vimaiz. Retrouvez ici vos interventions
+                                    à venir et suivez vos revenus en toute simplicité.
                                 </p>
                             </div>
                             {(stats?.missions_in_progress ?? 0) > 0 && (

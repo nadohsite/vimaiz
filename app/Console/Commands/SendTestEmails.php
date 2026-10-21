@@ -348,9 +348,9 @@ class SendTestEmails extends Command
             'estimated_price' => 120,
             'final_price' => 120,
             'estimated_hours' => 2,
-            'commission_rate' => 20,
-            'commission_amount' => 24,
-            'agent_amount' => 96,
+            'commission_rate' => 25,
+            'commission_amount' => 30,
+            'agent_amount' => 90,
             'status' => 'sent',
             'expires_at' => now()->addDays(7),
         ]);

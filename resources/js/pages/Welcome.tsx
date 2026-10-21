@@ -533,7 +533,11 @@ export default function Welcome({
             description="Suivez chaque intervention de ménage en temps réel depuis votre espace Vimaiz et préservez la réputation de votre grand patrimoine."
         >
             {/* Volet 1 — Header / bloc héros */}
-            <section className="hero wrap" id="estimateur">
+            <section
+                className="hero wrap"
+                id="estimateur"
+                style={{ ['--hero-photo' as string]: `url(${PHOTOS.hero})` }}
+            >
                 <div className="hero-grid">
                     <div>
                         <h1 className="rise-2">
@@ -771,8 +775,13 @@ export default function Welcome({
                                         />
                                     </svg>
                                 </div>
-                                <div className="req-body">
-                                    <div className="req-sub">Espace en plus (optionnel)</div>
+                                <details
+                                    className="req-body req-extra"
+                                    open={extraQty > 0 || extraSurface > 0 || extraType !== ''}
+                                >
+                                    <summary className="req-sub">
+                                        Ajouter un espace en plus (optionnel)
+                                    </summary>
                                     <input
                                         className="req-field"
                                         type="text"
@@ -817,7 +826,7 @@ export default function Welcome({
                                             }
                                         />
                                     </div>
-                                </div>
+                                </details>
                             </div>
 
                             <div className="req-row">

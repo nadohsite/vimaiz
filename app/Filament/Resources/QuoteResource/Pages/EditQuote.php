@@ -30,7 +30,7 @@ class EditQuote extends EditRecord
         }
 
         $final = (float) ($data['final_price'] ?? $this->record->final_price ?? 0);
-        $rate = (float) ($data['commission_rate'] ?? $this->record->commission_rate ?? (PricingRule::getActive()?->platform_commission_rate ?? 20));
+        $rate = (float) ($data['commission_rate'] ?? $this->record->commission_rate ?? (PricingRule::getActive()?->platform_commission_rate ?? 25));
         $commission = round($final * ($rate / 100), 2);
 
         $data['commission_amount'] = $commission;

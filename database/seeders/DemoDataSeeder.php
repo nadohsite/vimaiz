@@ -150,7 +150,7 @@ class DemoDataSeeder extends Seeder
             $date = Carbon::now()->subDays(rand(1, 30));
             $durationMinutes = $service->estimated_duration_minutes;
             $amount = $service->base_price;
-            $platformFee = $amount * 0.20; // 20% fee
+            $platformFee = $amount * 0.25; // 25% fee
             $servicePrice = $amount - $platformFee;
 
             $booking = Booking::create([
@@ -189,8 +189,8 @@ class DemoDataSeeder extends Seeder
                 'payment_method' => 'card',
             ]);
 
-            // Credit Agent Wallet (80% share)
-            $agentShare = $amount * 0.8;
+            // Credit Agent Wallet (75% share)
+            $agentShare = $amount * 0.75;
             $wallet = $this->initWallet($agent);
             $wallet->credit($agentShare, "Payment for booking #{$booking->booking_number}", $booking);
         }
@@ -202,7 +202,7 @@ class DemoDataSeeder extends Seeder
             $date = Carbon::now()->addDays(rand(1, 14));
             $durationMinutes = $service->estimated_duration_minutes;
             $amount = $service->base_price;
-            $platformFee = $amount * 0.20;
+            $platformFee = $amount * 0.25;
             $servicePrice = $amount - $platformFee;
 
             Booking::create([
