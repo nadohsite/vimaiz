@@ -269,23 +269,24 @@ const PHOTOS = {
 };
 
 /**
- * Avis Google RÉELS de la fiche Vimaiz, recopiés tels quels (texte, prénom,
- * note, date). Ne jamais inventer d'avis : seuls les avis 4 et 5 étoiles
- * sont affichés, et la section reste masquée tant que la liste est vide.
+ * Avis Google RÉELS de la fiche Vimaiz, recopiés depuis Google Business dans
+ * Admin > Gestion des Avis > Avis Google, et transmis par la route « / ».
+ * Seuls les avis 4 et 5 étoiles sont affichés ; la section reste masquée en
+ * production tant qu'aucun avis n'a été récupéré.
  */
 type GoogleReview = {
     author: string;
-    rating: 1 | 2 | 3 | 4 | 5;
+    rating: number;
     text: string;
     date: string; // ex. « septembre 2026 »
 };
 
-const GOOGLE_REVIEWS: GoogleReview[] = [];
+type GoogleSummary = { rating: number; count: number; url: string | null };
 
 /**
  * AVIS DE TEST — fictifs, uniquement pour visualiser le bandeau.
  * Ils ne s'affichent qu'en local (localhost / 127.0.0.1 / *.test), avec la
- * mention « Avis de test », et jamais lorsque GOOGLE_REVIEWS est rempli.
+ * mention « Avis de test », et jamais lorsque de vrais avis Google existent.
  */
 const TEST_REVIEWS: GoogleReview[] = [
     {
@@ -328,9 +329,6 @@ function isLocalHost() {
     return host === 'localhost' || host === '127.0.0.1' || host.endsWith('.test');
 }
 
-/** Note moyenne et nombre total d'avis affichés sur la fiche Google (null = non affiché). */
-const GOOGLE_SUMMARY: { rating: number; count: number; url: string } | null = null;
-
 const TRUST_ITEMS = [
     'Vous programmez',
     'Vimaiz co-assigne une équipe',
@@ -357,15 +355,22 @@ function Stars({ rating }: { rating: number }) {
     );
 }
 
-function GoogleReviews() {
+function GoogleReviews({
+    googleReviews,
+    summary,
+}: {
+    googleReviews: GoogleReview[];
+    summary: GoogleSummary | null;
+}) {
     const [local, setLocal] = useState(false);
     useEffect(() => setLocal(isLocalHost()), []);
 
-    const isTest = GOOGLE_REVIEWS.length === 0;
+    const isTest = googleReviews.length === 0;
     if (isTest && !local) {
         return null;
     }
-    const reviews = (isTest ? TEST_REVIEWS : GOOGLE_REVIEWS).filter(
+    const GOOGLE_SUMMARY = isTest ? null : summary;
+    const reviews = (isTest ? TEST_REVIEWS : googleReviews).filter(
         (review) => review.rating >= 4,
     );
     if (reviews.length === 0) {
@@ -380,7 +385,7 @@ function GoogleReviews() {
                     Ce que disent nos clients
                     {isTest && <span className="reviews-test-badge">Avis de test, visibles en local uniquement</span>}
                 </h3>
-                {GOOGLE_SUMMARY && (
+                {GOOGLE_SUMMARY && GOOGLE_SUMMARY.url && (
                     <a
                         className="reviews-summary"
                         href={GOOGLE_SUMMARY.url}
@@ -496,8 +501,12 @@ function HomeIcon() {
 
 export default function Welcome({
     availableAgentsCount: _availableAgentsCount = 0,
+    googleReviews = [],
+    googleSummary = null,
 }: {
     availableAgentsCount?: number;
+    googleReviews?: GoogleReview[];
+    googleSummary?: GoogleSummary | null;
 }) {
     const { auth } = usePage<SharedData>().props;
     const isLoggedIn = Boolean(auth.user);
@@ -1008,7 +1017,7 @@ export default function Welcome({
                             </div>
                         ))}
                     </div>
-                    <GoogleReviews />
+                    <GoogleReviews googleReviews={googleReviews} summary={googleSummary} />
                     <ReviewInvite />
                 </div>
             </section>

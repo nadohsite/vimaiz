@@ -21,6 +21,14 @@ class PlatformSetting extends Model
         'sepa_creditor_name',
         'sepa_creditor_iban',
         'sepa_creditor_bic',
+        'google_rating',
+        'google_rating_count',
+        'google_maps_url',
+    ];
+
+    protected $casts = [
+        'google_rating' => 'float',
+        'google_rating_count' => 'integer',
     ];
 
     /**

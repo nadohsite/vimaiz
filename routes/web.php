@@ -52,8 +52,41 @@ Route::get('/', function () {
         })
         ->count();
 
+    // Avis Google (4 et 5 étoiles) saisis dans Admin > Avis Google.
+    // En cas d'absence de table (migration non lancée), la page reste fonctionnelle.
+    $googleReviews = [];
+    $googleSummary = null;
+    try {
+        $googleReviews = \App\Models\GoogleReview::query()
+            ->displayable()
+            ->orderByDesc('published_at')
+            ->limit(12)
+            ->get()
+            ->map(fn (\App\Models\GoogleReview $review) => [
+                'author' => $review->author_name,
+                'rating' => $review->rating,
+                'text' => $review->text,
+                'date' => $review->published_at?->locale('fr')->translatedFormat('F Y') ?? '',
+            ])
+            ->values()
+            ->all();
+
+        $settings = \App\Models\PlatformSetting::current();
+        if ($settings->google_rating !== null && $settings->google_rating_count) {
+            $googleSummary = [
+                'rating' => (float) $settings->google_rating,
+                'count' => (int) $settings->google_rating_count,
+                'url' => $settings->google_maps_url,
+            ];
+        }
+    } catch (\Illuminate\Database\QueryException $e) {
+        report($e);
+    }
+
     return inertia('Welcome', [
         'availableAgentsCount' => $availableAgentsCount,
+        'googleReviews' => $googleReviews,
+        'googleSummary' => $googleSummary,
     ]);
 })->name('home');
 
