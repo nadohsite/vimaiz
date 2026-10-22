@@ -382,7 +382,7 @@ function GoogleReviews({
         <div className="reviews">
             <div className="reviews-head">
                 <h3>
-                    Ce que disent nos clients
+                    Ils nous font confiance
                     {isTest && <span className="reviews-test-badge">Avis de test, visibles en local uniquement</span>}
                 </h3>
                 {GOOGLE_SUMMARY && GOOGLE_SUMMARY.url && (
@@ -1028,9 +1028,13 @@ export default function Welcome({
                 style={{ ['--manifesto-photo' as string]: `url(${PHOTOS.manifeste})` }}
             >
                 <div className="wrap">
-                    <h2 className="manifesto-quote">
-                        L&apos;éloignement ne doit jamais justifier la perte de contrôle.
-                    </h2>
+                    <div className="manifesto-grid">
+                    <div className="manifesto-head">
+                        <p className="sec-eyebrow manifesto-eyebrow">Notre conviction</p>
+                        <h2 className="manifesto-quote">
+                            L&apos;éloignement ne doit jamais justifier la perte de contrôle.
+                        </h2>
+                    </div>
                     <div className="manifesto-body">
                         <p>
                             Nous croyons fermement que posséder une grande résidence secondaire
@@ -1044,6 +1048,7 @@ export default function Welcome({
                             pas être et vous garantit la traçabilité de chaque intervention de
                             ménage sur votre patrimoine, du début jusqu&apos;à la fin.
                         </p>
+                    </div>
                     </div>
 
                     <div id="agent" className="pro-band">

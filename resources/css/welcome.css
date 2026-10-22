@@ -2713,3 +2713,101 @@
         text-align: left;
     }
 }
+
+/* ---------------------------------------------------------------- MANIFESTE
+ * Grand écran : surtitre + citation à gauche, texte à droite (style éditorial).
+ * Mobile / tablette : tout empilé et centré.
+ */
+.welcome-page .manifesto-eyebrow {
+    margin: 0 0 18px;
+}
+
+.welcome-page .manifesto .manifesto-quote {
+    margin: 0;
+}
+
+.welcome-page .manifesto .manifesto-quote::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 3px;
+    margin-top: 28px;
+    border-radius: 3px;
+    background: var(--accent);
+}
+
+.welcome-page .manifesto .manifesto-body {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    max-width: none;
+    margin: 0;
+}
+
+.welcome-page .manifesto .manifesto-body p {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--stone);
+}
+
+.welcome-page .manifesto .manifesto-body p:first-child {
+    font-size: 20px;
+    line-height: 1.6;
+    font-weight: 500;
+    color: var(--ink);
+}
+
+@media (min-width: 921px) {
+    .welcome-page .manifesto-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 88px;
+        align-items: start;
+    }
+
+    .welcome-page .manifesto-head,
+    .welcome-page .manifesto .manifesto-quote {
+        text-align: left;
+    }
+
+    .welcome-page .manifesto .manifesto-quote {
+        max-width: 14ch;
+    }
+
+    /* Le texte démarre au niveau de la citation, sous le surtitre */
+    .welcome-page .manifesto .manifesto-body {
+        padding-top: 38px;
+    }
+}
+
+@media (max-width: 920px) {
+    .welcome-page .manifesto-head,
+    .welcome-page .manifesto .manifesto-body {
+        text-align: center;
+    }
+
+    .welcome-page .manifesto .manifesto-quote {
+        max-width: 20ch;
+        margin: 0 auto 28px;
+    }
+
+    .welcome-page .manifesto .manifesto-quote::after {
+        margin: 24px auto 0;
+    }
+
+    .welcome-page .manifesto .manifesto-body {
+        max-width: 640px;
+        margin: 0 auto;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .welcome-page .manifesto .manifesto-body p {
+        font-size: 16px;
+    }
+
+    .welcome-page .manifesto .manifesto-body p:first-child {
+        font-size: 17px;
+    }
+}
