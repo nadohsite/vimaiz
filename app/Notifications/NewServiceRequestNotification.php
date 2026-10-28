@@ -23,7 +23,7 @@ class NewServiceRequestNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('🏠 Nouvelle intervention - '.$this->serviceRequest->request_number)
+            ->subject('Nouvelle demande d\'intervention — '.$this->serviceRequest->request_number)
             ->view('emails.new-service-request', [
                 'notifiable' => $notifiable,
                 'serviceRequest' => $this->serviceRequest,

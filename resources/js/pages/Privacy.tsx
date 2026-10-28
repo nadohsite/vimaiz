@@ -218,7 +218,7 @@ export default function Privacy() {
                             </ul>
                             <p>
                                 Pour exercer ces droits, contactez-nous à :{' '}
-                                <a href="mailto:privacy@vimaiz.com">privacy@vimaiz.com</a>
+                                <a href="mailto:contact@vimaiz.com">contact@vimaiz.com</a>
                             </p>
                         </section>
 

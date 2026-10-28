@@ -7,7 +7,28 @@ use App\Models\Property;
 use App\Models\Quote;
 use App\Models\ServiceRequest;
 use App\Models\User;
+use App\Models\WalletTransaction;
+use App\Notifications\AgentAcceptedMissionAdminNotification;
+use App\Notifications\AgentAcceptedMissionNotification;
+use App\Notifications\AgentBannedNotification;
+use App\Notifications\AgentInterventionCompletedNotification;
+use App\Notifications\AgentInterventionConfirmedNotification;
 use App\Notifications\AgentPayoutNotification;
+use App\Notifications\AgentRefusedMissionClientNotification;
+use App\Notifications\AgentRefusedMissionNotification;
+use App\Notifications\AgentSuspendedNotification;
+use App\Notifications\AgentWarningNotification;
+use App\Notifications\ClientConfirmedReadyNotification;
+use App\Notifications\ClientValidatedInterventionNotification;
+use App\Notifications\MissionCompletedAdminNotification;
+use App\Notifications\MissionNeedsAgentNotification;
+use App\Notifications\NewServiceRequestNotification;
+use App\Notifications\QuoteAcceptedNotification;
+use App\Notifications\QuoteRefusedNotification;
+use App\Notifications\ReturnCompletedNotification;
+use App\Notifications\ReturnRequestedNotification;
+use App\Notifications\ServiceRequestReceivedNotification;
+use App\Notifications\WithdrawalRequestNotification;
 use App\Notifications\AgentProfileIncompleteReminder;
 use App\Notifications\ClientBookingReminder;
 use App\Notifications\ClientProfileIncompleteReminder;
@@ -27,10 +48,13 @@ use Illuminate\Support\Facades\Notification;
 
 class SendTestEmails extends Command
 {
+    /** Destinataire par défaut de tous les mails de test. */
+    public const DEFAULT_TEST_ADDRESS = 'revolthes@gmail.com';
+
     protected $signature = 'vimaiz:test-emails
-                            {email? : Adresse email destinataire (sinon --to)}
+                            {email? : Adresse email destinataire (par défaut : MAIL_TEST_ADDRESS, sinon revolthes@gmail.com)}
                             {--to= : Adresse email destinataire}
-                            {--type=all : Groupe à envoyer : client, agent, recap, all}
+                            {--type=all : Groupe à envoyer : client, agent, admin, recap, all}
                             {--mail= : Clé d\'un seul mail (ex: client-profile, weekly-recap-client)}
                             {--mailer= : Mailer à utiliser pour ce test (ex: log, smtp)}
                             {--list : Liste les mails disponibles}';
@@ -45,7 +69,9 @@ class SendTestEmails extends Command
             return self::SUCCESS;
         }
 
-        $email = $this->argument('email') ?: $this->option('to');
+        $email = $this->argument('email')
+            ?: $this->option('to')
+            ?: env('MAIL_TEST_ADDRESS', self::DEFAULT_TEST_ADDRESS);
 
         if (! $email) {
             $this->error('Indiquez une adresse : php artisan vimaiz:test-emails vous@email.com');
@@ -133,9 +159,11 @@ class SendTestEmails extends Command
 
         $this->newLine();
         $this->comment('Exemples :');
+        $this->line('  php artisan vimaiz:test-emails            (envoie tout à '.self::DEFAULT_TEST_ADDRESS.')');
         $this->line('  php artisan vimaiz:test-emails vous@email.com');
         $this->line('  php artisan vimaiz:test-emails vous@email.com --type=client');
         $this->line('  php artisan vimaiz:test-emails vous@email.com --type=agent');
+        $this->line('  php artisan vimaiz:test-emails vous@email.com --type=admin');
         $this->line('  php artisan vimaiz:test-emails vous@email.com --type=recap');
         $this->line('  php artisan vimaiz:test-emails vous@email.com --mail=client-profile');
         $this->line('  php artisan vimaiz:test-emails vous@email.com --mail=weekly-recap-client');
@@ -210,6 +238,26 @@ class SendTestEmails extends Command
                     'client',
                 ),
             ],
+            'service-request-received' => [
+                'label' => 'Demande bien reçue',
+                'groups' => ['client'],
+                'factory' => fn ($user, $mission, $quote) => new ServiceRequestReceivedNotification($quote->serviceRequest),
+            ],
+            'team-constituted' => [
+                'label' => 'Équipe constituée (intervention confirmée)',
+                'groups' => ['client'],
+                'factory' => fn ($user, $mission) => new AgentAcceptedMissionNotification($mission),
+            ],
+            'agent-replaced' => [
+                'label' => 'Remplacement d\'un intervenant',
+                'groups' => ['client'],
+                'factory' => fn ($user, $mission) => new AgentRefusedMissionClientNotification($mission),
+            ],
+            'client-ready' => [
+                'label' => 'Logement prêt (après validation)',
+                'groups' => ['client'],
+                'factory' => fn ($user, $mission) => new ClientConfirmedReadyNotification($mission),
+            ],
             'agent-profile' => [
                 'label' => 'Relance profil intervenant',
                 'groups' => ['agent'],
@@ -233,10 +281,40 @@ class SendTestEmails extends Command
                 'groups' => ['agent'],
                 'factory' => fn ($user, $mission) => new MissionAssignedNotification($mission),
             ],
+            'agent-confirmed' => [
+                'label' => 'Place confirmée (intervenant)',
+                'groups' => ['agent'],
+                'factory' => fn ($user, $mission) => new AgentInterventionConfirmedNotification($mission),
+            ],
+            'agent-completed' => [
+                'label' => 'Intervention clôturée (intervenant)',
+                'groups' => ['agent'],
+                'factory' => fn ($user, $mission) => new AgentInterventionCompletedNotification($mission),
+            ],
+            'agent-validated' => [
+                'label' => 'Intervention validée par le propriétaire',
+                'groups' => ['agent'],
+                'factory' => fn ($user, $mission) => new ClientValidatedInterventionNotification($mission),
+            ],
+            'agent-warning' => [
+                'label' => 'Avertissement',
+                'groups' => ['agent'],
+                'factory' => fn () => new AgentWarningNotification('Retard de plus de 30 minutes sans prévenir.', 1),
+            ],
+            'agent-suspended' => [
+                'label' => 'Suspension de compte',
+                'groups' => ['agent'],
+                'factory' => fn () => new AgentSuspendedNotification('Trois avertissements reçus.', now()->addDays(7)),
+            ],
+            'agent-banned' => [
+                'label' => 'Exclusion définitive',
+                'groups' => ['agent'],
+                'factory' => fn () => new AgentBannedNotification('Manquements graves et répétés aux conditions d\'utilisation.'),
+            ],
             'agent-payout' => [
                 'label' => 'Paiement crédité (portefeuille)',
                 'groups' => ['agent'],
-                'factory' => fn ($user, $mission) => new AgentPayoutNotification($mission, (float) ($mission->agent_payout ?: 80)),
+                'factory' => fn ($user, $mission) => new AgentPayoutNotification($mission, \App\Support\Brigade::shareFor($mission)),
             ],
             'weekly-recap-agent' => [
                 'label' => 'Récap hebdomadaire (intervenant)',
@@ -248,7 +326,79 @@ class SendTestEmails extends Command
                     'agent',
                 ),
             ],
+            'admin-new-request' => [
+                'label' => '[Admin] Nouvelle demande d\'intervention',
+                'groups' => ['admin'],
+                'factory' => fn ($user, $mission, $quote) => new NewServiceRequestNotification($quote->serviceRequest),
+            ],
+            'admin-quote-accepted' => [
+                'label' => '[Admin] Devis accepté',
+                'groups' => ['admin'],
+                'factory' => fn ($user, $mission, $quote) => new QuoteAcceptedNotification($quote),
+            ],
+            'admin-quote-refused' => [
+                'label' => '[Admin] Devis refusé',
+                'groups' => ['admin'],
+                'factory' => fn ($user, $mission, $quote) => new QuoteRefusedNotification($quote),
+            ],
+            'admin-team-complete' => [
+                'label' => '[Admin] Intervention confirmée',
+                'groups' => ['admin'],
+                'factory' => fn ($user, $mission) => new AgentAcceptedMissionAdminNotification($mission),
+            ],
+            'admin-agent-refused' => [
+                'label' => '[Admin] Intervention refusée par un intervenant',
+                'groups' => ['admin'],
+                'factory' => fn ($user, $mission) => new AgentRefusedMissionNotification($mission, 'Indisponible ce jour-là.'),
+            ],
+            'admin-needs-agent' => [
+                'label' => '[Admin] Attribution manuelle requise',
+                'groups' => ['admin'],
+                'factory' => fn ($user, $mission) => new MissionNeedsAgentNotification($mission),
+            ],
+            'admin-mission-completed' => [
+                'label' => '[Admin] Intervention clôturée',
+                'groups' => ['admin'],
+                'factory' => fn ($user, $mission) => new MissionCompletedAdminNotification($mission),
+            ],
+            'admin-return-requested' => [
+                'label' => '[Admin] Demande de nouveau passage',
+                'groups' => ['admin'],
+                'factory' => fn ($user, $mission) => new ReturnRequestedNotification($mission),
+            ],
+            'admin-return-completed' => [
+                'label' => '[Admin] Nouveau passage effectué',
+                'groups' => ['admin'],
+                'factory' => fn ($user, $mission) => new ReturnCompletedNotification($mission),
+            ],
+            'admin-withdrawal' => [
+                'label' => '[Admin] Demande de retrait',
+                'groups' => ['admin'],
+                'factory' => fn () => $this->sampleWithdrawal(),
+            ],
         ];
+    }
+
+    protected function sampleWithdrawal(): WithdrawalRequestNotification
+    {
+        $agent = new User();
+        $agent->id = 1;
+        $agent->name = 'Intervenant Test';
+        $agent->email = 'intervenant.test@example.com';
+
+        $transaction = new WalletTransaction([
+            'amount' => 435,
+            'metadata' => [
+                'payment_method' => 'bank_transfer',
+                'bank_account_holder' => 'Intervenant Test',
+                'bank_account' => 'FR7630006000011234567890189',
+                'bic' => 'AGRIFRPP',
+            ],
+        ]);
+        $transaction->id = 1;
+        $transaction->created_at = now();
+
+        return new WithdrawalRequestNotification($transaction, $agent);
     }
 
     protected function resolveRecipient(string $email): object
@@ -312,9 +462,10 @@ class SendTestEmails extends Command
             'started_at' => now()->subHours(3),
             'completed_at' => now()->subHour(),
             'duration_hours' => 2,
-            'total_price' => 120,
-            'agent_payout' => 96,
-            'platform_fee' => 24,
+            'total_price' => 580,
+            'agent_payout' => 435,
+            'platform_fee' => 145,
+            'required_agents' => 3,
             'status' => Mission::STATUS_COMPLETED,
         ]);
         $mission->id = 1;
@@ -363,12 +514,12 @@ class SendTestEmails extends Command
     protected function sampleProperty(): Property
     {
         $property = new Property([
-            'name' => 'Appartement Test Vimaiz',
-            'type' => 'appartement',
-            'city' => 'Chambéry',
-            'address_line1' => '12 rue de la Paix',
-            'postal_code' => '73000',
-            'surface_area' => 65,
+            'name' => 'Villa Test Vimaiz',
+            'type' => 'villa',
+            'city' => 'Biarritz',
+            'address_line1' => '12 avenue de la Plage',
+            'postal_code' => '64200',
+            'surface_area' => 340,
         ]);
         $property->id = 1;
 
@@ -383,17 +534,19 @@ class SendTestEmails extends Command
         return collect([
             (object) [
                 'mission_number' => 'MISS-TEST-001',
-                'property_label' => 'Appartement — Chambéry',
+                'property_label' => 'Villa — Biarritz',
                 'completed_at_label' => now()->subDays(3)->format('d/m/Y'),
                 'scheduled_at_label' => null,
-                'amount_label' => $forAgent ? '96,00 €' : '120,00 €',
+                'amount' => $forAgent ? 145.0 : 580.0,
+                'amount_label' => $forAgent ? '145,00 €' : '580,00 €',
             ],
             (object) [
                 'mission_number' => 'MISS-TEST-002',
-                'property_label' => 'Maison — Aix-les-Bains',
+                'property_label' => 'Mas — Saint-Rémy-de-Provence',
                 'completed_at_label' => now()->subDays(1)->format('d/m/Y'),
                 'scheduled_at_label' => null,
-                'amount_label' => $forAgent ? '128,00 €' : '160,00 €',
+                'amount' => $forAgent ? 160.0 : 640.0,
+                'amount_label' => $forAgent ? '160,00 €' : '640,00 €',
             ],
         ]);
     }
@@ -406,10 +559,11 @@ class SendTestEmails extends Command
         return collect([
             (object) [
                 'mission_number' => 'MISS-TEST-003',
-                'property_label' => 'Studio — Annecy',
+                'property_label' => 'Chalet — Megève',
                 'completed_at_label' => null,
                 'scheduled_at_label' => now()->addDays(2)->format('d/m/Y à H:i'),
-                'amount_label' => $forAgent ? '72,00 €' : '90,00 €',
+                'amount' => $forAgent ? 150.0 : 600.0,
+                'amount_label' => $forAgent ? '150,00 €' : '600,00 €',
             ],
         ]);
     }

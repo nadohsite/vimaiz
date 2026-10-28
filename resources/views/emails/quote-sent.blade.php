@@ -3,11 +3,11 @@
 @section('title', 'Votre devis est prêt')
 
 @section('content')
-    <h1>Votre devis est prêt ! 📋</h1>
+    <h1>Votre devis est prêt</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Nous avons préparé votre devis pour l'intervention sur votre bien.</p>
+    <p>Nous avons préparé le devis forfaitaire de l'intervention sur votre logement. Le montant indiqué est définitif : aucun frais caché.</p>
 
     <div class="success-box">
         <p><strong>Devis :</strong> {{ $quote->quote_number }}</p>
@@ -20,6 +20,9 @@
     <div class="info-box">
         <p><strong>Bien :</strong> {{ $quote->serviceRequest?->property?->name ?? $quote->serviceRequest?->property?->type ?? '—' }}</p>
         <p><strong>Surface :</strong> {{ $quote->serviceRequest?->property?->surface_area ?? '—' }} m²</p>
+        @if($quote->serviceRequest?->property?->surface_area)
+            <p><strong>Équipe prévue :</strong> {{ \App\Support\Brigade::label(\App\Support\Brigade::sizeForSurface($quote->serviceRequest->property->surface_area)) }}</p>
+        @endif
         <p><strong>Date prévue :</strong>
             {{ optional($quote->serviceRequest?->scheduled_date)->format('d/m/Y') ?? '—' }}
             @if($quote->serviceRequest?->scheduled_time)
@@ -35,7 +38,7 @@
         </div>
     @endif
 
-    <p>Une fois le devis accepté, vous pourrez procéder au paiement sécurisé et un intervenant vous sera attribué.</p>
+    <p>Une fois le devis accepté, vous réglez en ligne de façon sécurisée et Vimaiz constitue automatiquement votre équipe d'intervenants certifiés. Les intervenants ne sont payés qu'après votre validation de l'intervention.</p>
 
     <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/quotes/' . $quote->id) }}" class="button">

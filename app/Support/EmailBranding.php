@@ -4,7 +4,7 @@ namespace App\Support;
 
 class EmailBranding
 {
-    public const SLOGAN = 'La décoration attire le regard. La propreté inspire confiance.';
+    public const SLOGAN = 'Vos yeux là où vous n’en avez pas.';
 
     /**
      * Logo email optimisé (blanc sur fond transparent).

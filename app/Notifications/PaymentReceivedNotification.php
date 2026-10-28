@@ -43,7 +43,7 @@ class PaymentReceivedNotification extends Notification implements ShouldQueue
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'amount' => $this->mission->total_price,
-            'message' => '🔔 Votre intervention a bien été enregistrée. Nous recherchons actuellement un intervenant disponible.',
+            'message' => '🔔 Paiement reçu. Nous constituons votre équipe d\'intervenants certifiés.',
             'url' => '/client/missions/'.$this->mission->id,
         ];
     }

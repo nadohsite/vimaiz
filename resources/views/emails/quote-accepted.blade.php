@@ -3,7 +3,7 @@
 @section('title', 'Devis accepté')
 
 @section('content')
-    <h1>Devis accepté ! ✅</h1>
+    <h1>Devis accepté</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 

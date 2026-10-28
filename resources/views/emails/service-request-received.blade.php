@@ -7,7 +7,7 @@
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Nous avons bien enregistré votre demande d'intervention. Notre équipe vous envoie un devis sous 24h.</p>
+    <p>Nous avons bien enregistré votre demande d'intervention. Notre équipe vous envoie un devis forfaitaire sous 24 h, sans frais caché.</p>
 
     <div class="success-box">
         <p><strong>Demande :</strong> {{ $serviceRequest->request_number }}</p>
@@ -23,8 +23,11 @@
         <p><strong>Ville :</strong> {{ $serviceRequest->property->city ?? '—' }}</p>
         @if($serviceRequest->property?->surface_area)
             <p><strong>Surface :</strong> {{ $serviceRequest->property->surface_area }} m²</p>
+            <p><strong>Équipe prévue :</strong> {{ \App\Support\Brigade::label(\App\Support\Brigade::sizeForSurface($serviceRequest->property->surface_area)) }}</p>
         @endif
     </div>
+
+    <p>Pour garantir une exécution soignée dans la journée, Vimaiz dimensionne l'équipe selon la superficie de votre logement : jamais plus de 125 m² par intervenant, sans surcoût logistique pour vous.</p>
 
     <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/requests/' . $serviceRequest->id) }}" class="button">

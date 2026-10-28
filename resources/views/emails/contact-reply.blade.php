@@ -3,7 +3,7 @@
 @section('title', 'Réponse à votre message')
 
 @section('content')
-    <h1>Réponse à votre message ! 💬</h1>
+    <h1>Réponse à votre message</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 

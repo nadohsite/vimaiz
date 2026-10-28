@@ -3,15 +3,16 @@
 @section('title', 'Intervention validée')
 
 @section('content')
-    <h1>Intervention validée ! ✅</h1>
+    <h1>Intervention validée</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Votre intervention a été validée par le client. Merci pour votre professionnalisme.</p>
+    @php($share = \App\Support\Brigade::shareFor($mission, $notifiable->id ?? null))
+    <p>Le propriétaire a validé l'intervention. Merci pour votre professionnalisme : votre part est débloquée sur votre portefeuille.</p>
 
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
-        <p><strong>Rémunération :</strong> {{ number_format($mission->agent_payout, 2, ',', ' ') }} €</p>
+        <p><strong>Votre rémunération :</strong> {{ number_format($share, 2, ',', ' ') }} €</p>
     </div>
 
     <div class="info-box">

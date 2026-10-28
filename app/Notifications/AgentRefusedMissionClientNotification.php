@@ -23,7 +23,7 @@ class AgentRefusedMissionClientNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Nous recherchons un autre intervenant — '.$this->mission->mission_number)
+            ->subject('Remplacement d\'un intervenant — '.$this->mission->mission_number)
             ->view('emails.agent-refused-mission-client', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -36,7 +36,7 @@ class AgentRefusedMissionClientNotification extends Notification
             'type' => 'agent_refused_client',
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
-            'message' => 'L\'intervenant initial n\'est plus disponible. Nous recherchons un autre professionnel pour votre intervention.',
+            'message' => 'Un intervenant prévu n\'est plus disponible : nous le remplaçons automatiquement par un autre professionnel certifié.',
             'url' => '/client/missions/'.$this->mission->id,
         ];
     }

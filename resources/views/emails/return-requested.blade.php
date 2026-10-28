@@ -3,13 +3,13 @@
 @section('title', 'Demande de retour')
 
 @section('content')
-    <h1>Demande de retour client ! ⚠️</h1>
+    <h1>Demande de nouveau passage</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Un client a demandé un retour suite à un mécontentement concernant une intervention.</p>
+    <p>Un propriétaire a demandé un nouveau passage ciblé dans le délai de 48 h suivant la clôture. Le paiement des intervenants reste retenu jusqu'à la résolution.</p>
 
-    <div class="success-box">
+    <div class="info-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
         <p><strong>Client :</strong> {{ $mission->client->name ?? 'N/A' }}</p>
         <p><strong>Date de l'intervention :</strong> {{ ($mission->scheduled_at ?? now())->format('d/m/Y à H:i') }}</p>

@@ -22,7 +22,7 @@ class ClientBookingReminder extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Des intervenants sont disponibles près de chez vous')
+            ->subject('Préparez la prochaine arrivée de vos voyageurs')
             ->view('emails.reminder-client-booking', [
                 'notifiable' => $notifiable,
                 'availableAgentsCount' => $this->availableAgentsCount,
@@ -33,7 +33,7 @@ class ClientBookingReminder extends Notification
     {
         return [
             'type' => 'client_booking_reminder',
-            'message' => 'Des intervenants sont disponibles : programmez votre prochaine intervention dès maintenant.',
+            'message' => 'Planifiez dès maintenant la prochaine intervention dans votre logement.',
             'url' => '/client/requests/create',
         ];
     }

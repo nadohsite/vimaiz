@@ -3,7 +3,7 @@
 @section('title', 'Nouvelle demande')
 
 @section('content')
-    <h1>Nouvelle demande d'intervention ! 🏠</h1>
+    <h1>Nouvelle demande d'intervention</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 

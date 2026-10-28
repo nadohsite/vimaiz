@@ -3,13 +3,13 @@
 @section('title', 'Documents rejetés')
 
 @section('content')
-    <h1>Documents rejetés — action requise ⚠️</h1>
+    <h1>Documents rejetés — action requise</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
     <p>Nous avons examiné vos documents, mais nous ne pouvons pas les valider en l'état.</p>
 
-    <div class="success-box">
+    <div class="info-box">
         <p><strong>Statut :</strong> Rejetés</p>
         <p><strong>Action :</strong> Merci de renvoyer des documents conformes</p>
     </div>

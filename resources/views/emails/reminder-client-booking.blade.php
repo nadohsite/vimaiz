@@ -1,29 +1,26 @@
 @extends('emails.layout')
 
-@section('title', 'Des intervenants sont disponibles')
+@section('title', 'Planifiez votre prochaine intervention')
 
 @section('content')
-    <h1>Des intervenants sont disponibles près de chez vous ! 🧹</h1>
+    <h1>Préparez la prochaine arrivée de vos voyageurs</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Votre bien est enregistré sur Vimaiz, mais vous n'avez aucune intervention planifiée pour le moment.</p>
+    <p>Votre logement est enregistré sur Vimaiz, mais aucune intervention n'est planifiée pour le moment. Préparez dès maintenant l'arrivée de vos prochains voyageurs, même à distance.</p>
 
     <div class="success-box">
-        @if ($availableAgentsCount > 0)
-            <p><strong>Intervenants disponibles :</strong> {{ $availableAgentsCount }}</p>
-        @else
-            <p><strong>Intervenants disponibles :</strong> Oui</p>
-        @endif
+        <p><strong>Votre logement :</strong> enregistré, prêt à être pris en charge</p>
         <p><strong>Prochaine étape :</strong> Planifier une intervention</p>
     </div>
 
     <div class="info-box">
         <p><strong>Pourquoi planifier maintenant ?</strong></p>
-        <p>• Vous choisissez la date et le créneau</p>
-        <p>• Devis clair avant tout paiement</p>
-        <p>• Intervention géolocalisée et horodatée</p>
-        <p>• Idéal entre deux voyageurs</p>
+        <p>• Vous choisissez la date selon les rotations de vos voyageurs</p>
+        <p>• Devis forfaitaire clair avant tout paiement, sans frais caché</p>
+        <p>• Une équipe dimensionnée selon la superficie de votre logement</p>
+        <p>• Arrivée confirmée par géolocalisation, suivi en temps réel</p>
+        <p>• 48 h pour valider le rapport avant tout paiement des intervenants</p>
     </div>
 
     <p>Programmez votre intervention en quelques clics depuis votre espace client.</p>

@@ -26,7 +26,7 @@ class DocumentsVerifiedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Vos documents ont été validés - VIMAIZ')
+            ->subject('Vos documents sont validés — bienvenue dans le réseau Vimaiz')
             ->view('emails.documents-verified', [
                 'notifiable' => $notifiable,
             ]);

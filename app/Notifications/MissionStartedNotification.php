@@ -37,7 +37,7 @@ class MissionStartedNotification extends Notification
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'started_at' => $this->mission->started_at?->toISOString(),
-            'message' => '🏡 Votre intervenant a commencé son intervention.',
+            'message' => '🏡 Arrivée confirmée par géolocalisation : l\'intervention a commencé.',
             'url' => '/client/missions/'.$this->mission->id,
         ];
     }

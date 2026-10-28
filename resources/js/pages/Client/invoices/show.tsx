@@ -263,8 +263,8 @@ export default function InvoiceShow({ invoice }: Props) {
                                 <p>Merci de votre confiance !</p>
                                 <p className="mt-2">
                                     Pour toute question concernant cette facture, contactez-nous à{' '}
-                                    <a href="mailto:facturation@vimaiz.fr" className="text-sky-600 hover:underline">
-                                        facturation@vimaiz.fr
+                                    <a href="mailto:contact@vimaiz.com" className="text-sky-600 hover:underline">
+                                        contact@vimaiz.com
                                     </a>
                                 </p>
                             </div>

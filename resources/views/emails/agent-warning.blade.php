@@ -3,13 +3,13 @@
 @section('title', 'Avertissement')
 
 @section('content')
-    <h1>Avertissement reçu ! ⚠️</h1>
+    <h1>Avertissement reçu</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
     <p>Nous vous informons que vous avez reçu un avertissement concernant votre activité sur VIMAIZ.</p>
 
-    <div class="success-box">
+    <div class="info-box">
         <p><strong>Type :</strong> Avertissement</p>
         <p><strong>Nombre total d'avertissements :</strong> {{ $warningsCount }}</p>
         <p><strong>Date :</strong> {{ now()->format('d/m/Y à H:i') }}</p>

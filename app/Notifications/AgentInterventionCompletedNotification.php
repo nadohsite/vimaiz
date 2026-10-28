@@ -23,7 +23,7 @@ class AgentInterventionCompletedNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Intervention terminée — en attente du client — '.$this->mission->mission_number)
+            ->subject('Intervention clôturée — '.$this->mission->mission_number)
             ->view('emails.agent-intervention-completed', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -36,7 +36,7 @@ class AgentInterventionCompletedNotification extends Notification
             'type' => 'agent_intervention_completed',
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
-            'message' => '🎉 Merci. Votre intervention est terminée. Le client va maintenant la confirmer.',
+            'message' => '🎉 Merci. Intervention clôturée : votre part sera disponible après validation du propriétaire (48 h au plus tard).',
             'url' => '/agent/missions/'.$this->mission->id,
         ];
     }

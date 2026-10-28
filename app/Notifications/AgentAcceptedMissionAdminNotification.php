@@ -23,7 +23,7 @@ class AgentAcceptedMissionAdminNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('✅ Intervention confirmée par intervenant - '.$this->mission->mission_number)
+            ->subject('Intervention confirmée — '.$this->mission->mission_number)
             ->view('emails.agent-accepted-mission-admin', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,

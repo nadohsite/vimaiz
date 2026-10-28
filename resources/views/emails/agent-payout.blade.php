@@ -3,11 +3,11 @@
 @section('title', 'Paiement crédité')
 
 @section('content')
-    <h1>Paiement crédité ! 💰</h1>
+    <h1>Votre part est disponible</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Votre paiement pour l'intervention terminée a été crédité sur votre portefeuille VIMAIZ.</p>
+    <p>Votre part pour l'intervention ci-dessous est désormais disponible sur votre portefeuille Vimaiz. Elle correspond à l'intégralité de votre part du forfait, après la commission Vimaiz de 25 %.</p>
 
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>

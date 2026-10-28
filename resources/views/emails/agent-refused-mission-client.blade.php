@@ -3,13 +3,13 @@
 @section('title', 'Recherche d\'un autre intervenant')
 
 @section('content')
-    <h1>Nous trouvons un autre intervenant</h1>
+    <h1>Remplacement d'un intervenant</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
     <p>
-        L'intervenant initialement proposé n'est plus disponible pour votre intervention.
-        Votre paiement est bien enregistré : nous recherchons un autre professionnel.
+        Un intervenant prévu n'est plus disponible pour votre intervention.
+        Votre paiement est bien enregistré et rien ne change pour vous : nous le remplaçons automatiquement par un autre professionnel certifié de votre secteur.
     </p>
 
     <div class="info-box">

@@ -31,7 +31,7 @@ class MissionCompletedNotification extends Notification implements ShouldQueue
         $this->mission->loadMissing(['property', 'anomalies']);
 
         return (new MailMessage)
-            ->subject('Intervention terminée — à confirmer — '.$this->mission->mission_number)
+            ->subject('Intervention terminée — 48 h pour valider — '.$this->mission->mission_number)
             ->view('emails.mission-completed', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -45,7 +45,7 @@ class MissionCompletedNotification extends Notification implements ShouldQueue
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'completed_at' => $this->mission->completed_at?->toISOString(),
-            'message' => '✨ L\'intervention est terminée. Il ne vous reste plus qu\'à confirmer que tout est conforme.',
+            'message' => '✨ L\'intervention est terminée. Vous disposez de 48 h pour examiner le compte rendu et la valider.',
             'url' => '/client/missions/'.$this->mission->id,
         ];
     }

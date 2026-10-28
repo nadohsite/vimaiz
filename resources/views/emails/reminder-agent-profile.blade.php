@@ -3,7 +3,7 @@
 @section('title', 'Complétez votre profil intervenant')
 
 @section('content')
-    <h1>Votre profil est presque prêt ! 🚀</h1>
+    <h1>Votre profil est presque prêt</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
@@ -30,7 +30,7 @@
         <p>3. Attendez la validation de notre équipe</p>
     </div>
 
-    <p>Quelques minutes suffisent pour finaliser et commencer à recevoir des missions.</p>
+    <p>Quelques minutes suffisent pour finaliser votre profil et commencer à recevoir des interventions dans de grandes résidences, toujours en équipe dès 200 m².</p>
 
     <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/agent/documents') }}" class="button">

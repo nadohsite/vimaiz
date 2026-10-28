@@ -3,13 +3,13 @@
 @section('title', 'Compte suspendu')
 
 @section('content')
-    <h1>Votre compte a été suspendu ! 🚫</h1>
+    <h1>Votre compte a été suspendu</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
     <p>Nous vous informons que votre compte intervenant VIMAIZ a été temporairement suspendu.</p>
 
-    <div class="success-box">
+    <div class="info-box">
         <p><strong>Statut :</strong> Suspendu</p>
         <p><strong>Du :</strong> {{ now()->format('d/m/Y') }}</p>
         <p><strong>Au :</strong> {{ ($suspendedUntil ?? now())->format('d/m/Y à H:i') }}</p>

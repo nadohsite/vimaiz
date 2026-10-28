@@ -115,4 +115,15 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    | Toutes les réponses aux e-mails de la plateforme arrivent sur
+    | contact@vimaiz.com, même si l'expéditeur est une adresse noreply.
+    */
+    'reply_to' => [
+        'address' => env('MAIL_REPLY_TO_ADDRESS', 'contact@vimaiz.com'),
+        'name' => env('MAIL_REPLY_TO_NAME', 'Vimaiz'),
+    ],
+
+    'contact_email' => env('MAIL_CONTACT_ADDRESS', 'contact@vimaiz.com'),
+
 ];

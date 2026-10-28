@@ -2,7 +2,8 @@ import '../../../css/welcome.css';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { type ReactNode } from 'react';
+import { Menu, X } from 'lucide-react';
+import { type ReactNode, useEffect, useState } from 'react';
 import logoImage from '@/../assets/images/logo.png';
 
 export const LOGO_FILTER =
@@ -17,6 +18,22 @@ interface PublicLayoutProps {
 export default function PublicLayout({ title, description, children }: PublicLayoutProps) {
     const { auth } = usePage<SharedData>().props;
     const isLoggedIn = Boolean(auth.user);
+    /** Menu mobile : sous 920 px, les liens du header sont masqués. */
+    const [menuOpen, setMenuOpen] = useState(false);
+    const closeMenu = () => setMenuOpen(false);
+
+    useEffect(() => {
+        if (!menuOpen) {
+            return;
+        }
+        const onKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setMenuOpen(false);
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [menuOpen]);
 
     return (
         <div className="welcome-page">
@@ -56,6 +73,48 @@ export default function PublicLayout({ title, description, children }: PublicLay
                                     S&apos;inscrire
                                 </Link>
                             </>
+                        )}
+                        <button
+                            type="button"
+                            className="menu-toggle"
+                            aria-expanded={menuOpen}
+                            aria-controls="mobile-menu"
+                            aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+                            onClick={() => setMenuOpen((open) => !open)}
+                        >
+                            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+                        </button>
+                    </div>
+                </nav>
+
+                <nav
+                    id="mobile-menu"
+                    className="mobile-menu"
+                    data-open={menuOpen}
+                    aria-label="Menu principal"
+                    hidden={!menuOpen}
+                >
+                    <div className="wrap">
+                        <Link href="/#service" onClick={closeMenu}>
+                            Programmer une intervention
+                        </Link>
+                        <Link href={route('professionals.index')} onClick={closeMenu}>
+                            Devenir intervenant
+                        </Link>
+                        <Link href={route('about')} onClick={closeMenu}>
+                            À propos
+                        </Link>
+                        <Link href={route('contact.index')} onClick={closeMenu}>
+                            Contact
+                        </Link>
+                        {isLoggedIn ? (
+                            <Link href={route('dashboard')} className="mobile-menu-cta" onClick={closeMenu}>
+                                Mon espace
+                            </Link>
+                        ) : (
+                            <Link href={route('login')} className="mobile-menu-cta" onClick={closeMenu}>
+                                Connexion
+                            </Link>
                         )}
                     </div>
                 </nav>

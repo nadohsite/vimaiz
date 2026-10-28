@@ -24,7 +24,7 @@ class AgentPayoutNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Paiement crédité - '.number_format($this->amount, 2, ',', ' ').' €')
+            ->subject('Votre part est disponible — '.number_format($this->amount, 2, ',', ' ').' €')
             ->view('emails.agent-payout', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -39,7 +39,7 @@ class AgentPayoutNotification extends Notification
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'amount' => $this->amount,
-            'message' => number_format($this->amount, 2, ',', ' ').' € crédités sur votre portefeuille',
+            'message' => number_format($this->amount, 2, ',', ' ').' € disponibles sur votre portefeuille',
             'url' => '/agent/wallet',
         ];
     }

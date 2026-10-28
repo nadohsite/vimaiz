@@ -3,7 +3,7 @@
 @section('title', 'Documents validés')
 
 @section('content')
-    <h1>Félicitations ! Vos documents sont validés 🎉</h1>
+    <h1>Félicitations ! Vos documents sont validés</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
@@ -16,7 +16,8 @@
 
     <div class="info-box">
         <p><strong>Vous pouvez désormais :</strong></p>
-        <p>Recevoir des interventions, les accepter ou les refuser, gagner de l'argent sur chaque intervention terminée et retirer vos gains vers votre compte bancaire.</p>
+        <p>Recevoir des interventions dans de grandes résidences de votre secteur, les accepter ou les refuser selon vos disponibilités, et retirer vos gains vers votre compte bancaire.</p>
+        <p>Vous ne serez jamais seul face à un grand logement : Vimaiz co-assigne d'autres intervenants certifiés pour qu'aucun ne prenne en charge plus de 125 m². Vous percevez 75 % du montant de l'intervention.</p>
     </div>
 
     <p>Nous vous souhaitons beaucoup de succès sur VIMAIZ !</p>

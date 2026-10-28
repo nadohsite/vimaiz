@@ -3,7 +3,7 @@
 @section('title', 'Réinitialisation du mot de passe')
 
 @section('content')
-    <h1>Réinitialisation de votre mot de passe 🔐</h1>
+    <h1>Réinitialisation de votre mot de passe</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 

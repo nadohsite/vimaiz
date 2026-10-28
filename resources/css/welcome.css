@@ -2811,3 +2811,70 @@
         font-size: 17px;
     }
 }
+
+
+/* ---------------------------------------------------------------- MENU MOBILE */
+/* Sous 920 px, les liens du header (dont Contact) sont masqués :
+   ce bouton les rend accessibles sans avoir à se connecter. */
+.welcome-page .menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    flex: none;
+}
+
+.welcome-page .mobile-menu {
+    display: none;
+}
+
+@media (max-width: 920px) {
+    .welcome-page .menu-toggle {
+        display: inline-flex;
+    }
+
+    .welcome-page .mobile-menu[data-open='true'] {
+        display: block;
+        border-top: 1px solid var(--border);
+        background: var(--bg);
+        animation: welcome-faq-reveal 0.2s ease both;
+    }
+
+    .welcome-page .mobile-menu .wrap {
+        display: flex;
+        flex-direction: column;
+        padding-top: 8px;
+        padding-bottom: 16px;
+    }
+
+    .welcome-page .mobile-menu a {
+        padding: 14px 4px;
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--ink);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .welcome-page .mobile-menu a:hover {
+        color: var(--accent-ink);
+    }
+
+    .welcome-page .mobile-menu a.mobile-menu-cta {
+        border-bottom: none;
+        color: var(--accent-ink);
+        font-weight: 600;
+    }
+}
+
+@media (max-width: 640px) {
+    .welcome-page .menu-toggle {
+        width: 38px;
+        height: 38px;
+    }
+}

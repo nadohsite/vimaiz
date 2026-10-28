@@ -24,7 +24,7 @@ class AgentRefusedMissionNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('❌ Intervention refusée par intervenant - '.$this->mission->mission_number)
+            ->subject('Intervention refusée par un intervenant — '.$this->mission->mission_number)
             ->view('emails.agent-refused-mission', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,

@@ -25,7 +25,7 @@ class MissionCompletedAdminNotification extends Notification
         $this->mission->loadMissing(['property', 'anomalies', 'agent', 'client']);
 
         return (new MailMessage)
-            ->subject('🎉 Intervention terminée - '.$this->mission->mission_number)
+            ->subject('Intervention clôturée — '.$this->mission->mission_number)
             ->view('emails.mission-completed-admin', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,

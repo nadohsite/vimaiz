@@ -23,7 +23,7 @@ class ReturnCompletedNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('✅ Retour effectué - Intervention '.$this->mission->mission_number)
+            ->subject('Nouveau passage effectué — '.$this->mission->mission_number)
             ->view('emails.return-completed', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,

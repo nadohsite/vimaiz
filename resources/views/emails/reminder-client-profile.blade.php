@@ -3,11 +3,11 @@
 @section('title', 'Ajoutez votre logement')
 
 @section('content')
-    <h1>Ajoutez votre logement pour démarrer ! 🏠</h1>
+    <h1>Ajoutez votre grande résidence pour démarrer</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Votre espace Vimaiz est prêt. Il ne vous reste plus qu'à ajouter votre premier bien pour organiser vos interventions.</p>
+    <p>Votre espace Vimaiz est prêt. Ajoutez votre grande résidence (200 m² et plus) pour organiser et suivre à distance ses interventions de ménage.</p>
 
     <div class="success-box">
         <p><strong>Statut :</strong> Compte créé</p>
@@ -16,12 +16,12 @@
 
     <div class="info-box">
         <p><strong>En quelques minutes :</strong></p>
-        <p>1. Ajoutez votre bien et ses informations</p>
+        <p>1. Ajoutez votre logement et ses exigences : elles deviennent la feuille de route permanente des intervenants</p>
         <p>2. Programmez votre intervention</p>
-        <p>3. Suivez son avancement depuis votre espace</p>
+        <p>3. Suivez son déroulement en temps réel, où que vous soyez</p>
     </div>
 
-    <p>Une organisation simple, pensée pour que votre bien soit prêt à accueillir ses prochains voyageurs.</p>
+    <p>Vimaiz devient vos yeux là où vous n'en avez pas, pour préserver la réputation de votre patrimoine.</p>
 
     <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/properties/create') }}" class="button">

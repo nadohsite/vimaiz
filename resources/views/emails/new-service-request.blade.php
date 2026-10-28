@@ -3,7 +3,7 @@
 @section('title', 'Nouvelle demande d\'intervention')
 
 @section('content')
-    <h1>Nouvelle demande d'intervention ! 🏠</h1>
+    <h1>Nouvelle demande d'intervention</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
@@ -20,11 +20,16 @@
         <p><strong>Bien :</strong> {{ $serviceRequest->property->name ?? 'N/A' }} - {{ $serviceRequest->property->city ?? '' }}</p>
         <p><strong>Type :</strong> {{ $serviceRequest->property->type ?? 'N/A' }}</p>
         <p><strong>Surface :</strong> {{ $serviceRequest->property->surface_area ?? 'N/A' }} m²</p>
+        @if($serviceRequest->property?->surface_area)
+            <p><strong>Équipe à prévoir :</strong> {{ \App\Support\Brigade::label(\App\Support\Brigade::sizeForSurface($serviceRequest->property->surface_area)) }}</p>
+        @endif
         <p><strong>Heure :</strong> {{ $serviceRequest->scheduled_time ?? 'Flexible' }}</p>
-        <p><strong>Durée demandée :</strong> {{ $serviceRequest->requested_hours }} heures</p>
+        @if($serviceRequest->requested_hours)
+            <p><strong>Durée demandée :</strong> {{ $serviceRequest->requested_hours }} heures</p>
+        @endif
     </div>
 
-    <p>Merci de traiter cette demande rapidement pour maintenir un bon niveau de service.</p>
+    <p>Le propriétaire attend son devis sous 24 h.</p>
 
     <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ config('app.url') }}/admin/service-requests/{{ $serviceRequest->id }}" class="button">

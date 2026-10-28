@@ -8,7 +8,7 @@
         $isMobileMoney = $paymentMethod === 'mobile_money';
     @endphp
 
-    <h1>Nouvelle demande de retrait ! {{ $isMobileMoney ? '📱' : '🏦' }}</h1>
+    <h1>Nouvelle demande de retrait</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 

@@ -3,11 +3,11 @@
 @section('title', 'Bien prêt')
 
 @section('content')
-    <h1>Votre bien est prêt ! ✅</h1>
+    <h1>Votre logement est prêt</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Votre bien est désormais prêt à accueillir ses prochains voyageurs.</p>
+    <p>Merci pour votre validation. Votre logement est prêt à accueillir ses prochains voyageurs et les intervenants vont recevoir leur rémunération.</p>
 
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>

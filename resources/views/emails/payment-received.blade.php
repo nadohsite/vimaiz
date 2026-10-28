@@ -3,11 +3,12 @@
 @section('title', 'Paiement confirmé')
 
 @section('content')
-    <h1>Votre intervention est confirmée ! ✅</h1>
+    <h1>Votre intervention est confirmée</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>Votre paiement a bien été reçu. Votre intervention est enregistrée et nous recherchons actuellement un intervenant disponible.</p>
+    @php($teamSize = \App\Support\Brigade::size($mission))
+    <p>Votre paiement a bien été reçu. Votre intervention est enregistrée et nous constituons votre équipe : {{ \App\Support\Brigade::label($teamSize) }}.</p>
 
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
@@ -21,7 +22,7 @@
         <p><strong>Date de la prestation :</strong> {{ ($mission->scheduled_at ?? now())->copy()->timezone('Europe/Paris')->format('d/m/Y à H:i') }}</p>
     </div>
 
-    <p>Vous recevrez une notification dès qu'un intervenant aura confirmé l'intervention. Votre facture est disponible dans votre espace client.</p>
+    <p>Vous serez prévenu dès que l'équipe sera au complet, puis à l'arrivée des intervenants sur place, confirmée par géolocalisation. Votre paiement reste sécurisé : il n'est versé aux intervenants qu'après votre validation. Votre facture est disponible dans votre espace Vimaiz.</p>
 
     <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">

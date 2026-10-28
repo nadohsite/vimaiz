@@ -23,7 +23,7 @@ class AgentAcceptedMissionNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Intervention confirmée — '.$this->mission->mission_number)
+            ->subject('Votre équipe est constituée — '.$this->mission->mission_number)
             ->view('emails.agent-accepted-mission', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -37,7 +37,7 @@ class AgentAcceptedMissionNotification extends Notification
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'scheduled_at' => $this->mission->scheduled_at->toISOString(),
-            'message' => '✅ Votre intervention est désormais prise en charge. Un intervenant Vimaiz a été assigné à votre bien.',
+            'message' => '✅ Votre équipe d\'intervenants certifiés est constituée pour votre intervention.',
             'url' => '/client/missions/'.$this->mission->id,
         ];
     }

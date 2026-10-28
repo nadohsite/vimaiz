@@ -3,13 +3,13 @@
 @section('title', 'Intervention refusée')
 
 @section('content')
-    <h1>Intervention refusée par l'intervenant ! ❌</h1>
+    <h1>Intervention refusée par l'intervenant</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
     <p>Un intervenant a refusé une intervention qui lui a été proposée.</p>
 
-    <div class="success-box">
+    <div class="info-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
         <p><strong>Intervenant :</strong> {{ $agentName ?? 'N/A' }}</p>
         <p><strong>Date prévue :</strong> {{ ($mission->scheduled_at ?? now())->format('d/m/Y à H:i') }}</p>

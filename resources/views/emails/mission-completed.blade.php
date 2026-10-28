@@ -3,11 +3,11 @@
 @section('title', 'Intervention terminée')
 
 @section('content')
-    <h1>Intervention terminée ! 🎉</h1>
+    <h1>Intervention terminée : votre compte rendu</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>L'intervention sur votre bien est terminée. Il ne vous reste plus qu'à confirmer que tout est conforme.</p>
+    <p>L'intervention de ménage dans votre logement est terminée. Chaque intervenant a validé sa liste de contrôle. Voici le compte rendu.</p>
 
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
@@ -37,7 +37,7 @@
 
     <div class="info-box">
         @if($mission->report_nothing_to_report || $anomalies->isEmpty())
-            <p><strong>Rapport :</strong> Intervention terminée — aucune anomalie signalée.</p>
+            <p><strong>Rapport :</strong> Aucune anomalie signalée. Votre logement est prêt à accueillir vos prochains voyageurs.</p>
         @else
             <p><strong>Rapport :</strong> {{ $anomalies->count() }} élément{{ $anomalies->count() > 1 ? 's' : '' }} signalé{{ $anomalies->count() > 1 ? 's' : '' }}</p>
             @foreach($anomalies as $anomaly)
@@ -46,11 +46,15 @@
         @endif
     </div>
 
-    <p>L'intervention a été <strong>géolocalisée</strong> et <strong>horodatée</strong>. Retrouvez tous les détails dans votre espace client.</p>
+    <p>Les photos ne sont jointes qu'en cas d'anomalie constatée. L'intervention a été <strong>géolocalisée</strong> et <strong>horodatée</strong> du début à la fin.</p>
+
+    <div class="warning-box">
+        <p><strong>Vous disposez de 48 h</strong> pour examiner ce rapport. En cas de non-conformité, demandez un nouveau passage ciblé depuis votre espace Vimaiz. Les intervenants ne sont payés qu'après votre validation, ou à l'issue de ce délai sans contestation.</p>
+    </div>
 
     <p class="cta" style="text-align:center !important; margin:24px 0;">
         <a href="{{ url('/client/missions/' . $mission->id) }}" class="button">
-            Confirmer l'intervention
+            Examiner et valider
         </a>
     </p>
 

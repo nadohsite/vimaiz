@@ -99,8 +99,8 @@ class SendWeeklyWorksRecap extends Command
                         ->orderBy('scheduled_at')
                         ->get();
 
-                    $completedPayload = $this->mapMissions($completed, $role, 'completed');
-                    $upcomingPayload = $this->mapMissions($upcoming, $role, 'upcoming');
+                    $completedPayload = $this->mapMissions($completed, $role, 'completed', $user->id);
+                    $upcomingPayload = $this->mapMissions($upcoming, $role, 'upcoming', $user->id);
 
                     if ($dryRun) {
                         $this->line(sprintf(
@@ -138,16 +138,17 @@ class SendWeeklyWorksRecap extends Command
     /**
      * @return Collection<int, object>
      */
-    protected function mapMissions(Collection $missions, string $role, string $type): Collection
+    protected function mapMissions(Collection $missions, string $role, string $type, ?int $userId = null): Collection
     {
-        return $missions->map(function (Mission $mission) use ($role, $type) {
+        return $missions->map(function (Mission $mission) use ($role, $type, $userId) {
             $property = $mission->property;
             $propertyLabel = $property
                 ? ($property->name ?: trim(($property->type ?? 'Logement') . ' — ' . ($property->city ?? '')))
                 : 'Logement';
 
+            // Brigades : un intervenant ne touche que sa part, pas le total de l'équipe.
             $amount = $role === 'agent'
-                ? (float) $mission->agent_payout
+                ? \App\Support\Brigade::shareFor($mission, $userId)
                 : (float) $mission->total_price;
 
             return (object) [
@@ -159,6 +160,7 @@ class SendWeeklyWorksRecap extends Command
                 'scheduled_at_label' => $type === 'upcoming' && $mission->scheduled_at
                     ? $mission->scheduled_at->format('d/m/Y à H:i')
                     : null,
+                'amount' => $amount,
                 'amount_label' => number_format($amount, 2, ',', ' ') . ' €',
             ];
         });

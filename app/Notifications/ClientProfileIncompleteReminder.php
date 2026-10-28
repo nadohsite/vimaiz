@@ -18,7 +18,7 @@ class ClientProfileIncompleteReminder extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Ajoutez votre logement pour démarrer')
+            ->subject('Ajoutez votre grande résidence pour démarrer')
             ->view('emails.reminder-client-profile', [
                 'notifiable' => $notifiable,
             ]);

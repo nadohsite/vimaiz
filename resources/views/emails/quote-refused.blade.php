@@ -3,13 +3,13 @@
 @section('title', 'Devis refusé')
 
 @section('content')
-    <h1>Devis refusé par le client ! ❌</h1>
+    <h1>Devis refusé par le client</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
     <p>Un client a refusé le devis qui lui a été envoyé.</p>
 
-    <div class="success-box">
+    <div class="info-box">
         <p><strong>Numéro devis :</strong> {{ $quote->quote_number }}</p>
         <p><strong>Client :</strong> {{ $quote->serviceRequest->client->name ?? 'N/A' }}</p>
         <p><strong>Montant proposé :</strong> {{ number_format($quote->final_price ?? $quote->estimated_price, 2, ',', ' ') }} €</p>

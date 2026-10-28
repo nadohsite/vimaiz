@@ -3,7 +3,7 @@
 @section('title', 'Retour effectué')
 
 @section('content')
-    <h1>Retour effectué par l'intervenant ! ✅</h1>
+    <h1>Retour effectué par l'intervenant</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
