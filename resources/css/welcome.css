@@ -2878,3 +2878,366 @@
         height: 38px;
     }
 }
+
+/* ================================================================ HÉROS : COMPOSITION DE PHOTOS */
+/* Photo principale (remplaçable par une vidéo via HERO_VIDEO), deux photos
+   superposées et deux pastilles de réassurance. */
+.welcome-page .hero-media {
+    position: relative;
+    padding: 44px 0 76px 16%;
+}
+
+.welcome-page .hero-media-main {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--bg-soft);
+    box-shadow: var(--shadow-card);
+}
+
+.welcome-page .hero-media-main img,
+.welcome-page .hero-media-main video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 5 / 6;
+    object-fit: cover;
+}
+
+.welcome-page .hero-media-side,
+.welcome-page .hero-media-top {
+    position: absolute;
+    display: block;
+    object-fit: cover;
+    background: var(--bg-soft);
+    border: 6px solid var(--surface);
+    box-shadow: 0 18px 40px -18px rgba(11, 20, 32, 0.35);
+}
+
+.welcome-page .hero-media-side {
+    left: 0;
+    bottom: 0;
+    width: 40%;
+    aspect-ratio: 4 / 5;
+    border-radius: 20px;
+}
+
+.welcome-page .hero-media-top {
+    right: -14px;
+    top: 0;
+    width: 36%;
+    aspect-ratio: 13 / 10;
+    border-radius: 18px;
+}
+
+.welcome-page .hero-chip {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 12px 30px -14px rgba(11, 20, 32, 0.35);
+    line-height: 1.25;
+}
+
+.welcome-page .hero-chip strong {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.welcome-page .hero-chip small {
+    display: block;
+    font-size: 12px;
+    color: var(--stone);
+}
+
+.welcome-page .hero-chip-arrival {
+    top: 32%;
+    left: 4%;
+}
+
+.welcome-page .hero-chip-team {
+    right: -10px;
+    bottom: 34px;
+}
+
+.welcome-page .hero-chip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--accent-tint);
+    color: var(--accent-ink);
+}
+
+@media (max-width: 920px) {
+    .welcome-page .hero-media {
+        max-width: 560px;
+        margin: 0 auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .welcome-page .hero-media {
+        padding: 30px 0 56px 14%;
+    }
+
+    .welcome-page .hero-media-main {
+        border-radius: 20px;
+    }
+
+    .welcome-page .hero-media-main img,
+    .welcome-page .hero-media-main video {
+        aspect-ratio: 4 / 5;
+    }
+
+    .welcome-page .hero-media-side,
+    .welcome-page .hero-media-top {
+        border-width: 4px;
+    }
+
+    .welcome-page .hero-media-top {
+        right: 0;
+    }
+
+    .welcome-page .hero-chip {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .welcome-page .hero-chip strong {
+        font-size: 12.5px;
+    }
+
+    .welcome-page .hero-chip small {
+        font-size: 11px;
+    }
+
+    .welcome-page .hero-chip-team {
+        right: 0;
+        bottom: 16px;
+    }
+}
+
+@media (max-width: 400px) {
+    .welcome-page .hero-chip-team {
+        display: none;
+    }
+}
+
+/* ================================================================ ESTIMATEUR (après la FAQ) */
+.welcome-page section.estimator-section {
+    background: var(--bg-soft);
+}
+
+.welcome-page .estimator {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.welcome-page .estimator-form {
+    padding: 34px 36px 26px;
+}
+
+.welcome-page .estimator-form .card-head {
+    margin-bottom: 6px;
+}
+
+.welcome-page .estimator-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 28px;
+}
+
+/* « Espace en plus » sur toute la largeur */
+.welcome-page .estimator-grid .req-row-extra {
+    grid-column: 1 / -1;
+}
+
+.welcome-page .estimator-form > .req-row:last-child {
+    border-bottom: none;
+}
+
+.welcome-page .estimator-summary {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 40px 36px 34px;
+    color: #ffffff;
+    background:
+        radial-gradient(120% 80% at 100% 0%, rgba(255, 255, 255, 0.16), transparent 60%),
+        linear-gradient(160deg, #1594cc 0%, #0e729f 100%);
+}
+
+.dark .welcome-page .estimator-summary {
+    background:
+        radial-gradient(120% 80% at 100% 0%, rgba(255, 255, 255, 0.08), transparent 60%),
+        linear-gradient(160deg, #0f5f86 0%, #0a3e59 100%);
+}
+
+.welcome-page .estimator-summary .float-badge {
+    top: 24px;
+    right: 24px;
+    width: 46px;
+    height: 46px;
+    background: #ffffff;
+    color: #0e729f;
+}
+
+.welcome-page .estimator-summary .float-badge::before {
+    background: #ffffff;
+}
+
+.welcome-page .estimator-kicker {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.welcome-page .estimator-price {
+    font-size: 60px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    transition: opacity 0.18s;
+}
+
+.welcome-page .estimator-price.flash {
+    opacity: 0.6;
+}
+
+.welcome-page .estimator-detail {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: -6px;
+}
+
+.welcome-page .estimator-team {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 14.5px;
+    line-height: 1.45;
+}
+
+.welcome-page .estimator-team-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.welcome-page .team-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #0e729f;
+}
+
+.welcome-page .estimator-summary .estimate-security {
+    margin: 0;
+    padding: 0;
+    border: none;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 13px;
+}
+
+.welcome-page .estimator-summary .estimate-security svg {
+    color: #ffffff;
+}
+
+.welcome-page .estimator-summary .estimator-cta {
+    width: 100%;
+    margin-top: auto;
+    padding: 16px;
+    font-size: 16px;
+    background: #ffffff;
+    color: #0e729f;
+}
+
+.welcome-page .estimator-summary .estimator-cta:hover {
+    background: #e4f3fa;
+}
+
+.welcome-page .estimator-note {
+    margin: -4px 0 0;
+    font-size: 12.5px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 920px) {
+    .welcome-page .estimator {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .welcome-page .estimator {
+        border-radius: 20px;
+    }
+
+    .welcome-page .estimator-form {
+        padding: 24px 18px 14px;
+    }
+
+    .welcome-page .estimator-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome-page .estimator-summary {
+        padding: 30px 20px 24px;
+    }
+
+    .welcome-page .estimator-price {
+        font-size: 48px;
+    }
+
+    .welcome-page .estimator-summary .float-badge {
+        top: 18px;
+        right: 18px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Estimateur : alignement à gauche partout, date sur toute la largeur */
+.welcome-page .estimator,
+.welcome-page .estimator .req-body,
+.welcome-page .estimator .req-sub,
+.welcome-page .estimator .req-title {
+    text-align: left;
+}
+
+.welcome-page .estimator-grid .req-row:nth-child(3) {
+    grid-column: 1 / -1;
+}
+
+.welcome-page .estimator-grid .req-row:nth-child(3) .req-row-split {
+    max-width: 360px;
+}

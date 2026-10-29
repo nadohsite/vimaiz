@@ -1,7 +1,7 @@
 import PublicLayout from '@/components/public/public-layout';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronDown, ShieldCheck } from 'lucide-react';
+import { ChevronDown, ShieldCheck, UserCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const TYPE_OPTIONS = ['Appartement', 'Maison', 'Villa', 'Chalet', 'Gîte'] as const;
@@ -266,7 +266,16 @@ const PHOTOS = {
     hero: unsplash('1596178067639-5c6e68aea6dc', 1100, 900), // The Anam
     interieur: unsplash('1780391592801-5e8867523492', 1100, 820), // Valentin Ducrettet
     manifeste: unsplash('1543489822-c49534f3271f', 1800, 900), // big.tiny.belly
+    heroSalon: unsplash('1721222203415-69033eaf3bd1', 600, 760), // Sanju Pandita
+    heroJardin: unsplash('1582610116397-edb318620f90', 520, 400), // Dinuka Lankaloka
 };
+
+/**
+ * Vidéo du héros : renseigner le chemin (ex. '/videos/vimaiz.mp4', fichier
+ * placé dans public/videos) pour remplacer la photo principale par la vidéo.
+ * La photo reste affichée en image d'attente (poster).
+ */
+const HERO_VIDEO: string | null = null;
 
 /**
  * Avis Google RÉELS de la fiche Vimaiz, recopiés depuis Google Business dans
@@ -574,11 +583,7 @@ export default function Welcome({
             description="Suivez chaque intervention de ménage en temps réel depuis votre espace Vimaiz et préservez la réputation de votre grand patrimoine."
         >
             {/* Volet 1 — Header / bloc héros */}
-            <section
-                className="hero wrap"
-                id="estimateur"
-                style={{ ['--hero-photo' as string]: `url(${PHOTOS.hero})` }}
-            >
+            <section className="hero wrap">
                 <div className="hero-grid">
                     <div>
                         <h1 className="rise-2">
@@ -615,344 +620,61 @@ export default function Welcome({
                         </div>
                     </div>
 
-                    <div className="card-wrap">
-                        <img
-                            className="hero-photo"
-                            src={PHOTOS.hero}
-                            alt="Grande villa avec piscine entourée de palmiers"
-                            width={1100}
-                            height={900}
-                            fetchPriority="high"
-                        />
-                        <div className="card-stack">
-                        <div className="float-badge" aria-hidden="true">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path
-                                    d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"
-                                    stroke="currentColor"
-                                    strokeWidth="1.6"
-                                    strokeLinejoin="round"
-                                    strokeLinecap="round"
+                    <div className="hero-media rise-3" aria-label="Grandes résidences suivies par Vimaiz">
+                        <div className="hero-media-main">
+                            {HERO_VIDEO ? (
+                                <video
+                                    src={HERO_VIDEO}
+                                    poster={PHOTOS.hero}
+                                    autoPlay
+                                    muted
+                                    loop
+                                    playsInline
+                                    aria-label="Présentation de Vimaiz en vidéo"
                                 />
-                            </svg>
+                            ) : (
+                                <img
+                                    src={PHOTOS.hero}
+                                    alt="Grande villa avec piscine entourée de palmiers"
+                                    width={1100}
+                                    height={900}
+                                    fetchPriority="high"
+                                />
+                            )}
                         </div>
-                        <div className="card-request" id="service">
-                            <div className="card-head">
-                                <h3>Estimation de votre grand logement</h3>
-                                <span className="live-pill">
-                                    <span className="live-dot" aria-hidden="true" />
-                                    Intervenants dispo
-                                </span>
-                            </div>
-
-                            <div className="req-row">
-                                <div className="req-icon">
-                                    <HomeIcon />
-                                </div>
-                                <div className="req-body">
-                                    <div className="req-sub">Type de logement</div>
-                                    <select
-                                        className="req-field"
-                                        aria-label="Type de logement"
-                                        value={typeValue}
-                                        onChange={(e) =>
-                                            setTypeValue(
-                                                e.target.value as (typeof TYPE_OPTIONS)[number],
-                                            )
-                                        }
-                                    >
-                                        {TYPE_OPTIONS.map((option) => (
-                                            <option key={option} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="req-check on" aria-hidden="true">
-                                    <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
-                                        <path
-                                            d="M5 10l3.2 3.2L15 6.5"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <div className="req-row">
-                                <div className="req-icon">
-                                    <svg
-                                        width="19"
-                                        height="19"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        aria-hidden="true"
-                                    >
-                                        <rect
-                                            x="4"
-                                            y="5"
-                                            width="16"
-                                            height="15"
-                                            rx="2"
-                                            stroke="currentColor"
-                                            strokeWidth="1.7"
-                                        />
-                                        <path
-                                            d="M4 9h16M8 3v4M16 3v4"
-                                            stroke="currentColor"
-                                            strokeWidth="1.7"
-                                            strokeLinecap="round"
-                                        />
-                                    </svg>
-                                </div>
-                                <div className="req-body">
-                                    <div className="req-sub">Date et créneau</div>
-                                    <div className="req-row-split">
-                                        <input
-                                            className="req-field"
-                                            type="date"
-                                            aria-label="Date de l'intervention"
-                                            min={todayIso()}
-                                            value={dateValue}
-                                            onChange={(e) => setDateValue(e.target.value)}
-                                        />
-                                        <input
-                                            className="req-field"
-                                            type="time"
-                                            aria-label="Heure de l'intervention"
-                                            value={timeValue}
-                                            onChange={(e) => setTimeValue(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="req-check on" aria-hidden="true">
-                                    <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
-                                        <path
-                                            d="M5 10l3.2 3.2L15 6.5"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <div className="req-row">
-                                <div className="req-icon">
-                                    <svg
-                                        width="19"
-                                        height="19"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            d="M4 20V4h16v16H4z"
-                                            stroke="currentColor"
-                                            strokeWidth="1.7"
-                                        />
-                                        <path
-                                            d="M4 12h16M12 4v16"
-                                            stroke="currentColor"
-                                            strokeWidth="1.7"
-                                        />
-                                    </svg>
-                                </div>
-                                <div className="req-body">
-                                    <div className="req-sub">Surface (m² — 200 m² minimum)</div>
-                                    <input
-                                        className="req-field"
-                                        type="number"
-                                        min={MIN_SURFACE}
-                                        step={1}
-                                        inputMode="numeric"
-                                        aria-label="Surface en m², 200 m² minimum"
-                                        placeholder={`ex. ${MIN_SURFACE}`}
-                                        value={surfaceValue || ''}
-                                        onChange={(e) =>
-                                            setSurfaceValue(
-                                                e.target.value === ''
-                                                    ? 0
-                                                    : Math.max(0, Number(e.target.value)),
-                                            )
-                                        }
-                                        onBlur={() =>
-                                            setSurfaceValue((current) =>
-                                                Math.max(MIN_SURFACE, current),
-                                            )
-                                        }
-                                    />
-                                </div>
-                                <div className="req-check on" aria-hidden="true">
-                                    <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
-                                        <path
-                                            d="M5 10l3.2 3.2L15 6.5"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <div className="req-row req-row-extra">
-                                <div className="req-icon">
-                                    <svg
-                                        width="19"
-                                        height="19"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            d="M12 5v14M5 12h14"
-                                            stroke="currentColor"
-                                            strokeWidth="1.7"
-                                            strokeLinecap="round"
-                                        />
-                                    </svg>
-                                </div>
-                                <details
-                                    className="req-body req-extra"
-                                    open={extraQty > 0 || extraSurface > 0 || extraType !== ''}
-                                >
-                                    <summary className="req-sub">
-                                        Ajouter un espace en plus (optionnel)
-                                    </summary>
-                                    <input
-                                        className="req-field"
-                                        type="text"
-                                        aria-label="Type d'espace en plus"
-                                        placeholder="Type de bien (ex. garage, annexe)"
-                                        value={extraType}
-                                        onChange={(e) => setExtraType(e.target.value)}
-                                    />
-                                    <div className="req-row-split" style={{ marginTop: 8 }}>
-                                        <input
-                                            className="req-field"
-                                            type="number"
-                                            min={0}
-                                            step={1}
-                                            inputMode="numeric"
-                                            aria-label="Nombre d'espaces en plus"
-                                            placeholder="Quantité"
-                                            value={extraQty || ''}
-                                            onChange={(e) =>
-                                                setExtraQty(
-                                                    e.target.value === ''
-                                                        ? 0
-                                                        : Math.max(0, Number(e.target.value)),
-                                                )
-                                            }
-                                        />
-                                        <input
-                                            className="req-field"
-                                            type="number"
-                                            min={0}
-                                            step={1}
-                                            inputMode="numeric"
-                                            aria-label="Surface de l'espace en plus en m²"
-                                            placeholder="Surface m²"
-                                            value={extraSurface || ''}
-                                            onChange={(e) =>
-                                                setExtraSurface(
-                                                    e.target.value === ''
-                                                        ? 0
-                                                        : Math.max(0, Number(e.target.value)),
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                </details>
-                            </div>
-
-                            <div className="req-row">
-                                <div className="req-icon">
-                                    <svg
-                                        width="19"
-                                        height="19"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        aria-hidden="true"
-                                    >
-                                        <rect
-                                            x="3"
-                                            y="6"
-                                            width="18"
-                                            height="13"
-                                            rx="2"
-                                            stroke="currentColor"
-                                            strokeWidth="1.7"
-                                        />
-                                        <path
-                                            d="M3 10h18"
-                                            stroke="currentColor"
-                                            strokeWidth="1.7"
-                                        />
-                                    </svg>
-                                </div>
-                                <div className="req-body">
-                                    <div className="req-title">Paiement sécurisé</div>
-                                    <div className="req-sub">
-                                        Débité après validation, avant l&apos;intervention
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="avatar-stack">
-                                <div className="avatars">
-                                    <div className="avatar">ML</div>
-                                    <div className="avatar">KB</div>
-                                    <div className="avatar">SR</div>
-                                </div>
-                                <span className="avatar-note">
-                                    <strong>Plusieurs intervenants disponibles</strong>
-                                </span>
-                            </div>
-
-                            <div className="estimate-box">
-                                <div className="estimate-top">
-                                    <span className="estimate-label">
-                                        Estimation de l&apos;intervention
-                                    </span>
-                                    <span
-                                        className={`estimate-value${flash ? ' flash' : ''}`}
-                                    >
-                                        {displayEstimate} €
-                                    </span>
-                                </div>
-                                <div className="estimate-breakdown">
-                                    <span>
-                                        {typeValue} · {surface || 0} m²
-                                        {hasExtra
-                                            ? ` + ${extraQty}×${extraSurface} m²${extraType ? ` (${extraType})` : ''}`
-                                            : ''}{' '}
-                                        · {timeValue}
-                                    </span>
-                                    <span>{total} €</span>
-                                </div>
-                                {/* Volet 9 — mention dynamique de sécurité, recalculée à chaque saisie */}
-                                <div className="estimate-security">
-                                    <ShieldCheck size={16} aria-hidden="true" />
-                                    <span>
-                                        Sécurité Vimaiz : pour {surface} m², notre algorithme
-                                        déploie automatiquement {teamSize} intervenant
-                                        {teamSize > 1 ? 's' : ''} certifié
-                                        {teamSize > 1 ? 's' : ''} afin de garantir une exécution
-                                        parfaite dans la journée, sans aucun surcoût logistique
-                                        pour vous.
-                                    </span>
-                                </div>
-                            </div>
-
-                            <Link className="btn btn-primary" href={ctaHref}>
-                                Réserver pour {total} €
-                            </Link>
+                        <img
+                            className="hero-media-side"
+                            src={PHOTOS.heroSalon}
+                            alt="Salon spacieux et lumineux d'une grande résidence"
+                            width={600}
+                            height={760}
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <img
+                            className="hero-media-top"
+                            src={PHOTOS.heroJardin}
+                            alt="Maison avec piscine et jardin"
+                            width={520}
+                            height={400}
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <div className="hero-chip hero-chip-arrival">
+                            <span className="live-dot" aria-hidden="true" />
+                            <span>
+                                <strong>Arrivée confirmée</strong>
+                                <small>Géolocalisation validée</small>
+                            </span>
                         </div>
+                        <div className="hero-chip hero-chip-team">
+                            <span className="hero-chip-icon" aria-hidden="true">
+                                <ShieldCheck size={18} />
+                            </span>
+                            <span>
+                                <strong>Équipe certifiée</strong>
+                                <small>125 m² max par intervenant</small>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -1149,6 +871,348 @@ export default function Welcome({
                         );
                     })}
                     </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Volet 9 — Estimateur (CTA final, juste après la FAQ) */}
+            <section id="estimateur" className="welcome-section estimator-section">
+                <div className="wrap">
+                    <div className="sec-head sec-head-center">
+                        <h2>Estimez l&apos;intervention de votre grand logement</h2>
+                        <p className="sec-sub">
+                            Vous connaissez désormais notre exigence et notre philosophie. Voyons
+                            maintenant comment Vimaiz s&apos;adapte précisément à la superficie et
+                            aux besoins uniques de votre grand logement.
+                        </p>
+                    </div>
+
+                    <div className="estimator" id="service">
+                        <div className="estimator-form">
+                            <div className="card-head">
+                                <h3>Votre logement</h3>
+                                <span className="live-pill">
+                                    <span className="live-dot" aria-hidden="true" />
+                                    Intervenants dispo
+                                </span>
+                            </div>
+                            <div className="estimator-grid">
+                            <div className="req-row">
+                                <div className="req-icon">
+                                    <HomeIcon />
+                                </div>
+                                <div className="req-body">
+                                    <div className="req-sub">Type de logement</div>
+                                    <select
+                                        className="req-field"
+                                        aria-label="Type de logement"
+                                        value={typeValue}
+                                        onChange={(e) =>
+                                            setTypeValue(
+                                                e.target.value as (typeof TYPE_OPTIONS)[number],
+                                            )
+                                        }
+                                    >
+                                        {TYPE_OPTIONS.map((option) => (
+                                            <option key={option} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="req-check on" aria-hidden="true">
+                                    <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
+                                        <path
+                                            d="M5 10l3.2 3.2L15 6.5"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="req-row">
+                                <div className="req-icon">
+                                    <svg
+                                        width="19"
+                                        height="19"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M4 20V4h16v16H4z"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                        />
+                                        <path
+                                            d="M4 12h16M12 4v16"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="req-body">
+                                    <div className="req-sub">Surface (m² — 200 m² minimum)</div>
+                                    <input
+                                        className="req-field"
+                                        type="number"
+                                        min={MIN_SURFACE}
+                                        step={1}
+                                        inputMode="numeric"
+                                        aria-label="Surface en m², 200 m² minimum"
+                                        placeholder={`ex. ${MIN_SURFACE}`}
+                                        value={surfaceValue || ''}
+                                        onChange={(e) =>
+                                            setSurfaceValue(
+                                                e.target.value === ''
+                                                    ? 0
+                                                    : Math.max(0, Number(e.target.value)),
+                                            )
+                                        }
+                                        onBlur={() =>
+                                            setSurfaceValue((current) =>
+                                                Math.max(MIN_SURFACE, current),
+                                            )
+                                        }
+                                    />
+                                </div>
+                                <div className="req-check on" aria-hidden="true">
+                                    <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
+                                        <path
+                                            d="M5 10l3.2 3.2L15 6.5"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="req-row">
+                                <div className="req-icon">
+                                    <svg
+                                        width="19"
+                                        height="19"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        aria-hidden="true"
+                                    >
+                                        <rect
+                                            x="4"
+                                            y="5"
+                                            width="16"
+                                            height="15"
+                                            rx="2"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                        />
+                                        <path
+                                            d="M4 9h16M8 3v4M16 3v4"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                            strokeLinecap="round"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="req-body">
+                                    <div className="req-sub">Date et créneau</div>
+                                    <div className="req-row-split">
+                                        <input
+                                            className="req-field"
+                                            type="date"
+                                            aria-label="Date de l'intervention"
+                                            min={todayIso()}
+                                            value={dateValue}
+                                            onChange={(e) => setDateValue(e.target.value)}
+                                        />
+                                        <input
+                                            className="req-field"
+                                            type="time"
+                                            aria-label="Heure de l'intervention"
+                                            value={timeValue}
+                                            onChange={(e) => setTimeValue(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="req-check on" aria-hidden="true">
+                                    <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
+                                        <path
+                                            d="M5 10l3.2 3.2L15 6.5"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className="req-row req-row-extra">
+                                <div className="req-icon">
+                                    <svg
+                                        width="19"
+                                        height="19"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M12 5v14M5 12h14"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                            strokeLinecap="round"
+                                        />
+                                    </svg>
+                                </div>
+                                <details
+                                    className="req-body req-extra"
+                                    open={extraQty > 0 || extraSurface > 0 || extraType !== ''}
+                                >
+                                    <summary className="req-sub">
+                                        Ajouter un espace en plus (optionnel)
+                                    </summary>
+                                    <input
+                                        className="req-field"
+                                        type="text"
+                                        aria-label="Type d'espace en plus"
+                                        placeholder="Type de bien (ex. garage, annexe)"
+                                        value={extraType}
+                                        onChange={(e) => setExtraType(e.target.value)}
+                                    />
+                                    <div className="req-row-split" style={{ marginTop: 8 }}>
+                                        <input
+                                            className="req-field"
+                                            type="number"
+                                            min={0}
+                                            step={1}
+                                            inputMode="numeric"
+                                            aria-label="Nombre d'espaces en plus"
+                                            placeholder="Quantité"
+                                            value={extraQty || ''}
+                                            onChange={(e) =>
+                                                setExtraQty(
+                                                    e.target.value === ''
+                                                        ? 0
+                                                        : Math.max(0, Number(e.target.value)),
+                                                )
+                                            }
+                                        />
+                                        <input
+                                            className="req-field"
+                                            type="number"
+                                            min={0}
+                                            step={1}
+                                            inputMode="numeric"
+                                            aria-label="Surface de l'espace en plus en m²"
+                                            placeholder="Surface m²"
+                                            value={extraSurface || ''}
+                                            onChange={(e) =>
+                                                setExtraSurface(
+                                                    e.target.value === ''
+                                                        ? 0
+                                                        : Math.max(0, Number(e.target.value)),
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                </details>
+                            </div>
+                            </div>
+                            <div className="req-row">
+                                <div className="req-icon">
+                                    <svg
+                                        width="19"
+                                        height="19"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        aria-hidden="true"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="6"
+                                            width="18"
+                                            height="13"
+                                            rx="2"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                        />
+                                        <path
+                                            d="M3 10h18"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="req-body">
+                                    <div className="req-title">Paiement sécurisé</div>
+                                    <div className="req-sub">
+                                        Débité après validation, avant l&apos;intervention
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <aside className="estimator-summary" aria-live="polite">
+                            <div className="float-badge" aria-hidden="true">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"
+                                        stroke="currentColor"
+                                        strokeWidth="1.6"
+                                        strokeLinejoin="round"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                            </div>
+                            <span className="estimator-kicker">Estimation forfaitaire</span>
+                            <div className={`estimator-price${flash ? ' flash' : ''}`}>
+                                {displayEstimate} €
+                            </div>
+                            <div className="estimator-detail">
+                                {typeValue} · {surface || 0} m²
+                                {hasExtra
+                                    ? ` + ${extraQty}×${extraSurface} m²${extraType ? ` (${extraType})` : ''}`
+                                    : ''}
+                                {' '}· {timeValue}
+                            </div>
+
+                            <div className="estimator-team">
+                                <div className="estimator-team-icons" aria-hidden="true">
+                                    {Array.from({ length: Math.min(teamSize, 8) }).map((_, index) => (
+                                        <span key={index} className="team-dot">
+                                            <UserCheck size={15} />
+                                        </span>
+                                    ))}
+                                </div>
+                                <span>
+                                    <strong>
+                                        {teamSize} intervenant{teamSize > 1 ? 's' : ''} certifié
+                                        {teamSize > 1 ? 's' : ''}
+                                    </strong>{' '}
+                                    déployé{teamSize > 1 ? 's' : ''} pour {surface} m²
+                                </span>
+                            </div>
+
+                            {/* Volet 9 — mention dynamique de sécurité, recalculée à chaque saisie */}
+                            <div className="estimate-security">
+                                <ShieldCheck size={16} aria-hidden="true" />
+                                <span>
+                                    Sécurité Vimaiz : notre algorithme déploie automatiquement le
+                                    nombre optimal d&apos;intervenants certifiés afin de garantir une
+                                    exécution parfaite dans la journée, sans aucun surcoût logistique
+                                    pour vous.
+                                </span>
+                            </div>
+
+                            <Link className="btn btn-primary estimator-cta" href={ctaHref}>
+                                Réserver pour {total} €
+                            </Link>
+                            <p className="estimator-note">
+                                Aucun frais caché. Les intervenants ne sont payés qu&apos;après votre
+                                validation.
+                            </p>
+                        </aside>
                     </div>
                 </div>
             </section>
