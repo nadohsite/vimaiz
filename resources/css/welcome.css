@@ -3241,3 +3241,33 @@
 .welcome-page .estimator-grid .req-row:nth-child(3) .req-row-split {
     max-width: 360px;
 }
+
+
+/* ================================================================ TITRE DU HÉROS SUR 3 LIGNES */
+/* La question tient sur 3 lignes fixes ; la taille du texte suit la largeur
+   de la colonne (unité cqw) pour qu'aucune ligne ne déborde. */
+@media (min-width: 641px) {
+    .welcome-page .hero-grid > div:first-child {
+        container-type: inline-size;
+    }
+
+    .welcome-page .hero .hero-title {
+        font-size: 40px;
+        font-size: min(50px, calc(100cqw / 15.5));
+        line-height: 1.12;
+        text-wrap: initial;
+    }
+
+    .welcome-page .hero .hero-title .hero-line {
+        display: block;
+        white-space: nowrap;
+    }
+}
+
+/* Ordinateur : un peu plus de place pour le texte */
+@media (min-width: 921px) {
+    .welcome-page .hero-grid {
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+        gap: 64px;
+    }
+}

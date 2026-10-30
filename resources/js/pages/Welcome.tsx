@@ -586,9 +586,11 @@ export default function Welcome({
             <section className="hero wrap">
                 <div className="hero-grid">
                     <div>
-                        <h1 className="rise-2">
-                            Vous louez à distance votre grande résidence secondaire en
-                            location courte durée ?
+                        <h1 className="rise-2 hero-title">
+                            {/* Trois lignes fixes sur ordinateur et tablette */}
+                            <span className="hero-line">Vous louez à distance votre</span>{' '}
+                            <span className="hero-line">grande résidence secondaire en</span>{' '}
+                            <span className="hero-line">location courte durée ?</span>
                             <span className="accent"> Ne stressez plus.</span>
                         </h1>
                         <p className="hero-sub rise-3">
