@@ -50,6 +50,23 @@ class Brigade
         return round((float) $mission->agent_payout / self::size($mission), 2);
     }
 
+    /**
+     * Effectif réellement engagé (intervenants ayant accepté). Avant toute
+     * acceptation, on retombe sur l'effectif prévu.
+     */
+    public static function confirmedSize(Mission $mission): int
+    {
+        $accepted = (int) $mission->accepted_agents_count;
+
+        return $accepted > 0 ? $accepted : self::size($mission);
+    }
+
+    /** Accord singulier / pluriel : Brigade::plural(3, 'intervenant') => « intervenants ». */
+    public static function plural(int $count, string $singular, ?string $plural = null): string
+    {
+        return $count > 1 ? ($plural ?? $singular.'s') : $singular;
+    }
+
     /** « 3 intervenants certifiés » / « 1 intervenant certifié » */
     public static function label(int $size): string
     {

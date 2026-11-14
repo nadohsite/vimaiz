@@ -3243,8 +3243,8 @@
 }
 
 
-/* ================================================================ TITRE DU HÉROS SUR 3 LIGNES */
-/* La question tient sur 3 lignes fixes ; la taille du texte suit la largeur
+/* ================================================================ TITRE DU HÉROS SUR 2 LIGNES */
+/* La question tient sur 2 lignes fixes ; la taille du texte suit la largeur
    de la colonne (unité cqw) pour qu'aucune ligne ne déborde. */
 @media (min-width: 641px) {
     .welcome-page .hero-grid > div:first-child {
@@ -3253,7 +3253,7 @@
 
     .welcome-page .hero .hero-title {
         font-size: 40px;
-        font-size: min(50px, calc(100cqw / 15.5));
+        font-size: min(54px, calc(100cqw / 17));
         line-height: 1.12;
         text-wrap: initial;
     }
@@ -3269,5 +3269,121 @@
     .welcome-page .hero-grid {
         grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
         gap: 64px;
+    }
+}
+
+/* Surface mise en valeur dans le titre du héros */
+.welcome-page .hero-title .hero-hl {
+    color: var(--accent-ink);
+    white-space: nowrap;
+}
+
+/* Bloc « suivi des interventions » : deux paragraphes rapprochés */
+.welcome-page .night-band .sec-sub + .sec-sub,
+.welcome-page .sec-head .sec-sub + .sec-sub {
+    margin-top: 12px;
+}
+
+
+/* Notre conviction : sans trait bleu sous la citation, signature de marque */
+.welcome-page .manifesto .manifesto-quote::after {
+    content: none;
+    display: none;
+}
+
+.welcome-page .manifesto .manifesto-body p.manifesto-signature {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--accent-ink);
+}
+
+/* Estimateur : la pastille « Intervenants professionnels disponibles »
+   peut passer à la ligne sur les petits écrans plutôt que déborder. */
+@media (max-width: 640px) {
+    .welcome-page .estimator .live-pill {
+        white-space: normal;
+        text-align: left;
+    }
+}
+
+/* Bloc intervenant : paragraphes espacés, mention SIRET discrète */
+.welcome-page .pro-band p + p {
+    margin-top: 8px;
+}
+
+.welcome-page .pro-band p.pro-band-note {
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+/* ================================================================ PHOTOS : PROPORTIONS
+   Les balises <img> portent width/height (anti-décalage au chargement) :
+   sans « height: auto », la hauteur HTML écrase l'aspect-ratio et les
+   photos deviennent démesurément hautes, surtout sur mobile. */
+.welcome-page .hero-media-main img,
+.welcome-page .hero-media-main video,
+.welcome-page .hero-media-side,
+.welcome-page .hero-media-top,
+.welcome-page .report-photo,
+.welcome-page .hero-photo {
+    height: auto;
+}
+
+/* ================================================================ ALIGNEMENTS (revue mobile)
+   Bloc « suivi des interventions » : texte centré comme le titre, à toutes
+   les tailles ; chaque point est centré, son tiret bleu collé au texte. */
+.welcome-page .night-band .sec-sub {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.welcome-page .night-points li {
+    display: block;
+    text-align: center;
+    line-height: 1.55;
+}
+
+.welcome-page .night-points li::before {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+    transform: none;
+}
+
+/* Maquette du suivi : l'heure à gauche, le texte aligné à gauche */
+.welcome-page .live-report,
+.welcome-page .live-report * {
+    text-align: left;
+}
+
+/* FAQ : questions alignées à gauche, flèche à droite (lecture plus nette) */
+.welcome-page .faq-q {
+    text-align: left;
+}
+
+/* Titre du héros : coupures de lignes équilibrées sur mobile */
+@media (max-width: 640px) {
+    .welcome-page .hero .hero-title {
+        text-wrap: balance;
+    }
+
+    .welcome-page .faq-layout .sec-head {
+        margin-bottom: 8px;
+    }
+}
+
+/* ================================================================ HÉROS TABLETTE / MOBILE
+   Sur moyen et petit écran, la composition de photos ne s'empile plus sous
+   le texte : la villa reste en fond atténué derrière le titre. */
+@media (max-width: 920px) {
+    .welcome-page .hero-media {
+        display: none;
+    }
+
+    .welcome-page .hero-grid {
+        grid-template-columns: minmax(0, 1fr);
     }
 }

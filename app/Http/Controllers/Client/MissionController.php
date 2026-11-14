@@ -40,6 +40,26 @@ class MissionController extends Controller
             'canRequestReturn' => $mission->canRequestReturn(),
             'canValidateNow' => $mission->canValidateNow(),
             'reportSummary' => $mission->reportSummary(),
+            // Brigades : intervenants réellement engagés sur la mission.
+            'team' => $mission->missionAgents()
+                ->with('agent:id,name')
+                ->whereIn('status', [
+                    \App\Models\MissionAgent::STATUS_ACCEPTED,
+                    \App\Models\MissionAgent::STATUS_ARRIVED,
+                    \App\Models\MissionAgent::STATUS_IN_PROGRESS,
+                    \App\Models\MissionAgent::STATUS_COMPLETED,
+                ])
+                ->orderByDesc('is_lead')
+                ->oldest('responded_at')
+                ->get()
+                ->map(fn ($member) => [
+                    'id' => $member->agent_id,
+                    'name' => $member->agent?->name,
+                    'is_lead' => (bool) $member->is_lead,
+                    'arrived' => $member->arrived_at !== null,
+                ])
+                ->values(),
+            'requiredAgents' => (int) ($mission->required_agents ?: 1),
         ]);
     }
 

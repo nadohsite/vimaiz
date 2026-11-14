@@ -7,7 +7,7 @@
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    @php($teamSize = \App\Support\Brigade::size($mission))
+    @php($teamSize = \App\Support\Brigade::confirmedSize($mission))
     <p>{{ $teamSize > 1 ? "L'équipe est au complet ({$teamSize} intervenants) pour l'intervention ci-dessous." : "Un intervenant a accepté l'intervention ci-dessous." }}</p>
 
     <div class="success-box">

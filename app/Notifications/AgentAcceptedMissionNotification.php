@@ -23,7 +23,9 @@ class AgentAcceptedMissionNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Votre équipe est constituée — '.$this->mission->mission_number)
+            ->subject((\App\Support\Brigade::confirmedSize($this->mission) > 1
+                ? 'Votre équipe est constituée — '
+                : 'Votre intervenant est confirmé — ').$this->mission->mission_number)
             ->view('emails.agent-accepted-mission', [
                 'notifiable' => $notifiable,
                 'mission' => $this->mission,
@@ -37,7 +39,9 @@ class AgentAcceptedMissionNotification extends Notification
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'scheduled_at' => $this->mission->scheduled_at->toISOString(),
-            'message' => '✅ Votre équipe d\'intervenants certifiés est constituée pour votre intervention.',
+            'message' => \App\Support\Brigade::confirmedSize($this->mission) > 1
+                ? '✅ Votre équipe de '.\App\Support\Brigade::confirmedSize($this->mission).' intervenants certifiés est constituée pour votre intervention.'
+                : '✅ Un intervenant certifié est confirmé pour votre intervention.',
             'url' => '/client/missions/'.$this->mission->id,
         ];
     }

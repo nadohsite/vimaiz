@@ -37,7 +37,9 @@ class MissionStartedNotification extends Notification
             'mission_id' => $this->mission->id,
             'mission_number' => $this->mission->mission_number,
             'started_at' => $this->mission->started_at?->toISOString(),
-            'message' => '🏡 Arrivée confirmée par géolocalisation : l\'intervention a commencé.',
+            'message' => \App\Support\Brigade::confirmedSize($this->mission) > 1
+                ? '🏡 Les intervenants arrivent sur place (géolocalisation confirmée) : l\'intervention a commencé.'
+                : '🏡 Arrivée de l\'intervenant confirmée par géolocalisation : l\'intervention a commencé.',
             'url' => '/client/missions/'.$this->mission->id,
         ];
     }

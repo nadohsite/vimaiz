@@ -30,125 +30,86 @@ function intervenantsNeeded(surfaceM2: number): number {
 
 const PROPRIETAIRE_FAQS = [
     {
-        question: 'Qu’est-ce que Vimaiz ?',
+        question: 'Qu’est-ce que Vimaiz ?',
         answer: [
-            'Vimaiz est une plateforme technologique conçue pour les propriétaires qui louent à distance leurs grandes résidences secondaires en location courte durée et qui ont du mal à suivre le bon déroulement des interventions de ménage.',
-            'Vimaiz vous redonne des yeux là où vous n’en avez pas et vous permet de reprendre le contrôle de votre investissement immobilier, tout en préservant les précieux commentaires de vos voyageurs et vos excellentes notes sur vos différentes plateformes.',
+            'Vimaiz est une plateforme de suivi opérationnel destinée aux propriétaires de biens de 200 m² minimum proposés en location courte durée. Elle leur permet de suivre à distance le déroulement des interventions et de garder une visibilité sur leur propriété.',
         ],
     },
     {
-        question: 'J’ai un appartement de 70 m² en location saisonnière à distance. Puis-je utiliser Vimaiz ?',
+        question: 'À qui s’adresse Vimaiz ?',
         answer: [
-            'Non. Vimaiz a été développé selon un modèle d’ingénierie logistique conçu exclusivement pour répondre aux exigences des propriétés de plus de 200 m².',
-            'Nos algorithmes de co-assignation sont calibrés uniquement pour les grands espaces et les domaines d’exception, afin d’offrir une traçabilité et une vitesse d’exécution adaptées aux grandes superficies.',
+            'Vimaiz s’adresse exclusivement aux propriétaires de propriétés d’au moins 200 m², proposées en location courte durée, qui vivent à distance de leur bien et souhaitent en suivre les interventions sans être sur place.',
         ],
     },
     {
-        question: 'À qui s’adresse Vimaiz ?',
+        question: 'Comment une intervention est-elle organisée ?',
         answer: [
-            'Vimaiz a été pensé exclusivement pour vous si vous gérez à distance une grande résidence secondaire en location saisonnière et que cet éloignement génère une anxiété logistique.',
-            'Si vous habitez à proximité mais que le temps ou le manque de visibilité vous empêchent de contrôler la qualité et la ponctualité des interventions dans vos grands espaces, Vimaiz devient vos yeux sur place pour vous délester de cette charge mentale invisible.',
+            'Vous indiquez vos dates, vos besoins et les exigences de votre propriété. Vimaiz organise ensuite l’intervention en co-assignant plusieurs intervenants professionnels indépendants selon la superficie et la charge de travail. L’intervention ne repose donc pas sur une personne seule.',
         ],
     },
     {
-        question: 'Comment fonctionne une intervention ?',
+        question: 'Comment suis-je informé du déroulement de l’intervention ?',
         answer: [
-            'Vous planifiez le créneau en fonction des rotations de vos voyageurs et précisez vos demandes spécifiques.',
-            'Les intervenants professionnels de notre réseau, sélectionnés avec rigueur et disponibles dans votre zone, acceptent l’intervention depuis leur espace. Dès que l’intervention commence, vous êtes alerté et pouvez suivre son déroulement jusqu’à la clôture.',
+            'L’arrivée de chaque intervenant est validée par géolocalisation. Vous pouvez consulter les horaires et suivre le déroulement de l’intervention depuis votre espace Vimaiz.',
         ],
     },
     {
-        question: 'Comment êtes-vous informé de l’arrivée des intervenants ?',
+        question: 'Que contient le compte rendu d’une intervention ?',
         answer: [
-            'Notre technologie utilise la géolocalisation sécurisée du logement : l’arrivée sur place est enregistrée et validée avant que l’intervention puisse démarrer.',
-            'Vous recevez une notification dans votre espace Vimaiz, ce qui vous permet de savoir en temps réel si le planning est respecté.',
+            'Vous retrouvez la validation de la liste de contrôle et la confirmation de fin d’intervention. Des photos sont ajoutées uniquement lorsqu’une anomalie ou une dégradation est constatée.',
         ],
     },
     {
-        question: 'Comment Vimaiz me protège-t-il contre le risque de travail dissimulé ?',
+        question: 'Que se passe-t-il si je constate un problème après une intervention ?',
         answer: [
-            'Lorsque vous confiez les clés d’un grand patrimoine à distance, la sécurité juridique est essentielle. Un intervenant isolé face à un grand bien peut être tenté de faire appel à un proche non déclaré pour terminer à temps.',
-            'Avec notre système de répartition en équipe, les intervenants présents dans votre logement sont des professionnels indépendants certifiés par Vimaiz, dont le statut, l’affiliation à l’URSSAF et l’assurance professionnelle sont vérifiés.',
+            'Vous disposez de 48 heures après la clôture pour consulter le compte rendu et signaler une éventuelle non-conformité. Selon la situation, un nouveau passage ciblé peut être demandé.',
         ],
     },
     {
-        question: 'Que contient le compte rendu d’une intervention ?',
+        question: 'Puis-je échanger avec les intervenants ?',
         answer: [
-            'Une confirmation claire de la clôture de l’intervention. Chaque intervenant valide une liste de contrôle stricte et vous recevez une notification de fin d’intervention.',
-            'Les seules photos intégrées au rapport sont celles des anomalies ou dégradations éventuellement constatées, laissées par les voyageurs précédents. En l’absence de signalement, le logement est déclaré prêt à accueillir vos prochains voyageurs.',
+            'Oui. Un espace de conversation privé est accessible depuis votre compte Vimaiz. Les échanges avec les intervenants professionnels indépendants affectés à votre propriété sont encadrés par la plateforme.',
         ],
     },
     {
-        question: 'Que se passe-t-il si je ne suis pas satisfait de l’intervention ?',
+        question: 'Puis-je suivre plusieurs propriétés depuis mon compte ?',
         answer: [
-            'Vous disposez de 48 heures après la clôture de l’intervention pour examiner le rapport.',
-            'En cas de non-conformité constatée, vous pouvez demander un nouveau passage ciblé.',
+            'Oui. Vous pouvez centraliser vos différentes propriétés et consulter leur suivi depuis une seule interface Vimaiz, à condition qu’elles répondent à nos critères d’éligibilité.',
         ],
     },
     {
-        question: 'Puis-je choisir moi-même les intervenants qui interviendront dans mon logement ?',
+        question: 'Comment les professionnels intervenant dans ma propriété sont-ils sélectionnés ?',
         answer: [
-            'Non, et c’est ce qui vous libère l’esprit. Notre algorithme attribue automatiquement l’intervention aux professionnels certifiés les plus qualifiés et disponibles dans votre secteur.',
-            'Vous n’avez plus à perdre des heures à chercher, contacter ou relancer plusieurs prestataires.',
-        ],
-    },
-    {
-        question: 'Puis-je échanger avec les intervenants ?',
-        answer: [
-            'Oui. Un espace de conversation privé et sécurisé, accessible depuis votre espace Vimaiz, vous permet d’échanger directement avec les intervenants assignés à votre logement.',
-        ],
-    },
-    {
-        question: 'Puis-je gérer plusieurs logements avec Vimaiz ?',
-        answer: [
-            'Oui. Votre espace Vimaiz est un véritable tableau de bord patrimonial : vous pouvez y centraliser et suivre les interventions de l’ensemble de vos grands logements depuis une seule interface.',
-        ],
-    },
-    {
-        question: 'Comment fonctionne le paiement ?',
-        answer: [
-            'En toute transparence. Le montant forfaitaire de l’intervention est calculé et indiqué avant sa réalisation — aucun frais caché.',
-            'Le règlement est sécurisé directement via la plateforme.',
-        ],
-    },
-];
-
-const INTERVENANT_FAQS = [
-    {
-        question: 'Les propriétés de grande superficie demandent une charge de travail importante. Vais-je me retrouver seul(e) ?',
-        answer: [
-            'Non. Votre santé physique et la sérénité de votre métier sont nos priorités.',
-            'Notre algorithme applique une règle stricte : aucun intervenant ne prend en charge plus de 125 m² lors d’une intervention. Vimaiz co-assigne automatiquement d’autres professionnels indépendants certifiés de votre secteur dès que la superficie du bien le nécessite.',
-            'Vous travaillez en synergie, vous terminez dans les délais sans vous épuiser, et vous percevez l’intégralité de votre part du forfait, soit 75 % du montant de l’intervention.',
+            'Les intervenants professionnels intervenant via Vimaiz sont des prestataires indépendants. Les éléments relatifs à leur statut professionnel et à leur assurance sont vérifiés selon les procédures de la plateforme.',
         ],
     },
 ];
 
 const PARCOURS_STEPS = [
     {
-        title: 'Enregistrez votre bien et ses exigences',
+        title: 'Enregistrez votre propriété',
         description:
-            'Centralisez les spécificités de votre grande résidence — la feuille de route permanente de nos intervenants.',
+            'Renseignez sa superficie, ses équipements et ses spécificités pour préparer les interventions.',
     },
     {
-        title: 'Planifiez selon votre calendrier',
+        title: 'Planifiez vos interventions',
         description:
-            'Indiquez la date et l’heure de l’intervention en fonction des rotations de vos voyageurs, depuis votre espace Vimaiz.',
+            'Indiquez les dates et horaires souhaités selon le calendrier de vos voyageurs.',
     },
     {
-        title: 'Précisez vos demandes et validez le devis',
+        title: 'Précisez vos besoins et validez le devis',
         description:
-            'Ajoutez une consigne spécifique si nécessaire. Vous recevez un devis forfaitaire transparent, à vérifier et valider avant de régler en ligne.',
+            'Ajoutez vos consignes particulières et découvrez le tarif forfaitaire avant validation.',
     },
     {
-        title: 'Suivez le déroulement en direct',
+        title: 'Suivez chaque intervention',
         description:
-            'Ne devinez plus ce qui se passe chez vous. De l’arrivée au départ des intervenants, vous êtes informé en temps réel.',
+            'Consultez son déroulement, de l’arrivée au départ des intervenants.',
     },
     {
         title: 'Retrouvez vos documents en un clic',
         description:
-            'Rapports de fin d’intervention, historiques et factures : tous les documents de votre patrimoine, archivés et prêts à être consultés.',
+            'Rapports de fin d’intervention, historiques et factures : tous les documents de votre propriété, archivés et prêts à être consultés.',
     },
 ];
 
@@ -579,24 +540,26 @@ export default function Welcome({
 
     return (
         <PublicLayout
-            title="VIMAIZ — Vous louez à distance votre grande résidence ? Ne stressez plus."
-            description="Suivez chaque intervention de ménage en temps réel depuis votre espace Vimaiz et préservez la réputation de votre grand patrimoine."
+            title="VIMAIZ — Votre propriété fait 200 m² ou plus et vous la louez à distance ?"
+            description="Gardez le contrôle, même lorsque vous êtes loin. Avec Vimaiz, suivez chaque intervention depuis votre espace personnel."
         >
             {/* Volet 1 — Header / bloc héros */}
-            <section className="hero wrap">
+            <section
+                className="hero wrap"
+                style={{ ['--hero-photo' as string]: `url(${PHOTOS.hero})` }}
+            >
                 <div className="hero-grid">
                     <div>
                         <h1 className="rise-2 hero-title">
-                            {/* Trois lignes fixes sur ordinateur et tablette */}
-                            <span className="hero-line">Vous louez à distance votre</span>{' '}
-                            <span className="hero-line">grande résidence secondaire en</span>{' '}
-                            <span className="hero-line">location courte durée ?</span>
-                            <span className="accent"> Ne stressez plus.</span>
+                            {/* Deux lignes fixes sur ordinateur et tablette */}
+                            <span className="hero-line">
+                                Votre propriété fait <span className="hero-hl">200&nbsp;m² ou plus</span>
+                            </span>{' '}
+                            <span className="hero-line">et vous la louez à distance&nbsp;?</span>
                         </h1>
                         <p className="hero-sub rise-3">
-                            Suivez chaque intervention de ménage en temps réel depuis votre
-                            espace Vimaiz et préservez la précieuse réputation de votre grand
-                            patrimoine.
+                            Gardez le contrôle, même lorsque vous êtes loin. Avec Vimaiz, suivez
+                            chaque intervention depuis votre espace personnel.
                         </p>
                         <div className="hero-ctas rise-4">
                             <a className="btn btn-primary" href="#estimateur">
@@ -674,7 +637,7 @@ export default function Welcome({
                                 <ShieldCheck size={18} />
                             </span>
                             <span>
-                                <strong>Équipe certifiée</strong>
+                                <strong>Intervenants indépendants</strong>
                                 <small>125 m² max par intervenant</small>
                             </span>
                         </div>
@@ -686,21 +649,19 @@ export default function Welcome({
             <section id="pourquoi" className="night-band">
                 <div className="wrap night-grid">
                     <div>
-                        <h2>
-                            Vous n&apos;avez plus besoin d&apos;être sur place pour vérifier
-                            si le ménage a été bien réalisé dans les délais.
-                        </h2>
+                        <h2>Plus besoin d&apos;être sur place pour suivre les interventions.</h2>
                         <p className="sec-sub">
-                            Vimaiz a été pensé exclusivement pour les propriétaires qui vivent
-                            loin de leur logement de grande superficie proposé en location
-                            courte durée. De l&apos;arrivée au départ de l&apos;intervenant,
-                            vous suivez tout le déroulement de la prestation en temps réel, à
-                            distance, depuis votre espace Vimaiz.
+                            Vimaiz accompagne exclusivement les propriétaires de biens de
+                            200&nbsp;m² minimum proposés en location courte durée.
+                        </p>
+                        <p className="sec-sub">
+                            De l&apos;arrivée au départ des intervenants, vous gardez une
+                            visibilité sur chaque prestation.
                         </p>
                         <ul className="night-points">
-                            <li>Arrivée de l&apos;équipe validée par géolocalisation</li>
-                            <li>Liste de contrôle validée par chaque intervenant</li>
-                            <li>Photos uniquement en cas d&apos;anomalie constatée</li>
+                            <li>Arrivée de chaque intervenant validée par géolocalisation.</li>
+                            <li>Liste de contrôle renseignée par les intervenants.</li>
+                            <li>Photos transmises uniquement en cas d&apos;anomalie constatée.</li>
                         </ul>
                     </div>
                     <div className="report-stage">
@@ -722,10 +683,10 @@ export default function Welcome({
             <section id="steps" className="welcome-section">
                 <div className="wrap">
                     <div className="sec-head sec-head-center">
-                        <h2>Un fonctionnement premium, sur mesure</h2>
+                        <h2>Un accompagnement premium, adapté à votre propriété.</h2>
                         <p className="sec-sub">
-                            Reposant sur un devis transparent, pensé pour
-                            les grandes résidences.
+                            Chaque propriété a ses propres exigences. Vimaiz organise son suivi
+                            autour de vos besoins, avec un devis forfaitaire transparent.
                         </p>
                     </div>
                     <div className="steps steps-5">
@@ -756,32 +717,40 @@ export default function Welcome({
                     <div className="manifesto-head">
                         <p className="sec-eyebrow manifesto-eyebrow">Notre conviction</p>
                         <h2 className="manifesto-quote">
-                            L&apos;éloignement ne doit jamais justifier la perte de contrôle.
+                            L&apos;éloignement ne doit jamais signifier la perte de contrôle.
                         </h2>
                     </div>
                     <div className="manifesto-body">
                         <p>
-                            Nous croyons fermement que posséder une grande résidence secondaire
-                            en location saisonnière à distance devrait être une source de
-                            fierté, jamais d&apos;anxiété. Chez Vimaiz, la propreté d&apos;un
-                            logement ne tolère aucun compromis ni aucune approximation.
+                            Votre propriété mérite la même attention, que vous soyez sur place
+                            ou à des centaines de kilomètres.
                         </p>
                         <p>
-                            C&apos;est pourquoi nous mettons la technologie au service de
-                            l&apos;humain : Vimaiz vous redonne des yeux là où vous ne pouvez
-                            pas être et vous garantit la traçabilité de chaque intervention de
-                            ménage sur votre patrimoine, du début jusqu&apos;à la fin.
+                            Chez Vimaiz, la technologie est au service d&apos;un suivi rigoureux
+                            et structuré de chaque intervention.
+                        </p>
+                        <p className="manifesto-signature">
+                            Vimaiz — Vos yeux là où vous ne pouvez pas être.
                         </p>
                     </div>
                     </div>
 
                     <div id="agent" className="pro-band">
                         <div>
-                            <h3>Vous êtes intervenant de ménage ?</h3>
+                            <h3>
+                                Vous êtes un intervenant professionnel indépendant du secteur de
+                                l&apos;entretien&nbsp;?
+                            </h3>
                             <p>
-                                Vimaiz vous aide à développer votre activité en vous proposant
-                                des interventions selon vos disponibilités. Numéro de SIRET
-                                obligatoire.
+                                Rejoignez Vimaiz et accédez à des opportunités d&apos;intervention
+                                au sein de propriétés de grande superficie.
+                            </p>
+                            <p>
+                                Organisez vos disponibilités et recevez des propositions
+                                d&apos;intervention adaptées à votre activité.
+                            </p>
+                            <p className="pro-band-note">
+                                Professionnels indépendants déclarés — Numéro SIRET obligatoire.
                             </p>
                         </div>
                         <div className="pro-band-actions">
@@ -806,11 +775,6 @@ export default function Welcome({
                 <div className="wrap faq-layout">
                     <div className="sec-head">
                         <h2>Questions fréquentes</h2>
-                        <p className="sec-sub">
-                            Les dernières objections : le modèle de répartition en équipe, la
-                            sécurité juridique, et comment Vimaiz s&apos;adapte aux grands
-                            espaces.
-                        </p>
                     </div>
 
                     <div>
@@ -844,35 +808,6 @@ export default function Welcome({
                     })}
                     </div>
 
-                    <div className="faq-group">
-                    {INTERVENANT_FAQS.map((faq, index) => {
-                        const key = `intervenant-${index}`;
-                        return (
-                            <div
-                                className="faq-item"
-                                key={key}
-                                data-open={openFaq === key}
-                            >
-                                <button
-                                    type="button"
-                                    className="faq-q"
-                                    onClick={() => setOpenFaq(openFaq === key ? null : key)}
-                                    aria-expanded={openFaq === key}
-                                >
-                                    {faq.question}
-                                    <ChevronDown size={18} />
-                                </button>
-                                {openFaq === key && (
-                                    <div className="faq-a">
-                                        {faq.answer.map((paragraph) => (
-                                            <p key={paragraph}>{paragraph}</p>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                    </div>
                     </div>
                 </div>
             </section>
@@ -881,11 +816,14 @@ export default function Welcome({
             <section id="estimateur" className="welcome-section estimator-section">
                 <div className="wrap">
                     <div className="sec-head sec-head-center">
-                        <h2>Estimez l&apos;intervention de votre grand logement</h2>
+                        <h2>Découvrez le tarif de l&apos;accompagnement Vimaiz pour votre propriété.</h2>
                         <p className="sec-sub">
-                            Vous connaissez désormais notre exigence et notre philosophie. Voyons
-                            maintenant comment Vimaiz s&apos;adapte précisément à la superficie et
-                            aux besoins uniques de votre grand logement.
+                            Votre bien fait 200&nbsp;m² ou plus&nbsp;? Découvrez une première
+                            estimation adaptée à sa superficie et à ses caractéristiques.
+                        </p>
+                        <p className="sec-sub">
+                            Chaque accompagnement fait ensuite l&apos;objet d&apos;un devis
+                            personnalisé.
                         </p>
                     </div>
 
@@ -895,7 +833,7 @@ export default function Welcome({
                                 <h3>Votre logement</h3>
                                 <span className="live-pill">
                                     <span className="live-dot" aria-hidden="true" />
-                                    Intervenants dispo
+                                    Intervenants professionnels disponibles
                                 </span>
                             </div>
                             <div className="estimator-grid">
@@ -1189,10 +1127,10 @@ export default function Welcome({
                                 </div>
                                 <span>
                                     <strong>
-                                        {teamSize} intervenant{teamSize > 1 ? 's' : ''} certifié
-                                        {teamSize > 1 ? 's' : ''}
+                                        {teamSize} intervenant{teamSize > 1 ? 's' : ''} professionnel
+                                        {teamSize > 1 ? 's' : ''} indépendant{teamSize > 1 ? 's' : ''}
                                     </strong>{' '}
-                                    déployé{teamSize > 1 ? 's' : ''} pour {surface} m²
+                                    mobilisé{teamSize > 1 ? 's' : ''} pour votre intervention.
                                 </span>
                             </div>
 
@@ -1200,10 +1138,10 @@ export default function Welcome({
                             <div className="estimate-security">
                                 <ShieldCheck size={16} aria-hidden="true" />
                                 <span>
-                                    Sécurité Vimaiz : notre algorithme déploie automatiquement le
-                                    nombre optimal d&apos;intervenants certifiés afin de garantir une
-                                    exécution parfaite dans la journée, sans aucun surcoût logistique
-                                    pour vous.
+                                    Le nombre d&apos;intervenants professionnels indépendants mobilisés
+                                    est adapté à la superficie et aux caractéristiques de votre
+                                    propriété. Chaque intervention est organisée et coordonnée en
+                                    amont.
                                 </span>
                             </div>
 

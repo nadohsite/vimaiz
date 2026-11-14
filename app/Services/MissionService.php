@@ -414,6 +414,8 @@ class MissionService
             }
 
             // L'agent avait accepté puis se désiste : on libère son créneau.
+            // L'équipe était-elle complète (donc annoncée au propriétaire) ?
+            $wasFullyStaffed = $mission->accepted_agents_count >= $mission->required_agents;
             $newAcceptedCount = max(0, $mission->accepted_agents_count - 1);
             $wasLead = $mission->agent_id === $agent->id;
 
@@ -441,7 +443,11 @@ class MissionService
                 }
             }
 
-            return [true, ['newAcceptedCount' => $newAcceptedCount, 'mission' => $mission]];
+            return [true, [
+                'newAcceptedCount' => $newAcceptedCount,
+                'wasFullyStaffed' => $wasFullyStaffed,
+                'mission' => $mission,
+            ]];
         });
 
         if (! $hadAcceptedSlot) {
@@ -457,11 +463,41 @@ class MissionService
                 );
             }
 
+            // Plus aucun candidat ni proposition en attente, mais une partie
+            // de l'équipe est engagée : on confirme au propriétaire l'équipe
+            // réunie (effectif réduit) plutôt que de le laisser sans nouvelles.
+            $current = $mission->fresh();
+            $stillPending = $current->missionAgents()
+                ->where('status', MissionAgent::STATUS_PENDING_AGENT)
+                ->exists();
+
+            if ($remaining->isEmpty() && ! $stillPending
+                && $current->accepted_agents_count > 0
+                && $current->accepted_agents_count < $current->required_agents
+                && $current->status === Mission::STATUS_PENDING_AGENT) {
+                $current->update(['status' => Mission::STATUS_AGENT_ACCEPTED]);
+                $current->serviceRequest?->update([
+                    'status' => ServiceRequest::STATUS_ASSIGNED,
+                ]);
+                $confirmed = $current->fresh(['client', 'agent', 'property']);
+                $this->safeNotify(
+                    fn () => $confirmed->client?->notify(new AgentAcceptedMissionNotification($confirmed)),
+                    'agent_accepted_mission',
+                    $confirmed,
+                );
+                $this->safeNotify(
+                    fn () => User::notifyAdmins(new AgentAcceptedMissionAdminNotification($confirmed)),
+                    'agent_accepted_mission_admin',
+                    $confirmed,
+                );
+            }
+
             return $result;
         }
 
         $mission = $result['mission'];
         $newAcceptedCount = $result['newAcceptedCount'];
+        $wasFullyStaffed = $result['wasFullyStaffed'];
 
         if ($agent->agentProfile) {
             $agent->agentProfile->incrementMissionsRefused();
@@ -471,8 +507,15 @@ class MissionService
 
         User::notifyAdmins(new AgentRefusedMissionNotification($mission, $reason));
 
-        if ($client) {
-            $client->notify(new AgentRefusedMissionClientNotification($mission));
+        // Le propriétaire n'est prévenu d'un remplacement que si l'équipe lui
+        // avait déjà été annoncée comme complète. Tant qu'elle se constitue,
+        // il ne reçoit rien : il sera notifié une seule fois, équipe réunie.
+        if ($client && $wasFullyStaffed) {
+            $this->safeNotify(
+                fn () => $client->notify(new AgentRefusedMissionClientNotification($mission)),
+                'agent_refused_mission_client',
+                $mission,
+            );
         }
 
         $newAgents = $this->assignmentService->reassignMission($mission->fresh());
@@ -497,6 +540,25 @@ class MissionService
             // la mission continue avec un effectif réduit plutôt que de
             // bloquer sur un créneau introuvable.
             $mission->update(['status' => Mission::STATUS_AGENT_ACCEPTED]);
+
+            // Équipe jamais annoncée au propriétaire : on la lui confirme
+            // maintenant, avec l'effectif réellement engagé.
+            if (! $wasFullyStaffed) {
+                $mission->serviceRequest?->update([
+                    'status' => ServiceRequest::STATUS_ASSIGNED,
+                ]);
+                $confirmed = $mission->fresh(['client', 'agent', 'property']);
+                $this->safeNotify(
+                    fn () => $confirmed->client?->notify(new AgentAcceptedMissionNotification($confirmed)),
+                    'agent_accepted_mission',
+                    $confirmed,
+                );
+                $this->safeNotify(
+                    fn () => User::notifyAdmins(new AgentAcceptedMissionAdminNotification($confirmed)),
+                    'agent_accepted_mission_admin',
+                    $confirmed,
+                );
+            }
         }
 
         return $mission->fresh();

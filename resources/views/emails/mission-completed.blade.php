@@ -7,7 +7,8 @@
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    <p>L'intervention de ménage dans votre logement est terminée. Chaque intervenant a validé sa liste de contrôle. Voici le compte rendu.</p>
+    @php($teamSize = \App\Support\Brigade::confirmedSize($mission))
+    <p>L'intervention de ménage dans votre logement est terminée. {{ $teamSize > 1 ? 'Chaque intervenant a validé sa liste de contrôle.' : "L'intervenant a validé sa liste de contrôle." }} Voici le compte rendu.</p>
 
     <div class="success-box">
         <p><strong>Intervention :</strong> {{ $mission->mission_number }}</p>
@@ -49,7 +50,7 @@
     <p>Les photos ne sont jointes qu'en cas d'anomalie constatée. L'intervention a été <strong>géolocalisée</strong> et <strong>horodatée</strong> du début à la fin.</p>
 
     <div class="warning-box">
-        <p><strong>Vous disposez de 48 h</strong> pour examiner ce rapport. En cas de non-conformité, demandez un nouveau passage ciblé depuis votre espace Vimaiz. Les intervenants ne sont payés qu'après votre validation, ou à l'issue de ce délai sans contestation.</p>
+        <p><strong>Vous disposez de 48 h</strong> pour examiner ce rapport. En cas de non-conformité, demandez un nouveau passage ciblé depuis votre espace Vimaiz. {{ $teamSize > 1 ? 'Les intervenants ne sont payés' : "L'intervenant n'est payé" }} qu'après votre validation, ou à l'issue de ce délai sans contestation.</p>
     </div>
 
     <p class="cta" style="text-align:center !important; margin:24px 0;">

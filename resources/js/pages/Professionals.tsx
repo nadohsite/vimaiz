@@ -161,16 +161,6 @@ const faqs: { question: string; answer: FaqAnswer }[] = [
         },
     },
     {
-        question: 'Quelle est la commission de Vimaiz ?',
-        answer: {
-            paragraphs: [
-                'Vimaiz prélève une commission de 25 % sur chaque intervention réalisée : vous percevez 75 % du montant de l’intervention.',
-                'Cette commission permet de financer le développement de la plateforme, le support professionnel, la sécurisation des paiements ainsi que les outils mis à votre disposition.',
-                'Le montant affiché avant l’acceptation d’une intervention correspond toujours à la rémunération que vous percevrez.',
-            ],
-        },
-    },
-    {
         question: 'Dois-je fournir mon propre matériel ?',
         answer: {
             paragraphs: [

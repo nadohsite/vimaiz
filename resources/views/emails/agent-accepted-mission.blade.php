@@ -3,11 +3,11 @@
 @section('title', 'Intervention confirmée')
 
 @section('content')
-    <h1>Votre équipe est constituée</h1>
+    <h1>{{ $teamSize > 1 ? 'Votre équipe est constituée' : 'Votre intervenant est confirmé' }}</h1>
 
     <p>Bonjour {{ $notifiable->preferredFirstName() ?: $notifiable->name }},</p>
 
-    @php($teamSize = \App\Support\Brigade::size($mission))
+    @php($teamSize = \App\Support\Brigade::confirmedSize($mission))
     @if($teamSize > 1)
         <p>Votre équipe est au complet : {{ \App\Support\Brigade::label($teamSize) }} interviendront dans votre logement à la date prévue.</p>
     @else

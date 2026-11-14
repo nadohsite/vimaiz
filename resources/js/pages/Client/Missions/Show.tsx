@@ -75,15 +75,28 @@ interface Mission {
     anomalies?: ReportAnomaly[];
 }
 
+interface TeamMember {
+    id: number;
+    name: string | null;
+    is_lead: boolean;
+    arrived: boolean;
+}
+
 interface Props {
     mission: Mission;
+    team?: TeamMember[];
+    requiredAgents?: number;
     canDownloadInvoice: boolean;
     canReview?: boolean;
     canRequestReturn?: boolean;
     reportSummary?: ReportSummary;
 }
 
-export default function Show({ mission, canDownloadInvoice, canReview = false, canRequestReturn = false, reportSummary }: Props) {
+export default function Show({ mission, canDownloadInvoice, canReview = false, canRequestReturn = false, reportSummary, team = [], requiredAgents = 1 }: Props) {
+    // Accords : « l'intervenant » ou « les intervenants » selon l'équipe
+    const teamCount = Math.max(team.length, mission.agent ? 1 : 0);
+    const isTeam = teamCount > 1 || requiredAgents > 1;
+    const LeIntervenant = isTeam ? 'Les intervenants' : "L'intervenant";
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [lightboxImages, setLightboxImages] = useState<{ src: string; alt?: string; caption?: string }[]>([]);
@@ -233,25 +246,35 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 </Card>
                             )}
 
-                            {/* 2. Intervenant */}
+                            {/* 2. Intervenant(s) */}
                             {mission.agent && (
                                 <Card className="dark:bg-slate-800 dark:border-slate-700">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2 text-base dark:text-white">
                                             <User className="h-4 w-4 text-sky-500 dark:text-sky-400" />
-                                            Intervenant
+                                            {isTeam ? `Votre équipe (${teamCount} intervenant${teamCount > 1 ? 's' : ''})` : 'Intervenant'}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-sky-100 dark:bg-sky-900/50 rounded-full flex items-center justify-center">
-                                                <User className="h-6 w-6 text-sky-600 dark:text-sky-400" />
+                                        {(team.length > 0 ? team : [{ id: mission.agent.id, name: mission.agent.name, is_lead: true, arrived: false }]).map((member) => (
+                                            <div key={member.id} className="flex items-center gap-3">
+                                                <div className="w-11 h-11 bg-sky-100 dark:bg-sky-900/50 rounded-full flex items-center justify-center">
+                                                    <User className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="font-medium dark:text-white truncate">{member.name ?? 'Intervenant VIMAIZ'}</p>
+                                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                                        {isTeam && member.is_lead ? 'Intervenant référent' : 'Intervenant VIMAIZ'}
+                                                        {member.arrived ? ' · arrivé sur place' : ''}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="font-medium dark:text-white">{mission.agent.name}</p>
-                                                <p className="text-sm text-slate-500 dark:text-slate-400">Intervenant VIMAIZ</p>
-                                            </div>
-                                        </div>
+                                        ))}
+                                        {isTeam && teamCount < requiredAgents && (
+                                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                                                Équipe en cours de constitution : {teamCount} sur {requiredAgents} intervenants.
+                                            </p>
+                                        )}
                                         <Button
                                             type="button"
                                             variant="outline"
@@ -270,7 +293,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                 <CardContent className="p-6 text-center">
                                     <MapPin className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                                        L&apos;arrivée de l&apos;intervenant est vérifiée par géolocalisation à proximité
+                                        {isTeam ? "L'arrivée de chaque intervenant est vérifiée" : "L'arrivée de l'intervenant est vérifiée"} par géolocalisation à proximité
                                         du bien, et le début comme la fin de l&apos;intervention sont horodatés.
                                     </p>
                                 </CardContent>
@@ -452,7 +475,7 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                         {!showReturnForm ? (
                                             <div>
                                                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                                                    Si vous n'êtes pas satisfait de la prestation, vous pouvez demander un retour gratuit de l'intervenant dans les 48 heures suivant l'intervention.
+                                                    Si vous n'êtes pas satisfait de la prestation, vous pouvez demander un retour gratuit {isTeam ? 'des intervenants' : "de l'intervenant"} dans les 48 heures suivant l'intervention.
                                                 </p>
                                                 <Button
                                                     variant="outline"
@@ -537,13 +560,13 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
 
                                         {mission.return_status === 'pending' && (
                                             <p className="text-sm text-amber-700 dark:text-amber-300">
-                                                ⏳ L'intervenant a été notifié et va prendre en charge votre demande.
+                                                ⏳ {LeIntervenant} {isTeam ? 'ont été notifiés et vont prendre' : 'a été notifié et va prendre'} en charge votre demande.
                                             </p>
                                         )}
 
                                         {mission.return_status === 'in_progress' && (
                                             <p className="text-sm text-blue-700 dark:text-blue-300">
-                                                🔄 L'intervenant est en train d'effectuer le retour.
+                                                🔄 {LeIntervenant} {isTeam ? 'sont en train' : 'est en train'} d'effectuer le retour.
                                             </p>
                                         )}
 
@@ -551,13 +574,13 @@ export default function Show({ mission, canDownloadInvoice, canReview = false, c
                                             <div className="space-y-4">
                                                 {mission.return_agent_notes && (
                                                     <div>
-                                                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Notes de l'intervenant :</p>
+                                                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{isTeam ? 'Notes des intervenants :' : "Notes de l'intervenant :"}</p>
                                                         <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{mission.return_agent_notes}</p>
                                                     </div>
                                                 )}
                                                 <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
                                                     <p className="text-sm font-medium text-purple-800 dark:text-purple-300 mb-3">
-                                                        L'intervenant a terminé le retour. Êtes-vous satisfait ?
+                                                        {LeIntervenant} {isTeam ? 'ont terminé' : 'a terminé'} le retour. Êtes-vous satisfait ?
                                                     </p>
                                                     <Textarea
                                                         placeholder="Commentaire (optionnel)..."
