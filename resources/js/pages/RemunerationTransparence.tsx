@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Percent, ShieldCheck, Users, Wallet } from 'lucide-react';
+import { BadgeCheck, ShieldCheck, Users, Wallet } from 'lucide-react';
 
 const benefits = [
     {
@@ -35,9 +35,8 @@ export default function RemunerationTransparence() {
                             Rémunération et transparence
                         </h1>
                         <p className="mt-2 text-slate-600 dark:text-slate-400">
-                            Chez Vimaiz, nous valorisons votre expertise en vous connectant
-                            exclusivement à des propriétés de standing. Pour chaque forfait fixe,
-                            vous percevez 75 % du montant total de l&apos;intervention.
+                            Chez Vimaiz, votre expertise est précieuse. C&apos;est pourquoi nous
+                            veillons à ce que vous soyez rémunérés à votre juste valeur.
                         </p>
                     </div>
 
@@ -45,16 +44,17 @@ export default function RemunerationTransparence() {
                         <CardContent className="p-6">
                             <div className="flex items-start gap-4">
                                 <div className="bg-sky-100 dark:bg-sky-900/30 rounded-full p-3">
-                                    <Percent className="h-6 w-6 text-sky-600 dark:text-sky-400" />
+                                    <BadgeCheck className="h-6 w-6 text-sky-600 dark:text-sky-400" />
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-sky-900 dark:text-sky-100 mb-2">
-                                        Répartition 75 % / 25 %
+                                        Répartition 85&nbsp;% / 15&nbsp;%
                                     </h3>
                                     <p className="text-sm text-sky-700 dark:text-sky-300 leading-relaxed">
-                                        Les 25 % prélevés par la plateforme servent de réinvestissement
-                                        marketing, d&apos;amélioration continue et de sécurisation des
-                                        données. Ils se traduisent pour vous par des avantages concrets.
+                                        85&nbsp;% du montant total de chaque intervention reviennent aux
+                                        équipes d&apos;intervenants professionnels indépendants, tandis que
+                                        les 15&nbsp;% restants sont destinés à Vimaiz pour couvrir les frais
+                                        de gestion de la plateforme.
                                     </p>
                                 </div>
                             </div>
@@ -86,7 +86,7 @@ export default function RemunerationTransparence() {
                                     <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                                         Vous travaillez en synergie, vous terminez dans les délais sans
                                         vous épuiser, et vous percevez l&apos;intégralité de votre part
-                                        du forfait, soit 75 % du montant de l&apos;intervention.
+                                        du forfait, telle qu&apos;affichée avant l&apos;acceptation.
                                     </p>
                                 </div>
                             </div>

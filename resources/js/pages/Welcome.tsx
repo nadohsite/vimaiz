@@ -3,30 +3,28 @@ import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, ShieldCheck, UserCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import {
+    ANNEXES,
+    MAX_OPTION_QUANTITY,
+    MIN_SURFACE,
+    OPTIONS,
+    annexLabel,
+    estimate,
+    formatEuro,
+    optionsSummary,
+    type Annex,
+    type AnnexKey,
+    type OptionQuantities,
+} from '@/lib/tarification';
 
 const TYPE_OPTIONS = ['Appartement', 'Maison', 'Villa', 'Chalet', 'Gîte'] as const;
 
-/** Tarif ménage interne — non affiché au public */
-const PRICE_PER_M2 = 1.7;
-
 /**
- * Seuil minimal de superficie accepté sur Vimaiz (Volet 6.1 du cahier des
- * charges "grands espaces" — octobre 2026) : techniquement impossible de
- * saisir une valeur inférieure sur ce simulateur.
+ * Tarifs, annexes, options et taille d'équipe : voir resources/js/lib/tarification.ts
+ * (même grille que app/Support/Tarification.php). Seuil minimal : 200 m²
+ * (Volet 6.1 du cahier des charges « grands espaces »).
  */
-const MIN_SURFACE = 200;
 const DEFAULT_SURFACE = MIN_SURFACE;
-
-/**
- * Charge maximale par intervenant (décision du 14/10/2026 : 125 m², calculée
- * dynamiquement — pas de matrice fixe par palier). Le nombre d'intervenants
- * déployés est toujours le plus petit entier tel que superficie / n ≤ 125.
- */
-const MAX_M2_PER_INTERVENANT = 125;
-
-function intervenantsNeeded(surfaceM2: number): number {
-    return Math.max(2, Math.ceil(surfaceM2 / MAX_M2_PER_INTERVENANT));
-}
 
 const PROPRIETAIRE_FAQS = [
     {
@@ -484,24 +482,45 @@ export default function Welcome({
 
     const [typeValue, setTypeValue] = useState<(typeof TYPE_OPTIONS)[number]>('Villa');
     const [surfaceValue, setSurfaceValue] = useState(DEFAULT_SURFACE);
-    const [extraType, setExtraType] = useState('');
-    const [extraQty, setExtraQty] = useState(0);
-    const [extraSurface, setExtraSurface] = useState(0);
+    const [annexes, setAnnexes] = useState<Annex[]>([]);
+    const [options, setOptions] = useState<OptionQuantities>({});
     const [dateValue, setDateValue] = useState(todayIso);
     const [timeValue, setTimeValue] = useState('10:00');
     const [openFaq, setOpenFaq] = useState<string | null>(null);
 
     const surface = Math.max(MIN_SURFACE, surfaceValue);
-    const extraTotalSurface =
-        extraQty > 0 && extraSurface > 0 ? extraQty * Math.max(0, extraSurface) : 0;
-    const billableSurface = surface + extraTotalSurface;
-    const total = Math.round(billableSurface * PRICE_PER_M2);
-    const initialTotal = Math.round(DEFAULT_SURFACE * PRICE_PER_M2);
+    // Brief « Estimateur » : surface totale cumulée (principale + annexes),
+    // tarif au m² selon le palier, puis options ajoutées au forfait.
+    const pricing = estimate(surface, annexes, options);
+    const total = pricing.total;
+    const initialTotal = estimate(DEFAULT_SURFACE, [], {}).total;
     const [displayEstimate, setDisplayEstimate] = useState(initialTotal);
     const [flash, setFlash] = useState(false);
     const estimateRef = useRef(initialTotal);
-    const hasExtra = extraTotalSurface > 0;
-    const teamSize = intervenantsNeeded(surface);
+    const teamSize = pricing.teamSize;
+    const usedAnnexTypes = annexes.map((annex) => annex.type);
+    const nextAnnexType = ANNEXES.find((annex) => !usedAnnexTypes.includes(annex.key))?.key;
+    const selectedOptionsCount = Object.values(options).reduce((sum, qty) => sum + (qty ?? 0), 0);
+    const summaryParts = [
+        typeValue,
+        [
+            `${surface || 0} m²`,
+            ...pricing.annexes.map((annex) => `${annex.surface} m² (${annexLabel(annex.type)})`),
+        ].join(' + '),
+        timeValue,
+        ...optionsSummary(options),
+    ];
+
+    const updateAnnex = (index: number, patch: Partial<Annex>) =>
+        setAnnexes((current) =>
+            current.map((annex, i) => (i === index ? { ...annex, ...patch } : annex)),
+        );
+
+    const setOptionQuantity = (key: keyof OptionQuantities, quantity: number) =>
+        setOptions((current) => ({
+            ...current,
+            [key]: Math.min(MAX_OPTION_QUANTITY, Math.max(0, quantity)),
+        }));
 
     useEffect(() => {
         let frame = 0;
@@ -522,7 +541,7 @@ export default function Welcome({
             }
             const progress = Math.min((ts - startTime) / 320, 1);
             const eased = 1 - Math.pow(1 - progress, 3);
-            const value = Math.round(start + (target - start) * eased);
+            const value = Math.round((start + (target - start) * eased) * 100) / 100;
             estimateRef.current = value;
             setDisplayEstimate(value);
             if (progress < 1) {
@@ -1007,55 +1026,157 @@ export default function Welcome({
                                 </div>
                                 <details
                                     className="req-body req-extra"
-                                    open={extraQty > 0 || extraSurface > 0 || extraType !== ''}
+                                    onToggle={(e) => {
+                                        // Première ouverture : une ligne prête à remplir
+                                        if (e.currentTarget.open && annexes.length === 0 && nextAnnexType) {
+                                            setAnnexes([{ type: nextAnnexType, surface: 0 }]);
+                                        }
+                                    }}
                                 >
                                     <summary className="req-sub">
                                         Ajouter un espace en plus (optionnel)
                                     </summary>
-                                    <input
-                                        className="req-field"
-                                        type="text"
-                                        aria-label="Type d'espace en plus"
-                                        placeholder="Type de bien (ex. garage, annexe)"
-                                        value={extraType}
-                                        onChange={(e) => setExtraType(e.target.value)}
-                                    />
-                                    <div className="req-row-split" style={{ marginTop: 8 }}>
-                                        <input
-                                            className="req-field"
-                                            type="number"
-                                            min={0}
-                                            step={1}
-                                            inputMode="numeric"
-                                            aria-label="Nombre d'espaces en plus"
-                                            placeholder="Quantité"
-                                            value={extraQty || ''}
-                                            onChange={(e) =>
-                                                setExtraQty(
-                                                    e.target.value === ''
-                                                        ? 0
-                                                        : Math.max(0, Number(e.target.value)),
-                                                )
+                                    <p className="extra-hint">
+                                        Espaces annexes hors habitation principale. La surface
+                                        s&apos;ajoute à celle du logement.
+                                    </p>
+                                    {annexes.map((annex, index) => (
+                                        <div className="annex-row" key={index}>
+                                            <select
+                                                className="req-field annex-type"
+                                                aria-label="Type d'espace en plus"
+                                                value={annex.type}
+                                                onChange={(e) =>
+                                                    updateAnnex(index, {
+                                                        type: e.target.value as AnnexKey,
+                                                    })
+                                                }
+                                            >
+                                                {ANNEXES.filter(
+                                                    (option) =>
+                                                        option.key === annex.type ||
+                                                        !usedAnnexTypes.includes(option.key),
+                                                ).map((option) => (
+                                                    <option key={option.key} value={option.key}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <label className="annex-surface">
+                                                <input
+                                                    className="req-field"
+                                                    type="number"
+                                                    min={0}
+                                                    step={1}
+                                                    inputMode="numeric"
+                                                    aria-label={`Surface de l'espace en plus (${annexLabel(annex.type)}) en m²`}
+                                                    placeholder="0"
+                                                    value={annex.surface || ''}
+                                                    onChange={(e) =>
+                                                        updateAnnex(index, {
+                                                            surface: Math.max(
+                                                                0,
+                                                                Math.round(Number(e.target.value) || 0),
+                                                            ),
+                                                        })
+                                                    }
+                                                />
+                                                <span>m²</span>
+                                            </label>
+                                            <button
+                                                type="button"
+                                                className="annex-remove"
+                                                aria-label={`Retirer : ${annexLabel(annex.type)}`}
+                                                onClick={() =>
+                                                    setAnnexes((current) =>
+                                                        current.filter((_, i) => i !== index),
+                                                    )
+                                                }
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {nextAnnexType && annexes.length > 0 && (
+                                        <button
+                                            type="button"
+                                            className="annex-add"
+                                            onClick={() =>
+                                                setAnnexes((current) => [
+                                                    ...current,
+                                                    { type: nextAnnexType, surface: 0 },
+                                                ])
                                             }
+                                        >
+                                            + Ajouter un autre espace
+                                        </button>
+                                    )}
+                                </details>
+                            </div>
+                            <div className="req-row req-row-extra">
+                                <div className="req-icon">
+                                    <svg
+                                        width="19"
+                                        height="19"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M4 7h10M18 7h2M4 17h4M12 17h8"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                            strokeLinecap="round"
                                         />
-                                        <input
-                                            className="req-field"
-                                            type="number"
-                                            min={0}
-                                            step={1}
-                                            inputMode="numeric"
-                                            aria-label="Surface de l'espace en plus en m²"
-                                            placeholder="Surface m²"
-                                            value={extraSurface || ''}
-                                            onChange={(e) =>
-                                                setExtraSurface(
-                                                    e.target.value === ''
-                                                        ? 0
-                                                        : Math.max(0, Number(e.target.value)),
-                                                )
-                                            }
-                                        />
-                                    </div>
+                                        <circle cx="16" cy="7" r="2" stroke="currentColor" strokeWidth="1.7" />
+                                        <circle cx="10" cy="17" r="2" stroke="currentColor" strokeWidth="1.7" />
+                                    </svg>
+                                </div>
+                                <details className="req-body req-extra">
+                                    <summary className="req-sub">
+                                        Options &amp; équipements spécifiques (optionnel)
+                                        {selectedOptionsCount > 0 ? ` · ${selectedOptionsCount}` : ''}
+                                    </summary>
+                                    <ul className="option-list">
+                                        {OPTIONS.map((option) => {
+                                            const quantity = options[option.key] ?? 0;
+                                            return (
+                                                <li className="option-row" key={option.key}>
+                                                    <div className="option-text">
+                                                        <span className="option-label">{option.label}</span>
+                                                        {option.detail && (
+                                                            <span className="option-detail">{option.detail}</span>
+                                                        )}
+                                                        <span className="option-price">
+                                                            + {option.price} € / {option.unit}
+                                                        </span>
+                                                    </div>
+                                                    <div className="stepper">
+                                                        <button
+                                                            type="button"
+                                                            aria-label={`Retirer : ${option.label}`}
+                                                            disabled={quantity === 0}
+                                                            onClick={() =>
+                                                                setOptionQuantity(option.key, quantity - 1)
+                                                            }
+                                                        >
+                                                            −
+                                                        </button>
+                                                        <span aria-live="polite">{quantity}</span>
+                                                        <button
+                                                            type="button"
+                                                            aria-label={`Ajouter : ${option.label}`}
+                                                            onClick={() =>
+                                                                setOptionQuantity(option.key, quantity + 1)
+                                                            }
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
                                 </details>
                             </div>
                             </div>
@@ -1107,15 +1228,9 @@ export default function Welcome({
                             </div>
                             <span className="estimator-kicker">Estimation forfaitaire</span>
                             <div className={`estimator-price${flash ? ' flash' : ''}`}>
-                                {displayEstimate} €
+                                {formatEuro(displayEstimate)}
                             </div>
-                            <div className="estimator-detail">
-                                {typeValue} · {surface || 0} m²
-                                {hasExtra
-                                    ? ` + ${extraQty}×${extraSurface} m²${extraType ? ` (${extraType})` : ''}`
-                                    : ''}
-                                {' '}· {timeValue}
-                            </div>
+                            <div className="estimator-detail">{summaryParts.join(' • ')}</div>
 
                             <div className="estimator-team">
                                 <div className="estimator-team-icons" aria-hidden="true">
@@ -1130,7 +1245,7 @@ export default function Welcome({
                                         {teamSize} intervenant{teamSize > 1 ? 's' : ''} professionnel
                                         {teamSize > 1 ? 's' : ''} indépendant{teamSize > 1 ? 's' : ''}
                                     </strong>{' '}
-                                    mobilisé{teamSize > 1 ? 's' : ''} pour votre intervention.
+                                    mobilisé{teamSize > 1 ? 's' : ''} pour {pricing.totalSurface} m²
                                 </span>
                             </div>
 
@@ -1146,7 +1261,7 @@ export default function Welcome({
                             </div>
 
                             <Link className="btn btn-primary estimator-cta" href={ctaHref}>
-                                Réserver pour {total} €
+                                Réserver pour {formatEuro(total)}
                             </Link>
                             <p className="estimator-note">
                                 Aucun frais caché. Les intervenants ne sont payés qu&apos;après votre

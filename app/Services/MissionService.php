@@ -26,7 +26,9 @@ use App\Notifications\MissionStartedNotification;
 use App\Notifications\PaymentReceivedNotification;
 use App\Support\DefaultPropertyChecklist;
 use App\Support\InterventionReportCatalog;
+use App\Support\Brigade;
 use App\Support\ScheduledTime;
+use App\Support\Tarification;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -78,7 +80,7 @@ class MissionService
             'platform_fee' => $commissionAmount,
             'status' => Mission::STATUS_PENDING_AGENT,
             'payment_status' => Mission::PAYMENT_PENDING,
-            'required_agents' => $this->requiredAgentsForProperty($property),
+            'required_agents' => $this->requiredAgentsForProperty($property, $request->annexes),
         ]);
 
         return $mission;
@@ -90,13 +92,13 @@ class MissionService
      * sans exception. Les biens sous 200 m² (parc existant conservé,
      * décision du 14/10/2026) restent en mono-agent.
      */
-    protected function requiredAgentsForProperty(Property $property): int
+    protected function requiredAgentsForProperty(Property $property, ?array $annexes = null): int
     {
-        if ((float) $property->surface_area < 200) {
-            return 1;
-        }
-
-        return max(2, (int) ceil((float) $property->surface_area / 125));
+        // Brief « Estimateur » : l'équipe se calcule sur la surface totale
+        // cumulée (surface principale + m² des espaces annexes ajoutés).
+        return Brigade::sizeForSurface(
+            Tarification::totalSurface($property->surface_area, $annexes)
+        );
     }
 
     public function fulfillPaidQuote(Quote $quote, string $paymentIntentId): Mission

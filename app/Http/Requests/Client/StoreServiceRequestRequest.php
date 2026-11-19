@@ -37,6 +37,12 @@ class StoreServiceRequestRequest extends FormRequest
             'checklist_item_ids' => ['required', 'array', 'min:1'],
             'checklist_item_ids.*' => ['required', 'string', 'max:100'],
             'anomaly_id' => ['nullable', 'integer', 'exists:mission_anomalies,id'],
+            // Brief « Estimateur » : espaces annexes et options du forfait
+            'annexes' => ['nullable', 'array', 'max:10'],
+            'annexes.*.type' => ['required', 'string', \Illuminate\Validation\Rule::in(array_keys(\App\Support\Tarification::ANNEXES))],
+            'annexes.*.surface' => ['nullable', 'integer', 'min:0', 'max:'.\App\Support\Tarification::MAX_ANNEX_SURFACE],
+            'options' => ['nullable', 'array'],
+            'options.*' => ['integer', 'min:0', 'max:'.\App\Support\Tarification::MAX_OPTION_QUANTITY],
         ];
     }
 

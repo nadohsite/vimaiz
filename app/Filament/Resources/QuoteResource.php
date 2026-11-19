@@ -8,6 +8,8 @@ use App\Models\Quote;
 use App\Models\ServiceRequest;
 use App\Services\QuoteCalculationService;
 use App\Support\ScheduledTime;
+use App\Support\Brigade;
+use App\Support\Tarification;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -105,6 +107,46 @@ class QuoteResource extends Resource
             ],
         ];
 
+        // Brief « Estimateur » : annexes, options et forfait indicatif
+        // (surface totale cumulée × tarif au m² + options).
+        if ($request && $property) {
+            $estimate = Tarification::estimate($surface, $request->annexes, $request->options);
+
+            if ($estimate['annex_surface'] > 0) {
+                $characteristics[] = [
+                    'label' => 'Espaces annexes',
+                    'value' => collect($estimate['annexes'])
+                        ->map(fn ($annex) => $annex['label'].' '.$annex['surface'].' m²')
+                        ->implode(', '),
+                    'icon' => 'layers',
+                ];
+            }
+
+            $characteristics[] = [
+                'label' => 'Surface totale cumulée',
+                'value' => number_format($estimate['total_surface'], 0, ',', ' ').' m² — '
+                    .$estimate['team_size'].' '.Brigade::plural($estimate['team_size'], 'intervenant'),
+                'icon' => 'maximize',
+            ];
+
+            if ($estimate['options'] !== []) {
+                $characteristics[] = [
+                    'label' => 'Options',
+                    'value' => Tarification::optionsLabel($request->options),
+                    'icon' => 'sun',
+                ];
+            }
+
+            $characteristics[] = [
+                'label' => 'Forfait indicatif',
+                'value' => self::formatEuro($estimate['total'])
+                    .' ('.number_format($estimate['rate'], 2, ',', ' ').' €/m²'
+                    .($estimate['options_amount'] > 0 ? ' + '.self::formatEuro($estimate['options_amount']).' d\'options' : '')
+                    .')',
+                'icon' => 'layers',
+            ];
+        }
+
         return [
             'name' => $property?->name ?: ($property?->type_label ?: '—'),
             'type' => $property?->type_label ?: '—',
@@ -123,6 +165,18 @@ class QuoteResource extends Resource
         ];
     }
 
+    /** Forfait indicatif d'une demande, pré-rempli comme prix final du devis. */
+    public static function suggestedPrice(?ServiceRequest $request): ?float
+    {
+        $surface = $request?->property?->surface_area;
+
+        if (! $request || $surface === null) {
+            return null;
+        }
+
+        return Tarification::estimate($surface, $request->annexes, $request->options)['total'];
+    }
+
     protected static function formatScheduledTime(mixed $time): string
     {
         return ScheduledTime::toHi($time) ?? '—';
@@ -133,7 +187,7 @@ class QuoteResource extends Resource
      */
     protected static function amountsFromForm(Get $get): array
     {
-        $rate = (float) ($get('commission_rate') ?? (PricingRule::getActive()?->platform_commission_rate ?? 25));
+        $rate = (float) ($get('commission_rate') ?? (PricingRule::getActive()?->platform_commission_rate ?? Tarification::COMMISSION_RATE));
         $final = (float) ($get('final_price') ?? 0);
         $commission = round($final * ($rate / 100), 2);
 
@@ -180,6 +234,13 @@ class QuoteResource extends Resource
                                     if ($pricingRule) {
                                         $set('commission_rate', $pricingRule->platform_commission_rate);
                                     }
+
+                                    $suggested = self::suggestedPrice(
+                                        ServiceRequest::with('property')->find($state)
+                                    );
+                                    if ($suggested !== null) {
+                                        $set('final_price', $suggested);
+                                    }
                                 }
                             }),
                         Forms\Components\TextInput::make('quote_number')
@@ -215,7 +276,7 @@ class QuoteResource extends Resource
                                     ->label('Taux commission')
                                     ->numeric()
                                     ->suffix('%')
-                                    ->default(fn () => PricingRule::getActive()?->platform_commission_rate ?? 25)
+                                    ->default(fn () => PricingRule::getActive()?->platform_commission_rate ?? Tarification::COMMISSION_RATE)
                                     ->live(),
                             ]),
                         Grid::make(2)

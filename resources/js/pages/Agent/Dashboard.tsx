@@ -1,3 +1,4 @@
+import { formatEuro, shareOf } from '@/lib/tarification';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -33,6 +34,7 @@ interface Mission {
     scheduled_at: string;
     duration_hours: number;
     agent_payout: number;
+    required_agents?: number | null;
     property: Property;
     client?: {
         name: string;
@@ -260,7 +262,7 @@ export default function Dashboard({
                                                 À confirmer
                                             </span>
                                             <span className="font-mono text-lg font-bold text-slate-900 dark:text-white">
-                                                {Number(mission.agent_payout).toFixed(0)} €
+                                                {formatEuro(Math.round(shareOf(mission.agent_payout, mission.required_agents)))}
                                             </span>
                                         </div>
                                         <h3 className="font-semibold text-slate-900 capitalize dark:text-white">
@@ -341,7 +343,7 @@ export default function Dashboard({
                                                 </div>
                                                 <div className="flex flex-none items-center gap-2">
                                                     <span className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                                                        {Number(mission.agent_payout).toFixed(0)} €
+                                                        {formatEuro(Math.round(shareOf(mission.agent_payout, mission.required_agents)))}
                                                     </span>
                                                     <ChevronRight className="h-4 w-4 text-slate-400" />
                                                 </div>
@@ -392,7 +394,7 @@ export default function Dashboard({
                                                         Intervention terminée
                                                     </span>
                                                     <span className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
-                                                        {Number(mission.agent_payout).toFixed(0)} €
+                                                        {formatEuro(Math.round(shareOf(mission.agent_payout, mission.required_agents)))}
                                                     </span>
                                                 </div>
                                             </Link>

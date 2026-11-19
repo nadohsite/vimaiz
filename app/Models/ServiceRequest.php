@@ -21,6 +21,8 @@ class ServiceRequest extends Model
         'scheduled_date',
         'scheduled_time',
         'requested_hours',
+        'annexes',
+        'options',
         'special_instructions',
         'checklist',
         'status',
@@ -32,6 +34,8 @@ class ServiceRequest extends Model
         'scheduled_date' => 'date',
         'cancelled_at' => 'datetime',
         'checklist' => 'array',
+        'annexes' => 'array',
+        'options' => 'array',
     ];
 
     // status_label is read directly by the frontend (Requests/Show.tsx,

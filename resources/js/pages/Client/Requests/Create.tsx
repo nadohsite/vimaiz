@@ -10,6 +10,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Home, Calendar, ClipboardList, FileText, Send, Wrench } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import type { ChecklistSection } from '@/components/property/PropertyChecklistEditor';
+import ForfaitOptions from '@/components/pricing/forfait-options';
+import type { Annex, OptionQuantities } from '@/lib/tarification';
 
 interface Property {
     id: number;
@@ -66,6 +68,8 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
         checklist_section_ids: initialIds.sectionIds,
         checklist_item_ids: initialIds.itemIds,
         anomaly_id: fromAnomaly?.id ?? null,
+        annexes: [] as Annex[],
+        options: {} as OptionQuantities,
     });
 
     const selectedProperty = useMemo(
@@ -435,6 +439,17 @@ export default function Create({ properties, minDate, maxDate, selectedPropertyI
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {selectedProperty && (
+                            <ForfaitOptions
+                                surface={Number(selectedProperty.surface_area) || 0}
+                                annexes={data.annexes}
+                                options={data.options}
+                                onAnnexesChange={(annexes) => setData('annexes', annexes)}
+                                onOptionsChange={(options) => setData('options', options)}
+                                errors={errors as Record<string, string | undefined>}
+                            />
+                        )}
 
                         <Card className="dark:bg-slate-800 dark:border-slate-700">
                             <CardHeader>

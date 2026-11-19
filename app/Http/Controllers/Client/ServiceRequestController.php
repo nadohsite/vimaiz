@@ -120,6 +120,8 @@ class ServiceRequestController extends Controller
             'scheduled_date' => $data['scheduled_date'],
             'scheduled_time' => $data['scheduled_time'],
             'requested_hours' => $data['requested_hours'] ?? null,
+            'annexes' => \App\Support\Tarification::sanitizeAnnexes($data['annexes'] ?? []) ?: null,
+            'options' => \App\Support\Tarification::sanitizeOptions($data['options'] ?? []) ?: null,
             'special_instructions' => $data['special_instructions'] ?? null,
             'checklist' => $checklist,
             'status' => ServiceRequest::STATUS_PENDING,

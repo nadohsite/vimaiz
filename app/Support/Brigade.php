@@ -27,7 +27,9 @@ class Brigade
 
     public static function size(Mission $mission): int
     {
-        return max(1, (int) ($mission->required_agents ?: self::sizeForSurface($mission->property?->surface_area)));
+        return max(1, (int) ($mission->required_agents ?: self::sizeForSurface(
+            Tarification::totalSurface($mission->property?->surface_area, $mission->serviceRequest?->annexes)
+        )));
     }
 
     /**
@@ -67,9 +69,11 @@ class Brigade
         return $count > 1 ? ($plural ?? $singular.'s') : $singular;
     }
 
-    /** « 3 intervenants certifiés » / « 1 intervenant certifié » */
+    /** « 3 intervenants professionnels indépendants » / « 1 intervenant professionnel indépendant » */
     public static function label(int $size): string
     {
-        return $size > 1 ? $size.' intervenants certifiés' : '1 intervenant certifié';
+        return $size > 1
+            ? $size.' intervenants professionnels indépendants'
+            : '1 intervenant professionnel indépendant';
     }
 }

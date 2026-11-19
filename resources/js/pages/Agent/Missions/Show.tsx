@@ -1,3 +1,4 @@
+import { formatEuro, shareOf } from '@/lib/tarification';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -58,6 +59,7 @@ interface Mission {
     actual_duration_label: string | null;
     estimated_duration_label: string | null;
     agent_payout: number;
+    required_agents?: number | null;
     status: string;
     status_label: string;
     checklist: Array<{
@@ -278,7 +280,14 @@ export default function Show({
                                     <h1 className="text-2xl font-bold text-slate-900">{mission.mission_number}</h1>
                                     <Badge className={getStatusColor(mission.status)}>{mission.status_label}</Badge>
                                 </div>
-                                <p className="text-lg font-bold text-green-600 mt-1">{mission.agent_payout} €</p>
+                                <p className="text-lg font-bold text-green-600 mt-1">
+                                    {formatEuro(shareOf(mission.agent_payout, mission.required_agents))}
+                                    <span className="ml-2 text-sm font-medium text-slate-500">
+                                        {(mission.required_agents ?? 1) > 1
+                                            ? `votre gain · ${formatEuro(Number(mission.agent_payout))} pour l'équipe de ${mission.required_agents}`
+                                            : 'votre gain'}
+                                    </span>
+                                </p>
                             </div>
                             {canDownloadInvoice && mission.invoice && (
                                 <a href={route('agent.missions.invoice', mission.id)}>

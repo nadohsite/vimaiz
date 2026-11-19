@@ -123,8 +123,11 @@ Route::get('/a-propos', function () {
 // About.tsx appellent route('remuneration-transparence'), qui n'existait plus
 // que sous le nom 'agent.remuneration-transparence' depuis la réorganisation
 // des routes agent).
+// La répartition 85 % / 15 % n'est affichée que dans l'espace intervenant :
+// l'ancienne adresse publique renvoie vers la page de l'espace intervenant
+// (connexion intervenant obligatoire).
 Route::get('/remuneration-transparence', function () {
-    return Inertia::render('RemunerationTransparence');
+    return redirect()->route('agent.remuneration-transparence');
 })->name('remuneration-transparence');
 
 Route::get('/contact', function () {

@@ -1,3 +1,4 @@
+import { formatEuro, shareOf } from '@/lib/tarification';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,6 +27,7 @@ interface Mission {
     scheduled_at: string;
     duration_hours: number;
     agent_payout: number;
+    required_agents?: number | null;
     status: string;
     status_label: string;
     property: Property;
@@ -154,9 +156,14 @@ export default function Index({ missions, currentStatus, statuses }: Props) {
                                                 <div className="flex items-center justify-between sm:justify-end gap-4">
                                                     <div className="text-right">
                                                         <p className="text-lg font-bold text-green-600">
-                                                            {mission.agent_payout} €
+                                                            {formatEuro(shareOf(mission.agent_payout, mission.required_agents))}
                                                         </p>
-                                                        <p className="text-xs text-slate-500">Votre gain</p>
+                                                        <p className="text-xs text-slate-500">
+                                                            Votre gain
+                                                            {(mission.required_agents ?? 1) > 1
+                                                                ? ` · ${formatEuro(Number(mission.agent_payout))} pour l'équipe de ${mission.required_agents}`
+                                                                : ''}
+                                                        </p>
                                                     </div>
                                                     {mission.status !== 'pending_agent' && (
                                                         <Link href={route('agent.missions.show', mission.id)}>
