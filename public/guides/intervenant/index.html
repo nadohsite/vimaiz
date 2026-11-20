@@ -39,7 +39,7 @@
     .cover-brand img { height: 40px; width: auto; filter: brightness(0) invert(1); }
     .cover-brand span { font-weight: 700; letter-spacing: .02em; }
     header.cover h1 { font-size: 2.15rem; line-height: 1.2; margin: 0 0 12px; }
-    header.cover p.lead { font-size: 1.1rem; opacity: .95; max-width: 640px; margin: 0; }
+    header.cover p.lead { color: #fff; font-size: 1.1rem; opacity: .95; max-width: 640px; margin: 0; }
     .meta { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px; }
     .pill {
       background: rgba(255,255,255,.18);
@@ -181,13 +181,15 @@
       </div>
       <h1>Guide utilisateur intervenant</h1>
       <p class="lead">
-        De la création de votre compte jusqu’au paiement : toutes les étapes
-        pour rejoindre le réseau, accepter des interventions et retirer vos gains.
+        Vous êtes un intervenant professionnel indépendant du secteur de l’entretien ?
+        De la création de votre compte jusqu’au paiement : toutes les étapes pour
+        rejoindre Vimaiz, intervenir en équipe dans des propriétés de grande
+        superficie et retirer vos gains.
       </p>
       <div class="meta">
         <span class="pill">Parcours complet</span>
         <span class="pill">Captures de l’espace pro</span>
-        <span class="pill">Septembre 2026</span>
+        <span class="pill">Novembre 2026</span>
       </div>
     </div>
   </header>
@@ -212,9 +214,12 @@
 
     <h2 class="chapter" id="parcours">1. Le parcours en un coup d’œil</h2>
     <p>
-      Vimaiz met en relation des propriétaires de locations saisonnières avec des
-      professionnels du ménage. Vous restez libre d’accepter ou de refuser chaque
-      intervention. Le montant affiché est <strong>votre rémunération nette</strong> :
+      Vimaiz accompagne exclusivement les propriétaires de biens de
+      <strong>200&nbsp;m² minimum</strong> proposés en location courte durée. Chaque
+      intervention est réalisée par une <strong>équipe d’intervenants professionnels
+      indépendants</strong> co-assignés selon la superficie (125&nbsp;m² maximum par
+      intervenant, au moins deux dès 200&nbsp;m²). Vous restez libre d’accepter ou de
+      refuser chaque proposition. Le montant affiché est <strong>votre rémunération nette</strong> :
       c’est exactement ce qui vous sera versé.
     </p>
     <div class="steps">
@@ -229,7 +234,8 @@
     </div>
     <div class="callout info">
       <p>
-        <strong>Prérequis.</strong> Vous devez exercer légalement
+        <strong>Prérequis.</strong> Professionnels indépendants déclarés —
+        <strong>numéro SIRET obligatoire</strong>. Vous devez exercer légalement
         (micro-entreprise, société ou autre statut déclaré). Une pièce d’identité,
         un justificatif de domicile de moins de 3 mois et un extrait KBIS / INSEE
         sont obligatoires. L’assurance RCP est fortement recommandée dès l’inscription
@@ -265,8 +271,8 @@
       <li><strong>Type d’intervenant</strong> : Indépendant ou Agence / Société.</li>
       <li><strong>Téléphone professionnel</strong>.</li>
       <li><strong>Années d’expérience</strong>.</li>
-      <li><strong>Surface maximale</strong> : petite (− 50 m²), moyenne (− 100 m²), grande (− 200 m²) ou illimitée.</li>
-      <li><strong>Types de biens</strong> : appartement, maison, villa, chalet, gîte.</li>
+      <li><strong>Surface maximale</strong> : indication de votre expérience. Les missions Vimaiz portent toutes sur des biens de 200&nbsp;m² ou plus, réalisés en équipe : votre part ne dépasse jamais 125&nbsp;m².</li>
+      <li><strong>Types de biens</strong> : villa, maison, chalet, gîte, grand appartement.</li>
       <li><strong>Localisation de référence</strong> : saisissez votre adresse et <em>choisissez-la dans la liste</em>. Les missions vous sont proposées dans un rayon d’environ <strong>150 km</strong>.</li>
     </ul>
     <figure>
@@ -391,17 +397,18 @@
 
     <h2 class="chapter" id="propositions">8. Recevoir et accepter une intervention</h2>
     <p>
-      Dès qu’une mission correspond à votre zone, vous êtes notifié
+      Dès qu’une mission correspond à votre zone, vous êtes notifié qu’une place
+      d’équipe vous est proposée
       (« Une intervention vous est proposée »). Elle apparaît :
     </p>
     <ul class="docs">
-      <li>sur le <strong>tableau de bord</strong>, encadré orange « À confirmer », avec le gain et la date ;</li>
+      <li>sur le <strong>tableau de bord</strong>, encadré orange « À confirmer », avec votre gain et la date ;</li>
       <li>dans <strong>Mes interventions</strong>, avec le filtre de statut ;</li>
       <li>en détail, en cliquant sur la mission.</li>
     </ul>
     <figure>
       <img src="captures/10-interventions.png" alt="Liste Mes interventions" />
-      <figcaption>Fig. 10 — Liste des interventions : numéro, ville, date/heure et « Votre gain » (rémunération nette).</figcaption>
+      <figcaption>Fig. 10 — Liste des interventions : numéro, ville, date/heure et « Votre gain » (votre part nette ; le montant de l’équipe est indiqué à côté).</figcaption>
     </figure>
     <p>Sur une proposition, deux actions s’affichent :</p>
     <div class="btn-row">
@@ -409,13 +416,15 @@
       <span class="fake-btn red">✕ Décliner</span>
     </div>
     <ul class="docs">
-      <li><strong>Accepter</strong> : vous devenez responsable de l’intervention et les autres intervenants ne pourront plus la valider.</li>
-      <li><strong>Décliner</strong> : la mission disparaît de votre liste, redevient disponible et est proposée aux autres intervenants.</li>
+      <li><strong>Accepter</strong> : vous rejoignez l’équipe de l’intervention. Le premier intervenant qui accepte en devient le <strong>référent</strong>.</li>
+      <li><strong>Décliner</strong> : la proposition disparaît de votre liste et votre place est proposée à un autre intervenant.</li>
     </ul>
     <div class="callout warn">
       <p>
-        Le premier intervenant qui accepte la mission se la voit attribuer. Relisez bien
-        tous les détails et vérifiez qu’elle vous correspond avant de confirmer.
+        L’intervention est confirmée au propriétaire uniquement quand l’équipe est
+        réunie, c’est-à-dire quand tous les intervenants prévus ont accepté. Relisez
+        bien tous les détails avant de confirmer : un désistement oblige Vimaiz à
+        trouver un remplaçant.
       </p>
     </div>
     <figure>
@@ -458,7 +467,7 @@
     <ol class="howto">
       <li>Cliquez sur <strong>Terminer l’intervention</strong>.</li>
       <li>Si tout est conforme : <strong>Rien à signaler</strong> (rapport généré automatiquement).</li>
-      <li>Sinon : <strong>Oui, signaler un élément</strong>, choisissez le lieu puis le type d’anomalie.</li>
+      <li>Sinon : <strong>Oui, signaler un élément</strong>, choisissez le lieu puis le type d’anomalie. Les <strong>photos</strong> sont à transmettre uniquement dans ce cas, en cas d’anomalie ou de dégradation constatée.</li>
     </ol>
     <figure>
       <img src="captures/12-rapport-fin.png" alt="Fenêtre Rapport de fin d’intervention" />
@@ -475,7 +484,10 @@
 
     <h2 class="chapter" id="paiement">10. Portefeuille et paiement</h2>
     <p>
-      À la clôture de l’intervention, votre gain est <strong>crédité sur le portefeuille</strong>
+      À la clôture de l’intervention, votre part apparaît <strong>en attente</strong>
+      sur le portefeuille pendant <strong>48&nbsp;heures</strong> : c’est le délai dont
+      dispose le propriétaire pour consulter le compte rendu et signaler une
+      éventuelle non-conformité. Passé ce délai, elle est <strong>créditée</strong>
       (notification du type « 56,25 € crédités »). Menu <strong>Mon portefeuille</strong>.
     </p>
     <figure>
@@ -503,7 +515,7 @@
     <div class="callout info">
       <p>
         <strong>Solde disponible</strong> = déjà crédité et retirable.
-        <strong>En attente</strong> = paiement encore en cours de traitement.
+        <strong>En attente</strong> = paiement retenu 48&nbsp;h après la clôture, ou en cours de traitement.
         L’historique liste chaque crédit de mission et chaque retrait.
       </p>
     </div>
@@ -516,7 +528,7 @@
     </p>
     <figure>
       <img src="captures/17-messages.png" alt="Liste des conversations" />
-      <figcaption>Fig. 16 — Conversations avec les clients rattachés à vos interventions.</figcaption>
+      <figcaption>Fig. 16 — Conversations avec les propriétaires rattachés à vos interventions, encadrées par la plateforme.</figcaption>
     </figure>
 
     <h3>Avis clients</h3>
@@ -547,7 +559,8 @@
       </thead>
       <tbody>
         <tr><td>Dois-je accepter toutes les missions ?</td><td>Non. Vous restez libre selon vos disponibilités.</td></tr>
-        <tr><td>Quel montant vais-je toucher ?</td><td>Celui affiché en vert (« Votre gain ») : c’est le montant qui vous est versé.</td></tr>
+        <tr><td>Quel montant vais-je toucher ?</td><td>Celui affiché en vert (« Votre gain ») : c’est votre part, versée 48 h après la clôture.</td></tr>
+        <tr><td>Vais-je travailler seul ?</td><td>Non. Chaque intervention est réalisée en équipe, 125 m² maximum par intervenant.</td></tr>
         <tr><td>Dois-je apporter le matériel ?</td><td>Oui, sauf mention contraire dans la fiche mission.</td></tr>
         <tr><td>Pourquoi je ne reçois pas de missions ?</td><td>Vérifiez adresse GPS, documents « Vérifié » et clause RCP.</td></tr>
         <tr><td>Comment retirer l’argent ?</td><td>IBAN enregistré, puis Demander un retrait (min. 1 €).</td></tr>
@@ -555,7 +568,7 @@
     </table>
     <div class="callout ok">
       <p>
-        Besoin d’aide ? Utilisez la page <strong>Contact</strong> du site Vimaiz
+        Besoin d’aide ? Écrivez à <strong>contact@vimaiz.com</strong>, utilisez la page <strong>Contact</strong> du site Vimaiz
         ou répondez à un e-mail de notification. Conservez vos justificatifs à jour
         pour rester éligible aux nouvelles interventions.
       </p>
@@ -563,7 +576,7 @@
 
     <footer class="guide-foot">
       Guide utilisateur intervenant — Vimaiz Espace pro · Captures réalisées sur l’interface réelle ·
-      Document interne / formation · Septembre 2026
+      Document interne / formation · Novembre 2026
     </footer>
   </div>
 </body>

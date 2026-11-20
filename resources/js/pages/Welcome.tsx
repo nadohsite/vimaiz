@@ -1263,10 +1263,6 @@ export default function Welcome({
                             <Link className="btn btn-primary estimator-cta" href={ctaHref}>
                                 Réserver pour {formatEuro(total)}
                             </Link>
-                            <p className="estimator-note">
-                                Aucun frais caché. Les intervenants ne sont payés qu&apos;après votre
-                                validation.
-                            </p>
                         </aside>
                     </div>
                 </div>
